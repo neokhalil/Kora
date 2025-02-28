@@ -774,10 +774,11 @@ const ChatAssistant: React.FC = () => {
                                   const b = parseInt(params[2]);
                                   const c = parseInt(params[3]);
                                   
-                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
+                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
                                 } else {
-                                  // Fallback plus générique
-                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** la variable $x$\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
+                                  // Fallback plus générique pour les équations algébriques non standard
+                                  const equationComplete = equation.includes('=') ? equation : `${equation} = ?`;
+                                  solution = `Pour résoudre l'équation $${equationComplete}$ :\n\n1. **Isoler** la variable $x$\n\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
                                 }
                               } else {
                                 solution = `La réponse à cette équation est **$x = ${answer}$**`;
@@ -789,7 +790,7 @@ const ChatAssistant: React.FC = () => {
                               const radiusMatch = originalContent.match(/rayon\s+de\s+\$(\d+)\$/i);
                               if (radiusMatch && radiusMatch[1]) {
                                 const radius = parseInt(radiusMatch[1]);
-                                solution = `Pour calculer l'aire d'un cercle avec un rayon de $${radius}$ cm :\n\n1. **Appliquer** la formule de l'aire d'un cercle: $A = \\pi r^2$\n2. **Remplacer** $r$ par $${radius}$\n   $A = \\pi \\times ${radius}^2$\n   $A = \\pi \\times ${radius * radius}$\n   $A \\approx 3.14159 \\times ${radius * radius}$\n   $A \\approx ${Math.PI * radius * radius}$\n\n3. **Arrondir** à l'entier le plus proche\n   $A \\approx ${answer}$ cm$^2$\n\nLa réponse est donc **$${answer}$ cm$^2$**`;
+                                solution = `Pour calculer l'aire d'un cercle avec un rayon de $${radius}$ cm :\n\n1. **Appliquer** la formule de l'aire d'un cercle: $A = \\pi r^2$\n\n2. **Remplacer** $r$ par $${radius}$\n\n   $A = \\pi \\times ${radius}^2$\n\n   $A = \\pi \\times ${radius * radius}$\n\n   $A \\approx 3.14159 \\times ${radius * radius}$\n\n   $A \\approx ${Math.PI * radius * radius}$\n\n3. **Arrondir** à l'entier le plus proche\n\n   $A \\approx ${answer}$ cm$^2$\n\nLa réponse est donc **$${answer}$ cm$^2$**`;
                               } else {
                                 solution = `Pour calculer l'aire du cercle, j'ai utilisé la formule $A = \\pi r^2$ et arrondi à l'entier le plus proche.\n\nLa réponse est **$${answer}$ cm$^2$**`;
                               }
@@ -804,7 +805,7 @@ const ChatAssistant: React.FC = () => {
                                 const derivCoeff = coefficient * power;
                                 const derivPower = power - 1;
                                 
-                                solution = `Pour dériver la fonction $f(x) = ${coefficient}x^{${power}}$ :\n\n1. **Appliquer** la règle de dérivation pour les fonctions puissance:\n   $\\frac{d}{dx}[x^n] = nx^{n-1}$\n\n2. **Utiliser** la règle du coefficient constant: $\\frac{d}{dx}[cf(x)] = c\\frac{d}{dx}[f(x)]$\n\n3. **Calculer** la dérivée:\n   $f'(x) = ${coefficient} \\times ${power} \\times x^{${power}-1}$\n   $f'(x) = ${derivCoeff}x^{${derivPower}}$\n\nLa réponse est donc **$f'(x) = ${answer}$**`;
+                                solution = `Pour dériver la fonction $f(x) = ${coefficient}x^{${power}}$ :\n\n1. **Appliquer** la règle de dérivation pour les fonctions puissance:\n\n   $\\frac{d}{dx}[x^n] = nx^{n-1}$\n\n2. **Utiliser** la règle du coefficient constant:\n\n   $\\frac{d}{dx}[cf(x)] = c\\frac{d}{dx}[f(x)]$\n\n3. **Calculer** la dérivée:\n\n   $f'(x) = ${coefficient} \\times ${power} \\times x^{${power}-1}$\n\n   $f'(x) = ${derivCoeff}x^{${derivPower}}$\n\nLa réponse est donc **$f'(x) = ${answer}$**`;
                               } else {
                                 solution = `Pour dériver cette fonction, j'ai appliqué les règles standard de dérivation.\n\nLa réponse est **$f'(x) = ${answer}$**`;
                               }
