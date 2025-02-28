@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, Image as ImageIcon, FileText, X } from 'lucide-react';
+import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, Image, ImagePlus, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
@@ -46,8 +46,13 @@ const ChatAssistant: React.FC = () => {
   const [isThinking, setIsThinking] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [challengeAnswers, setChallengeAnswers] = useState<Record<string, string>>({});
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageSubject, setImageSubject] = useState<string>('general');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -401,10 +406,126 @@ const ChatAssistant: React.FC = () => {
     }, 500);
   };
 
+  // Handle image selection
+  const handleImageSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check if the file is an image
+      if (!file.type.startsWith('image/')) {
+        alert('Veuillez sélectionner une image valide.');
+        return;
+      }
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('L\'image est trop grande. La taille maximale est de 5MB.');
+        return;
+      }
+      
+      setSelectedImage(file);
+      
+      // Create image preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Clear selected image
+  const handleClearImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
+  // Upload image and get analysis
+  const handleImageAnalysis = async () => {
+    if (!selectedImage) return;
+    
+    setIsUploadingImage(true);
+    setIsThinking(true);
+    
+    // Add user message with image
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: inputValue || "Peux-tu m'aider avec cette image ?",
+      sender: 'user',
+      imageUrl: imagePreview || undefined
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Create form data for the file upload
+    const formData = new FormData();
+    formData.append('image', selectedImage);
+    
+    // Add optional subject field
+    formData.append('subject', imageSubject);
+    
+    // Add optional query text
+    if (inputValue.trim()) {
+      formData.append('query', inputValue);
+    }
+    
+    try {
+      // Send the request to the server
+      const response = await fetch('/api/image-analysis', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      // Parse the response
+      const data = await response.json();
+      
+      // Add response to messages
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        isImageAnalysis: true,
+        allowActions: true
+      }]);
+      
+      // Clear image and input
+      handleClearImage();
+      setInputValue('');
+      
+    } catch (error) {
+      console.error('Error analyzing image:', error);
+      
+      // Show error message
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème lors de l'analyse de cette image. Veuillez réessayer ou utiliser une autre image.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsUploadingImage(false);
+      setIsThinking(false);
+    }
+  };
+  
+  // Open file browser dialog
+  const handleOpenFileBrowser = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (selectedImage) {
+        handleImageAnalysis();
+      } else {
+        handleSendMessage();
+      }
     }
   };
   
@@ -987,19 +1108,91 @@ const ChatAssistant: React.FC = () => {
         
         {/* Input area */}
         <div className="border-t p-3">
+          {/* Image preview area (shown when an image is selected) */}
+          {imagePreview && (
+            <div className="mb-3 relative">
+              <div className="rounded-lg overflow-hidden relative max-h-[200px]">
+                <img
+                  src={imagePreview}
+                  alt="Aperçu de l'image"
+                  className="max-w-full object-contain mx-auto"
+                  style={{ maxHeight: '200px' }}
+                />
+                <button 
+                  onClick={handleClearImage}
+                  className="absolute top-2 right-2 bg-gray-800 bg-opacity-70 text-white rounded-full p-1 hover:bg-opacity-90"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {inputValue ? (
+                <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                  {inputValue}
+                </div>
+              ) : (
+                <div className="mt-2 text-sm text-gray-400 dark:text-gray-500 italic">
+                  Ajoute un message pour préciser ta question (optionnel)
+                </div>
+              )}
+              <Button
+                className="mt-2 w-full"
+                onClick={handleImageAnalysis}
+                disabled={isUploadingImage}
+              >
+                {isUploadingImage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyse en cours...
+                  </>
+                ) : (
+                  <>
+                    <ImagePlus className="h-4 w-4 mr-2" />
+                    Analyser cette image
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+          
           <div className="flex items-center space-x-2">
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Pose ta question à Kora..."
+              placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
               className="flex-1"
-              disabled={isThinking}
+              disabled={isThinking || isUploadingImage}
             />
+            
+            {/* Hidden file input for image upload */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleImageSelect}
+              onClick={(e) => {
+                // Reset the value to allow selecting the same file again
+                (e.target as HTMLInputElement).value = '';
+              }}
+            />
+            
+            {/* Image upload button */}
+            <Button
+              size="icon"
+              variant="outline"
+              disabled={isThinking || isUploadingImage}
+              onClick={handleOpenFileBrowser}
+              title="Télécharger une image"
+            >
+              <Image className="h-5 w-5" />
+            </Button>
+            
+            {/* Send message button */}
             <Button 
               size="icon" 
-              disabled={!inputValue.trim() || isThinking} 
-              onClick={handleSendMessage}
+              disabled={(selectedImage ? false : !inputValue.trim()) || isThinking || isUploadingImage} 
+              onClick={selectedImage ? handleImageAnalysis : handleSendMessage}
             >
               <Send className="h-5 w-5" />
             </Button>
