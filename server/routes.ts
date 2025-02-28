@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // File filter to only allow image files
-  const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  const imageFileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     // Accept only images
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
@@ -42,11 +42,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
   
+  // File filter for audio files
+  const audioFileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    // Accept audio files
+    const validAudioTypes = [
+      'audio/wav', 'audio/mpeg', 'audio/mp4', 'audio/ogg', 
+      'audio/webm', 'audio/x-m4a', 'audio/mp3'
+    ];
+    
+    if (validAudioTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only audio files are allowed'));
+    }
+  };
+  
+  // Multer config for image uploads
   const upload = multer({ 
     storage: multerStorage, 
-    fileFilter,
+    fileFilter: imageFileFilter,
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    }
+  });
+  
+  // Multer config for audio uploads
+  const audioUpload = multer({
+    storage: multerStorage,
+    fileFilter: audioFileFilter,
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB file size limit for audio
     }
   });
   // Create a shared conversation history map for all types of interactions
@@ -237,6 +262,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error in challenge problem request:', error);
       res.status(500).json({ message: 'Failed to generate challenge problem' });
+    }
+  });
+
+  // Endpoint for audio transcription with Whisper API
+  app.post('/api/transcribe', audioUpload.single('audio'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No audio file uploaded' });
+      }
+
+      // Get language from query parameters or body, default to French
+      const language = req.body.language || 'fr';
+      
+      // Get optional session ID for context tracking
+      const sessionId = req.body.sessionId || 'default';
+      
+      console.log(`Processing audio transcription request: ${req.file.originalname}, language: ${language}`);
+      
+      // Process the audio file with Whisper API
+      const transcriptionResult = await handleAudioTranscription(req.file, { 
+        language
+      });
+      
+      // Store in conversation context if we have a valid session ID
+      if (sessionId !== 'default') {
+        // Ensure this user has conversation history
+        if (!userConversations.has(sessionId)) {
+          userConversations.set(sessionId, []);
+        }
+        
+        // Get the conversation history
+        const conversationHistory = userConversations.get(sessionId) || [];
+        
+        // Add the current interaction to history
+        if (transcriptionResult.text) {
+          conversationHistory.push({ 
+            role: 'user', 
+            content: transcriptionResult.text
+          });
+          
+          // Update the map
+          userConversations.set(sessionId, conversationHistory);
+        }
+      }
+      
+      // Return the transcription result
+      res.json({
+        text: transcriptionResult.text,
+        duration: transcriptionResult.duration,
+        language: transcriptionResult.language,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error processing audio transcription:', error);
+      res.status(500).json({ 
+        message: 'Failed to transcribe audio',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 

@@ -21,6 +21,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import VoiceRecorder from '@/components/VoiceRecorder';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
@@ -1413,61 +1414,106 @@ const ChatAssistant: React.FC = () => {
             </div>
           )}
           
-          <div className="flex items-center space-x-2">
-            <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
-              className="flex-1"
-              disabled={isThinking || isUploadingImage || isCameraActive}
-            />
-            
-            {/* Hidden file input for image upload */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageSelect}
-              onClick={(e) => {
-                // Reset the value to allow selecting the same file again
-                (e.target as HTMLInputElement).value = '';
-              }}
-            />
-            
-            {/* Image upload button */}
-            <Button
-              size="icon"
-              variant="outline"
-              disabled={isThinking || isUploadingImage || isCameraActive}
-              onClick={handleOpenFileBrowser}
-              title="Télécharger une image"
-            >
-              <ImageIcon className="h-5 w-5" />
-            </Button>
-            
-            {/* Temporarily disabled camera button until we can fix cross-platform compatibility */}
-            {/* {isMobileDevice && (
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
+                className="flex-1"
+                disabled={isThinking || isUploadingImage || isCameraActive}
+              />
+              
+              {/* Hidden file input for image upload */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageSelect}
+                onClick={(e) => {
+                  // Reset the value to allow selecting the same file again
+                  (e.target as HTMLInputElement).value = '';
+                }}
+              />
+              
+              {/* Image upload button */}
               <Button
                 size="icon"
                 variant="outline"
-                disabled={isThinking || isUploadingImage}
-                onClick={toggleCamera}
-                title={isCameraActive ? "Fermer la caméra" : "Prendre une photo"}
+                disabled={isThinking || isUploadingImage || isCameraActive}
+                onClick={handleOpenFileBrowser}
+                title="Télécharger une image"
               >
-                <Camera className={`h-5 w-5 ${isCameraActive ? 'text-red-500' : ''}`} />
+                <ImageIcon className="h-5 w-5" />
               </Button>
-            )} */}
-            
-            {/* Send message button */}
-            <Button 
-              size="icon" 
-              disabled={(selectedImage ? false : !inputValue.trim()) || isThinking || isUploadingImage} 
-              onClick={selectedImage ? handleImageAnalysis : handleSendMessage}
-            >
-              <Send className="h-5 w-5" />
-            </Button>
+              
+              {/* Temporarily disabled camera button until we can fix cross-platform compatibility */}
+              {/* {isMobileDevice && (
+                <Button
+                  size="icon"
+                  variant="outline"
+                  disabled={isThinking || isUploadingImage}
+                  onClick={toggleCamera}
+                  title={isCameraActive ? "Fermer la caméra" : "Prendre une photo"}
+                >
+                  <Camera className={`h-5 w-5 ${isCameraActive ? 'text-red-500' : ''}`} />
+                </Button>
+              )} */}
+              
+              {/* Voice input button */}
+              <VoiceRecorder 
+                onTranscriptionComplete={(text) => {
+                  // When transcription is complete, set the input value
+                  setInputValue(text);
+                  
+                  // Optionally, send the message immediately
+                  if (text.trim().length > 0) {
+                    setTimeout(() => {
+                      // Add user message to chat
+                      const userMessage: Message = {
+                        id: Date.now().toString(),
+                        content: text,
+                        sender: 'user',
+                      };
+                      
+                      setMessages(prev => [...prev, userMessage]);
+                      
+                      // Send to WebSocket server if connected
+                      if (sendMessage('chat', { content: text })) {
+                        // Message sent successfully
+                      } else {
+                        // WebSocket not connected, use fallback
+                        setIsThinking(true);
+                        
+                        // Simulate a response delay
+                        setTimeout(() => {
+                          setIsThinking(false);
+                          setMessages(prev => [...prev, {
+                            id: Date.now().toString(),
+                            content: "Je ne suis pas connecté au serveur actuellement. Mais je peux t'aider avec des mathématiques, des sciences, ou d'autres sujets. Pose-moi une question!",
+                            sender: 'kora',
+                          }]);
+                        }, 1500);
+                      }
+                    }, 500);
+                  }
+                }}
+                disabled={isThinking || isUploadingImage || isCameraActive}
+                maxRecordingTimeMs={30000} // 30 secondes maximum
+                language="fr" // langue française par défaut
+              />
+              
+              {/* Send message button */}
+              <Button 
+                size="icon" 
+                disabled={(selectedImage ? false : !inputValue.trim()) || isThinking || isUploadingImage} 
+                onClick={selectedImage ? handleImageAnalysis : handleSendMessage}
+              >
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
           
           <div className="mt-2 text-xs text-gray-500 text-center">

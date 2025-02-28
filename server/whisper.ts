@@ -59,8 +59,7 @@ export async function transcribeAudio(
     });
     
     console.log('Transcription réussie:', { 
-      text_length: response.text.length,
-      duration: response.duration
+      text_length: response.text.length
     });
     
     // Retourner les résultats
