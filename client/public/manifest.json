@@ -1,0 +1,31 @@
+{
+  "short_name": "Kora",
+  "name": "Kora - Plateforme Éducative",
+  "icons": [
+    {
+      "src": "assets/brain-icon.svg",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "assets/brain-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/brain-icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#64748B",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "description": "Plateforme éducative pour l'aide aux devoirs et la préparation aux examens",
+  "dir": "ltr",
+  "lang": "fr-FR",
+  "scope": "/",
+  "prefer_related_applications": false
+}
