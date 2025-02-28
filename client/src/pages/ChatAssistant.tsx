@@ -778,8 +778,15 @@ const ChatAssistant: React.FC = () => {
                                   
                                   solution = `Pour résoudre l'équation $${a}x + ${b} = ${c}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
                                 } else {
-                                  // Fallback plus générique pour les équations algébriques non standard
-                                  const equationComplete = equation.includes('=') ? equation : `${equation} = ${answer}`;
+                                  // Récupérer l'équation originale du message
+                                  const originalMessageContent = originalContent || "";
+                                  const equationMatchInChallenge = originalMessageContent.match(/l'équation\s*\$([^$]+)\$/i);
+                                  
+                                  // Si on peut extraire l'équation originale du défi, l'utiliser, sinon créer une équation générique
+                                  const equationComplete = equationMatchInChallenge ? 
+                                    equationMatchInChallenge[1] : 
+                                    (equation.includes('=') ? equation : `${equation} = c`);
+                                    
                                   solution = `Pour résoudre l'équation $${equationComplete}$ :\n\n1. **Isoler** la variable $x$\n\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
                                 }
                               } else {
