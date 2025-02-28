@@ -205,93 +205,172 @@ const ChatAssistant: React.FC = () => {
   
   // Custom renderer for markdown that preserves and renders LaTeX
   const CustomMarkdownRenderer = ({ content }: { content: string }) => {
-    // Pre-process to protect LaTeX from markdown processing
-    // Replace LaTeX blocks and inline math with placeholders
+    // A simpler two-pass approach:
+    // 1. First render all math with simplified placeholders
+    // 2. Then render markdown with the placeholders
+    
+    // Step 1: Extract all math and replace with unique placeholders
+    const mathExpressions: Array<{
+      id: string;
+      isBlock: boolean;
+      formula: string;
+    }> = [];
+    
+    // Process block math expressions
     const blockMathRegex = /\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\]/g;
-    const inlineMathRegex = /\$([\s\S]*?)\$|\\\(([\s\S]*?)\\\)/g;
-    
-    const mathExpressions: { type: 'block' | 'inline', formula: string }[] = [];
-    
-    // First handle block math expressions ($$...$$)
     let processedContent = content.replace(blockMathRegex, (match, group1, group2) => {
       const formula = group1 || group2;
-      mathExpressions.push({ type: 'block', formula });
-      return `::BLOCK_MATH_${mathExpressions.length - 1}::`;
+      const id = `math-${mathExpressions.length}`;
+      mathExpressions.push({
+        id,
+        isBlock: true,
+        formula
+      });
+      return `[MATH-BLOCK-${id}]`;
     });
     
-    // Then handle inline math expressions ($...$)
+    // Process inline math expressions
+    const inlineMathRegex = /\$((?!\$)[\s\S]*?)\$|\\\(([\s\S]*?)\\\)/g;
     processedContent = processedContent.replace(inlineMathRegex, (match, group1, group2) => {
       const formula = group1 || group2;
-      mathExpressions.push({ type: 'inline', formula });
-      return `::INLINE_MATH_${mathExpressions.length - 1}::`;
+      const id = `math-${mathExpressions.length}`;
+      mathExpressions.push({
+        id,
+        isBlock: false,
+        formula
+      });
+      return `[MATH-INLINE-${id}]`;
     });
     
-    // Replace markdown headers with proper HTML tags to handle formatting
-    // Convert **patterns** to proper markdown headers
-    processedContent = processedContent.replace(/\*\*(Étape \d+.*?)\*\*/g, (match, content) => {
-      return `### ${content}`;
-    });
+    // Format markdown titles and sections
+    processedContent = processedContent
+      // Replace **Étape N:** with markdown headers
+      .replace(/\*\*(Étape \d+.*?)\*\*/g, '### $1')
+      // Replace **Important:** with headers
+      .replace(/\*\*(Important|Remarque|Note|Attention)(\s*:)\*\*/g, '### $1$2')
+      // Ensure consistent list formatting
+      .replace(/^- ([^*])/gm, '* $1')
+      .replace(/^(\d+)\. /gm, '$1\\. ');
     
-    // Convert **Important :** to proper emphasis
-    processedContent = processedContent.replace(/\*\*(Important|Remarque|Note|Attention)(\s*:)\*\*/g, (match, type, punctuation) => {
-      return `### ${type}${punctuation}`;
-    });
-    
-    // Ensure proper rendering of lists
-    // Convert "- " at start of lines to proper markdown bullet points if not already
-    processedContent = processedContent.replace(/^- ([^*])/gm, '* $1');
-    
-    // Convert "1. " at start of lines to proper ordered lists if not already  
-    processedContent = processedContent.replace(/^(\d+)\. /gm, '$1\\. ');
-    
-    // Convert bold and italic text that might not be properly formatted
-    processedContent = processedContent.replace(/(\*\*\*|___)(.*?)(\*\*\*|___)/g, '***$2***'); // Bold italic
-    
-    // Handle horizontal rules that might be inconsistently marked
-    processedContent = processedContent.replace(/^(-{3,}|\*{3,})$/gm, '---');
+    // Step 2: Render the markdown content 
+    const renderMathFromPlaceholder = (text: string) => {
+      if (!text) return null;
+      
+      // Quick check if we have math to process
+      if (!text.includes('[MATH-')) {
+        return text;
+      }
+      
+      // Process all math placeholders
+      const blockRegex = /\[MATH-BLOCK-(math-\d+)\]/g;
+      const inlineRegex = /\[MATH-INLINE-(math-\d+)\]/g;
+      
+      // First replace all block math
+      const parts: React.ReactNode[] = [];
+      let lastEnd = 0;
+      let match;
+      
+      // Handle block math
+      while ((match = blockRegex.exec(text)) !== null) {
+        const beforeText = text.substring(lastEnd, match.index);
+        if (beforeText) {
+          parts.push(beforeText);
+        }
+        
+        const mathId = match[1];
+        const mathItem = mathExpressions.find(m => m.id === mathId);
+        
+        if (mathItem) {
+          parts.push(
+            <div key={mathId} className="my-2">
+              <BlockMath math={mathItem.formula} />
+            </div>
+          );
+        } else {
+          parts.push(`[Error: Math block not found]`);
+        }
+        
+        lastEnd = match.index + match[0].length;
+      }
+      
+      // Add the remaining text
+      if (lastEnd < text.length) {
+        parts.push(text.substring(lastEnd));
+      }
+      
+      // Now process inline math in each text node
+      const processedParts: React.ReactNode[] = [];
+      
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        
+        if (typeof part !== 'string') {
+          processedParts.push(part);
+          continue;
+        }
+        
+        const textPart = part as string;
+        const inlineParts: React.ReactNode[] = [];
+        let inlineLastEnd = 0;
+        let inlineMatch;
+        
+        // Reset the regex for each string part
+        inlineRegex.lastIndex = 0;
+        
+        while ((inlineMatch = inlineRegex.exec(textPart)) !== null) {
+          const beforeInlineText = textPart.substring(inlineLastEnd, inlineMatch.index);
+          if (beforeInlineText) {
+            inlineParts.push(beforeInlineText);
+          }
+          
+          const mathId = inlineMatch[1];
+          const mathItem = mathExpressions.find(m => m.id === mathId);
+          
+          if (mathItem) {
+            inlineParts.push(
+              <InlineMath key={mathId} math={mathItem.formula} />
+            );
+          } else {
+            inlineParts.push(`[Error: Inline math not found]`);
+          }
+          
+          inlineLastEnd = inlineMatch.index + inlineMatch[0].length;
+        }
+        
+        // Add remaining text from this part
+        if (inlineLastEnd < textPart.length) {
+          inlineParts.push(textPart.substring(inlineLastEnd));
+        }
+        
+        if (inlineParts.length === 1) {
+          processedParts.push(inlineParts[0]);
+        } else {
+          processedParts.push(<React.Fragment key={`inline-group-${i}`}>{inlineParts}</React.Fragment>);
+        }
+      }
+      
+      if (processedParts.length === 1) {
+        return processedParts[0];
+      }
+      
+      return <>{processedParts}</>;
+    };
     
     // Custom component for rendering markdown with proper math rendering
     const components = {
+      
       // Custom paragraph rendering with math support
       p: ({ node, children, ...props }: any) => {
-        // Process children to replace math placeholders
-        let processedChildren: React.ReactNode[] = [];
-        if (typeof children === 'string') {
-          const parts = children.split(/::(BLOCK|INLINE)_MATH_(\d+)::/);
-          for (let i = 0; i < parts.length; i++) {
-            if (i % 3 === 0) {
-              // Regular text
-              if (parts[i]) processedChildren.push(parts[i]);
-            } else if (i % 3 === 1) {
-              // Math type (BLOCK or INLINE)
-              const mathType = parts[i] as 'BLOCK' | 'INLINE';
-              const mathIndex = parseInt(parts[i + 1]);
-              const mathExpr = mathExpressions[mathIndex];
-              
-              if (mathExpr) {
-                if (mathType === 'BLOCK') {
-                  // Block math
-                  processedChildren.push(
-                    <div key={`block-${mathIndex}`} className="my-2">
-                      <BlockMath math={mathExpr.formula} />
-                    </div>
-                  );
-                } else {
-                  // Inline math
-                  processedChildren.push(
-                    <InlineMath key={`inline-${mathIndex}`} math={mathExpr.formula} />
-                  );
-                }
-              }
-              
-              // Skip the next part (the index)
-              i++;
-            }
+        // Find text nodes and replace math placeholders with components
+        const processedChildren = React.Children.map(children, child => {
+          // If it's a string, check for math placeholders
+          if (typeof child === 'string') {
+            return renderMathFromPlaceholder(child);
           }
-          return <p {...props}>{processedChildren}</p>;
-        }
+          return child;
+        });
         
-        return <p {...props}>{children}</p>;
+        return <p {...props}>{processedChildren}</p>;
       },
       
       // Custom rendering for headings
@@ -328,42 +407,16 @@ const ChatAssistant: React.FC = () => {
         </ol>
       ),
       li: ({ node, children, ...props }: any) => {
-        // Process children to replace math placeholders in list items
-        let processedChildren: React.ReactNode[] = [];
-        if (typeof children === 'string') {
-          const parts = children.split(/::(BLOCK|INLINE)_MATH_(\d+)::/);
-          for (let i = 0; i < parts.length; i++) {
-            if (i % 3 === 0) {
-              // Regular text
-              if (parts[i]) processedChildren.push(parts[i]);
-            } else if (i % 3 === 1) {
-              // Math type (BLOCK or INLINE)
-              const mathType = parts[i] as 'BLOCK' | 'INLINE';
-              const mathIndex = parseInt(parts[i + 1]);
-              const mathExpr = mathExpressions[mathIndex];
-              
-              if (mathExpr) {
-                if (mathType === 'BLOCK') {
-                  processedChildren.push(
-                    <div key={`block-${mathIndex}`} className="my-1">
-                      <BlockMath math={mathExpr.formula} />
-                    </div>
-                  );
-                } else {
-                  processedChildren.push(
-                    <InlineMath key={`inline-${mathIndex}`} math={mathExpr.formula} />
-                  );
-                }
-              }
-              
-              // Skip the next part (the index)
-              i++;
-            }
+        // Find text nodes and replace math placeholders with components
+        const processedChildren = React.Children.map(children, child => {
+          // If it's a string, check for math placeholders
+          if (typeof child === 'string') {
+            return renderMathFromPlaceholder(child);
           }
-          return <li {...props}>{processedChildren}</li>;
-        }
+          return child;
+        });
         
-        return <li {...props}>{children}</li>;
+        return <li {...props}>{processedChildren}</li>;
       },
       
       // Better styling for code blocks and inline code
@@ -396,6 +449,32 @@ const ChatAssistant: React.FC = () => {
       hr: ({ node, ...props }: any) => (
         <hr className="my-5 border-t-2 border-gray-200 dark:border-gray-700" {...props} />
       ),
+      
+      // Process all components with mathematical content
+      strong: ({ node, children, ...props }: any) => {
+        const processedChildren = React.Children.map(children, child => 
+          processMathPlaceholders(child)
+        );
+        return <strong {...props}>{processedChildren}</strong>;
+      },
+      em: ({ node, children, ...props }: any) => {
+        const processedChildren = React.Children.map(children, child => 
+          processMathPlaceholders(child)
+        );
+        return <em {...props}>{processedChildren}</em>;
+      },
+      a: ({ node, children, ...props }: any) => {
+        const processedChildren = React.Children.map(children, child => 
+          processMathPlaceholders(child)
+        );
+        return <a {...props}>{processedChildren}</a>;
+      },
+      span: ({ node, children, ...props }: any) => {
+        const processedChildren = React.Children.map(children, child => 
+          processMathPlaceholders(child)
+        );
+        return <span {...props}>{processedChildren}</span>;
+      },
     };
     
     return (
