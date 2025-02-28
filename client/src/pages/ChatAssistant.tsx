@@ -223,6 +223,9 @@ const ChatAssistant: React.FC = () => {
     const message = messages.find(m => m.id === messageId);
     if (!message) return;
     
+    // Get the expected answer from the challenge data
+    const expectedAnswer = message.challengeData?.expectedAnswer || "";
+    
     // Set a loading state for this message
     setMessages(prev => 
       prev.map(m => 
@@ -248,9 +251,6 @@ const ChatAssistant: React.FC = () => {
     
     // For demo purposes, we'll simulate a response
     setTimeout(() => {
-      // Get expected answer, or use a default value if not provided
-      const expectedAnswer = message.challengeData?.expectedAnswer || "5";
-      
       // Compare answers (you could make this more sophisticated)
       const isCorrect = answer.trim() === expectedAnswer.trim();
       
@@ -264,7 +264,8 @@ const ChatAssistant: React.FC = () => {
                   ...m.challengeData,
                   isAnswered: true,
                   userAnswer: answer,
-                  isCorrect
+                  isCorrect,
+                  expectedAnswer  // Make sure to include the expected answer
                 }
               }
             : m
@@ -597,9 +598,25 @@ const ChatAssistant: React.FC = () => {
                           console.log("Requesting solution for message:", messageToServer);
                           
                           // For demo/testing purposes, add a fake solution message
+                          // Extract the equation from the original question if possible
+                          const originalMessage = messages.find(m => m.id === message.id);
+                          
+                          let equation = "";
+                          let answer = message.challengeData?.expectedAnswer || "";
+                          
+                          if (originalMessage?.content) {
+                            // Try to extract the equation from the message content using regex
+                            const equationMatch = originalMessage.content.match(/\$([^$]+)\$/);
+                            if (equationMatch && equationMatch[1]) {
+                              equation = equationMatch[1];
+                            }
+                          }
+                          
                           const solutionMessage: Message = {
                             id: Date.now().toString(),
-                            content: `### Solution détaillée:\n\nPour résoudre l'équation avec la réponse ${message.challengeData?.expectedAnswer || "8.67"}, voici la méthode:\n\n1. Isoler le terme avec x\n2. Diviser les deux côtés par le coefficient de x\n3. Simplifier pour obtenir la valeur de x\n\nLa réponse est donc x = ${message.challengeData?.expectedAnswer || "8.67"}`,
+                            content: equation ? 
+                              `### Solution détaillée:\n\nPour résoudre l'équation $${equation}$, voici la méthode:\n\n1. Isoler le terme avec x\n2. Diviser les deux côtés par le coefficient de x\n3. Simplifier pour obtenir la valeur de x\n\nLa réponse est donc $x = ${answer}$` :
+                              `### Solution détaillée:\n\nPour résoudre cette équation, voici la méthode:\n\n1. Isoler le terme avec x\n2. Diviser les deux côtés par le coefficient de x\n3. Simplifier pour obtenir la valeur de x\n\nLa réponse est donc $x = ${answer}$`,
                             sender: 'kora',
                             isChallenge: false
                           };
