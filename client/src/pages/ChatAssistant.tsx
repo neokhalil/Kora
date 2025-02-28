@@ -145,6 +145,15 @@ const ChatAssistant: React.FC = () => {
                 content: data.message,
                 sender: 'kora',
               }]);
+            } else if (data.type === 'history') {
+              // Handle conversation history update
+              console.log('Received history update from server:', data.history?.length || 0);
+              
+              // We're not updating the UI with this history directly 
+              // It's just to ensure the server has the correct context for future interactions
+              if (data.sessionId === sessionId) {
+                console.log('History updated for current session');
+              }
             }
           } catch (error) {
             console.error('Error parsing WebSocket message:', error);
@@ -185,6 +194,19 @@ const ChatAssistant: React.FC = () => {
     };
   }, []);
   
+  // Generate a unique session ID for this browser session
+  const [sessionId] = useState(() => {
+    // Try to get existing session ID from localStorage
+    const savedSessionId = localStorage.getItem('kora_session_id');
+    if (savedSessionId) {
+      return savedSessionId;
+    }
+    // Create a new session ID if none exists
+    const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    localStorage.setItem('kora_session_id', newSessionId);
+    return newSessionId;
+  });
+
   // Send a message to the server via WebSocket
   const sendMessage = (type: string, content: any) => {
     if (
@@ -193,6 +215,7 @@ const ChatAssistant: React.FC = () => {
     ) {
       socketRef.current.send(JSON.stringify({
         type,
+        sessionId,
         ...content
       }));
       return true;
@@ -496,6 +519,9 @@ const ChatAssistant: React.FC = () => {
     // Add optional subject field
     formData.append('subject', imageSubject);
     
+    // Add session ID to preserve context between HTTP and WebSocket
+    formData.append('sessionId', sessionId);
+    
     // Add optional query text
     if (inputValue.trim()) {
       formData.append('query', inputValue);
@@ -523,6 +549,12 @@ const ChatAssistant: React.FC = () => {
         isImageAnalysis: true,
         allowActions: true
       }]);
+      
+      // Request any updated conversation history from server via WebSocket
+      // This will ensure context continuity for future interactions
+      setTimeout(() => {
+        sendMessage('load_history', {});
+      }, 500);
       
       // Clear image and input
       handleClearImage();
