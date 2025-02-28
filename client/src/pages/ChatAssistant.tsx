@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import 'katex/dist/katex.min.css';
+import { InlineMath, BlockMath } from 'react-katex';
 
 // Define the message types
 interface Message {
@@ -200,6 +202,91 @@ const ChatAssistant: React.FC = () => {
     }
   };
   
+  // Helper function to parse and render math content
+  const renderMathContent = (content: string) => {
+    // Regular expression to identify LaTeX blocks and inline math
+    // This matches both $...$ and $$...$$ and \(...\) and \[...\]
+    const blockMathRegex = /\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\]/g;
+    const inlineMathRegex = /\$([\s\S]*?)\$|\\\(([\s\S]*?)\\\)/g;
+    
+    // Split content by math expressions
+    let parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let match;
+    
+    // First handle block math expressions ($$...$$)
+    const contentWithBlockMath = content.replace(blockMathRegex, (match, group1, group2) => {
+      const formula = group1 || group2;
+      // Replace with a placeholder that won't be affected by inline matching
+      return `__BLOCK_MATH_${parts.length}__`;
+    });
+    
+    // Then handle inline math expressions ($...$)
+    let currentContent = contentWithBlockMath;
+    while ((match = inlineMathRegex.exec(currentContent)) !== null) {
+      // Add text before the math
+      if (match.index > lastIndex) {
+        parts.push(currentContent.substring(lastIndex, match.index));
+      }
+      
+      // Extract the math formula (without the delimiters)
+      const formula = match[1] || match[2];
+      
+      try {
+        // Add the math component
+        parts.push(
+          <InlineMath key={`inline-${parts.length}`} math={formula} />
+        );
+      } catch (error) {
+        // Fallback if math rendering fails
+        console.error('Error rendering math:', error);
+        parts.push(<span key={`error-${parts.length}`}>{match[0]}</span>);
+      }
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add any remaining text
+    if (lastIndex < currentContent.length) {
+      parts.push(currentContent.substring(lastIndex));
+    }
+    
+    // Replace block math placeholders with actual BlockMath components
+    const finalParts: React.ReactNode[] = [];
+    parts.forEach(part => {
+      if (typeof part !== 'string') {
+        finalParts.push(part);
+        return;
+      }
+      
+      // Check for block math placeholders
+      const blockParts = part.split(/__BLOCK_MATH_(\d+)__/g);
+      for (let i = 0; i < blockParts.length; i++) {
+        if (i % 2 === 0) {
+          // Regular text
+          if (blockParts[i]) finalParts.push(blockParts[i]);
+        } else {
+          // Block math index
+          try {
+            const formula = content.match(blockMathRegex)?.[Number(blockParts[i])]?.replace(/^\$\$|\$\$$|\\\[|\\\]$/g, '');
+            if (formula) {
+              finalParts.push(
+                <div key={`block-${blockParts[i]}`} className="my-2">
+                  <BlockMath math={formula} />
+                </div>
+              );
+            }
+          } catch (error) {
+            console.error('Error rendering block math:', error);
+            finalParts.push(<span key={`error-block-${blockParts[i]}`}>[Math rendering error]</span>);
+          }
+        }
+      }
+    });
+    
+    return finalParts;
+  };
+
   // Format the chat bubbles based on the design
   const renderMessage = (message: Message) => {
     if (message.sender === 'user') {
@@ -230,7 +317,7 @@ const ChatAssistant: React.FC = () => {
           )}
           
           <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
-            {message.content}
+            {renderMathContent(message.content)}
           </div>
           
           {message.allowActions && (
