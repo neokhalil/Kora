@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, Image, ImagePlus, FileText, X } from 'lucide-react';
+import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, FileText, X } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
@@ -1146,7 +1147,7 @@ const ChatAssistant: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <ImagePlus className="h-4 w-4 mr-2" />
+                    <FileText className="h-4 w-4 mr-2" />
                     Analyser cette image
                   </>
                 )}
@@ -1185,7 +1186,7 @@ const ChatAssistant: React.FC = () => {
               onClick={handleOpenFileBrowser}
               title="Télécharger une image"
             >
-              <Image className="h-5 w-5" />
+              <ImageIcon className="h-5 w-5" />
             </Button>
             
             {/* Send message button */}
