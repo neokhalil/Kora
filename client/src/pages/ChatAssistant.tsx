@@ -838,13 +838,15 @@ const ChatAssistant: React.FC = () => {
         if (mathExpr) {
           if (mathExpr.isBlock) {
             parts.push(
-              <div key={id} className="my-2">
+              <div key={id} className="my-2 math-block-container overflow-x-auto">
                 <BlockMath math={mathExpr.formula} />
               </div>
             );
           } else {
             parts.push(
-              <InlineMath key={id} math={mathExpr.formula} />
+              <span key={id} className="math-inline-container">
+                <InlineMath math={mathExpr.formula} />
+              </span>
             );
           }
         } else {

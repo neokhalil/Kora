@@ -1,57 +1,67 @@
-/* Styles pour améliorer l'affichage des formules mathématiques */
+/* Styles spécifiques pour l'affichage des formules mathématiques */
 
-/* Styles globaux pour les formules KaTeX */
-.katex-display {
+/* Containers for math blocks */
+.math-block-container {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+  margin: 0.75rem 0;
+  scrollbar-width: thin;
+}
+
+/* Make sure equations don't overflow on mobile */
+.math-block-container .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.5rem 0;
-  margin: 0.5rem 0;
+  padding-bottom: 5px; /* Space for scrollbar */
+  margin: 0;
 }
 
-/* Style pour les formules inline */
-.katex {
-  max-width: 100%;
-  font-size: 1.1em;
-}
-
-/* Permettre aux formules de s'adapter au conteneur sur mobile */
-@media screen and (max-width: 640px) {
-  .katex-display > .katex {
-    max-width: 100%;
-    white-space: normal;
-  }
-  
-  .katex-display {
-    padding: 0.25rem 0;
-  }
-  
-  /* Conserver le défilement horizontal pour les formules trop longues */
-  .katex-display > .katex > .katex-html {
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-    padding-bottom: 5px; /* Pour la barre de défilement */
-  }
-  
-  /* Ajuster la taille des formules sur petit écran */
-  .katex {
-    font-size: 1em;
-  }
-}
-
-/* Style pour les conteneurs de messages */
-.message-content {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
-  hyphens: auto;
-}
-
-/* Assurer que les blocs de code/formules s'adaptent correctement */
-.message-content pre,
-.message-content code {
-  white-space: pre-wrap;
+/* Fix for inline math elements to prevent line breaks within the formula */
+.math-inline-container {
+  display: inline-flex;
   max-width: 100%;
   overflow-x: auto;
+  vertical-align: middle;
+  scrollbar-width: none; /* Hide scrollbar for inline math */
+}
+
+.math-inline-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome */
+}
+
+/* Ensure readable font size on mobile devices */
+@media (max-width: 640px) {
+  .katex {
+    font-size: 1.1em; /* Slightly larger on mobile */
+  }
+  
+  .math-block-container {
+    margin: 0.5rem 0;
+    background-color: rgba(240, 240, 250, 0.2); /* Subtle background to indicate scrollable area */
+    border-radius: 4px;
+  }
+  
+  /* Add fading edges to indicate scrollable content */
+  .math-block-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
+    pointer-events: none;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .math-block-container {
+    background-color: rgba(30, 30, 60, 0.2);
+  }
+  
+  .math-block-container::after {
+    background: linear-gradient(to right, transparent, rgba(30, 30, 40, 0.8));
+  }
 }
