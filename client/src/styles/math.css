@@ -16,6 +16,7 @@
   padding: 0.5rem 0;
   margin: 0.75rem 0;
   scrollbar-width: thin;
+  position: relative;
 }
 
 /* Make sure equations don't overflow on mobile */
@@ -65,6 +66,28 @@
     pointer-events: none;
   }
   
+  /* Add scroll indicator icon for mobile */
+  .math-block-container::before {
+    content: '⟺';
+    position: absolute;
+    right: 5px;
+    bottom: 3px;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    animation: fadeInOut 2s infinite;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    padding: 0 5px;
+    pointer-events: none; /* Allow clicking through */
+  }
+  
+  /* Animation for the scroll indicator */
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+  
   /* Improve spacing for better readability on small screens */
   .message-content.math-content p {
     margin-bottom: 0.75rem;
@@ -94,6 +117,11 @@
   
   .math-block-container::after {
     background: linear-gradient(to right, transparent, rgba(30, 30, 40, 0.8));
+  }
+  
+  .math-block-container::before {
+    color: rgba(200, 200, 255, 0.7);
+    background-color: rgba(20, 20, 40, 0.6);
   }
   
   .message-content.math-content pre {
