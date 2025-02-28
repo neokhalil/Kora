@@ -546,19 +546,25 @@ const ChatAssistant: React.FC = () => {
   // Camera functions
   const startCamera = async () => {
     try {
+      console.log('Starting camera initialization');
       // Check if the browser supports mediaDevices
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        console.error('Browser does not support getUserMedia');
         alert('Votre navigateur ne supporte pas l\'accès à la caméra');
         return;
       }
       
-      // Get webcam stream
+      // Make sure to stop any existing streams first
+      if (videoRef.current && videoRef.current.srcObject) {
+        stopCamera();
+      }
+      
+      // Wait a moment before trying to initialize the camera
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Use simpler constraints first to ensure compatibility
       const constraints = { 
-        video: {
-          facingMode: 'environment', // Prefer rear camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
+        video: true,
         audio: false
       };
       
@@ -566,14 +572,35 @@ const ChatAssistant: React.FC = () => {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       console.log('Camera access granted, stream obtained');
       
-      // Set video source
-      if (videoRef.current) {
-        console.log('Setting video source');
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(e => console.error('Error playing video:', e));
-      } else {
-        console.error('Video reference is not available');
+      // Check if we still have the video element (user hasn't navigated away)
+      if (!videoRef.current) {
+        console.error('Video reference lost during camera initialization');
+        return;
       }
+      
+      // Set video source and make sure it's visible
+      console.log('Setting video source to stream');
+      videoRef.current.srcObject = stream;
+      videoRef.current.style.display = 'block';
+      
+      // Attempt to play the video
+      try {
+        await videoRef.current.play();
+        console.log('Video playback started successfully');
+      } catch (e) {
+        console.error('Error playing video:', e);
+        alert('Problème lors de l\'initialisation de la caméra. Veuillez réessayer.');
+        return;
+      }
+      
+      // Make sure we can actually see content from the camera
+      setTimeout(() => {
+        if (videoRef.current && !videoRef.current.videoWidth) {
+          console.warn('Video element has no dimensions after timeout');
+        } else if (videoRef.current) {
+          console.log('Video dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+        }
+      }, 1000);
       
       setIsCameraActive(true);
     } catch (error) {
@@ -1244,15 +1271,17 @@ const ChatAssistant: React.FC = () => {
           {/* Camera interface (shown when camera is active) */}
           {isCameraActive && (
             <div className="mb-3 relative">
-              <div className="rounded-lg overflow-hidden relative bg-black flex justify-center items-center" style={{ minHeight: '300px' }}>
-                <video 
-                  ref={videoRef}
-                  className="w-full h-full max-h-[300px] object-contain"
-                  autoPlay
-                  playsInline
-                  muted
-                  style={{ display: 'block' }}
-                />
+              <div className="relative bg-gray-900 rounded-lg" style={{ height: '300px', overflow: 'hidden' }}>
+                <p className="text-white text-center py-2">Caméra</p>
+                <div className="absolute inset-0 flex justify-center items-center">
+                  <video 
+                    ref={videoRef}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    autoPlay
+                    playsInline
+                    muted
+                  />
+                </div>
                 <canvas ref={canvasRef} className="hidden" />
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center">
                   <Button
