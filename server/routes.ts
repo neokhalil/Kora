@@ -286,16 +286,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else if (data.type === 'reexplain') {
           // Handle re-explanation request
           try {
-            // Find the original question and AI response
-            const originalQuestion = conversationHistory.find(msg => 
-              msg.role === 'user' && 
-              conversationHistory.indexOf(msg) === conversationHistory.findIndex(m => m.role === 'user')
-            )?.content || "Question originale non trouvée";
+            // Find the most recent question and AI response
+            // Get the recent messages (last user question and assistant response)
+            const recentMessages = [...conversationHistory];
+            let originalQuestion = "Question originale non trouvée";
+            let originalExplanation = "Explication originale non trouvée";
             
-            const originalExplanation = conversationHistory.find(msg => 
-              msg.role === 'assistant' && 
-              conversationHistory.indexOf(msg) === conversationHistory.findIndex(m => m.role === 'assistant')
-            )?.content || "Explication originale non trouvée";
+            // Find the latest user message
+            for (let i = recentMessages.length - 1; i >= 0; i--) {
+              if (recentMessages[i].role === 'user') {
+                originalQuestion = recentMessages[i].content;
+                // Look for the next assistant message after this user message
+                for (let j = i + 1; j < recentMessages.length; j++) {
+                  if (recentMessages[j].role === 'assistant') {
+                    originalExplanation = recentMessages[j].content;
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+            
+            console.log('Re-explaining based on recent context:', { originalQuestion, originalExplanationLength: originalExplanation.length });
             
             // Generate alternative explanation
             const alternativeExplanation = await generateReExplanation(
@@ -325,10 +337,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else if (data.type === 'challenge') {
           // Handle challenge request
           try {
-            // Get the last question and explanation
-            const recentMessages = conversationHistory.slice(-2);
-            const originalQuestion = recentMessages.find(msg => msg.role === 'user')?.content || "Question non trouvée";
-            const explanation = recentMessages.find(msg => msg.role === 'assistant')?.content || "Explication non trouvée";
+            // Get recent messages for context
+            const recentMessages = [...conversationHistory];
+            let originalQuestion = "Question non trouvée";
+            let explanation = "Explication non trouvée";
+            
+            // Find the latest user message and corresponding assistant response
+            for (let i = recentMessages.length - 1; i >= 0; i--) {
+              if (recentMessages[i].role === 'user') {
+                originalQuestion = recentMessages[i].content;
+                // Look for the next assistant message after this user message
+                for (let j = i + 1; j < recentMessages.length; j++) {
+                  if (recentMessages[j].role === 'assistant') {
+                    explanation = recentMessages[j].content;
+                    break;
+                  }
+                }
+                break;
+              }
+            }
+            
+            console.log('Generating challenge based on recent context:', { originalQuestion, explanationLength: explanation.length });
             
             // Generate challenge problem
             const challengeProblem = await generateChallengeProblem(originalQuestion, explanation);
