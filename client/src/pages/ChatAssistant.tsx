@@ -553,18 +553,26 @@ const ChatAssistant: React.FC = () => {
       }
       
       // Get webcam stream
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const constraints = { 
         video: {
           facingMode: 'environment', // Prefer rear camera on mobile
           width: { ideal: 1280 },
           height: { ideal: 720 }
-        }
-      });
+        },
+        audio: false
+      };
+      
+      console.log('Requesting camera access with constraints:', constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Camera access granted, stream obtained');
       
       // Set video source
       if (videoRef.current) {
+        console.log('Setting video source');
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch(e => console.error('Error playing video:', e));
+      } else {
+        console.error('Video reference is not available');
       }
       
       setIsCameraActive(true);
@@ -1236,22 +1244,24 @@ const ChatAssistant: React.FC = () => {
           {/* Camera interface (shown when camera is active) */}
           {isCameraActive && (
             <div className="mb-3 relative">
-              <div className="rounded-lg overflow-hidden relative bg-black">
+              <div className="rounded-lg overflow-hidden relative bg-black flex justify-center items-center" style={{ minHeight: '300px' }}>
                 <video 
                   ref={videoRef}
-                  className="w-full max-h-[300px] object-contain mx-auto"
+                  className="w-full h-full max-h-[300px] object-contain"
                   autoPlay
                   playsInline
                   muted
+                  style={{ display: 'block' }}
                 />
                 <canvas ref={canvasRef} className="hidden" />
                 <div className="absolute bottom-3 left-0 right-0 flex justify-center">
                   <Button
+                    variant="secondary"
                     size="icon"
-                    className="rounded-full bg-white border-2 border-gray-300"
+                    className="rounded-full h-16 w-16 bg-white hover:bg-gray-100"
                     onClick={captureImage}
                   >
-                    <div className="h-12 w-12 rounded-full border-2 border-gray-400" />
+                    <div className="h-12 w-12 rounded-full border-4 border-gray-500" />
                   </Button>
                 </div>
                 <button 
