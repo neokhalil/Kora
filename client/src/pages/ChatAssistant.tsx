@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, FileText, X } from 'lucide-react';
+import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, FileText, X, Camera } from 'lucide-react';
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,14 +51,43 @@ const ChatAssistant: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                      (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+      setIsMobileDevice(isMobile);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+  
+  // Clean up camera when component unmounts
+  useEffect(() => {
+    return () => {
+      if (isCameraActive) {
+        stopCamera();
+      }
+    };
+  }, [isCameraActive]);
   
   // Initialize WebSocket connection
   useEffect(() => {
@@ -514,6 +543,101 @@ const ChatAssistant: React.FC = () => {
     }
   };
   
+  // Camera functions
+  const startCamera = async () => {
+    try {
+      // Check if the browser supports mediaDevices
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Votre navigateur ne supporte pas l\'accès à la caméra');
+        return;
+      }
+      
+      // Get webcam stream
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          facingMode: 'environment', // Prefer rear camera on mobile
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      });
+      
+      // Set video source
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      
+      setIsCameraActive(true);
+    } catch (error) {
+      console.error('Error starting camera:', error);
+      alert('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+    }
+  };
+  
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      setIsCameraActive(false);
+    }
+  };
+  
+  const captureImage = () => {
+    // Check if video and canvas are ready
+    if (
+      !videoRef.current || 
+      !canvasRef.current || 
+      !videoRef.current.videoWidth
+    ) {
+      return;
+    }
+    
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    
+    // Set canvas dimensions to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Draw video frame to canvas
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to data URL
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+      
+      // Create a file from the data URL
+      fetch(imageDataUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+          
+          // Set as selected image
+          setSelectedImage(file);
+          setImagePreview(imageDataUrl);
+          
+          // Stop camera after taking photo
+          stopCamera();
+        })
+        .catch(error => {
+          console.error('Error creating file from canvas:', error);
+        });
+    }
+  };
+  
+  // Toggle camera on/off
+  const toggleCamera = () => {
+    if (isCameraActive) {
+      stopCamera();
+    } else {
+      startCamera();
+    }
+  };
+  
   // Open file browser dialog
   const handleOpenFileBrowser = () => {
     fileInputRef.current?.click();
@@ -712,9 +836,9 @@ const ChatAssistant: React.FC = () => {
     );
   };
 
-  // Format the chat bubbles based on the design with Markdown support
-
-  // Format the chat bubbles based on the design
+  // Render each message bubble in the chat
+  // For user messages, simply display the text content
+  // For Kora's messages, render markdown content and support math formatting
   const renderMessage = (message: Message) => {
     if (message.sender === 'user') {
       return (
@@ -1109,8 +1233,42 @@ const ChatAssistant: React.FC = () => {
         
         {/* Input area */}
         <div className="border-t p-3">
+          {/* Camera interface (shown when camera is active) */}
+          {isCameraActive && (
+            <div className="mb-3 relative">
+              <div className="rounded-lg overflow-hidden relative bg-black">
+                <video 
+                  ref={videoRef}
+                  className="w-full max-h-[300px] object-contain mx-auto"
+                  autoPlay
+                  playsInline
+                  muted
+                />
+                <canvas ref={canvasRef} className="hidden" />
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center">
+                  <Button
+                    size="icon"
+                    className="rounded-full bg-white border-2 border-gray-300"
+                    onClick={captureImage}
+                  >
+                    <div className="h-12 w-12 rounded-full border-2 border-gray-400" />
+                  </Button>
+                </div>
+                <button 
+                  onClick={stopCamera}
+                  className="absolute top-2 right-2 bg-gray-800 bg-opacity-70 text-white rounded-full p-1 hover:bg-opacity-90"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="mt-2 text-xs text-gray-500 text-center">
+                Prends une photo de ton devoir, équation ou problème
+              </div>
+            </div>
+          )}
+          
           {/* Image preview area (shown when an image is selected) */}
-          {imagePreview && (
+          {imagePreview && !isCameraActive && (
             <div className="mb-3 relative">
               <div className="rounded-lg overflow-hidden relative max-h-[200px]">
                 <img
@@ -1162,7 +1320,7 @@ const ChatAssistant: React.FC = () => {
               onKeyPress={handleKeyPress}
               placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
               className="flex-1"
-              disabled={isThinking || isUploadingImage}
+              disabled={isThinking || isUploadingImage || isCameraActive}
             />
             
             {/* Hidden file input for image upload */}
@@ -1182,12 +1340,25 @@ const ChatAssistant: React.FC = () => {
             <Button
               size="icon"
               variant="outline"
-              disabled={isThinking || isUploadingImage}
+              disabled={isThinking || isUploadingImage || isCameraActive}
               onClick={handleOpenFileBrowser}
               title="Télécharger une image"
             >
               <ImageIcon className="h-5 w-5" />
             </Button>
+            
+            {/* Camera button - only show on mobile devices that likely have cameras */}
+            {isMobileDevice && (
+              <Button
+                size="icon"
+                variant="outline"
+                disabled={isThinking || isUploadingImage}
+                onClick={toggleCamera}
+                title={isCameraActive ? "Fermer la caméra" : "Prendre une photo"}
+              >
+                <Camera className={`h-5 w-5 ${isCameraActive ? 'text-red-500' : ''}`} />
+              </Button>
+            )}
             
             {/* Send message button */}
             <Button 
