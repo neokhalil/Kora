@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import HomeworkHelp from "@/pages/HomeworkHelp";
 import ExamPrep from "@/pages/ExamPrep";
 import InteractiveLessons from "@/pages/InteractiveLessons";
+import ChatAssistant from "@/pages/ChatAssistant";
 import { MenuProvider } from "@/hooks/use-menu";
 
 const Router: React.FC = () => {
@@ -19,6 +20,7 @@ const Router: React.FC = () => {
       <Route path="/aide-aux-devoirs" component={HomeworkHelp} />
       <Route path="/preparation-examens" component={ExamPrep} />
       <Route path="/lecons-interactives" component={InteractiveLessons} />
+      <Route path="/chat-assistant" component={ChatAssistant} />
       <Route component={NotFound} />
     </Switch>
   );
