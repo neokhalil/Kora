@@ -62,6 +62,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const [recorderState, setRecorderState] = useState<RecorderState>('inactive');
   const [recordingDuration, setRecordingDuration] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [audioLevels, setAudioLevels] = useState<number[]>(Array(44).fill(1));
   
   // Configuration du visualiseur audio - style WhatsApp avec des barres plus fines
   const visualizerConfig: AudioVisualizerConfig = {
@@ -105,7 +106,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
-  // Visualiseur audio
+  // Visualiseur audio optimisé
   const setupAudioVisualizer = (stream: MediaStream) => {
     if (!canvasRef.current) return;
     
@@ -130,15 +131,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     
-    // Configuration du canvas
+    // Configuration du canvas (toujours utilisé pour le traitement, mais non affiché)
     canvas.width = visualizerConfig.width;
     canvas.height = visualizerConfig.height;
     
-    // Nombre de barres basé sur la largeur du canvas et la largeur des barres + espace
-    const barCount = Math.floor(canvas.width / (visualizerConfig.barWidth + visualizerConfig.barGap));
-    
-    // Fonction de dessin qui sera appelée récursivement
-    const draw = () => {
+    // Fonction pour mettre à jour les niveaux audio qui sera utilisée pour actualiser l'état
+    const updateAudioLevels = () => {
       // Continuer l'animation si le state est toujours 'recording'
       if (recorderState !== 'recording') {
         if (animationFrameRef.current) {
@@ -148,59 +146,45 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       }
       
       // Planifier la prochaine frame
-      animationFrameRef.current = requestAnimationFrame(draw);
+      animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
       
       // Obtenir les données audio
       analyser.getByteFrequencyData(dataArray);
       
-      // Effacer le canvas
-      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+      // Calculer le nombre de barres à afficher (44 pour correspondre à notre rendu)
+      const totalBars = 44;
+      const step = Math.floor(bufferLength / totalBars);
       
-      // Boucle pour dessiner les barres de fréquence façon WhatsApp
-      for (let i = 0; i < barCount; i++) {
+      // Créer un nouveau tableau pour les hauteurs des barres
+      const newLevels = [];
+      
+      // Calculer les hauteurs des barres en fonction de l'audio
+      for (let i = 0; i < totalBars; i++) {
         // Calculer l'index dans le dataArray pour cette barre
-        const dataIndex = Math.floor(i * (bufferLength / barCount));
+        const dataIndex = Math.floor(i * step);
         
-        // Obtenir la valeur d'amplitude pour cette fréquence (0-255)
-        const value = dataArray[dataIndex];
-        
-        // Calculer la hauteur de la barre avec sensibilité
-        // Dans WhatsApp, les barres partent du milieu et ont une hauteur minimale
-        const minHeight = canvas.height * 0.2; // Hauteur minimale des barres
-        const maxVariation = canvas.height * 0.6; // Variation maximale de hauteur
-        
-        // Calculer la hauteur réelle en fonction du volume
-        const barHeight = minHeight + ((value / 255) * maxVariation * visualizerConfig.sensitivity);
-        
-        // Calculer la position x pour cette barre
-        const x = i * (visualizerConfig.barWidth + visualizerConfig.barGap);
-        
-        // Positionner la barre au milieu du canvas
-        const y = (canvas.height - barHeight) / 2;
-        
-        // Couleur unique en bleu-vert (teinte WhatsApp)
-        canvasCtx.fillStyle = '#00A884'; // Couleur de WhatsApp
-        
-        // Pour mode sombre
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          canvasCtx.fillStyle = '#00CF9D'; // Version plus claire pour le mode sombre
-        }
-        
-        // Vérifier si roundRect est disponible (navigateurs récents)
-        if (canvasCtx.roundRect) {
-          canvasCtx.beginPath();
-          // @ts-ignore - La méthode roundRect existe mais TypeScript peut ne pas la reconnaître
-          canvasCtx.roundRect(x, y, visualizerConfig.barWidth, barHeight, [1]);
-          canvasCtx.fill();
+        if (dataIndex < bufferLength) {
+          // Obtenir la valeur d'amplitude et appliquer la sensibilité
+          const value = dataArray[dataIndex] * visualizerConfig.sensitivity;
+          
+          // Normaliser entre 1 et 12 pixels pour la hauteur
+          // Ajouter une hauteur minimum pour les barres WhatsApp
+          const minHeight = 1; 
+          const maxHeight = 12;
+          const barHeight = minHeight + Math.min(maxHeight - minHeight, Math.floor((value / 255.0) * maxHeight));
+          
+          newLevels.push(barHeight);
         } else {
-          // Alternative pour les navigateurs qui ne supportent pas roundRect
-          canvasCtx.fillRect(x, y, visualizerConfig.barWidth, barHeight);
+          newLevels.push(1); // Hauteur minimale par défaut
         }
       }
+      
+      // Mettre à jour l'état avec les nouvelles hauteurs
+      setAudioLevels(newLevels);
     };
     
-    // Démarrer l'animation
-    draw();
+    // Démarrer la mise à jour des niveaux audio
+    updateAudioLevels();
   };
   
   // Fonction pour démarrer l'enregistrement
@@ -502,16 +486,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                 style={{ height: '24px' }}
               />
               
-              {/* Visualiseur style WhatsApp - ligne pointillée */}
+              {/* Visualiseur style WhatsApp - ligne pointillée avec données audio en temps réel */}
               <div className="w-full h-5 flex items-center justify-center gap-[2px]">
-                {/* Générons une série de tirets de différentes hauteurs */}
-                {Array.from({ length: 44 }).map((_, i) => {
-                  // Utiliser une fonction Math.sin pour varier les hauteurs de manière ondulatoire
-                  const baseHeight = Math.abs(Math.sin(i * 0.3) * 6) + 1;
-                  // Ajouter un peu de variation aléatoire pour un effet plus naturel
-                  const randomFactor = (i % 3 === 0) ? 1.5 : (i % 2 === 0) ? 0.8 : 1.2;
-                  const height = baseHeight * randomFactor;
-                  
+                {/* Utiliser les niveaux audio réels pour les hauteurs des barres */}
+                {audioLevels.map((height, i) => {
                   return (
                     <div 
                       key={i}
@@ -520,11 +498,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                         width: '2px',
                         height: `${height}px`,
                         backgroundColor: '#00A884', // Couleur de WhatsApp
-                        // Animation plus lente pour les barres plus hautes
-                        animationDuration: `${0.8 + (height / 10)}s`,
-                        // Décalage d'animation pour que toutes les barres ne clignotent pas en même temps
-                        animationDelay: `${(i * 25) % 500}ms`,
-                        opacity: 0.8
+                        opacity: 0.9,
+                        transition: 'height 50ms ease-in-out'
                       }}
                     />
                   );
