@@ -24,8 +24,14 @@ const SideNavigation = () => {
   // Function to handle navigation
   const handleNavigation = (path: string) => {
     console.log("Navigating to:", path);
-    setLocation(path);
-    closeMenu();
+    
+    // Use a small timeout to ensure the navigation happens after
+    // any current rendering cycle completes
+    setTimeout(() => {
+      setLocation(path);
+      closeMenu();
+      console.log("Navigation completed to:", path);
+    }, 10);
   };
   
   return (
