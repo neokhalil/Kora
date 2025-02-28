@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { Brain, Target, Book } from 'lucide-react';
+import { Brain, Target, Book, MessageSquare } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
+  {
+    label: 'Accueil',
+    path: '/',
+    icon: <Book className="text-primary mr-3 h-5 w-5" />
+  },
   {
     label: 'Aide aux Devoirs',
     path: '/aide-aux-devoirs',
@@ -17,6 +22,11 @@ export const navItems: NavItem[] = [
     label: 'Leçons interactives',
     path: '/lecons-interactives',
     icon: <Book className="text-primary mr-3 h-5 w-5" />
+  },
+  {
+    label: 'Assistant Kora',
+    path: '/chat-assistant',
+    icon: <MessageSquare className="text-primary mr-3 h-5 w-5" />
   }
 ];
 
