@@ -605,34 +605,35 @@ const ChatAssistant: React.FC = () => {
                           let solution = "";
                           let equationStr = "";
                           
-                          // Extraire l'équation du contenu du message
-                          const equationMatch = originalContent.match(/\$([^$=]+)(\s*=\s*\?)\$/);
+                          // Extraire l'équation du contenu du message avec une régex plus flexible
+                          const equationMatch = originalContent.match(/\$([^$]+?)(?:\s*=\s*\?)?\$/);
                           
                           if (equationMatch && equationMatch[1]) {
-                            equationStr = equationMatch[1].trim();
+                            // Nettoyer l'équation en enlevant tout "= ?" éventuel
+                            equationStr = equationMatch[1].replace(/=\s*\?/, '').trim();
                             console.log("Extracted equation:", equationStr);
                             
                             // Générer une solution basée sur l'opération
                             if (equationStr.includes('+')) {
                               const [a, b] = equationStr.split('+').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Additionner les nombres $${a}$ et $${b}$\n2. $${a} + ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les nombres $${a}$ et $${b}$\n2. $${a} + ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                             } 
                             else if (equationStr.includes('-')) {
                               const [a, b] = equationStr.split('-').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Soustraire $${b}$ de $${a}$\n2. $${a} - ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** $${b}$ de $${a}$\n2. $${a} - ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                             } 
                             else if (equationStr.includes('×')) {
                               const [a, b] = equationStr.split('×').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Multiplier les nombres $${a}$ et $${b}$\n2. $${a} \\times ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les nombres $${a}$ et $${b}$\n2. $${a} \\times ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                             } 
                             else {
                               // Équation générique
-                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Effectuer l'opération indiquée\n2. Simplifier l'expression\n\nLa réponse est donc $${answer}$`;
+                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Effectuer** l'opération indiquée\n2. **Simplifier** l'expression\n\nLa réponse est donc **$${answer}$**`;
                             }
                           } 
                           else {
-                            // Fallback si on ne peut pas extraire l'équation
-                            solution = `Pour résoudre ce problème:\n\n1. Effectuer l'opération demandée\n2. Simplifier l'expression\n\nLa réponse est $${answer}$`;
+                            // Fallback si on ne peut pas extraire l'équation - on montre quand même la réponse
+                            solution = `Pour résoudre ce problème :\n\n1. **Effectuer** l'opération demandée\n2. **Simplifier** l'expression\n\nLa réponse est **$${answer}$**`;
                           }
                           
                           const solutionMessage: Message = {
