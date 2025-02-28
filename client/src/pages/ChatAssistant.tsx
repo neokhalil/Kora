@@ -717,76 +717,102 @@ const ChatAssistant: React.FC = () => {
                         onClick={() => {
                           console.log("Requesting solution for challenge");
                           
-                          // For demo purposes, generate a detailed solution
+                          // Générer une solution détaillée adaptée au type de défi
                           const answer = message.challengeData?.expectedAnswer || "";
+                          const challengeType = message.challengeData?.challengeType || "arithmetic";
                           
-                          // Récupérer le défi original pour extraire l'équation
+                          // Récupérer le contenu original du défi
                           const originalContent = message.content;
-                          console.log("Original content:", originalContent);
+                          console.log("Challenge type:", challengeType);
                           
                           let solution = "";
-                          let equationStr = "";
                           
-                          // Extraire l'équation du contenu du message avec une régex plus flexible
-                          const equationMatch = originalContent.match(/\$([^$]+?)(?:\s*=\s*\?)?\$/);
-                          
-                          if (equationMatch && equationMatch[1]) {
-                            // Approche simplifiée: ne pas essayer de parser l'équation
-                            // car elle peut être complexe
-                            
-                            // Construire une solution adaptée en fonction du type de challenge
-                            // Pour les opérations simples générées par notre système
-                            
-                            // Cas d'une équation simple
-                            if (message.challengeData && answer) {
-                              // Pour les défis que nous générons automatiquement, l'équation est simple
-                              if (equationStr.includes('+') && !equationStr.includes('=')) {
-                                // Addition simple
-                                const parts = equationStr.split('+').map(p => p.trim());
-                                if (parts.length === 2) {
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} + ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                          // Traiter différemment selon le type de défi
+                          switch (challengeType) {
+                            case 'arithmetic':
+                              // Extraire l'équation avec une régex
+                              const arithmeticMatch = originalContent.match(/\$([^$]+?)(?:\s*=\s*\?)?\$/);
+                              if (arithmeticMatch && arithmeticMatch[1]) {
+                                const equation = arithmeticMatch[1].trim();
+                                
+                                if (equation.includes('+')) {
+                                  // Addition
+                                  const parts = equation.split('+').map(p => p.trim());
+                                  solution = `Pour résoudre $${equation} = ?$ :\n\n1. **Additionner** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} + ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                                 } 
-                                else {
-                                  // Fallback pour addition avec format inconnu
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les termes\n\nLa réponse est **$${answer}$**`;
+                                else if (equation.includes('-')) {
+                                  // Soustraction
+                                  const parts = equation.split('-').map(p => p.trim());
+                                  solution = `Pour résoudre $${equation} = ?$ :\n\n1. **Soustraire** $${parts[1]}$ de $${parts[0]}$\n2. $${parts[0]} - ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                                 }
-                              }
-                              else if (equationStr.includes('-') && !equationStr.includes('=')) {
-                                // Soustraction simple
-                                const parts = equationStr.split('-').map(p => p.trim());
-                                if (parts.length === 2) {
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** $${parts[1]}$ de $${parts[0]}$\n2. $${parts[0]} - ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
-                                }
-                                else {
-                                  // Fallback pour soustraction avec format inconnu
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** les termes correctement\n\nLa réponse est **$${answer}$**`;
-                                }
-                              }
-                              else if (equationStr.includes('×') && !equationStr.includes('=')) {
-                                // Multiplication simple
-                                const parts = equationStr.split('×').map(p => p.trim());
-                                if (parts.length === 2) {
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} \\times ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                                else if (equation.includes('\\times') || equation.includes('×')) {
+                                  // Multiplication
+                                  const parts = equation.split(/\\times|×/).map(p => p.trim());
+                                  solution = `Pour résoudre $${equation} = ?$ :\n\n1. **Multiplier** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} \\times ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
                                 }
                                 else {
-                                  // Fallback pour multiplication avec format inconnu
-                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les facteurs\n\nLa réponse est **$${answer}$**`;
+                                  // Fallback général pour arithmétique
+                                  solution = `Pour résoudre $${equation} = ?$ :\n\n1. **Effectuer** l'opération demandée\n\nLa réponse est **$${answer}$**`;
                                 }
+                              } else {
+                                solution = `La réponse est **${answer}**`;
                               }
-                              else {
-                                // Équation plus complexe ou format non reconnu
-                                // Fournir une solution générique basée seulement sur la réponse
-                                solution = `Pour résoudre cette expression :\n\n1. **Simplifier** les termes\n2. **Calculer** la valeur finale\n\nLa réponse est **$${answer}$**`;
+                              break;
+                              
+                            case 'algebra':
+                              // Extraire l'équation avec une régex
+                              const algebraMatch = originalContent.match(/\$([^$]+?)(?:\s*=\s*[^$]+?)?\$/);
+                              if (algebraMatch && algebraMatch[1]) {
+                                const equation = algebraMatch[1].trim();
+                                
+                                // Extraction des paramètres a, b, c pour ax + b = c
+                                const algebraPattern = /(\d+)x\s*\+\s*(\d+)\s*=\s*(\d+)/;
+                                const params = equation.match(algebraPattern);
+                                
+                                if (params) {
+                                  const a = parseInt(params[1]);
+                                  const b = parseInt(params[2]);
+                                  const c = parseInt(params[3]);
+                                  
+                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
+                                } else {
+                                  // Fallback plus générique
+                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** la variable $x$\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
+                                }
+                              } else {
+                                solution = `La réponse à cette équation est **$x = ${answer}$**`;
                               }
-                            } 
-                            else {
-                              // Solution par défaut si nous n'avons pas de réponse attendue
-                              solution = `Pour résoudre cette expression :\n\n1. **Simplifier** les termes\n2. **Calculer** la valeur finale\n\nVérifie tes calculs attentivement.`;
-                            }
-                          } 
-                          else {
-                            // Fallback si on ne peut pas extraire l'équation - on montre quand même la réponse
-                            solution = `Pour résoudre ce problème :\n\n1. **Effectuer** l'opération demandée\n2. **Simplifier** l'expression\n\nLa réponse est **$${answer}$**`;
+                              break;
+                              
+                            case 'geometry':
+                              // Extraire le rayon du cercle
+                              const radiusMatch = originalContent.match(/rayon\s+de\s+\$(\d+)\$/i);
+                              if (radiusMatch && radiusMatch[1]) {
+                                const radius = parseInt(radiusMatch[1]);
+                                solution = `Pour calculer l'aire d'un cercle avec un rayon de $${radius}$ cm :\n\n1. **Appliquer** la formule de l'aire d'un cercle: $A = \\pi r^2$\n2. **Remplacer** $r$ par $${radius}$\n   $A = \\pi \\times ${radius}^2$\n   $A = \\pi \\times ${radius * radius}$\n   $A \\approx 3.14159 \\times ${radius * radius}$\n   $A \\approx ${Math.PI * radius * radius}$\n\n3. **Arrondir** à l'entier le plus proche\n   $A \\approx ${answer}$ cm$^2$\n\nLa réponse est donc **$${answer}$ cm$^2$**`;
+                              } else {
+                                solution = `Pour calculer l'aire du cercle, j'ai utilisé la formule $A = \\pi r^2$ et arrondi à l'entier le plus proche.\n\nLa réponse est **$${answer}$ cm$^2$**`;
+                              }
+                              break;
+                              
+                            case 'calculus':
+                              // Extraire la fonction
+                              const functionMatch = originalContent.match(/f\(x\)\s*=\s*(\d+)x\^{(\d+)}/);
+                              if (functionMatch) {
+                                const coefficient = parseInt(functionMatch[1]);
+                                const power = parseInt(functionMatch[2]);
+                                const derivCoeff = coefficient * power;
+                                const derivPower = power - 1;
+                                
+                                solution = `Pour dériver la fonction $f(x) = ${coefficient}x^{${power}}$ :\n\n1. **Appliquer** la règle de dérivation pour les fonctions puissance:\n   $\\frac{d}{dx}[x^n] = nx^{n-1}$\n\n2. **Utiliser** la règle du coefficient constant: $\\frac{d}{dx}[cf(x)] = c\\frac{d}{dx}[f(x)]$\n\n3. **Calculer** la dérivée:\n   $f'(x) = ${coefficient} \\times ${power} \\times x^{${power}-1}$\n   $f'(x) = ${derivCoeff}x^{${derivPower}}$\n\nLa réponse est donc **$f'(x) = ${answer}$**`;
+                              } else {
+                                solution = `Pour dériver cette fonction, j'ai appliqué les règles standard de dérivation.\n\nLa réponse est **$f'(x) = ${answer}$**`;
+                              }
+                              break;
+                              
+                            default:
+                              // Solution générique par défaut
+                              solution = `La solution à ce problème est: **${answer}**\n\nPour résoudre ce type de problème, identifie d'abord les valeurs données, puis applique les formules ou méthodes appropriées pour trouver la réponse.`;
                           }
                           
                           const solutionMessage: Message = {
@@ -853,7 +879,8 @@ const ChatAssistant: React.FC = () => {
                           isChallenge: true,
                           challengeData: {
                             expectedAnswer: answer,
-                            isAnswered: false
+                            isAnswered: false,
+                            challengeType: 'arithmetic'
                           }
                         };
                         
