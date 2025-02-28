@@ -29,69 +29,79 @@ const ChatInterface: React.FC = () => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    // Create WebSocket connection
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    let socket: WebSocket | null = null;
     
-    const socket = new WebSocket(wsUrl);
-    socketRef.current = socket;
-
-    // Connection opened
-    socket.addEventListener('open', (event) => {
-      console.log('Connected to WebSocket server');
-      setWsConnected(true);
-    });
-
-    // Listen for messages
-    socket.addEventListener('message', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('Message from server:', data);
-        
-        if (data.type === 'welcome') {
-          // Handle welcome message
-          setMessages([{
-            id: Date.now().toString(),
-            content: data.message,
-            sender: 'kora',
-            timestamp: new Date(data.timestamp)
-          }]);
-        } else if (data.type === 'chat') {
-          // Handle chat message
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: data.content,
-            sender: 'kora',
-            timestamp: new Date(data.timestamp),
-            includeSteps: data.includeSteps,
-            includeVideo: data.includeVideo
-          }]);
-        } else if (data.type === 'error') {
-          // Handle error message
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: data.message,
-            sender: 'kora',
-            timestamp: new Date(data.timestamp)
-          }]);
+    try {
+      // Create WebSocket connection
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = window.location.host;
+      const wsUrl = `${protocol}//${host}/ws`;
+      
+      console.log('Attempting to connect to WebSocket at:', wsUrl);
+      
+      socket = new WebSocket(wsUrl);
+      socketRef.current = socket;
+      
+      // Connection opened
+      socket.addEventListener('open', () => {
+        console.log('Connected to WebSocket server');
+        setWsConnected(true);
+      });
+      
+      // Listen for messages
+      socket.addEventListener('message', (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('Message from server:', data);
+          
+          if (data.type === 'welcome') {
+            // Handle welcome message
+            setMessages([{
+              id: Date.now().toString(),
+              content: data.message,
+              sender: 'kora',
+              timestamp: new Date(data.timestamp)
+            }]);
+          } else if (data.type === 'chat') {
+            // Handle chat message
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              content: data.content,
+              sender: 'kora',
+              timestamp: new Date(data.timestamp),
+              includeSteps: data.includeSteps,
+              includeVideo: data.includeVideo
+            }]);
+          } else if (data.type === 'error') {
+            // Handle error message
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              content: data.message,
+              sender: 'kora',
+              timestamp: new Date(data.timestamp)
+            }]);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
         }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    });
-
-    // Connection closed
-    socket.addEventListener('close', (event) => {
-      console.log('Disconnected from WebSocket server');
+      });
+      
+      // Connection closed
+      socket.addEventListener('close', () => {
+        console.log('Disconnected from WebSocket server');
+        setWsConnected(false);
+      });
+      
+      // Connection error
+      socket.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+        setWsConnected(false);
+      });
+    } catch (error) {
+      console.error('Error setting up WebSocket:', error);
       setWsConnected(false);
-    });
-
-    // Connection error
-    socket.addEventListener('error', (event) => {
-      console.error('WebSocket error:', event);
-      setWsConnected(false);
-    });
-
+    }
+    
     // Cleanup function
     return () => {
       if (socket && socket.readyState === WebSocket.OPEN) {
