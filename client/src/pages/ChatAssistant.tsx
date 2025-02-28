@@ -6,6 +6,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import ReactMarkdown from 'react-markdown';
 
 // Define the message types
 interface Message {
@@ -202,90 +203,209 @@ const ChatAssistant: React.FC = () => {
     }
   };
   
-  // Helper function to parse and render math content
-  const renderMathContent = (content: string) => {
-    // Regular expression to identify LaTeX blocks and inline math
-    // This matches both $...$ and $$...$$ and \(...\) and \[...\]
+  // Custom renderer for markdown that preserves and renders LaTeX
+  const CustomMarkdownRenderer = ({ content }: { content: string }) => {
+    // Pre-process to protect LaTeX from markdown processing
+    // Replace LaTeX blocks and inline math with placeholders
     const blockMathRegex = /\$\$([\s\S]*?)\$\$|\\\[([\s\S]*?)\\\]/g;
     const inlineMathRegex = /\$([\s\S]*?)\$|\\\(([\s\S]*?)\\\)/g;
     
-    // Split content by math expressions
-    let parts: React.ReactNode[] = [];
-    let lastIndex = 0;
-    let match;
+    const mathExpressions: { type: 'block' | 'inline', formula: string }[] = [];
     
     // First handle block math expressions ($$...$$)
-    const contentWithBlockMath = content.replace(blockMathRegex, (match, group1, group2) => {
+    let processedContent = content.replace(blockMathRegex, (match, group1, group2) => {
       const formula = group1 || group2;
-      // Replace with a placeholder that won't be affected by inline matching
-      return `__BLOCK_MATH_${parts.length}__`;
+      mathExpressions.push({ type: 'block', formula });
+      return `::BLOCK_MATH_${mathExpressions.length - 1}::`;
     });
     
     // Then handle inline math expressions ($...$)
-    let currentContent = contentWithBlockMath;
-    while ((match = inlineMathRegex.exec(currentContent)) !== null) {
-      // Add text before the math
-      if (match.index > lastIndex) {
-        parts.push(currentContent.substring(lastIndex, match.index));
-      }
-      
-      // Extract the math formula (without the delimiters)
-      const formula = match[1] || match[2];
-      
-      try {
-        // Add the math component
-        parts.push(
-          <InlineMath key={`inline-${parts.length}`} math={formula} />
-        );
-      } catch (error) {
-        // Fallback if math rendering fails
-        console.error('Error rendering math:', error);
-        parts.push(<span key={`error-${parts.length}`}>{match[0]}</span>);
-      }
-      
-      lastIndex = match.index + match[0].length;
-    }
-    
-    // Add any remaining text
-    if (lastIndex < currentContent.length) {
-      parts.push(currentContent.substring(lastIndex));
-    }
-    
-    // Replace block math placeholders with actual BlockMath components
-    const finalParts: React.ReactNode[] = [];
-    parts.forEach(part => {
-      if (typeof part !== 'string') {
-        finalParts.push(part);
-        return;
-      }
-      
-      // Check for block math placeholders
-      const blockParts = part.split(/__BLOCK_MATH_(\d+)__/g);
-      for (let i = 0; i < blockParts.length; i++) {
-        if (i % 2 === 0) {
-          // Regular text
-          if (blockParts[i]) finalParts.push(blockParts[i]);
-        } else {
-          // Block math index
-          try {
-            const formula = content.match(blockMathRegex)?.[Number(blockParts[i])]?.replace(/^\$\$|\$\$$|\\\[|\\\]$/g, '');
-            if (formula) {
-              finalParts.push(
-                <div key={`block-${blockParts[i]}`} className="my-2">
-                  <BlockMath math={formula} />
-                </div>
-              );
-            }
-          } catch (error) {
-            console.error('Error rendering block math:', error);
-            finalParts.push(<span key={`error-block-${blockParts[i]}`}>[Math rendering error]</span>);
-          }
-        }
-      }
+    processedContent = processedContent.replace(inlineMathRegex, (match, group1, group2) => {
+      const formula = group1 || group2;
+      mathExpressions.push({ type: 'inline', formula });
+      return `::INLINE_MATH_${mathExpressions.length - 1}::`;
     });
     
-    return finalParts;
+    // Replace markdown headers with proper HTML tags to handle formatting
+    // Convert **patterns** to proper markdown headers
+    processedContent = processedContent.replace(/\*\*(Étape \d+.*?)\*\*/g, (match, content) => {
+      return `### ${content}`;
+    });
+    
+    // Convert **Important :** to proper emphasis
+    processedContent = processedContent.replace(/\*\*(Important|Remarque|Note|Attention)(\s*:)\*\*/g, (match, type, punctuation) => {
+      return `### ${type}${punctuation}`;
+    });
+    
+    // Ensure proper rendering of lists
+    // Convert "- " at start of lines to proper markdown bullet points if not already
+    processedContent = processedContent.replace(/^- ([^*])/gm, '* $1');
+    
+    // Convert "1. " at start of lines to proper ordered lists if not already  
+    processedContent = processedContent.replace(/^(\d+)\. /gm, '$1\\. ');
+    
+    // Convert bold and italic text that might not be properly formatted
+    processedContent = processedContent.replace(/(\*\*\*|___)(.*?)(\*\*\*|___)/g, '***$2***'); // Bold italic
+    
+    // Handle horizontal rules that might be inconsistently marked
+    processedContent = processedContent.replace(/^(-{3,}|\*{3,})$/gm, '---');
+    
+    // Custom component for rendering markdown with proper math rendering
+    const components = {
+      // Custom paragraph rendering with math support
+      p: ({ node, children, ...props }: any) => {
+        // Process children to replace math placeholders
+        let processedChildren: React.ReactNode[] = [];
+        if (typeof children === 'string') {
+          const parts = children.split(/::(BLOCK|INLINE)_MATH_(\d+)::/);
+          for (let i = 0; i < parts.length; i++) {
+            if (i % 3 === 0) {
+              // Regular text
+              if (parts[i]) processedChildren.push(parts[i]);
+            } else if (i % 3 === 1) {
+              // Math type (BLOCK or INLINE)
+              const mathType = parts[i] as 'BLOCK' | 'INLINE';
+              const mathIndex = parseInt(parts[i + 1]);
+              const mathExpr = mathExpressions[mathIndex];
+              
+              if (mathExpr) {
+                if (mathType === 'BLOCK') {
+                  // Block math
+                  processedChildren.push(
+                    <div key={`block-${mathIndex}`} className="my-2">
+                      <BlockMath math={mathExpr.formula} />
+                    </div>
+                  );
+                } else {
+                  // Inline math
+                  processedChildren.push(
+                    <InlineMath key={`inline-${mathIndex}`} math={mathExpr.formula} />
+                  );
+                }
+              }
+              
+              // Skip the next part (the index)
+              i++;
+            }
+          }
+          return <p {...props}>{processedChildren}</p>;
+        }
+        
+        return <p {...props}>{children}</p>;
+      },
+      
+      // Custom rendering for headings
+      h1: ({ node, children, ...props }: any) => (
+        <h1 className="text-2xl font-bold mt-5 mb-3 text-blue-800 dark:text-blue-300" {...props}>
+          {children}
+        </h1>
+      ),
+      h2: ({ node, children, ...props }: any) => (
+        <h2 className="text-xl font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400" {...props}>
+          {children}
+        </h2>
+      ),
+      h3: ({ node, children, ...props }: any) => (
+        <h3 className="text-lg font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400" {...props}>
+          {children}
+        </h3>
+      ),
+      h4: ({ node, children, ...props }: any) => (
+        <h4 className="text-base font-medium mt-3 mb-1 text-blue-600 dark:text-blue-500" {...props}>
+          {children}
+        </h4>
+      ),
+      
+      // Enhanced list items with better spacing
+      ul: ({ node, children, ...props }: any) => (
+        <ul className="list-disc pl-5 my-3 space-y-1" {...props}>
+          {children}
+        </ul>
+      ),
+      ol: ({ node, children, ...props }: any) => (
+        <ol className="list-decimal pl-5 my-3 space-y-1" {...props}>
+          {children}
+        </ol>
+      ),
+      li: ({ node, children, ...props }: any) => {
+        // Process children to replace math placeholders in list items
+        let processedChildren: React.ReactNode[] = [];
+        if (typeof children === 'string') {
+          const parts = children.split(/::(BLOCK|INLINE)_MATH_(\d+)::/);
+          for (let i = 0; i < parts.length; i++) {
+            if (i % 3 === 0) {
+              // Regular text
+              if (parts[i]) processedChildren.push(parts[i]);
+            } else if (i % 3 === 1) {
+              // Math type (BLOCK or INLINE)
+              const mathType = parts[i] as 'BLOCK' | 'INLINE';
+              const mathIndex = parseInt(parts[i + 1]);
+              const mathExpr = mathExpressions[mathIndex];
+              
+              if (mathExpr) {
+                if (mathType === 'BLOCK') {
+                  processedChildren.push(
+                    <div key={`block-${mathIndex}`} className="my-1">
+                      <BlockMath math={mathExpr.formula} />
+                    </div>
+                  );
+                } else {
+                  processedChildren.push(
+                    <InlineMath key={`inline-${mathIndex}`} math={mathExpr.formula} />
+                  );
+                }
+              }
+              
+              // Skip the next part (the index)
+              i++;
+            }
+          }
+          return <li {...props}>{processedChildren}</li>;
+        }
+        
+        return <li {...props}>{children}</li>;
+      },
+      
+      // Better styling for code blocks and inline code
+      code: ({ node, inline, className, children, ...props }: any) => {
+        return inline ? (
+          <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono" {...props}>
+            {children}
+          </code>
+        ) : (
+          <code
+            className="block bg-gray-100 dark:bg-gray-800 p-3 rounded-md text-sm font-mono overflow-x-auto"
+            {...props}
+          >
+            {children}
+          </code>
+        );
+      },
+      
+      // Enhanced styling for blockquotes
+      blockquote: ({ node, children, ...props }: any) => (
+        <blockquote
+          className="border-l-4 border-blue-300 dark:border-blue-700 pl-4 py-1 my-3 text-gray-700 dark:text-gray-300 italic"
+          {...props}
+        >
+          {children}
+        </blockquote>
+      ),
+      
+      // Custom horizontal rule
+      hr: ({ node, ...props }: any) => (
+        <hr className="my-5 border-t-2 border-gray-200 dark:border-gray-700" {...props} />
+      ),
+    };
+    
+    return (
+      <ReactMarkdown components={components}>
+        {processedContent}
+      </ReactMarkdown>
+    );
   };
+
+  // Format the chat bubbles based on the design with Markdown support
 
   // Format the chat bubbles based on the design
   const renderMessage = (message: Message) => {
@@ -316,8 +436,8 @@ const ChatAssistant: React.FC = () => {
             </div>
           )}
           
-          <div className="whitespace-pre-wrap text-gray-800 dark:text-gray-200">
-            {renderMathContent(message.content)}
+          <div className="text-gray-800 dark:text-gray-200">
+            <CustomMarkdownRenderer content={message.content} />
           </div>
           
           {message.allowActions && (

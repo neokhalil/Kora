@@ -50,13 +50,20 @@ IMPORTANT FORMATTING NOTES:
 - Always use LaTeX for mathematical expressions
 - Enclose inline formulas with $ symbols (e.g., $x+y=z$)
 - Enclose block/display equations with $$ symbols (e.g., $$E=mc^2$$)
+- For section titles or headers, use markdown formatting:
+  - Use **Étape 1 : Titre de l'étape** for step titles 
+  - Use **Important :** for important notes
+  - Use three asterisks (***) for horizontal separators between major sections
 - Use LaTeX commands for proper mathematical notation:
   - Fractions: $\\frac{numerator}{denominator}$
   - Square roots: $\\sqrt{x}$
   - Powers/exponents: $x^2$
   - Subscripts: $x_1$
   - Greek letters: $\\alpha$, $\\beta$, $\\pi$, etc.
-  - Avoid plaintext for mathematical expressions
+  - Avoid plaintext for mathematical expressions 
+- Format mathematical variables consistently:
+  - Always use $x$ instead of just x
+  - Use $\\cdot$ for multiplication instead of *
 
 Respond in ${process.env.LANGUAGE || "French"}.
 If the student doesn't specify their grade/age level, assume they are in high school.
