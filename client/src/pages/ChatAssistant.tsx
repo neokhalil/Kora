@@ -202,8 +202,58 @@ const ChatAssistant: React.FC = () => {
   
   // Handle requesting a challenge problem
   const handleChallenge = () => {
-    sendMessage('challenge', {});
+    console.log("Generating challenge from button");
     setIsThinking(true);
+    
+    // Create a random math challenge directly
+    const a = Math.floor(Math.random() * 10) + 1;
+    const b = Math.floor(Math.random() * 10) + 1;
+    const operation = ['+', '-', '*'][Math.floor(Math.random() * 3)];
+    let result, equation, answer;
+    
+    switch(operation) {
+      case '+':
+        result = a + b;
+        equation = `${a} + ${b}`;
+        answer = result.toString();
+        break;
+      case '-':
+        result = a - b;
+        equation = `${a} - ${b}`;
+        answer = result.toString();
+        break;
+      case '*':
+        result = a * b;
+        equation = `${a} × ${b}`;
+        answer = result.toString();
+        break;
+    }
+    
+    // Create a new challenge message
+    const challengeMessage: Message = {
+      id: Date.now().toString(),
+      content: `### Nouveau défi:\n\nCalcule: $${equation} = ?$\n\nEntre ta réponse ci-dessous.`,
+      sender: 'kora',
+      isChallenge: true,
+      challengeData: {
+        expectedAnswer: answer,
+        isAnswered: false
+      }
+    };
+    
+    // Add the message and stop thinking indicator
+    setTimeout(() => {
+      setMessages(prev => [...prev, challengeMessage]);
+      setIsThinking(false);
+      
+      // Scroll to the new message
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }, 500);
+    
+    // Also notify the server (for tracking purposes)
+    sendMessage('challenge', {});
   };
   
   // Handle changes to challenge answer inputs
