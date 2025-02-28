@@ -182,79 +182,148 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         throw new Error(`Limite d'utilisation journalière atteinte (${DAILY_USAGE_LIMIT} enregistrements)`);
       }
       
-      // Obtenir l'extension appropriée à partir du type MIME
-      const mimeType = audioBlob.type;
-      let fileExtension = '.webm'; // Par défaut
-      
-      if (mimeType.includes('audio/wav') || mimeType.includes('audio/x-wav')) {
-        fileExtension = '.wav';
-      } else if (mimeType.includes('audio/mp3') || mimeType.includes('audio/mpeg')) {
-        fileExtension = '.mp3';
-      } else if (mimeType.includes('audio/mp4')) {
-        fileExtension = '.mp4';
-      } else if (mimeType.includes('audio/ogg')) {
-        fileExtension = '.ogg';
-      } else if (mimeType.includes('audio/webm')) {
-        fileExtension = '.webm';
+      // Tester le blob pour s'assurer qu'il est valide
+      if (!audioBlob || audioBlob.size === 0) {
+        throw new Error("Le fichier audio est vide ou invalide");
       }
       
-      console.log(`Envoi du fichier audio avec le type MIME ${mimeType} et l'extension ${fileExtension}`);
+      // Capturer la taille du blob pour le débogage
+      const blobSizeKB = (audioBlob.size / 1024).toFixed(2);
+      console.log(`Taille du blob audio: ${blobSizeKB} KB`);
+      
+      // Forcer le type MIME à audio/webm pour une meilleure compatibilité
+      // Certains navigateurs peuvent ne pas définir correctement le type
+      const forcedMimeType = 'audio/webm';
+      
+      // Créer un nouveau blob avec le type MIME forcé si nécessaire
+      let processedBlob = audioBlob;
+      if (audioBlob.type !== forcedMimeType) {
+        processedBlob = new Blob([audioBlob], { type: forcedMimeType });
+        console.log(`Type MIME forcé de ${audioBlob.type} à ${forcedMimeType}`);
+      }
+      
+      // Obtenir l'extension appropriée
+      const fileExtension = '.webm';
+      
+      // Log de débogage amélioré
+      console.log(`Préparation de l'envoi du fichier audio:`, {
+        originalType: audioBlob.type,
+        forcedType: processedBlob.type,
+        originalSize: audioBlob.size,
+        processedSize: processedBlob.size,
+        extension: fileExtension
+      });
+      
+      // Vérifier que le blob est utilisable
+      try {
+        const url = URL.createObjectURL(processedBlob);
+        console.log("Blob URL créée avec succès:", url);
+        // Libérer la ressource
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("Impossible de créer une URL pour le blob:", e);
+        throw new Error("Le fichier audio est corrompu ou inutilisable");
+      }
       
       // Créer un FormData pour l'envoi
       const formData = new FormData();
       
-      // Utiliser un nom de fichier avec l'extension appropriée pour aider le serveur à détecter le format
-      formData.append('audio', audioBlob, `recording${fileExtension}`);
+      // Utiliser un nom de fichier explicite avec l'extension correcte
+      const filename = `recording_${Date.now()}${fileExtension}`;
+      formData.append('audio', processedBlob, filename);
       formData.append('language', language);
       
-      // Ajouter des informations de débogage au serveur
+      // Ajouter des informations détaillées de débogage
       formData.append('debugInfo', JSON.stringify({
-        blobSize: audioBlob.size,
-        blobType: audioBlob.type,
-        fileExtension: fileExtension,
+        originalBlobSize: audioBlob.size,
+        originalBlobType: audioBlob.type,
+        processedBlobSize: processedBlob.size,
+        processedBlobType: processedBlob.type,
+        filename: filename,
         language: language,
-        browser: navigator.userAgent
+        browser: navigator.userAgent,
+        platform: navigator.platform,
+        timestamp: new Date().toISOString()
       }));
       
-      // Envoi de l'audio au serveur pour transcription
-      const response = await fetch('/api/transcribe', {
-        method: 'POST',
-        body: formData,
-      });
+      console.log("Envoi de la requête de transcription...");
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `Erreur lors de la transcription (${response.status}): ${
-            errorData.error || errorData.message || response.statusText
-          }`
-        );
+      // Envoi de l'audio au serveur avec un timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 secondes de timeout
+      
+      try {
+        // Envoi de l'audio au serveur pour transcription
+        const response = await fetch('/api/transcribe', {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal
+        });
+        
+        // Annuler le timeout
+        clearTimeout(timeoutId);
+        
+        console.log("Réponse du serveur reçue:", {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries([...response.headers])
+        });
+        
+        if (!response.ok) {
+          let errorMessage = `Erreur du serveur: ${response.status} ${response.statusText}`;
+          
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorData.message || errorMessage;
+          } catch (e) {
+            // Si la réponse n'est pas au format JSON, essayons de récupérer le texte
+            try {
+              const errorText = await response.text();
+              if (errorText) {
+                errorMessage = `${errorMessage} - ${errorText}`;
+              }
+            } catch (e2) {
+              // Ignoré intentionnellement
+            }
+          }
+          
+          throw new Error(errorMessage);
+        }
+        
+        // Analyser la réponse
+        const data = await response.json();
+        console.log("Données de transcription reçues:", data);
+        
+        if (!data.text) {
+          throw new Error('Aucun texte transcrit reçu du serveur');
+        }
+        
+        // Incrémenter le compteur d'utilisation
+        usageCounter.increment();
+        
+        // Afficher un toast de succès
+        toast({
+          title: "Transcription réussie",
+          description: "Votre message a été transcrit avec succès.",
+        });
+        
+        // Appeler le callback avec le texte transcrit
+        onTranscriptionComplete(data.text);
+        
+        // Réinitialiser l'état
+        setRecorderState('inactive');
+        
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        
+        if (fetchError.name === 'AbortError') {
+          throw new Error('La requête a été annulée car elle prenait trop de temps');
+        }
+        throw fetchError;
       }
-      
-      // Analyser la réponse
-      const data = await response.json();
-      
-      if (!data.text) {
-        throw new Error('Aucun texte transcrit reçu du serveur');
-      }
-      
-      // Incrémenter le compteur d'utilisation
-      usageCounter.increment();
-      
-      // Afficher un toast de succès
-      toast({
-        title: "Transcription réussie",
-        description: "Votre message a été transcrit avec succès.",
-      });
-      
-      // Appeler le callback avec le texte transcrit
-      onTranscriptionComplete(data.text);
-      
-      // Retourner à l'état inactif
-      setRecorderState('inactive');
       
     } catch (error) {
-      console.error('Erreur de transcription:', error);
+      console.error("Erreur lors de la transcription:", error);
       setErrorMessage((error as Error).message);
       setRecorderState('error');
       
@@ -393,16 +462,16 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Configurer le visualiseur audio
       setupAudioVisualizer(stream);
       
-      // Listener pour les données audio
-      mediaRecorder.addEventListener('dataavailable', (event) => {
+      // Utiliser des références pour stocker les fonctions des event listeners
+      // Cela nous permettra de les supprimer correctement plus tard
+      const onDataAvailable = (event: BlobEvent) => {
         console.log('Chunk audio reçu, taille:', event.data.size, 'type:', event.data.type);
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
-      });
+      };
       
-      // Listener pour la fin de l'enregistrement
-      mediaRecorder.addEventListener('stop', () => {
+      const onStop = async () => {
         console.log('Enregistrement terminé, nombre de chunks:', audioChunksRef.current.length);
         
         // Arrêter le timer
@@ -411,54 +480,97 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           recordingTimerRef.current = null;
         }
         
-        // Arrêter le flux du microphone
-        if (mediaStreamRef.current) {
-          mediaStreamRef.current.getTracks().forEach(track => track.stop());
-        }
+        // Arrêter le flux du microphone (mais seulement après avoir créé le blob)
+        const tracks = mediaStreamRef.current?.getTracks() || [];
         
         // Vérifier si nous avons des données
         if (audioChunksRef.current.length === 0) {
           console.error('Aucune donnée audio capturée');
+          
+          // Essayer de forcer une dernière fois la capture des données
+          const lastDataEvent = new Event('dataavailable') as BlobEvent;
+          
+          // Arrêter le mediaRecorder et libérer les ressources
+          if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.removeEventListener('dataavailable', onDataAvailable);
+            mediaRecorderRef.current.removeEventListener('stop', onStop);
+          }
+          
+          // Fermer les pistes audio
+          tracks.forEach(track => track.stop());
+          
           setErrorMessage('Aucune donnée audio capturée');
           setRecorderState('error');
           
           toast({
             variant: "destructive",
             title: "Erreur d'enregistrement",
-            description: "Aucune donnée audio n'a été capturée. Veuillez réessayer.",
+            description: "Aucune donnée audio n'a été capturée. Essayez un autre navigateur ou vérifiez vos permissions.",
           });
           return;
         }
         
-        // Créer un blob audio à partir des chunks avec le même type MIME que le recorder
-        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/mp3';
+        // Créer un blob audio à partir des chunks
+        const mimeType = 'audio/webm'; // Toujours utiliser webm pour la compatibilité maximale
         console.log('Création du blob audio avec le type MIME:', mimeType);
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         console.log('Taille du blob audio:', audioBlob.size);
         
         if (audioBlob.size === 0) {
           console.error('Blob audio vide');
+          
+          // Arrêter le mediaRecorder et libérer les ressources
+          if (mediaRecorderRef.current) {
+            mediaRecorderRef.current.removeEventListener('dataavailable', onDataAvailable);
+            mediaRecorderRef.current.removeEventListener('stop', onStop);
+          }
+          
+          // Fermer les pistes audio
+          tracks.forEach(track => track.stop());
+          
           setErrorMessage('Blob audio vide');
           setRecorderState('error');
           
           toast({
             variant: "destructive",
             title: "Erreur d'enregistrement",
-            description: "L'enregistrement audio est vide. Veuillez réessayer.",
+            description: "L'enregistrement audio est vide. Essayez avec un autre navigateur.",
           });
           return;
         }
+
+        // Arrêter le mediaRecorder et libérer les ressources
+        if (mediaRecorderRef.current) {
+          mediaRecorderRef.current.removeEventListener('dataavailable', onDataAvailable);
+          mediaRecorderRef.current.removeEventListener('stop', onStop);
+        }
+        
+        // Fermer les pistes audio seulement après avoir créé le blob
+        tracks.forEach(track => track.stop());
         
         // Passer à l'état de traitement
         setRecorderState('processing');
         
+        // Créer une copie du blob pour l'envoyer
+        // Certains navigateurs peuvent avoir des problèmes avec l'envoi du blob original
+        const blobCopy = audioBlob.slice(0, audioBlob.size, audioBlob.type);
+        
         // Traiter l'audio pour transcription
-        processAudioForTranscription(audioBlob);
-      });
+        await processAudioForTranscription(blobCopy);
+      };
       
-      // Démarrer l'enregistrement avec des timeslices pour obtenir des données régulièrement
-      // Ce paramètre est crucial pour s'assurer que dataavailable est déclenché régulièrement
-      mediaRecorder.start(1000); // Obtenir un chunk toutes les secondes
+      // Ajout des listeners
+      mediaRecorder.addEventListener('dataavailable', onDataAvailable);
+      mediaRecorder.addEventListener('stop', onStop);
+      
+      // Démarrer l'enregistrement avec un timeslice court pour capturer les données régulièrement
+      try {
+        mediaRecorder.start(200); // 200ms pour obtenir des chunks plus fréquemment
+        console.log('Enregistrement démarré avec succès');
+      } catch (e) {
+        console.error('Erreur lors du démarrage de l\'enregistrement:', e);
+        throw e;
+      }
       setRecorderState('recording');
       recordingStartTimeRef.current = Date.now();
       
