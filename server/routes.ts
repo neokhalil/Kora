@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertQuestionSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
+import { generateTutoringResponse, generateReExplanation, generateChallengeProblem } from './openai';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Questions API endpoints
@@ -63,6 +64,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch topic' });
     }
   });
+  
+  // AI Tutoring API Endpoints
+  app.post('/api/tutoring/ask', async (req: Request, res: Response) => {
+    try {
+      const { question, messages } = req.body;
+      
+      if (!question) {
+        return res.status(400).json({ message: 'Question is required' });
+      }
+      
+      // Convert messages to the format expected by OpenAI
+      const formattedMessages = messages && Array.isArray(messages) 
+        ? messages.map(msg => ({ 
+            role: msg.sender === 'user' ? 'user' as const : 'assistant' as const, 
+            content: msg.content 
+          }))
+        : [];
+      
+      const response = await generateTutoringResponse(question, formattedMessages);
+      
+      res.json({ 
+        content: response,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error in tutoring request:', error);
+      res.status(500).json({ message: 'Failed to generate tutoring response' });
+    }
+  });
+  
+  app.post('/api/tutoring/reexplain', async (req: Request, res: Response) => {
+    try {
+      const { originalQuestion, originalExplanation } = req.body;
+      
+      if (!originalQuestion || !originalExplanation) {
+        return res.status(400).json({ message: 'Original question and explanation are required' });
+      }
+      
+      const response = await generateReExplanation(originalQuestion, originalExplanation);
+      
+      res.json({ 
+        content: response,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error in re-explanation request:', error);
+      res.status(500).json({ message: 'Failed to generate re-explanation' });
+    }
+  });
+  
+  app.post('/api/tutoring/challenge', async (req: Request, res: Response) => {
+    try {
+      const { originalQuestion, explanation } = req.body;
+      
+      if (!originalQuestion || !explanation) {
+        return res.status(400).json({ message: 'Original question and explanation are required' });
+      }
+      
+      const response = await generateChallengeProblem(originalQuestion, explanation);
+      
+      res.json({ 
+        content: response,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error in challenge problem request:', error);
+      res.status(500).json({ message: 'Failed to generate challenge problem' });
+    }
+  });
 
   const httpServer = createServer(app);
 
@@ -80,51 +150,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
       timestamp: new Date().toISOString()
     }));
 
+    // Store conversation history for each connection
+    const conversationHistory: { role: 'user' | 'assistant', content: string }[] = [];
+    
     // Handle messages from client
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString());
         console.log('Received message:', data);
 
         // Process the message based on content
         if (data.type === 'chat') {
-          // Simulate a response
-          setTimeout(() => {
-            // Only send if client is still connected
+          // Let client know we're processing the request
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'status',
+              status: 'thinking',
+              timestamp: new Date().toISOString()
+            }));
+          }
+          
+          try {
+            // Store user message
+            conversationHistory.push({ role: 'user', content: data.content });
+            
+            // Generate AI response
+            const aiResponse = await generateTutoringResponse(data.content, conversationHistory);
+            
+            // Store AI response
+            conversationHistory.push({ role: 'assistant', content: aiResponse });
+            
+            // Limit conversation history to last 10 messages to prevent token limits
+            if (conversationHistory.length > 10) {
+              conversationHistory.splice(0, 2); // Remove oldest Q&A pair
+            }
+            
+            // Send response to client
             if (ws.readyState === WebSocket.OPEN) {
-              // Check if message contains certain keywords for education-related content
-              const content = data.content.toLowerCase();
-              let response;
-
-              if (content.includes('équation') || content.includes('mathématique') || 
-                  content.includes('algèbre') || content.includes('2x')) {
-                // Math response
-                response = {
-                  type: 'chat',
-                  content: "D'accord ! Si tu as une équation comme 2x + 3 = 11, on peut la résoudre ensemble.\n\nPour isoler x, voici comment faire :\n\n1. D'abord, soustrais 3 des deux côtés :\n2x + 3 - 3 = 11 - 3\nCe qui donne : 2x = 8\n\n2. Ensuite, divise les deux côtés par 2 :\n2x / 2 = 8 / 2\nCe qui donne : x = 4\n\nDonc, la solution est x = 4. Si tu as une autre équation ou une question, n'hésite pas à demander !",
-                  includeSteps: true,
-                  timestamp: new Date().toISOString()
-                };
-              } else if (content.includes('français') || content.includes('littérature') || 
-                          content.includes('grammaire') || content.includes('dissertation')) {
-                // French/literature response
-                response = {
-                  type: 'chat',
-                  content: "Pour rédiger une bonne dissertation en français, il faut suivre une structure claire :\n\n1. Introduction : présenter le sujet et la problématique\n2. Développement : organiser plusieurs parties avec des arguments et exemples\n3. Conclusion : synthétiser et ouvrir sur une réflexion plus large\n\nJe peux t'aider à structurer ta réflexion si tu me donnes plus de détails sur ton sujet.",
-                  timestamp: new Date().toISOString()
-                };
-              } else {
-                // General response
-                response = {
-                  type: 'chat',
-                  content: "Je peux t'aider avec ça. Pourrais-tu me donner plus de détails sur ta question ? Je peux t'aider avec des équations, des problèmes de géométrie, des analyses de textes, etc.",
-                  timestamp: new Date().toISOString()
-                };
-              }
-
+              const response = {
+                type: 'chat',
+                content: aiResponse,
+                messageId: Date.now().toString(), // Unique ID for this message
+                timestamp: new Date().toISOString(),
+                allowActions: true // Enable re-explain and challenge buttons
+              };
+              
               ws.send(JSON.stringify(response));
             }
-          }, 1000);
+          } catch (error) {
+            console.error('Error generating AI response:', error);
+            
+            // Fallback response if AI fails
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'chat',
+                content: "Je suis désolé, j'ai rencontré un problème en traitant ta question. Pourrais-tu reformuler ou essayer plus tard?",
+                timestamp: new Date().toISOString()
+              }));
+            }
+          }
+        } else if (data.type === 'reexplain') {
+          // Handle re-explanation request
+          try {
+            // Find the original question and AI response
+            const originalQuestion = conversationHistory.find(msg => 
+              msg.role === 'user' && 
+              conversationHistory.indexOf(msg) === conversationHistory.findIndex(m => m.role === 'user')
+            )?.content || "Question originale non trouvée";
+            
+            const originalExplanation = conversationHistory.find(msg => 
+              msg.role === 'assistant' && 
+              conversationHistory.indexOf(msg) === conversationHistory.findIndex(m => m.role === 'assistant')
+            )?.content || "Explication originale non trouvée";
+            
+            // Generate alternative explanation
+            const alternativeExplanation = await generateReExplanation(
+              originalQuestion, 
+              originalExplanation
+            );
+            
+            // Send response to client
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'chat',
+                content: alternativeExplanation,
+                isReExplanation: true,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          } catch (error) {
+            console.error('Error generating re-explanation:', error);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'error',
+                message: "Désolé, je n'ai pas pu générer une explication alternative. Veuillez réessayer.",
+                timestamp: new Date().toISOString()
+              }));
+            }
+          }
+        } else if (data.type === 'challenge') {
+          // Handle challenge request
+          try {
+            // Get the last question and explanation
+            const recentMessages = conversationHistory.slice(-2);
+            const originalQuestion = recentMessages.find(msg => msg.role === 'user')?.content || "Question non trouvée";
+            const explanation = recentMessages.find(msg => msg.role === 'assistant')?.content || "Explication non trouvée";
+            
+            // Generate challenge problem
+            const challengeProblem = await generateChallengeProblem(originalQuestion, explanation);
+            
+            // Send response to client
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'chat',
+                content: challengeProblem,
+                isChallenge: true,
+                timestamp: new Date().toISOString()
+              }));
+            }
+          } catch (error) {
+            console.error('Error generating challenge problem:', error);
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'error',
+                message: "Désolé, je n'ai pas pu générer un problème de défi. Veuillez réessayer.",
+                timestamp: new Date().toISOString()
+              }));
+            }
+          }
         }
       } catch (error) {
         console.error('Error processing WebSocket message:', error);
