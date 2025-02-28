@@ -21,12 +21,12 @@ const Router: React.FC = () => {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/aide-aux-devoirs" component={HomeworkHelp} />
-      <Route path="/preparation-examens" component={ExamPrep} />
-      <Route path="/lecons-interactives" component={InteractiveLessons} />
-      <Route path="/chat-assistant" component={ChatAssistant} />
-      <Route path="/test" component={TestPage} />
-      <Route component={NotFound} />
+      <Route path="/aide-aux-devoirs">{(params) => <HomeworkHelp />}</Route>
+      <Route path="/preparation-examens">{(params) => <ExamPrep />}</Route>
+      <Route path="/lecons-interactives">{(params) => <InteractiveLessons />}</Route>
+      <Route path="/chat-assistant">{(params) => <ChatAssistant />}</Route>
+      <Route path="/test">{(params) => <TestPage />}</Route>
+      <Route>{(params) => <NotFound />}</Route>
     </Switch>
   );
 };
