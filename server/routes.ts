@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage as dbStorage } from "./storage"; // Rename to avoid conflict with multer storage
 import { z } from "zod";
 import { insertQuestionSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
@@ -20,7 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   
   // Configure multer for image uploads
-  const storage = multer.diskStorage({
+  const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, uploadDir);
     },
@@ -42,16 +42,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
   
   const upload = multer({ 
-    storage, 
+    storage: multerStorage, 
     fileFilter,
     limits: {
       fileSize: 5 * 1024 * 1024, // 5MB file size limit
     }
   });
+  // Add image processing endpoint
+  app.post('/api/image-analysis', upload.single('image'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: 'No image file uploaded' });
+      }
+
+      // Read the uploaded file
+      const imagePath = req.file.path;
+      const imageBuffer = fs.readFileSync(imagePath);
+      const imageBase64 = imageBuffer.toString('base64');
+      
+      // Get optional parameters
+      const { subject = 'general', query = '' } = req.body;
+      
+      // Process the image with OpenAI
+      const response = await processImageQuery(imageBase64, query, subject);
+      
+      // Return the response
+      res.json({
+        content: response,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Clean up - remove the temporary file
+      fs.unlinkSync(imagePath);
+      
+    } catch (error) {
+      console.error('Error processing image:', error);
+      res.status(500).json({ message: 'Failed to process image' });
+    }
+  });
+  
   // Questions API endpoints
   app.get('/api/questions/recent', async (req: Request, res: Response) => {
     try {
-      const recentQuestions = await storage.getRecentQuestions();
+      const recentQuestions = await dbStorage.getRecentQuestions();
       res.json(recentQuestions);
     } catch (error) {
       res.status(500).json({ message: 'Failed to fetch recent questions' });
@@ -61,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/questions', async (req: Request, res: Response) => {
     try {
       const validatedData = insertQuestionSchema.parse(req.body);
-      const newQuestion = await storage.createQuestion(validatedData);
+      const newQuestion = await dbStorage.createQuestion(validatedData);
       res.status(201).json(newQuestion);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -74,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/questions/:id', async (req: Request, res: Response) => {
     try {
-      const question = await storage.getQuestion(parseInt(req.params.id));
+      const question = await dbStorage.getQuestion(parseInt(req.params.id));
       if (!question) {
         return res.status(404).json({ message: 'Question not found' });
       }
@@ -87,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Discussion topics API endpoints
   app.get('/api/topics', async (req: Request, res: Response) => {
     try {
-      const topics = await storage.getAllTopics();
+      const topics = await dbStorage.getAllTopics();
       res.json(topics);
     } catch (error) {
       res.status(500).json({ message: 'Failed to fetch topics' });
@@ -96,7 +129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/topics/:id', async (req: Request, res: Response) => {
     try {
-      const topic = await storage.getTopic(parseInt(req.params.id));
+      const topic = await dbStorage.getTopic(parseInt(req.params.id));
       if (!topic) {
         return res.status(404).json({ message: 'Topic not found' });
       }
