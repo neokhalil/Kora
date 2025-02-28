@@ -26,6 +26,19 @@ interface TranscriptionOptions {
 }
 
 /**
+ * Vérifie si l'extension du fichier est compatible avec l'API Whisper
+ * 
+ * @param filePath Chemin du fichier à vérifier
+ * @returns Boolean indiquant si le format est supporté
+ */
+function isWhisperCompatibleFormat(filePath: string): boolean {
+  // Liste des extensions de fichiers supportées par l'API Whisper
+  const supportedExtensions = ['.flac', '.m4a', '.mp3', '.mp4', '.mpeg', '.mpga', '.oga', '.ogg', '.wav', '.webm'];
+  const extension = path.extname(filePath).toLowerCase();
+  return supportedExtensions.includes(extension);
+}
+
+/**
  * Transcrit un fichier audio en texte en utilisant l'API OpenAI Whisper.
  * 
  * @param audioFilePath Chemin vers le fichier audio à transcrire
@@ -42,7 +55,26 @@ export async function transcribeAudio(
       throw new Error(`Le fichier audio n'existe pas: ${audioFilePath}`);
     }
     
-    console.log(`Transcription du fichier: ${audioFilePath}`);
+    // Vérifier si le format est supporté
+    const fileExt = path.extname(audioFilePath).toLowerCase();
+    if (!isWhisperCompatibleFormat(audioFilePath)) {
+      throw new Error(`Format de fichier non supporté: ${fileExt}. Formats supportés: flac, m4a, mp3, mp4, mpeg, mpga, oga, ogg, wav, webm`);
+    }
+    
+    // Vérifier la taille du fichier
+    const fileStats = fs.statSync(audioFilePath);
+    const fileSizeInMB = fileStats.size / (1024 * 1024);
+    console.log(`Taille du fichier: ${fileSizeInMB.toFixed(2)} MB`);
+    
+    if (fileStats.size === 0) {
+      throw new Error('Le fichier audio est vide');
+    }
+    
+    if (fileSizeInMB > 25) {
+      throw new Error(`Fichier trop volumineux: ${fileSizeInMB.toFixed(2)} MB. La limite est de 25 MB.`);
+    }
+    
+    console.log(`Transcription du fichier: ${audioFilePath} (${fileExt})`);
     console.log(`Options de transcription:`, options);
     
     // Créer un stream de lecture pour le fichier
@@ -81,7 +113,28 @@ export async function transcribeAudio(
  * @returns Chemin vers le fichier sauvegardé
  */
 export async function saveAudioFile(multerFile: Express.Multer.File): Promise<string> {
-  const fileExtension = path.extname(multerFile.originalname) || '.webm';
+  // Déterminer l'extension correcte selon le type MIME
+  let fileExtension = path.extname(multerFile.originalname).toLowerCase();
+  
+  // Si pas d'extension ou extension non reconnue, déduire du type MIME
+  if (!fileExtension || !isWhisperCompatibleFormat(fileExtension)) {
+    const mimeExtMap: Record<string, string> = {
+      'audio/wav': '.wav',
+      'audio/x-wav': '.wav',
+      'audio/mp3': '.mp3',
+      'audio/mpeg': '.mp3',
+      'audio/mp4': '.mp4',
+      'audio/ogg': '.ogg',
+      'audio/webm': '.webm',
+      'audio/flac': '.flac',
+      'audio/x-m4a': '.m4a'
+    };
+    
+    fileExtension = mimeExtMap[multerFile.mimetype] || '.mp3'; // '.mp3' comme fallback
+  }
+  
+  console.log(`Type MIME détecté: ${multerFile.mimetype}, extension utilisée: ${fileExtension}`);
+  
   const fileName = `audio_${uuidv4()}${fileExtension}`;
   const filePath = path.join(TEMP_UPLOADS_DIR, fileName);
   

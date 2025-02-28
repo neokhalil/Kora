@@ -240,8 +240,32 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Sauvegarder le flux pour pouvoir le fermer plus tard
       mediaStreamRef.current = stream;
       
-      // Configurer le MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream);
+      // Configurer le MediaRecorder avec des options spécifiques pour un format compatible
+      const options = { mimeType: 'audio/wav' };
+      
+      // Vérifier si le format est supporté, sinon utiliser les options par défaut
+      let mediaRecorder: MediaRecorder;
+      try {
+        if (MediaRecorder.isTypeSupported('audio/wav')) {
+          mediaRecorder = new MediaRecorder(stream, options);
+          console.log('Enregistrement audio au format WAV');
+        } else if (MediaRecorder.isTypeSupported('audio/mp3')) {
+          mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp3' });
+          console.log('Enregistrement audio au format MP3');
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+          mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+          console.log('Enregistrement audio au format WEBM');
+        } else {
+          // Fallback si aucun des formats préférés n'est supporté
+          mediaRecorder = new MediaRecorder(stream);
+          console.log('Enregistrement audio au format par défaut:', mediaRecorder.mimeType);
+        }
+      } catch (e) {
+        console.warn('Format audio non supporté, utilisation du format par défaut');
+        mediaRecorder = new MediaRecorder(stream);
+        console.log('Format d\'enregistrement:', mediaRecorder.mimeType);
+      }
+      
       mediaRecorderRef.current = mediaRecorder;
       
       // Configurer le visualiseur audio
@@ -267,8 +291,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           mediaStreamRef.current.getTracks().forEach(track => track.stop());
         }
         
-        // Créer un blob audio à partir des chunks
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        // Créer un blob audio à partir des chunks avec le même type MIME que le recorder
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        console.log('Création du blob audio avec le type MIME:', mimeType);
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         
         // Passer à l'état de traitement
         setRecorderState('processing');
