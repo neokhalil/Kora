@@ -324,8 +324,8 @@ const ChatAssistant: React.FC = () => {
       }, 100);
     }, 800);
     
-    // Also notify the server (for tracking purposes)
-    sendMessage('challenge', {});
+    // Nous n'avons pas besoin d'envoyer un message au serveur car nous générons le défi localement
+    // sendMessage('challenge', {});
   };
   
   // Handle changes to challenge answer inputs
@@ -891,8 +891,8 @@ const ChatAssistant: React.FC = () => {
                           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
                         }, 100);
                         
-                        // Also notify the server
-                        sendMessage('challenge', {});
+                        // Nous n'avons pas besoin d'envoyer un message au serveur ici
+                        // sendMessage('challenge', {});
                       }}
                       className="text-xs"
                     >
