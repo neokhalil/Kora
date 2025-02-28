@@ -15,6 +15,8 @@ interface ChallengeData {
   userAnswer?: string;
   isAnswered?: boolean;
   isCorrect?: boolean;
+  challengeType?: string;    // Type of challenge: 'arithmetic', 'algebra', 'geometry', 'calculus'
+  solution?: string;         // Detailed solution text that will be shown when user clicks "Voir la solution"
 }
 
 interface Message {
@@ -205,39 +207,109 @@ const ChatAssistant: React.FC = () => {
     console.log("Generating challenge from button");
     setIsThinking(true);
     
-    // Create a random math challenge directly
-    const a = Math.floor(Math.random() * 10) + 1;
-    const b = Math.floor(Math.random() * 10) + 1;
-    const operation = ['+', '-', '*'][Math.floor(Math.random() * 3)];
-    let result, equation, answer;
+    // Générer un défi adapté au contexte de la conversation
+    let challengeType = 'basic'; // Par défaut
+    let challengeContent = '';
+    let expectedAnswer = '';
     
-    switch(operation) {
-      case '+':
-        result = a + b;
-        equation = `${a} + ${b}`;
-        answer = result.toString();
-        break;
-      case '-':
-        result = a - b;
-        equation = `${a} - ${b}`;
-        answer = result.toString();
-        break;
-      case '*':
-        result = a * b;
-        equation = `${a} × ${b}`;
-        answer = result.toString();
-        break;
+    // Chercher des indices sur le contexte dans les messages récents
+    const recentMessages = messages.slice(-5);
+    const algebraPattern = /équation|variable|x\s*=|ax\s*\+|résoudre|linéaire|système|isoler/i;
+    const geometryPattern = /triangle|cercle|aire|surface|volume|périmètre|angle|degré|rectangle|carré/i;
+    const calculusPattern = /dérivée|intégrale|fonction|limite|dx|f\(x\)/i;
+    
+    // Vérifier si les messages récents contiennent des mots-clés
+    const hasAlgebra = recentMessages.some(m => algebraPattern.test(m.content));
+    const hasGeometry = recentMessages.some(m => geometryPattern.test(m.content));
+    const hasCalculus = recentMessages.some(m => calculusPattern.test(m.content));
+    
+    // Créer un défi en fonction du contexte
+    if (hasAlgebra) {
+      // Défi d'algèbre simple: résoudre pour x
+      const a = Math.floor(Math.random() * 5) + 1;  // 1-5
+      const b = Math.floor(Math.random() * 10);     // 0-9
+      const c = Math.floor(Math.random() * 20) + 1; // 1-20
+      
+      // Equation ax + b = c
+      const result = (c - b) / a;
+      
+      // Vérifier que result est un nombre entier pour simplifier
+      if (Number.isInteger(result)) {
+        challengeContent = `### Nouveau défi d'algèbre:\n\nRésous l'équation pour trouver x: $${a}x + ${b} = ${c}$\n\nEntre ta réponse ci-dessous.`;
+        expectedAnswer = result.toString();
+      } else {
+        // Dans le cas où ce n'est pas un entier, formater comme fraction ou décimal selon le cas
+        if (result === Math.floor(result)) {
+          expectedAnswer = result.toString();
+        } else {
+          // Arrondir à 2 décimales pour simplifier
+          expectedAnswer = result.toFixed(2);
+        }
+        challengeContent = `### Nouveau défi d'algèbre:\n\nRésous l'équation pour trouver x: $${a}x + ${b} = ${c}$\n\nEntre ta réponse sous forme décimale arrondie à 2 décimales si nécessaire.`;
+      }
+      challengeType = 'algebra';
+    } 
+    else if (hasGeometry) {
+      // Défi de géométrie simple
+      const radius = Math.floor(Math.random() * 10) + 1;
+      const area = Math.PI * radius * radius;
+      challengeContent = `### Nouveau défi de géométrie:\n\nCalcule l'aire d'un cercle avec un rayon de $${radius}$ cm.\n\nDonne ta réponse arrondie à l'entier le plus proche.`;
+      expectedAnswer = Math.round(area).toString();
+      challengeType = 'geometry';
+    }
+    else if (hasCalculus) {
+      // Défi sur les dérivées simples
+      const power = Math.floor(Math.random() * 3) + 2; // puissance entre 2 et 4
+      const coefficient = Math.floor(Math.random() * 5) + 1; // coefficient entre 1 et 5
+      
+      challengeContent = `### Nouveau défi de calcul différentiel:\n\nCalcule la dérivée de la fonction $f(x) = ${coefficient}x^{${power}}$\n\nExprime ta réponse sous la forme $ax^b$.`;
+      
+      const derivCoeff = coefficient * power;
+      const derivPower = power - 1;
+      
+      expectedAnswer = `${derivCoeff}x^${derivPower}`;
+      challengeType = 'calculus';
+    }
+    else {
+      // Défi arithmétique simple si aucun contexte spécifique
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      const operations = ['+', '-', '*'];
+      const opIndex = Math.floor(Math.random() * 3);
+      const operation = operations[opIndex];
+      
+      let result = 0, equation = '';
+      
+      switch(operation) {
+        case '+':
+          result = a + b;
+          equation = `${a} + ${b}`;
+          break;
+        case '-':
+          result = a - b;
+          equation = `${a} - ${b}`;
+          break;
+        case '*':
+          result = a * b;
+          equation = `${a} \\times ${b}`;
+          break;
+      }
+      
+      challengeContent = `### Nouveau défi d'arithmétique:\n\nCalcule: $${equation} = ?$\n\nEntre ta réponse ci-dessous.`;
+      expectedAnswer = result.toString();
+      challengeType = 'arithmetic';
     }
     
     // Create a new challenge message
     const challengeMessage: Message = {
       id: Date.now().toString(),
-      content: `### Nouveau défi:\n\nCalcule: $${equation} = ?$\n\nEntre ta réponse ci-dessous.`,
+      content: challengeContent,
       sender: 'kora',
       isChallenge: true,
       challengeData: {
-        expectedAnswer: answer,
-        isAnswered: false
+        expectedAnswer: expectedAnswer,
+        isAnswered: false,
+        challengeType: challengeType  // Stocker le type de défi pour générer la solution
       }
     };
     
@@ -250,7 +322,7 @@ const ChatAssistant: React.FC = () => {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
-    }, 500);
+    }, 800);
     
     // Also notify the server (for tracking purposes)
     sendMessage('challenge', {});
