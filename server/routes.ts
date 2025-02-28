@@ -278,7 +278,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get optional session ID for context tracking
       const sessionId = req.body.sessionId || 'default';
       
-      console.log(`Processing audio transcription request: ${req.file.originalname}, language: ${language}`);
+      // Check for debug information
+      let debugInfo = {};
+      if (req.body.debugInfo) {
+        try {
+          debugInfo = JSON.parse(req.body.debugInfo);
+          console.log('Debug info received from client:', debugInfo);
+        } catch (e) {
+          console.warn('Failed to parse debug info:', e);
+        }
+      }
+      
+      // Log file information
+      console.log(`Processing audio transcription request:`, {
+        filename: req.file.originalname,
+        language,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        // Include other useful info
+        ...debugInfo
+      });
       
       // Process the audio file with Whisper API
       const transcriptionResult = await handleAudioTranscription(req.file, { 
@@ -307,6 +326,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Log successful transcription
+      console.log('Transcription completed successfully:', {
+        textLength: transcriptionResult.text.length,
+        language: transcriptionResult.language
+      });
+      
       // Return the transcription result
       res.json({
         text: transcriptionResult.text,
@@ -317,9 +342,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error('Error processing audio transcription:', error);
+      
+      // Return a more detailed error message
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
       res.status(500).json({ 
         message: 'Failed to transcribe audio',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: errorMessage,
+        details: errorStack
       });
     }
   });

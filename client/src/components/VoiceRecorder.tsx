@@ -182,10 +182,39 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         throw new Error(`Limite d'utilisation journalière atteinte (${DAILY_USAGE_LIMIT} enregistrements)`);
       }
       
+      // Obtenir l'extension appropriée à partir du type MIME
+      const mimeType = audioBlob.type;
+      let fileExtension = '.webm'; // Par défaut
+      
+      if (mimeType.includes('audio/wav') || mimeType.includes('audio/x-wav')) {
+        fileExtension = '.wav';
+      } else if (mimeType.includes('audio/mp3') || mimeType.includes('audio/mpeg')) {
+        fileExtension = '.mp3';
+      } else if (mimeType.includes('audio/mp4')) {
+        fileExtension = '.mp4';
+      } else if (mimeType.includes('audio/ogg')) {
+        fileExtension = '.ogg';
+      } else if (mimeType.includes('audio/webm')) {
+        fileExtension = '.webm';
+      }
+      
+      console.log(`Envoi du fichier audio avec le type MIME ${mimeType} et l'extension ${fileExtension}`);
+      
       // Créer un FormData pour l'envoi
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
+      
+      // Utiliser un nom de fichier avec l'extension appropriée pour aider le serveur à détecter le format
+      formData.append('audio', audioBlob, `recording${fileExtension}`);
       formData.append('language', language);
+      
+      // Ajouter des informations de débogage au serveur
+      formData.append('debugInfo', JSON.stringify({
+        blobSize: audioBlob.size,
+        blobType: audioBlob.type,
+        fileExtension: fileExtension,
+        language: language,
+        browser: navigator.userAgent
+      }));
       
       // Envoi de l'audio au serveur pour transcription
       const response = await fetch('/api/transcribe', {
@@ -194,7 +223,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       });
       
       if (!response.ok) {
-        throw new Error(`Erreur lors de la transcription: ${response.status} ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          `Erreur lors de la transcription (${response.status}): ${
+            errorData.error || errorData.message || response.statusText
+          }`
+        );
       }
       
       // Analyser la réponse
@@ -206,6 +240,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       // Incrémenter le compteur d'utilisation
       usageCounter.increment();
+      
+      // Afficher un toast de succès
+      toast({
+        title: "Transcription réussie",
+        description: "Votre message a été transcrit avec succès.",
+      });
       
       // Appeler le callback avec le texte transcrit
       onTranscriptionComplete(data.text);
@@ -243,18 +283,30 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Configurer le MediaRecorder avec des options spécifiques pour un format compatible
       const options = { mimeType: 'audio/wav' };
       
-      // Vérifier si le format est supporté, sinon utiliser les options par défaut
+      // Essayer les formats dans l'ordre de préférence pour l'API OpenAI Whisper
       let mediaRecorder: MediaRecorder;
       try {
-        if (MediaRecorder.isTypeSupported('audio/wav')) {
-          mediaRecorder = new MediaRecorder(stream, options);
-          console.log('Enregistrement audio au format WAV');
-        } else if (MediaRecorder.isTypeSupported('audio/mp3')) {
-          mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp3' });
-          console.log('Enregistrement audio au format MP3');
-        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
-          mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-          console.log('Enregistrement audio au format WEBM');
+        // Formats supportés par Whisper en ordre de préférence pour la compatibilité navigateur
+        const preferredFormats = [
+          'audio/webm',         // Bonne compatibilité avec Chrome
+          'audio/wav',          // Compatible avec certains navigateurs
+          'audio/mp3',          // Peut ne pas être supporté directement
+          'audio/ogg;codecs=opus', // Bonne compatibilité avec Firefox
+          'audio/mp4'           // Peut être supporté sur Safari
+        ];
+        
+        // Chercher le premier format supporté
+        let selectedFormat = '';
+        for (const format of preferredFormats) {
+          if (MediaRecorder.isTypeSupported(format)) {
+            selectedFormat = format;
+            break;
+          }
+        }
+        
+        if (selectedFormat) {
+          mediaRecorder = new MediaRecorder(stream, { mimeType: selectedFormat });
+          console.log(`Enregistrement audio au format ${selectedFormat}`);
         } else {
           // Fallback si aucun des formats préférés n'est supporté
           mediaRecorder = new MediaRecorder(stream);
@@ -263,7 +315,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       } catch (e) {
         console.warn('Format audio non supporté, utilisation du format par défaut');
         mediaRecorder = new MediaRecorder(stream);
-        console.log('Format d\'enregistrement:', mediaRecorder.mimeType);
+        console.log('Format d\'enregistrement par défaut:', mediaRecorder.mimeType);
       }
       
       mediaRecorderRef.current = mediaRecorder;
@@ -273,6 +325,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       // Listener pour les données audio
       mediaRecorder.addEventListener('dataavailable', (event) => {
+        console.log('Chunk audio reçu, taille:', event.data.size, 'type:', event.data.type);
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
@@ -280,6 +333,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       // Listener pour la fin de l'enregistrement
       mediaRecorder.addEventListener('stop', () => {
+        console.log('Enregistrement terminé, nombre de chunks:', audioChunksRef.current.length);
+        
         // Arrêter le timer
         if (recordingTimerRef.current) {
           clearInterval(recordingTimerRef.current);
@@ -291,10 +346,38 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           mediaStreamRef.current.getTracks().forEach(track => track.stop());
         }
         
+        // Vérifier si nous avons des données
+        if (audioChunksRef.current.length === 0) {
+          console.error('Aucune donnée audio capturée');
+          setErrorMessage('Aucune donnée audio capturée');
+          setRecorderState('error');
+          
+          toast({
+            variant: "destructive",
+            title: "Erreur d'enregistrement",
+            description: "Aucune donnée audio n'a été capturée. Veuillez réessayer.",
+          });
+          return;
+        }
+        
         // Créer un blob audio à partir des chunks avec le même type MIME que le recorder
-        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+        const mimeType = mediaRecorderRef.current?.mimeType || 'audio/mp3';
         console.log('Création du blob audio avec le type MIME:', mimeType);
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        console.log('Taille du blob audio:', audioBlob.size);
+        
+        if (audioBlob.size === 0) {
+          console.error('Blob audio vide');
+          setErrorMessage('Blob audio vide');
+          setRecorderState('error');
+          
+          toast({
+            variant: "destructive",
+            title: "Erreur d'enregistrement",
+            description: "L'enregistrement audio est vide. Veuillez réessayer.",
+          });
+          return;
+        }
         
         // Passer à l'état de traitement
         setRecorderState('processing');
@@ -303,8 +386,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         processAudioForTranscription(audioBlob);
       });
       
-      // Démarrer l'enregistrement
-      mediaRecorder.start();
+      // Démarrer l'enregistrement avec des timeslices pour obtenir des données régulièrement
+      // Ce paramètre est crucial pour s'assurer que dataavailable est déclenché régulièrement
+      mediaRecorder.start(1000); // Obtenir un chunk toutes les secondes
       setRecorderState('recording');
       recordingStartTimeRef.current = Date.now();
       
