@@ -12,25 +12,33 @@ interface MenuProviderProps {
   children: React.ReactNode;
 }
 
-export const MenuProvider: React.FC<MenuProviderProps> = ({ children }) => {
+export const MenuProvider = ({ children }: MenuProviderProps) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-    if (!isMenuOpen) {
-      document.body.classList.add('overflow-hidden');
-    } else {
-      document.body.classList.remove('overflow-hidden');
-    }
-  };
+  const toggleMenu = React.useCallback(() => {
+    setIsMenuOpen((prev) => {
+      if (!prev) {
+        document.body.classList.add('overflow-hidden');
+      } else {
+        document.body.classList.remove('overflow-hidden');
+      }
+      return !prev;
+    });
+  }, []);
 
-  const closeMenu = () => {
+  const closeMenu = React.useCallback(() => {
     setIsMenuOpen(false);
     document.body.classList.remove('overflow-hidden');
-  };
+  }, []);
+
+  const value = React.useMemo(() => ({
+    isMenuOpen,
+    toggleMenu,
+    closeMenu
+  }), [isMenuOpen, toggleMenu, closeMenu]);
 
   return (
-    <MenuContext.Provider value={{ isMenuOpen, toggleMenu, closeMenu }}>
+    <MenuContext.Provider value={value}>
       {children}
     </MenuContext.Provider>
   );

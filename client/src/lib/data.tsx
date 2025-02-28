@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Brain, Target, Book, MessageSquare } from 'lucide-react';
+import { Brain, Target, Book, MessageSquare, TestTube } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
@@ -27,6 +27,11 @@ export const navItems: NavItem[] = [
     label: 'Assistant Kora',
     path: '/chat-assistant',
     icon: <MessageSquare className="text-primary mr-3 h-5 w-5" />
+  },
+  {
+    label: 'Test Page',
+    path: '/test',
+    icon: <TestTube className="text-primary mr-3 h-5 w-5" />
   }
 ];
 
