@@ -9,6 +9,14 @@ import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
 
 // Define the message types
+interface ChallengeData {
+  questionId?: string;
+  expectedAnswer?: string;
+  userAnswer?: string;
+  isAnswered?: boolean;
+  isCorrect?: boolean;
+}
+
 interface Message {
   id: string;
   content: string;
@@ -17,6 +25,7 @@ interface Message {
   isChallenge?: boolean;
   allowActions?: boolean;
   messageId?: string;
+  challengeData?: ChallengeData;
 }
 
 // Define the AI tutoring component
@@ -31,6 +40,7 @@ const ChatAssistant: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [challengeAnswers, setChallengeAnswers] = useState<Record<string, string>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
   
@@ -195,6 +205,73 @@ const ChatAssistant: React.FC = () => {
     sendMessage('challenge', {});
     setIsThinking(true);
   };
+  
+  // Handle changes to challenge answer inputs
+  const handleChallengeAnswerChange = (messageId: string, value: string) => {
+    setChallengeAnswers(prev => ({
+      ...prev,
+      [messageId]: value
+    }));
+  };
+  
+  // Submit a challenge answer
+  const handleSubmitChallengeAnswer = (messageId: string) => {
+    const answer = challengeAnswers[messageId];
+    if (!answer || !answer.trim()) return;
+    
+    // Find the correct answer from the message's challenge data
+    const message = messages.find(m => m.id === messageId);
+    if (!message) return;
+    
+    // Set a loading state for this message
+    setMessages(prev => 
+      prev.map(m => 
+        m.id === messageId 
+          ? {
+              ...m,
+              challengeData: {
+                ...m.challengeData,
+                isAnswered: true,
+                userAnswer: answer,
+                isCorrect: undefined // Loading state
+              }
+            }
+          : m
+      )
+    );
+    
+    // Send the answer to the server for evaluation
+    sendMessage('challenge_answer', { 
+      messageId: message.messageId, 
+      answer 
+    });
+    
+    // For demo purposes, we'll simulate a response
+    setTimeout(() => {
+      // Get expected answer, or use a default value if not provided
+      const expectedAnswer = message.challengeData?.expectedAnswer || "5";
+      
+      // Compare answers (you could make this more sophisticated)
+      const isCorrect = answer.trim() === expectedAnswer.trim();
+      
+      // Update the message with the result
+      setMessages(prev => 
+        prev.map(m => 
+          m.id === messageId 
+            ? {
+                ...m,
+                challengeData: {
+                  ...m.challengeData,
+                  isAnswered: true,
+                  userAnswer: answer,
+                  isCorrect
+                }
+              }
+            : m
+        )
+      );
+    }, 500);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -241,55 +318,55 @@ const ChatAssistant: React.FC = () => {
     // Create a component that renders the markdown first,
     // then replaces the math placeholders with actual rendered math
     const components = {
-      p: ({ children }: { children: React.ReactNode }) => {
-        const processedChildren = renderChildrenWithMath(children);
-        return <p className="mb-4">{processedChildren}</p>;
+      p: ({ ...props }: any) => {
+        const processedChildren = renderChildrenWithMath(props.children);
+        return <p className="mb-4" {...props}>{processedChildren}</p>;
       },
-      h1: ({ children }: { children: React.ReactNode }) => (
-        <h1 className="text-2xl font-bold mt-5 mb-3 text-blue-800 dark:text-blue-300">
-          {renderChildrenWithMath(children)}
+      h1: ({ ...props }: any) => (
+        <h1 className="text-2xl font-bold mt-5 mb-3 text-blue-800 dark:text-blue-300" {...props}>
+          {renderChildrenWithMath(props.children)}
         </h1>
       ),
-      h2: ({ children }: { children: React.ReactNode }) => (
-        <h2 className="text-xl font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400">
-          {renderChildrenWithMath(children)}
+      h2: ({ ...props }: any) => (
+        <h2 className="text-xl font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400" {...props}>
+          {renderChildrenWithMath(props.children)}
         </h2>
       ),
-      h3: ({ children }: { children: React.ReactNode }) => (
-        <h3 className="text-lg font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400">
-          {renderChildrenWithMath(children)}
+      h3: ({ ...props }: any) => (
+        <h3 className="text-lg font-semibold mt-4 mb-2 text-blue-700 dark:text-blue-400" {...props}>
+          {renderChildrenWithMath(props.children)}
         </h3>
       ),
-      h4: ({ children }: { children: React.ReactNode }) => (
-        <h4 className="text-base font-medium mt-3 mb-1 text-blue-600 dark:text-blue-500">
-          {renderChildrenWithMath(children)}
+      h4: ({ ...props }: any) => (
+        <h4 className="text-base font-medium mt-3 mb-1 text-blue-600 dark:text-blue-500" {...props}>
+          {renderChildrenWithMath(props.children)}
         </h4>
       ),
-      ul: ({ children }: { children: React.ReactNode }) => (
-        <ul className="list-disc pl-5 my-3 space-y-1">
-          {children}
+      ul: ({ ...props }: any) => (
+        <ul className="list-disc pl-5 my-3 space-y-1" {...props}>
+          {props.children}
         </ul>
       ),
-      ol: ({ children }: { children: React.ReactNode }) => (
-        <ol className="list-decimal pl-5 my-3 space-y-1">
-          {children}
+      ol: ({ ...props }: any) => (
+        <ol className="list-decimal pl-5 my-3 space-y-1" {...props}>
+          {props.children}
         </ol>
       ),
-      li: ({ children }: { children: React.ReactNode }) => (
-        <li className="mb-1">
-          {renderChildrenWithMath(children)}
+      li: ({ ...props }: any) => (
+        <li className="mb-1" {...props}>
+          {renderChildrenWithMath(props.children)}
         </li>
       ),
-      blockquote: ({ children }: { children: React.ReactNode }) => (
-        <blockquote className="border-l-4 border-blue-300 dark:border-blue-700 pl-4 py-1 my-3 text-gray-700 dark:text-gray-300 italic">
-          {renderChildrenWithMath(children)}
+      blockquote: ({ ...props }: any) => (
+        <blockquote className="border-l-4 border-blue-300 dark:border-blue-700 pl-4 py-1 my-3 text-gray-700 dark:text-gray-300 italic" {...props}>
+          {renderChildrenWithMath(props.children)}
         </blockquote>
       ),
-      strong: ({ children }: { children: React.ReactNode }) => (
-        <strong>{renderChildrenWithMath(children)}</strong>
+      strong: ({ ...props }: any) => (
+        <strong {...props}>{renderChildrenWithMath(props.children)}</strong>
       ),
-      em: ({ children }: { children: React.ReactNode }) => (
-        <em>{renderChildrenWithMath(children)}</em>
+      em: ({ ...props }: any) => (
+        <em {...props}>{renderChildrenWithMath(props.children)}</em>
       ),
       code: ({ node, inline, className, children, ...props }: any) => (
         inline ? 
@@ -418,6 +495,66 @@ const ChatAssistant: React.FC = () => {
           
           <div className="text-gray-800 dark:text-gray-200">
             <CustomMarkdownRenderer content={message.content} />
+            
+            {/* Challenge answer input area */}
+            {message.isChallenge && !message.challengeData?.isAnswered && (
+              <div className="my-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+                <div className="font-medium mb-2">Entre ta réponse :</div>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    value={challengeAnswers[message.id] || ''}
+                    onChange={(e) => handleChallengeAnswerChange(message.id, e.target.value)}
+                    placeholder="Ta réponse..."
+                    className="flex-1"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSubmitChallengeAnswer(message.id);
+                      }
+                    }}
+                  />
+                  <Button 
+                    size="sm"
+                    onClick={() => handleSubmitChallengeAnswer(message.id)}
+                    disabled={!challengeAnswers[message.id]?.trim()}
+                  >
+                    Vérifier
+                  </Button>
+                </div>
+              </div>
+            )}
+            
+            {/* Challenge result feedback */}
+            {message.isChallenge && message.challengeData?.isAnswered && (
+              <div className={`my-4 p-4 rounded-lg ${
+                message.challengeData.isCorrect 
+                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
+                  : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+              }`}>
+                <div className="flex items-center">
+                  {message.challengeData.isCorrect ? (
+                    <>
+                      <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center mr-2">
+                        <span className="text-white text-xs">✓</span>
+                      </div>
+                      <span className="font-medium text-green-800 dark:text-green-200">
+                        Correct! Ta réponse {message.challengeData.userAnswer} est exacte.
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center mr-2">
+                        <span className="text-white text-xs">✗</span>
+                      </div>
+                      <span className="font-medium text-red-800 dark:text-red-200">
+                        Ta réponse {message.challengeData.userAnswer} n'est pas correcte.
+                        La bonne réponse est {message.challengeData.expectedAnswer}.
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           
           {message.allowActions && (
