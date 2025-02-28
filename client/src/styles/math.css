@@ -1,5 +1,14 @@
 /* Styles spécifiques pour l'affichage des formules mathématiques */
 
+/* Message content container */
+.message-content.math-content {
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
 /* Containers for math blocks */
 .math-block-container {
   max-width: 100%;
@@ -38,8 +47,10 @@
   
   .math-block-container {
     margin: 0.5rem 0;
+    padding: 0.5rem;
     background-color: rgba(240, 240, 250, 0.2); /* Subtle background to indicate scrollable area */
     border-radius: 4px;
+    position: relative;
   }
   
   /* Add fading edges to indicate scrollable content */
@@ -53,6 +64,26 @@
     background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.8));
     pointer-events: none;
   }
+  
+  /* Improve spacing for better readability on small screens */
+  .message-content.math-content p {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Make links more tappable on mobile */
+  .message-content.math-content a {
+    padding: 0.1rem 0;
+    display: inline-block;
+  }
+  
+  /* Allow code blocks to scroll horizontally on small screens */
+  .message-content.math-content pre {
+    overflow-x: auto;
+    white-space: pre;
+    padding: 0.75rem;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }
 
 /* Dark mode adjustments */
@@ -63,5 +94,14 @@
   
   .math-block-container::after {
     background: linear-gradient(to right, transparent, rgba(30, 30, 40, 0.8));
+  }
+  
+  .message-content.math-content pre {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Improve readability of code blocks in dark mode */
+  .message-content.math-content code {
+    color: #e8e8e8;
   }
 }

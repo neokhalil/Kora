@@ -869,7 +869,9 @@ const ChatAssistant: React.FC = () => {
     }
     
     return (
-      <ReactMarkdown components={components}>{processedContent}</ReactMarkdown>
+      <div className="message-content math-content">
+        <ReactMarkdown components={components}>{processedContent}</ReactMarkdown>
+      </div>
     );
   };
 
