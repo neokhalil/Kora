@@ -1,14 +1,18 @@
 import React from 'react';
+import ChatInterface from '@/components/ChatInterface';
 
 const ChatAssistant: React.FC = () => {
-  console.log("ChatAssistant rendering"); // Debug log
-  
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Kora Chat Assistant</h1>
-      <p className="mb-4">Welcome to the Kora Assistant interface.</p>
-      <div className="p-4 bg-gray-100 rounded-lg">
-        <p>This is a simple placeholder for the chat interface.</p>
+    <div className="flex flex-col h-full max-w-4xl mx-auto">
+      <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 p-4">
+        <h1 className="text-xl font-semibold">Kora Assistant</h1>
+        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+          En ligne
+        </span>
+      </div>
+      
+      <div className="flex-1 overflow-hidden">
+        <ChatInterface />
       </div>
     </div>
   );

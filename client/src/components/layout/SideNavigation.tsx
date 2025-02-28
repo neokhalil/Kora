@@ -8,29 +8,26 @@ const SideNavigation = () => {
   const { isMenuOpen, closeMenu } = useMenu();
   const [location, setLocation] = useLocation();
   
-  // Debug current location and navigation items
+  // Track current location for highlighting active link
   React.useEffect(() => {
-    console.log("Current location in SideNavigation:", location);
-    console.log("Navigation items:", navItems);
-    
-    // Force re-render with timeout to ensure UI updates
-    const timer = setTimeout(() => {
-      console.log("Navigation refreshed");
-    }, 500);
-    
-    return () => clearTimeout(timer);
+    // Only log in development
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("Current location in SideNavigation:", location);
+    }
   }, [location]);
   
-  // Function to handle navigation
+  // Function to handle navigation with debounce protection
   const handleNavigation = (path: string) => {
-    console.log("Navigating to:", path);
+    // Only log in development
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("Navigating to:", path);
+    }
     
     // Use a small timeout to ensure the navigation happens after
     // any current rendering cycle completes
     setTimeout(() => {
       setLocation(path);
       closeMenu();
-      console.log("Navigation completed to:", path);
     }, 10);
   };
   
@@ -86,42 +83,31 @@ const SideNavigation = () => {
           </ul>
         </nav>
         
-        {/* Debug section */}
+        {/* Version info */}
         <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50 dark:bg-gray-800">
-          <p>Current route: {location}</p>
-          <p>Navigation items: {navItems.length}</p>
-          <div className="mt-1 text-xs">
-            <details>
-              <summary>All Routes</summary>
-              <ul className="pl-2 mt-1">
-                {navItems.map((item, index) => (
-                  <li key={index} className="flex justify-between">
-                    <span>{item.label} ({item.path})</span>
-                    <button 
-                      className="text-indigo-600 hover:underline" 
-                      onClick={() => handleNavigation(item.path)}
-                    >
-                      Go
-                    </button>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-2 flex space-x-2">
-                <button 
-                  className="px-1 py-0.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                  onClick={() => handleNavigation("/test")}
-                >
-                  Test Page
-                </button>
-                <button 
-                  className="px-1 py-0.5 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                  onClick={() => handleNavigation("/chat-assistant")}
-                >
-                  Chat Assistant
-                </button>
+          <p>Kora Learning Platform v1.0</p>
+          {process.env.NODE_ENV === 'development' && (
+            <details className="mt-1">
+              <summary>Developer Info</summary>
+              <div className="mt-1">
+                <p>Current route: {location}</p>
+                <p>Navigation items: {navItems.length}</p>
+                <ul className="pl-2 mt-1 space-y-1">
+                  {navItems.map((item, index) => (
+                    <li key={index} className="flex justify-between">
+                      <span>{item.label}</span>
+                      <button 
+                        className="text-indigo-600 hover:underline text-xs" 
+                        onClick={() => handleNavigation(item.path)}
+                      >
+                        Go
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </details>
-          </div>
+          )}
         </div>
         
         {/* Footer section */}

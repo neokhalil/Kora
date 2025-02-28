@@ -24,39 +24,15 @@ const routes = [
   { path: "/test", Component: TestPage }
 ];
 
-// Simple router with enhanced debugging
+// Router component
 const AppRouter: React.FC = () => {
-  // Track the current path manually
-  const [currentPath, setCurrentPath] = React.useState(window.location.pathname);
-  
-  // Update currentPath when location changes
-  React.useEffect(() => {
-    console.log("Current location in AppRouter:", currentPath);
-    
-    // Listen for location changes
-    const handleLocationChange = () => {
-      setCurrentPath(window.location.pathname);
-    };
-    
-    // Add event listener
-    window.addEventListener('popstate', handleLocationChange);
-    
-    return () => {
-      window.removeEventListener('popstate', handleLocationChange);
-    };
-  }, [currentPath]);
-  
-  // Debugging helper - log all route registrations
-  React.useEffect(() => {
-    console.log("Available routes:", routes.map(r => r.path));
-    
-    // Force rerender on first load to ensure routes are properly registered
-    const timer = setTimeout(() => {
-      console.log("Routes initialized");
-    }, 200);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    // Log all registered routes once during initialization
+    React.useEffect(() => {
+      console.log("Available routes:", routes.map(r => r.path));
+    }, []);
+  }
   
   return (
     <Switch>
