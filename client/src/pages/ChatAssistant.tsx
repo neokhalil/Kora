@@ -1,9 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain } from 'lucide-react';
+import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, Image as ImageIcon, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
@@ -25,9 +26,11 @@ interface Message {
   sender: 'user' | 'kora';
   isReExplanation?: boolean;
   isChallenge?: boolean;
+  isImageAnalysis?: boolean;
   allowActions?: boolean;
   messageId?: string;
   challengeData?: ChallengeData;
+  imageUrl?: string;
 }
 
 // Define the AI tutoring component
