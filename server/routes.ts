@@ -48,6 +48,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       fileSize: 5 * 1024 * 1024, // 5MB file size limit
     }
   });
+  // Create a shared conversation history map for all types of interactions
+  const userConversations = new Map<string, { role: 'user' | 'assistant', content: string }[]>();
+  
   // Add image processing endpoint
   app.post('/api/image-analysis', upload.single('image'), async (req: Request, res: Response) => {
     try {
@@ -61,15 +64,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageBase64 = imageBuffer.toString('base64');
       
       // Get optional parameters
-      const { subject = 'general', query = '' } = req.body;
+      const { subject = 'general', query = '', sessionId = 'default' } = req.body;
       
       // Process the image with OpenAI
       const response = await processImageQuery(imageBase64, query, subject);
       
-      // Return the response
+      // Store conversation history in the shared map for use with WebSocket
+      if (!userConversations.has(sessionId)) {
+        userConversations.set(sessionId, []);
+      }
+      
+      // Get the conversation history
+      const conversationHistory = userConversations.get(sessionId) || [];
+      
+      // Add the current interaction to history
+      conversationHistory.push({ 
+        role: 'user', 
+        content: query || "Analyse cette image s'il te plaît" 
+      });
+      
+      conversationHistory.push({ 
+        role: 'assistant', 
+        content: response 
+      });
+      
+      // Limit conversation history to last 10 messages
+      if (conversationHistory.length > 10) {
+        conversationHistory.splice(0, 2); // Remove oldest Q&A pair
+      }
+      
+      // Update the map
+      userConversations.set(sessionId, conversationHistory);
+      
+      // Return the response with conversation ID
       res.json({
         content: response,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        sessionId
       });
       
       // Clean up - remove the temporary file
@@ -216,22 +247,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Handle WebSocket connections
   wss.on('connection', (ws) => {
     console.log('WebSocket client connected');
+    
+    // Track session ID for this connection
+    let sessionId = 'default';
 
     // Send a welcome message
     ws.send(JSON.stringify({
       type: 'welcome',
       message: "Bonjour ! Je suis Kora, ton assistant éducatif. Comment puis-je t'aider aujourd'hui ?",
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      sessionId
     }));
-
-    // Store conversation history for each connection
-    const conversationHistory: { role: 'user' | 'assistant', content: string }[] = [];
     
     // Handle messages from client
     ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString());
         console.log('Received message:', data);
+        
+        // Update session ID if provided
+        if (data.sessionId) {
+          sessionId = data.sessionId;
+        }
+        
+        // Ensure this user has conversation history
+        if (!userConversations.has(sessionId)) {
+          userConversations.set(sessionId, []);
+        }
+        
+        // Get conversation history for this session
+        const conversationHistory = userConversations.get(sessionId) || [];
 
         // Process the message based on content
         if (data.type === 'chat') {
@@ -247,6 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           try {
             // Store user message
             conversationHistory.push({ role: 'user', content: data.content });
+            userConversations.set(sessionId, conversationHistory);
             
             // Generate AI response
             const aiResponse = await generateTutoringResponse(data.content, conversationHistory);
@@ -259,6 +305,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               conversationHistory.splice(0, 2); // Remove oldest Q&A pair
             }
             
+            // Update the shared history
+            userConversations.set(sessionId, conversationHistory);
+            
             // Send response to client
             if (ws.readyState === WebSocket.OPEN) {
               const response = {
@@ -266,7 +315,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 content: aiResponse,
                 messageId: Date.now().toString(), // Unique ID for this message
                 timestamp: new Date().toISOString(),
-                allowActions: true // Enable re-explain and challenge buttons
+                allowActions: true, // Enable re-explain and challenge buttons
+                sessionId
               };
               
               ws.send(JSON.stringify(response));
@@ -286,8 +336,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else if (data.type === 'reexplain') {
           // Handle re-explanation request
           try {
-            // Find the most recent question and AI response
-            // Get the recent messages (last user question and assistant response)
+            // Get the conversation history
             const recentMessages = [...conversationHistory];
             let originalQuestion = "Question originale non trouvée";
             let originalExplanation = "Explication originale non trouvée";
@@ -307,7 +356,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
             
-            console.log('Re-explaining based on recent context:', { originalQuestion, originalExplanationLength: originalExplanation.length });
+            console.log('Re-explaining based on recent context:', { 
+              sessionId,
+              originalQuestion, 
+              originalExplanationLength: originalExplanation.length,
+              historyLength: conversationHistory.length 
+            });
             
             // Generate alternative explanation
             const alternativeExplanation = await generateReExplanation(
@@ -315,13 +369,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
               originalExplanation
             );
             
+            // Add to conversation history
+            conversationHistory.push({ 
+              role: 'assistant', 
+              content: alternativeExplanation 
+            });
+            
+            // Update shared history
+            userConversations.set(sessionId, conversationHistory);
+            
             // Send response to client
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
                 type: 'chat',
                 content: alternativeExplanation,
                 isReExplanation: true,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                sessionId
               }));
             }
           } catch (error) {
@@ -337,7 +401,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } else if (data.type === 'challenge') {
           // Handle challenge request
           try {
-            // Get recent messages for context
+            // Get the conversation history
             const recentMessages = [...conversationHistory];
             let originalQuestion = "Question non trouvée";
             let explanation = "Explication non trouvée";
@@ -357,10 +421,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
             }
             
-            console.log('Generating challenge based on recent context:', { originalQuestion, explanationLength: explanation.length });
+            console.log('Generating challenge based on recent context:', { 
+              sessionId,
+              originalQuestion, 
+              explanationLength: explanation.length,
+              historyLength: conversationHistory.length 
+            });
             
             // Generate challenge problem
             const challengeProblem = await generateChallengeProblem(originalQuestion, explanation);
+            
+            // Add to conversation history
+            conversationHistory.push({ 
+              role: 'assistant', 
+              content: challengeProblem 
+            });
+            
+            // Update shared history
+            userConversations.set(sessionId, conversationHistory);
             
             // Send response to client
             if (ws.readyState === WebSocket.OPEN) {
@@ -368,7 +446,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 type: 'chat',
                 content: challengeProblem,
                 isChallenge: true,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                sessionId
               }));
             }
           } catch (error) {
@@ -380,6 +459,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 timestamp: new Date().toISOString()
               }));
             }
+          }
+        } else if (data.type === 'load_history') {
+          // Send the current conversation history to the client
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'history',
+              history: conversationHistory,
+              timestamp: new Date().toISOString(),
+              sessionId
+            }));
           }
         }
       } catch (error) {
@@ -399,6 +488,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Handle client disconnection
     ws.on('close', () => {
       console.log('WebSocket client disconnected');
+      // Note: We don't remove the conversation history when client disconnects
+      // to allow it to be used across sessions
     });
   });
 
