@@ -593,43 +593,46 @@ const ChatAssistant: React.FC = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => {
-                          // Request detailed solution
-                          const messageToServer = message.messageId || message.id;
-                          console.log("Requesting solution for message:", messageToServer);
+                          console.log("Requesting solution for challenge");
                           
-                          // For demo/testing purposes, add a fake solution message
-                          // Prepare data for the solution
+                          // For demo purposes, generate a detailed solution
                           const answer = message.challengeData?.expectedAnswer || "";
+                          
+                          // Récupérer le défi original pour extraire l'équation
+                          const originalContent = message.content;
+                          console.log("Original content:", originalContent);
+                          
                           let solution = "";
-                          let equation = "";
+                          let equationStr = "";
                           
-                          // Find the challenge content
-                          if (message?.content) {
-                            // Try to extract the equation from the challenge content using regex
-                            const equationMatch = message.content.match(/\$([^$]+)\$/);
-                            if (equationMatch && equationMatch[1]) {
-                              equation = equationMatch[1];
-                              
-                              // Parse the equation to provide a better solution
-                              if (equation.includes('+')) {
-                                const [a, b] = equation.split('+').map(part => part.trim());
-                                solution = `Pour résoudre $${equation} = ?$:\n\n1. Additionner les nombres $${a}$ et $${b}$\n2. $${a} + ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
-                              } else if (equation.includes('-')) {
-                                const [a, b] = equation.split('-').map(part => part.trim());
-                                solution = `Pour résoudre $${equation} = ?$:\n\n1. Soustraire $${b}$ de $${a}$\n2. $${a} - ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
-                              } else if (equation.includes('×')) {
-                                const [a, b] = equation.split('×').map(part => part.trim());
-                                solution = `Pour résoudre $${equation} = ?$:\n\n1. Multiplier les nombres $${a}$ et $${b}$\n2. $${a} \\times ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
-                              } else {
-                                // Generic solution for other types of equations
-                                solution = `Pour résoudre $${equation} = ?$:\n\n1. Effectuer l'opération indiquée\n2. Simplifier l'expression\n\nLa réponse est donc $${answer}$`;
-                              }
+                          // Extraire l'équation du contenu du message
+                          const equationMatch = originalContent.match(/\$([^$=]+)(\s*=\s*\?)\$/);
+                          
+                          if (equationMatch && equationMatch[1]) {
+                            equationStr = equationMatch[1].trim();
+                            console.log("Extracted equation:", equationStr);
+                            
+                            // Générer une solution basée sur l'opération
+                            if (equationStr.includes('+')) {
+                              const [a, b] = equationStr.split('+').map(part => part.trim());
+                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Additionner les nombres $${a}$ et $${b}$\n2. $${a} + ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                            } 
+                            else if (equationStr.includes('-')) {
+                              const [a, b] = equationStr.split('-').map(part => part.trim());
+                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Soustraire $${b}$ de $${a}$\n2. $${a} - ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                            } 
+                            else if (equationStr.includes('×')) {
+                              const [a, b] = equationStr.split('×').map(part => part.trim());
+                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Multiplier les nombres $${a}$ et $${b}$\n2. $${a} \\times ${b} = ${answer}$\n\nLa réponse est donc $${answer}$`;
+                            } 
+                            else {
+                              // Équation générique
+                              solution = `Pour résoudre $${equationStr} = ?$:\n\n1. Effectuer l'opération indiquée\n2. Simplifier l'expression\n\nLa réponse est donc $${answer}$`;
                             }
-                          }
-                          
-                          // If we couldn't parse a specific solution, use a generic one
-                          if (!solution) {
-                            solution = `Pour résoudre cette équation:\n\n1. Isoler le terme avec x\n2. Diviser les deux côtés par le coefficient de x\n3. Simplifier pour obtenir la valeur de x\n\nLa réponse est donc $${answer}$`;
+                          } 
+                          else {
+                            // Fallback si on ne peut pas extraire l'équation
+                            solution = `Pour résoudre ce problème:\n\n1. Effectuer l'opération demandée\n2. Simplifier l'expression\n\nLa réponse est $${answer}$`;
                           }
                           
                           const solutionMessage: Message = {
@@ -643,7 +646,7 @@ const ChatAssistant: React.FC = () => {
                           
                           // In a real implementation, also send to server
                           sendMessage('challenge_solution', { 
-                            messageId: messageToServer
+                            messageId: message.id
                           });
                           
                           // Scroll to the new message
