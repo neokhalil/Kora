@@ -43,9 +43,9 @@ const SideNavigation = () => {
             {navItems.map((item) => (
               <li key={item.path}>
                 <Link href={item.path}>
-                  <a 
+                  <div 
                     className={cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
                       location === item.path 
                         ? "bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-indigo-400" 
                         : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -54,7 +54,7 @@ const SideNavigation = () => {
                   >
                     <span className="mr-3">{item.icon}</span>
                     {item.label}
-                  </a>
+                  </div>
                 </Link>
               </li>
             ))}
