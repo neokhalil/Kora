@@ -782,10 +782,14 @@ const ChatAssistant: React.FC = () => {
                                   const originalMessageContent = originalContent || "";
                                   const equationMatchInChallenge = originalMessageContent.match(/l'équation\s*\$([^$]+)\$/i);
                                   
-                                  // Si on peut extraire l'équation originale du défi, l'utiliser, sinon créer une équation générique
+                                  // Tenter d'identifier les valeurs dans le contenu original
+                                  const numericValueMatch = originalMessageContent.match(/=\s*\$?(\d+(?:\.\d+)?)\$?/);
+                                  const rightSideValue = numericValueMatch ? numericValueMatch[1] : "?";
+                                
+                                  // Si on peut extraire l'équation originale du défi, l'utiliser, sinon créer une équation précise
                                   const equationComplete = equationMatchInChallenge ? 
                                     equationMatchInChallenge[1] : 
-                                    (equation.includes('=') ? equation : `${equation} = c`);
+                                    (equation.includes('=') ? equation : `${equation} = ${rightSideValue}`);
                                     
                                   solution = `Pour résoudre l'équation $${equationComplete}$ :\n\n1. **Isoler** la variable $x$\n\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
                                 }
