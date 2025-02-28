@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Switch, Route } from "wouter";
+import { Route, Router as WouterRouter, Switch } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,19 +14,36 @@ import ChatAssistant from "@/pages/ChatAssistant";
 import TestPage from "@/pages/TestPage";
 import { MenuProvider } from "@/hooks/use-menu";
 
-const Router: React.FC = () => {
-  // Log the current routes for debugging
-  console.log("Router component rendering with routes");
+// Set up static route config for debugging
+const routes = [
+  { path: "/", Component: Home },
+  { path: "/aide-aux-devoirs", Component: HomeworkHelp },
+  { path: "/preparation-examens", Component: ExamPrep },
+  { path: "/lecons-interactives", Component: InteractiveLessons },
+  { path: "/chat-assistant", Component: ChatAssistant },
+  { path: "/test", Component: TestPage }
+];
+
+// Simple router with enhanced debugging
+const AppRouter: React.FC = () => {
+  const [location] = React.useState(window.location.pathname);
+  console.log("Current location:", location);
+  
+  // Debugging helper - log all route registrations
+  React.useEffect(() => {
+    console.log("Available routes:", routes.map(r => r.path));
+  }, []);
   
   return (
     <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/aide-aux-devoirs">{(params) => <HomeworkHelp />}</Route>
-      <Route path="/preparation-examens">{(params) => <ExamPrep />}</Route>
-      <Route path="/lecons-interactives">{(params) => <InteractiveLessons />}</Route>
-      <Route path="/chat-assistant">{(params) => <ChatAssistant />}</Route>
-      <Route path="/test">{(params) => <TestPage />}</Route>
-      <Route>{(params) => <NotFound />}</Route>
+      {routes.map(({ path, Component }) => (
+        <Route key={path} path={path}>
+          <Component />
+        </Route>
+      ))}
+      <Route>
+        <NotFound />
+      </Route>
     </Switch>
   );
 };
@@ -39,8 +56,8 @@ const App: React.FC = () => {
           <Header />
           <div className="flex flex-1 relative">
             <SideNavigation />
-            <main className="flex-1 mx-auto w-full max-w-screen-xl">
-              <Router />
+            <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
+              <AppRouter />
             </main>
           </div>
         </div>

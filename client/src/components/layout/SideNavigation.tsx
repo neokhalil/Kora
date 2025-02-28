@@ -1,12 +1,24 @@
 import React from 'react';
-import { Link, useLocation } from 'wouter';
+import { useLocation } from 'wouter';
 import { useMenu } from '@/hooks/use-menu';
 import { navItems } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
 const SideNavigation = () => {
   const { isMenuOpen, closeMenu } = useMenu();
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  
+  // Debug current location
+  React.useEffect(() => {
+    console.log("Current location in SideNavigation:", location);
+  }, [location]);
+  
+  // Function to handle navigation
+  const handleNavigation = (path: string) => {
+    console.log("Navigating to:", path);
+    setLocation(path);
+    closeMenu();
+  };
   
   return (
     <>
@@ -27,14 +39,15 @@ const SideNavigation = () => {
       >
         {/* Logo section at the top of sidebar */}
         <div className="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800">
-          <Link href="/">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center">
-                <span className="text-white font-bold text-lg">K</span>
-              </div>
-              <span className="text-xl font-bold">Kora</span>
+          <div 
+            className="flex items-center space-x-2 cursor-pointer" 
+            onClick={() => handleNavigation("/")}
+          >
+            <div className="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center">
+              <span className="text-white font-bold text-lg">K</span>
             </div>
-          </Link>
+            <span className="text-xl font-bold">Kora</span>
+          </div>
         </div>
         
         {/* Navigation Links */}
@@ -42,24 +55,27 @@ const SideNavigation = () => {
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.path}>
-                <Link href={item.path}>
-                  <div 
-                    className={cn(
-                      "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
-                      location === item.path 
-                        ? "bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-indigo-400" 
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                    )}
-                    onClick={closeMenu}
-                  >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.label}
-                  </div>
-                </Link>
+                <div 
+                  className={cn(
+                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
+                    location === item.path 
+                      ? "bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-indigo-400" 
+                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                  )}
+                  onClick={() => handleNavigation(item.path)}
+                >
+                  <span className="mr-3">{item.icon}</span>
+                  {item.label}
+                </div>
               </li>
             ))}
           </ul>
         </nav>
+        
+        {/* Debug section */}
+        <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50 dark:bg-gray-800">
+          <p>Current route: {location}</p>
+        </div>
         
         {/* Footer section */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-800">
