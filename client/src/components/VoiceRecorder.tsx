@@ -440,7 +440,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       {/* Version enregistrement - style WhatsApp */}
       {recorderState === 'recording' && (
-        <div className="flex items-center w-full max-w-xl bg-gray-100 dark:bg-gray-800 rounded-full shadow-md overflow-hidden">
+        <div className="flex items-center w-full max-w-xl bg-white dark:bg-slate-900 rounded-full shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
           {/* Bouton pour annuler l'enregistrement */}
           <Button
             size="icon"
@@ -475,9 +475,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             className="h-12 w-12 text-gray-500 hover:text-red-500 rounded-l-full flex-shrink-0"
             aria-label="Annuler l'enregistrement"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 5v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              <line x1="10" y1="12" x2="14" y2="12"></line>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18"></path>
+              <path d="m6 6 12 12"></path>
             </svg>
           </Button>
           
@@ -485,7 +485,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           <div className="flex-1 px-2 flex items-center overflow-hidden">
             {/* Cercle rouge d'enregistrement avec animation pulse */}
             <div className="flex-shrink-0 mr-3">
-              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
             </div>
             
             {/* Durée d'enregistrement */}
@@ -493,13 +493,43 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               {formatDuration(recordingDuration)}
             </span>
             
-            {/* Visualiseur audio custom - points qui bougent */}
-            <div className="flex-1 mx-2 h-6 flex items-center gap-[2px] overflow-hidden">
+            {/* Visualiseur audio style WhatsApp - série de points/tirets */}
+            <div className="flex-1 mx-2 h-6 flex items-center justify-center overflow-hidden">
+              {/* Nous cachons le canvas mais l'utilisons toujours pour analyser l'audio */}
               <canvas 
                 ref={canvasRef} 
-                className="w-full h-full"
+                className="hidden"
                 style={{ height: '24px' }}
               />
+              
+              {/* Visualiseur style WhatsApp - ligne pointillée */}
+              <div className="w-full h-5 flex items-center justify-center gap-[2px]">
+                {/* Générons une série de tirets de différentes hauteurs */}
+                {Array.from({ length: 44 }).map((_, i) => {
+                  // Utiliser une fonction Math.sin pour varier les hauteurs de manière ondulatoire
+                  const baseHeight = Math.abs(Math.sin(i * 0.3) * 6) + 1;
+                  // Ajouter un peu de variation aléatoire pour un effet plus naturel
+                  const randomFactor = (i % 3 === 0) ? 1.5 : (i % 2 === 0) ? 0.8 : 1.2;
+                  const height = baseHeight * randomFactor;
+                  
+                  return (
+                    <div 
+                      key={i}
+                      className="rounded-full"
+                      style={{ 
+                        width: '2px',
+                        height: `${height}px`,
+                        backgroundColor: '#00A884', // Couleur de WhatsApp
+                        // Animation plus lente pour les barres plus hautes
+                        animationDuration: `${0.8 + (height / 10)}s`,
+                        // Décalage d'animation pour que toutes les barres ne clignotent pas en même temps
+                        animationDelay: `${(i * 25) % 500}ms`,
+                        opacity: 0.8
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </div>
             
             {/* Durée restante (optionnel) */}
@@ -513,7 +543,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             size="icon"
             variant="ghost"
             onClick={stopRecording}
-            className="h-12 w-12 bg-green-500 hover:bg-green-600 text-white rounded-r-full flex-shrink-0"
+            className="h-12 w-12 bg-[#00A884] hover:bg-[#009670] text-white rounded-r-full flex-shrink-0"
             aria-label="Envoyer l'enregistrement"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
