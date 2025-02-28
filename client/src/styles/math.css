@@ -36,6 +36,34 @@
   scrollbar-width: none; /* Hide scrollbar for inline math */
 }
 
+/* Special styles for array environments like matrices */
+.katex .array-brackets,
+.katex .array-table,
+.katex .array-align {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
+/* Specific fix for begin{array} environments */
+.katex .array-table-container {
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 5px;
+}
+
+/* Ensure matrices and arrays render correctly */
+.katex .array-table {
+  display: inline-table;
+  border-collapse: collapse;
+}
+
+/* Fix for any escaped LaTeX characters like & and _ */
+.katex .amsmath-array .amp,
+.katex .amsmath-array .underscore {
+  display: inline-block;
+}
+
 .math-inline-container::-webkit-scrollbar {
   display: none; /* Hide scrollbar for Chrome */
 }
@@ -107,6 +135,24 @@
     border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.05);
   }
+}
+
+/* Specific fix for array environment */
+.katex .array-environment {
+  overflow-x: auto;
+  display: block;
+  max-width: 100%;
+  padding: 5px 0;
+}
+
+/* Escape and special characters in LaTeX */
+.katex .amp, 
+.katex .backslash, 
+.katex .left-brace, 
+.katex .right-brace,
+.katex .underscore {
+  display: inline-block;
+  vertical-align: baseline;
 }
 
 /* Dark mode adjustments */

@@ -735,14 +735,19 @@ const ChatAssistant: React.FC = () => {
     // Handle display/block math expressions ($$...$$)
     let processedContent = content.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
       const id = `block-${mathExpressions.length}`;
-      mathExpressions.push({ id, formula, isBlock: true });
+      // Nettoyer la formule pour éviter les problèmes de rendu
+      const cleanedFormula = formula.trim();
+      mathExpressions.push({ id, formula: cleanedFormula, isBlock: true });
       return `{{MATH-${id}}}`;
     });
     
     // Handle inline math expressions ($...$) but not double $$ already handled
-    processedContent = processedContent.replace(/\$([^\$]*?)\$/g, (match, formula) => {
+    // Modification du regex pour mieux capturer les expressions mathématiques complexes
+    processedContent = processedContent.replace(/\$([^\$]+?)\$/g, (match, formula) => {
       const id = `inline-${mathExpressions.length}`;
-      mathExpressions.push({ id, formula, isBlock: false });
+      // Nettoyer la formule pour éviter les problèmes de rendu
+      const cleanedFormula = formula.trim();
+      mathExpressions.push({ id, formula: cleanedFormula, isBlock: false });
       return `{{MATH-${id}}}`;
     });
     
@@ -754,7 +759,12 @@ const ChatAssistant: React.FC = () => {
       .replace(/\*\*(Important|Remarque|Note|Attention)(\s*:)\*\*/g, '### $1$2')
       // Make sure lists render properly
       .replace(/^- ([^*])/gm, '* $1')
-      .replace(/^(\d+)\. /gm, '$1\\. ');
+      .replace(/^(\d+)\. /gm, '$1\\. ')
+      // Preprocess array environments to handle them specially
+      .replace(/\\begin\{array\}(\{[^}]*\})([\s\S]*?)\\end\{array\}/g, (match) => {
+        // Escape the match to preserve it through markdown processing
+        return '```latex\n' + match + '\n```';
+      });
     
     // Create a component that renders the markdown first,
     // then replaces the math placeholders with actual rendered math
