@@ -6,6 +6,7 @@ import { insertQuestionSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
 import multer from 'multer';
 import { generateTutoringResponse, generateReExplanation, generateChallengeProblem, processImageQuery } from './openai';
+import { handleAudioTranscription } from './whisper';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';

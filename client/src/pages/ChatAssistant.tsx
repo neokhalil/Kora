@@ -1,11 +1,26 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { Send, Loader2, ThumbsUp, ThumbsDown, RefreshCw, Brain, FileText, X, Camera } from 'lucide-react';
+import { 
+  Send, 
+  Loader2, 
+  ThumbsUp, 
+  ThumbsDown, 
+  RefreshCw, 
+  Brain, 
+  FileText, 
+  X, 
+  Camera, 
+  Mic, 
+  Square, 
+  AlertCircle 
+} from 'lucide-react';
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
