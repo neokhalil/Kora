@@ -223,6 +223,8 @@ const ChatAssistant: React.FC = () => {
     const hasGeometry = recentMessages.some(m => geometryPattern.test(m.content));
     const hasCalculus = recentMessages.some(m => calculusPattern.test(m.content));
     
+    console.log("Context detection for challenge:", {hasAlgebra, hasGeometry, hasCalculus});
+    
     // Créer un défi en fonction du contexte
     if (hasAlgebra) {
       // Défi d'algèbre simple: résoudre pour x
@@ -295,7 +297,7 @@ const ChatAssistant: React.FC = () => {
           break;
       }
       
-      challengeContent = `### Nouveau défi d'arithmétique:\n\nCalcule: $${equation} = ?$\n\nEntre ta réponse ci-dessous.`;
+      challengeContent = `### Nouveau défi d'arithmétique:\n\nCalcule: $${equation} = $\n\nEntre ta réponse ci-dessous.`;
       expectedAnswer = result.toString();
       challengeType = 'arithmetic';
     }
@@ -774,10 +776,10 @@ const ChatAssistant: React.FC = () => {
                                   const b = parseInt(params[2]);
                                   const c = parseInt(params[3]);
                                   
-                                  solution = `Pour résoudre l'équation $${equation}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
+                                  solution = `Pour résoudre l'équation $${a}x + ${b} = ${c}$ :\n\n1. **Isoler** le terme avec $x$ en soustrayant $${b}$ des deux côtés\n\n   $${a}x + ${b} - ${b} = ${c} - ${b}$\n\n   $${a}x = ${c - b}$\n\n2. **Diviser** les deux côtés par $${a}$ pour isoler $x$\n\n   $\\frac{${a}x}{${a}} = \\frac{${c - b}}{${a}}$\n\n   $x = ${answer}$\n\nLa réponse est donc **$x = ${answer}$**`;
                                 } else {
                                   // Fallback plus générique pour les équations algébriques non standard
-                                  const equationComplete = equation.includes('=') ? equation : `${equation} = ?`;
+                                  const equationComplete = equation.includes('=') ? equation : `${equation} = c`;
                                   solution = `Pour résoudre l'équation $${equationComplete}$ :\n\n1. **Isoler** la variable $x$\n\n2. **Résoudre** l'équation\n\nLa réponse est $x = ${answer}$`;
                                 }
                               } else {
@@ -875,7 +877,7 @@ const ChatAssistant: React.FC = () => {
                         // Create a new challenge message
                         const challengeMessage: Message = {
                           id: Date.now().toString(),
-                          content: `### Nouveau défi:\n\nCalcule: $${equation} = ?$\n\nEntre ta réponse ci-dessous.`,
+                          content: `### Nouveau défi:\n\nCalcule: $${equation} = $\n\nEntre ta réponse ci-dessous.`,
                           sender: 'kora',
                           isChallenge: true,
                           challengeData: {
