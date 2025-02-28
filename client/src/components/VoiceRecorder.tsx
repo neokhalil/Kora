@@ -266,19 +266,89 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     }
   };
   
+  // Vérifie si l'API MediaRecorder est disponible
+  const isMediaRecorderSupported = () => {
+    return typeof window !== 'undefined' && 
+           typeof window.MediaRecorder !== 'undefined' &&
+           typeof navigator !== 'undefined' && 
+           typeof navigator.mediaDevices !== 'undefined' &&
+           typeof navigator.mediaDevices.getUserMedia !== 'undefined';
+  };
+
+  // Vérifie si le navigateur a accès au microphone
+  const checkMicrophoneAccess = async (): Promise<boolean> => {
+    try {
+      // Vérifier si les permissions sont déjà accordées
+      const permissions = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      
+      if (permissions.state === 'granted') {
+        return true;
+      } else if (permissions.state === 'prompt') {
+        // Afficher un toast pour informer l'utilisateur qu'il devra accepter les permissions
+        toast({
+          title: "Permission requise",
+          description: "Merci d'autoriser l'accès au microphone quand demandé.",
+        });
+      } else if (permissions.state === 'denied') {
+        throw new Error("L'accès au microphone a été bloqué. Veuillez modifier les permissions dans les paramètres de votre navigateur.");
+      }
+      
+      return false;
+    } catch (error) {
+      console.warn('Impossible de vérifier les permissions du microphone:', error);
+      return false;
+    }
+  };
+  
   // Démarrer l'enregistrement
   const startRecording = async () => {
     try {
+      // Vérifier si MediaRecorder est supporté
+      if (!isMediaRecorderSupported()) {
+        throw new Error("Votre navigateur ne supporte pas l'enregistrement audio.");
+      }
+      
+      // Vérifier les permissions du microphone
+      await checkMicrophoneAccess();
+      
       // Réinitialiser les états
       setErrorMessage(null);
       setRecordingDuration(0);
       audioChunksRef.current = [];
       
-      // Demander l'accès au microphone
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Demander l'accès au microphone avec des contraintes audio optimisées
+      const constraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      };
+      
+      // Demander l'accès au microphone avec un timeout
+      const streamPromise = navigator.mediaDevices.getUserMedia(constraints);
+      
+      // Ajouter un timeout pour éviter d'attendre indéfiniment
+      const timeoutPromise = new Promise<MediaStream>((_, reject) => {
+        setTimeout(() => reject(new Error("Délai d'attente dépassé pour l'accès au microphone")), 10000);
+      });
+      
+      // Utiliser la première promesse résolue (stream ou timeout)
+      const stream = await Promise.race([streamPromise, timeoutPromise]);
       
       // Sauvegarder le flux pour pouvoir le fermer plus tard
       mediaStreamRef.current = stream;
+      
+      // S'assurer que le flux a des pistes audio
+      if (stream.getAudioTracks().length === 0) {
+        throw new Error("Aucune piste audio détectée dans le flux du microphone");
+      }
+      
+      console.log("Flux audio obtenu avec succès:", {
+        tracks: stream.getAudioTracks().length,
+        track0: stream.getAudioTracks()[0]?.label || 'Piste sans nom'
+      });
       
       // Configurer le MediaRecorder avec des options spécifiques pour un format compatible
       const options = { mimeType: 'audio/wav' };
@@ -484,67 +554,102 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Retourner le composant
   return (
     <div className="relative flex items-center justify-center">
-      {/* Bouton d'enregistrement */}
-      <Button
-        size="icon"
-        variant={recorderState === 'recording' ? "destructive" : "outline"}
-        disabled={disabled || recorderState === 'processing'}
-        onClick={recorderState === 'recording' ? stopRecording : startRecording}
-        title={recorderState === 'recording' ? "Arrêter l'enregistrement" : "Enregistrer"}
-        className="relative"
-      >
-        {recorderState === 'processing' ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
-        ) : recorderState === 'recording' ? (
-          <StopCircle className="h-5 w-5" />
-        ) : (
-          <Mic className="h-5 w-5" />
-        )}
+      <div className="tooltip-container relative group">
+        {/* Bouton d'enregistrement */}
+        <Button
+          size="icon"
+          variant={recorderState === 'recording' ? "destructive" : "outline"}
+          disabled={disabled || recorderState === 'processing'}
+          onClick={recorderState === 'recording' ? stopRecording : startRecording}
+          aria-label={recorderState === 'recording' ? "Arrêter l'enregistrement" : "Enregistrer votre voix"}
+          className="relative hover:bg-primary/10 hover:text-primary transition-colors"
+        >
+          {recorderState === 'processing' ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : recorderState === 'recording' ? (
+            <StopCircle className="h-5 w-5" />
+          ) : (
+            <Mic className="h-5 w-5" />
+          )}
+          
+          {/* Indicateur de progression circulaire */}
+          {recorderState === 'recording' && (
+            <svg
+              className="absolute inset-0 w-full h-full -rotate-90"
+              viewBox="0 0 100 100"
+            >
+              <circle
+                className="text-gray-300 opacity-25"
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+              />
+              <circle
+                className="text-red-600"
+                cx="50"
+                cy="50"
+                r="40"
+                stroke="currentColor"
+                strokeWidth="8"
+                fill="none"
+                strokeDasharray="251.2"
+                strokeDashoffset={251.2 - (251.2 * recordingProgressPercent) / 100}
+              />
+            </svg>
+          )}
+        </Button>
         
-        {/* Indicateur de progression circulaire */}
-        {recorderState === 'recording' && (
-          <svg
-            className="absolute inset-0 w-full h-full -rotate-90"
-            viewBox="0 0 100 100"
-          >
-            <circle
-              className="text-gray-300 opacity-25"
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="currentColor"
-              strokeWidth="8"
-              fill="none"
-            />
-            <circle
-              className="text-red-600"
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="currentColor"
-              strokeWidth="8"
-              fill="none"
-              strokeDasharray="251.2"
-              strokeDashoffset={251.2 - (251.2 * recordingProgressPercent) / 100}
-            />
-          </svg>
-        )}
-      </Button>
+        {/* Infobulle */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity w-max max-w-[200px] pointer-events-none">
+          {recorderState === 'recording' 
+            ? "Cliquez pour arrêter l'enregistrement" 
+            : recorderState === 'processing'
+            ? "Traitement en cours..."
+            : recorderState === 'error'
+            ? "Une erreur s'est produite, cliquez pour réessayer"
+            : "Cliquez pour enregistrer votre question"
+          }
+        </div>
+      </div>
       
       {/* Visualiseur audio */}
       {recorderState === 'recording' && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-black/5 dark:bg-white/5 rounded-md p-2 w-64">
-          <div className="text-xs text-center mb-1 font-mono">
-            {formatDuration(recordingDuration)} / {formatDuration(maxRecordingTimeMs)}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-black/10 dark:bg-white/10 rounded-md p-2 w-64 z-50 shadow-lg">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs font-mono">{formatDuration(recordingDuration)}</span>
+            <span className="text-xs text-center font-medium">Enregistrement en cours...</span>
+            <span className="text-xs font-mono">{formatDuration(maxRecordingTimeMs)}</span>
           </div>
           <canvas 
             ref={canvasRef} 
-            className="mx-auto"
+            className="mx-auto rounded"
             style={{ 
               width: visualizerConfig.width, 
               height: visualizerConfig.height 
             }}
           />
+          <div className="mt-1 flex justify-center">
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={stopRecording}
+              className="px-2 py-1 h-8 text-xs"
+            >
+              <StopCircle className="h-3 w-3 mr-1" />
+              Arrêter
+            </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* État d'erreur */}
+      {recorderState === 'error' && errorMessage && (
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-2 w-64 text-xs">
+          <p className="font-medium">Erreur d'enregistrement</p>
+          <p>{errorMessage}</p>
         </div>
       )}
     </div>
