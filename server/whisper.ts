@@ -77,6 +77,32 @@ export async function transcribeAudio(
     console.log(`Transcription du fichier: ${audioFilePath} (${fileExt})`);
     console.log(`Options de transcription:`, options);
     
+    // Logs d'information supplémentaires pour le débogage
+    try {
+      // Vérifier si le fichier est lisible
+      const canRead = await new Promise<boolean>((resolve) => {
+        fs.access(audioFilePath, fs.constants.R_OK, (err) => {
+          resolve(!err);
+        });
+      });
+      
+      if (!canRead) {
+        console.warn(`Le fichier ${audioFilePath} n'est pas lisible, mais on continue quand même.`);
+      }
+      
+      // Essayer de lire les premiers octets du fichier pour vérifier qu'il est lisible
+      const buffer = Buffer.alloc(1024);
+      const fd = await fs.promises.open(audioFilePath, 'r');
+      const { bytesRead } = await fd.read(buffer, 0, 1024, 0);
+      await fd.close();
+      
+      console.log(`Test de lecture: ${bytesRead} octets lus sur les 1024 premiers octets.`);
+      console.log(`Début du fichier (hex): ${buffer.slice(0, Math.min(bytesRead, 64)).toString('hex')}`);
+    } catch (error) {
+      console.warn('Erreur lors du test de lecture du fichier:', error);
+      // Continuer malgré l'erreur
+    }
+    
     // Créer un stream de lecture pour le fichier
     const audioReadStream = fs.createReadStream(audioFilePath);
     
@@ -113,6 +139,30 @@ export async function transcribeAudio(
  * @returns Chemin vers le fichier sauvegardé
  */
 export async function saveAudioFile(multerFile: Express.Multer.File): Promise<string> {
+  // Vérifier si le fichier est valide
+  if (!multerFile) {
+    throw new Error('Fichier audio non fourni ou invalide');
+  }
+  
+  if (!multerFile.buffer && !multerFile.path) {
+    throw new Error('Fichier audio sans contenu (ni buffer ni path)');
+  }
+
+  console.log('Informations sur le fichier:', {
+    fieldname: multerFile.fieldname,
+    originalname: multerFile.originalname,
+    mimetype: multerFile.mimetype,
+    size: multerFile.size,
+    hasBuffer: !!multerFile.buffer,
+    hasPath: !!multerFile.path,
+    encoding: multerFile.encoding
+  });
+  
+  // Vérifier si le fichier a une taille valide
+  if (multerFile.size === 0) {
+    throw new Error('Le fichier audio est vide (taille 0)');
+  }
+  
   // Déterminer l'extension correcte selon le type MIME
   let fileExtension = path.extname(multerFile.originalname).toLowerCase();
   
@@ -130,7 +180,8 @@ export async function saveAudioFile(multerFile: Express.Multer.File): Promise<st
       'audio/x-m4a': '.m4a'
     };
     
-    fileExtension = mimeExtMap[multerFile.mimetype] || '.mp3'; // '.mp3' comme fallback
+    // Si on ne reconnaît pas le type MIME, forcer .webm pour plus de compatibilité
+    fileExtension = mimeExtMap[multerFile.mimetype] || '.webm';
   }
   
   console.log(`Type MIME détecté: ${multerFile.mimetype}, extension utilisée: ${fileExtension}`);
@@ -141,14 +192,25 @@ export async function saveAudioFile(multerFile: Express.Multer.File): Promise<st
   try {
     // Si le fichier est déjà sur le disque (comme avec multer.diskStorage)
     if (multerFile.path) {
+      console.log(`Déplacement du fichier de ${multerFile.path} vers ${filePath}`);
       // Renommer simplement le fichier au bon endroit
       await fs.promises.rename(multerFile.path, filePath);
-    } else {
-      // Sinon, écrire le buffer dans un nouveau fichier
+    } else if (multerFile.buffer) {
+      console.log(`Écriture du buffer (taille: ${multerFile.buffer.length}) vers ${filePath}`);
+      // Écrire le buffer dans un nouveau fichier
       await fs.promises.writeFile(filePath, multerFile.buffer);
+    } else {
+      throw new Error('Ni chemin ni buffer disponible pour le fichier audio');
     }
     
-    console.log(`Fichier audio sauvegardé: ${filePath}`);
+    // Vérifier que le fichier a bien été écrit
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Le fichier n'a pas été créé à l'emplacement ${filePath}`);
+    }
+    
+    const stats = fs.statSync(filePath);
+    console.log(`Fichier audio sauvegardé: ${filePath} (taille: ${stats.size} octets)`);
+    
     return filePath;
   } catch (error) {
     console.error('Erreur lors de la sauvegarde du fichier audio:', error);

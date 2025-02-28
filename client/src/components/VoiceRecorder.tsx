@@ -313,13 +313,15 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         // Réinitialiser l'état
         setRecorderState('inactive');
         
-      } catch (fetchError) {
+      } catch (error) {
         clearTimeout(timeoutId);
+        
+        const fetchError = error as { name?: string; message?: string };
         
         if (fetchError.name === 'AbortError') {
           throw new Error('La requête a été annulée car elle prenait trop de temps');
         }
-        throw fetchError;
+        throw new Error(`Erreur de communication avec le serveur: ${fetchError.message || 'Erreur inconnue'}`);
       }
       
     } catch (error) {
@@ -487,8 +489,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         if (audioChunksRef.current.length === 0) {
           console.error('Aucune donnée audio capturée');
           
-          // Essayer de forcer une dernière fois la capture des données
-          const lastDataEvent = new Event('dataavailable') as BlobEvent;
+          // Essayer de récupérer des données avant de terminer
+          // Ce code est commenté car il ne fonctionne pas correctement sur tous les navigateurs
+          // const lastDataEvent = new Event('dataavailable') as BlobEvent;
           
           // Arrêter le mediaRecorder et libérer les ressources
           if (mediaRecorderRef.current) {

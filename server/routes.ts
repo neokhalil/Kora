@@ -66,9 +66,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Multer config for audio uploads
+  // Multer config for audio uploads - using memory storage for improved reliability
+  // Audio will be stored in memory as a buffer to avoid file system issues
   const audioUpload = multer({
-    storage: multerStorage,
+    storage: multer.memoryStorage(), // Use memory storage instead of disk
     fileFilter: audioFileFilter,
     limits: {
       fileSize: 10 * 1024 * 1024, // 10MB file size limit for audio
