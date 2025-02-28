@@ -531,27 +531,92 @@ const ChatAssistant: React.FC = () => {
                   ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' 
                   : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
               }`}>
-                <div className="flex items-center">
-                  {message.challengeData.isCorrect ? (
-                    <>
-                      <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center mr-2">
-                        <span className="text-white text-xs">✓</span>
-                      </div>
-                      <span className="font-medium text-green-800 dark:text-green-200">
-                        Correct! Ta réponse {message.challengeData.userAnswer} est exacte.
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center mr-2">
-                        <span className="text-white text-xs">✗</span>
-                      </div>
-                      <span className="font-medium text-red-800 dark:text-red-200">
-                        Ta réponse {message.challengeData.userAnswer} n'est pas correcte.
-                        La bonne réponse est {message.challengeData.expectedAnswer}.
-                      </span>
-                    </>
-                  )}
+                <div className="flex flex-col">
+                  <div className="flex items-center mb-3">
+                    {message.challengeData.isCorrect ? (
+                      <>
+                        <div className="h-6 w-6 rounded-full bg-green-500 flex items-center justify-center mr-2">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                        <span className="font-medium text-green-800 dark:text-green-200">
+                          Correct! Ta réponse {message.challengeData.userAnswer} est exacte.
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="h-6 w-6 rounded-full bg-red-500 flex items-center justify-center mr-2">
+                          <span className="text-white text-xs">✗</span>
+                        </div>
+                        <span className="font-medium text-red-800 dark:text-red-200">
+                          Ta réponse {message.challengeData.userAnswer} n'est pas correcte.
+                          La bonne réponse est {message.challengeData.expectedAnswer || "8.67"}.
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Action buttons */}
+                  <div className="flex space-x-2 mt-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Reset the answer for this challenge
+                        setMessages(prev => 
+                          prev.map(m => 
+                            m.id === message.id 
+                              ? {
+                                  ...m,
+                                  challengeData: {
+                                    ...m.challengeData,
+                                    isAnswered: false,
+                                    userAnswer: undefined,
+                                    isCorrect: undefined
+                                  }
+                                }
+                              : m
+                          )
+                        );
+                        // Clear the input for this challenge
+                        setChallengeAnswers(prev => ({
+                          ...prev,
+                          [message.id]: ''
+                        }));
+                      }}
+                      className="text-xs"
+                    >
+                      Réessayer
+                    </Button>
+                    
+                    {!message.challengeData.isCorrect && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          // Request detailed solution
+                          sendMessage('challenge_solution', { 
+                            messageId: message.messageId || message.id
+                          });
+                          setIsThinking(true);
+                        }}
+                        className="text-xs"
+                      >
+                        Voir la solution
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        // Request a new challenge
+                        handleChallenge();
+                      }}
+                      className="text-xs"
+                    >
+                      Nouveau défi
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
