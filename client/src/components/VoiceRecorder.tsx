@@ -63,13 +63,13 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const [recordingDuration, setRecordingDuration] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
-  // Configuration du visualiseur audio
+  // Configuration du visualiseur audio - style WhatsApp avec des barres plus fines
   const visualizerConfig: AudioVisualizerConfig = {
-    width: 280, // Largeur du canvas
-    height: 60,  // Hauteur du canvas
-    barWidth: 3,  // Largeur des barres
+    width: 300, // Largeur du canvas (sera ajustée par CSS)
+    height: 24,  // Hauteur du canvas style WhatsApp
+    barWidth: 2,  // Barres plus fines
     barGap: 1,    // Espace entre les barres
-    sensitivity: 1.5 // Sensibilité du visualiseur (plus c'est haut, plus les barres sont hautes)
+    sensitivity: 1.8 // Sensibilité plus élevée pour mieux voir les variations
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -156,7 +156,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Effacer le canvas
       canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Boucle pour dessiner les barres de fréquence
+      // Boucle pour dessiner les barres de fréquence façon WhatsApp
       for (let i = 0; i < barCount; i++) {
         // Calculer l'index dans le dataArray pour cette barre
         const dataIndex = Math.floor(i * (bufferLength / barCount));
@@ -165,20 +165,37 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         const value = dataArray[dataIndex];
         
         // Calculer la hauteur de la barre avec sensibilité
-        const barHeight = (value / 255) * canvas.height * visualizerConfig.sensitivity;
+        // Dans WhatsApp, les barres partent du milieu et ont une hauteur minimale
+        const minHeight = canvas.height * 0.2; // Hauteur minimale des barres
+        const maxVariation = canvas.height * 0.6; // Variation maximale de hauteur
+        
+        // Calculer la hauteur réelle en fonction du volume
+        const barHeight = minHeight + ((value / 255) * maxVariation * visualizerConfig.sensitivity);
         
         // Calculer la position x pour cette barre
         const x = i * (visualizerConfig.barWidth + visualizerConfig.barGap);
         
-        // Positionner la barre en bas du canvas
-        const y = canvas.height - barHeight;
+        // Positionner la barre au milieu du canvas
+        const y = (canvas.height - barHeight) / 2;
         
-        // Calculer une couleur en fonction de l'amplitude
-        const hue = ((i / barCount) * 180) + 180; // 180-360 pour les tons bleus/violets
+        // Couleur unique en bleu-vert (teinte WhatsApp)
+        canvasCtx.fillStyle = '#00A884'; // Couleur de WhatsApp
         
-        // Dessiner la barre
-        canvasCtx.fillStyle = `hsla(${hue}, 80%, 60%, 0.8)`;
-        canvasCtx.fillRect(x, y, visualizerConfig.barWidth, barHeight);
+        // Pour mode sombre
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          canvasCtx.fillStyle = '#00CF9D'; // Version plus claire pour le mode sombre
+        }
+        
+        // Vérifier si roundRect est disponible (navigateurs récents)
+        if (canvasCtx.roundRect) {
+          canvasCtx.beginPath();
+          // @ts-ignore - La méthode roundRect existe mais TypeScript peut ne pas la reconnaître
+          canvasCtx.roundRect(x, y, visualizerConfig.barWidth, barHeight, [1]);
+          canvasCtx.fill();
+        } else {
+          // Alternative pour les navigateurs qui ne supportent pas roundRect
+          canvasCtx.fillRect(x, y, visualizerConfig.barWidth, barHeight);
+        }
       }
     };
     
@@ -391,155 +408,118 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Retourner le composant
   return (
     <div className="relative flex items-center justify-center">
-      <div className="tooltip-container relative group">
-        {/* Bouton d'enregistrement - plus grand sur mobile pour une meilleure expérience tactile */}
+      {/* Version inactive - juste un bouton mic */}
+      {recorderState === 'inactive' && (
         <Button
           size="icon"
-          variant={recorderState === 'recording' ? "destructive" : "outline"}
-          disabled={disabled || recorderState === 'processing'}
-          onClick={recorderState === 'recording' ? stopRecording : startRecording}
-          aria-label={recorderState === 'recording' ? "Arrêter l'enregistrement" : "Enregistrer votre voix"}
-          className={`
-            relative hover:bg-primary/10 hover:text-primary transition-colors 
-            sm:h-10 sm:w-10 h-12 w-12 rounded-full
-            active:scale-95 transform transition-transform
-            touch-manipulation
-            ${recorderState === 'recording' ? 'shadow-md bg-red-50 dark:bg-red-900/20' : ''}
-          `}
+          variant="outline"
+          disabled={disabled}
+          onClick={startRecording}
+          aria-label="Enregistrer votre voix"
+          className="relative hover:bg-primary/10 hover:text-primary transition-colors 
+                     h-10 w-10 rounded-full
+                     active:scale-95 transform transition-transform
+                     touch-manipulation"
         >
-          {recorderState === 'processing' ? (
-            <Loader2 className="h-5 w-5 sm:h-4 sm:w-4 animate-spin" />
-          ) : recorderState === 'recording' ? (
-            <StopCircle className="h-6 w-6 sm:h-5 sm:w-5 text-red-600 dark:text-red-400" />
-          ) : (
-            <Mic className="h-6 w-6 sm:h-5 sm:w-5" />
-          )}
-          
-          {/* Indicateur de progression circulaire */}
-          {recorderState === 'recording' && (
-            <svg
-              className="absolute inset-0 w-full h-full -rotate-90"
-              viewBox="0 0 100 100"
-            >
-              <circle
-                className="text-gray-300 opacity-25 dark:text-gray-600"
-                cx="50"
-                cy="50"
-                r="40"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-              />
-              <circle
-                className="text-red-500 dark:text-red-400"
-                cx="50"
-                cy="50"
-                r="40"
-                stroke="currentColor"
-                strokeWidth="8" 
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray="251.2"
-                strokeDashoffset={251.2 - (251.2 * recordingProgressPercent) / 100}
-              />
-            </svg>
-          )}
+          <Mic className="h-5 w-5" />
         </Button>
-        
-        {/* Infobulle - visible sur desktop, cachée sur mobile pour laisser place au visualiseur */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity w-max max-w-[200px] pointer-events-none hidden sm:block">
-          {recorderState === 'recording' 
-            ? "Cliquez pour arrêter l'enregistrement" 
-            : recorderState === 'processing'
-            ? "Traitement en cours..."
-            : recorderState === 'error'
-            ? "Une erreur s'est produite, cliquez pour réessayer"
-            : "Cliquez pour enregistrer votre question"
-          }
-        </div>
-      </div>
+      )}
       
-      {/* Visualiseur audio */}
+      {/* Version en cours de traitement - spinner */}
+      {recorderState === 'processing' && (
+        <Button
+          size="icon"
+          variant="outline"
+          disabled={true}
+          aria-label="Traitement en cours"
+          className="relative h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800"
+        >
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </Button>
+      )}
+      
+      {/* Version enregistrement - style WhatsApp */}
       {recorderState === 'recording' && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-black/10 dark:bg-white/10 rounded-md p-2 w-80 max-w-[90vw] z-50 shadow-lg">
-          <div className="flex flex-col">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-mono font-bold">{formatDuration(recordingDuration)}</span>
-              <div className="flex items-center">
-                <span className="text-xs text-center font-medium mr-1">Enregistrement</span>
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-              </div>
-              <span className="text-xs font-mono">{formatDuration(maxRecordingTimeMs)}</span>
+        <div className="flex items-center w-full max-w-xl bg-gray-100 dark:bg-gray-800 rounded-full shadow-md overflow-hidden">
+          {/* Bouton pour annuler l'enregistrement */}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={() => {
+              // Annuler l'enregistrement sans traiter l'audio
+              if (mediaRecorderRef.current) {
+                // Arrêter le mediaRecorder sans traiter les données
+                mediaRecorderRef.current.onstop = null;
+                
+                // Vider les chunks audio
+                audioChunksRef.current = [];
+                
+                // Arrêter l'enregistrement
+                mediaRecorderRef.current.stop();
+                
+                // Fermer le flux
+                if (mediaStreamRef.current) {
+                  mediaStreamRef.current.getTracks().forEach(track => track.stop());
+                }
+                
+                // Réinitialiser l'état
+                setRecorderState('inactive');
+                
+                // Afficher un toast pour informer l'utilisateur
+                toast({
+                  title: "Enregistrement annulé",
+                  description: "L'enregistrement a été annulé",
+                });
+              }
+            }}
+            className="h-12 w-12 text-gray-500 hover:text-red-500 rounded-l-full flex-shrink-0"
+            aria-label="Annuler l'enregistrement"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 5v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg>
+          </Button>
+          
+          {/* Indicateur de durée et visualiseur audio */}
+          <div className="flex-1 px-2 flex items-center overflow-hidden">
+            {/* Cercle rouge d'enregistrement avec animation pulse */}
+            <div className="flex-shrink-0 mr-3">
+              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
             </div>
             
-            {/* Barre de progression */}
-            <div className="w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full mb-2 overflow-hidden">
-              <div 
-                className="h-full bg-red-500 rounded-full transition-all duration-100"
-                style={{ width: `${recordingProgressPercent}%` }}
+            {/* Durée d'enregistrement */}
+            <span className="text-sm font-mono flex-shrink-0 mr-2 font-semibold">
+              {formatDuration(recordingDuration)}
+            </span>
+            
+            {/* Visualiseur audio custom - points qui bougent */}
+            <div className="flex-1 mx-2 h-6 flex items-center gap-[2px] overflow-hidden">
+              <canvas 
+                ref={canvasRef} 
+                className="w-full h-full"
+                style={{ height: '24px' }}
               />
             </div>
-          
-            <canvas 
-              ref={canvasRef} 
-              className="mx-auto rounded"
-              style={{ 
-                width: visualizerConfig.width, 
-                height: visualizerConfig.height 
-              }}
-            />
             
-            <div className="mt-1 flex justify-between px-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  // Annuler l'enregistrement sans traiter l'audio
-                  if (mediaRecorderRef.current) {
-                    // Arrêter le mediaRecorder sans traiter les données
-                    const oldStop = mediaRecorderRef.current.onstop;
-                    mediaRecorderRef.current.onstop = null;
-                    
-                    // Vider les chunks audio
-                    audioChunksRef.current = [];
-                    
-                    // Arrêter l'enregistrement
-                    mediaRecorderRef.current.stop();
-                    
-                    // Fermer le flux
-                    if (mediaStreamRef.current) {
-                      mediaStreamRef.current.getTracks().forEach(track => track.stop());
-                    }
-                    
-                    // Réinitialiser l'état
-                    setRecorderState('inactive');
-                    
-                    // Afficher un toast pour informer l'utilisateur
-                    toast({
-                      title: "Enregistrement annulé",
-                      description: "L'enregistrement a été annulé",
-                    });
-                  }
-                }}
-                className="px-2 py-1 h-8 text-xs touch-manipulation"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
-                  <path d="M18 6 6 18"></path>
-                  <path d="m6 6 12 12"></path>
-                </svg>
-                Annuler
-              </Button>
-              <Button
-                size="sm"
-                variant="destructive"
-                onClick={stopRecording}
-                className="px-2 py-1 h-8 text-xs touch-manipulation"
-              >
-                <StopCircle className="h-3 w-3 mr-1" />
-                Arrêter
-              </Button>
-            </div>
+            {/* Durée restante (optionnel) */}
+            <span className="text-xs text-gray-500 font-mono flex-shrink-0 mr-1 hidden sm:block">
+              {formatDuration(maxRecordingTimeMs - recordingDuration)}
+            </span>
           </div>
+          
+          {/* Bouton pour envoyer l'enregistrement */}
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={stopRecording}
+            className="h-12 w-12 bg-green-500 hover:bg-green-600 text-white rounded-r-full flex-shrink-0"
+            aria-label="Envoyer l'enregistrement"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m5 12 5 5 9-9"></path>
+            </svg>
+          </Button>
         </div>
       )}
       
