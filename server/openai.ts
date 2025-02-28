@@ -1,4 +1,6 @@
 import OpenAI from "openai";
+import fs from "fs";
+import { Buffer } from "buffer";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -149,5 +151,93 @@ export async function generateChallengeProblem(
   } catch (error) {
     console.error("Error generating challenge problem:", error);
     return "Désolé, j'ai rencontré un problème en essayant de créer un défi. Veuillez réessayer.";
+  }
+}
+
+/**
+ * Process an uploaded image and generate an educational response
+ */
+export async function processImageQuery(
+  imageBase64: string,
+  textQuery: string = "",
+  subject: string = "general"
+): Promise<string> {
+  try {
+    // Vision-specific system prompt enhancements for educational context
+    const visionSystemPrompt = `${SYSTEM_PROMPT}
+    
+You are analyzing an educational image uploaded by a student. This may be:
+- A math problem they need help solving
+- A diagram or chart they need help understanding
+- A homework question they're stuck on
+- Text in a textbook or worksheet they need explained
+
+Important when analyzing images:
+1. First describe what you see in the image clearly but briefly
+2. Identify the subject matter and specific topic
+3. For math problems, show a complete step-by-step solution with all work
+4. For diagrams/charts, provide a comprehensive explanation
+5. Provide educational context around the concept, not just a direct answer
+6. Use your educational guidelines for proper mathematical notation
+7. If the image is unclear or unreadable, mention specific parts that are difficult to see
+8. If the question requires more context, mention what additional information would help
+
+Respond in ${process.env.LANGUAGE || "French"}.`;
+
+    // Set up appropriate subject-specific guidance
+    let subjectGuidance = "";
+
+    switch (subject.toLowerCase()) {
+      case "math":
+        subjectGuidance = "Focus on providing a complete step-by-step solution with proper mathematical notation. Show all work clearly and explain each step. Identify the mathematical concepts involved.";
+        break;
+      case "science":
+        subjectGuidance = "Explain scientific concepts, diagrams, or problems clearly. Relate to fundamental principles and provide real-world examples where applicable.";
+        break;
+      case "language":
+        subjectGuidance = "Analyze language content, provide grammatical explanations, translation assistance, or literary analysis as appropriate.";
+        break;
+      case "history":
+        subjectGuidance = "Provide historical context, analysis of events, or explanation of historical documents. Focus on objective presentation of facts.";
+        break;
+      default:
+        subjectGuidance = "Identify the subject matter in the image and provide educational assistance appropriate to that subject.";
+    }
+
+    const userPrompt = textQuery 
+      ? `J'ai besoin d'aide avec cette image. ${textQuery}`
+      : "Peux-tu m'aider à comprendre ce qui est montré dans cette image?";
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { 
+          role: "system", 
+          content: `${visionSystemPrompt}\n\n${subjectGuidance}` 
+        },
+        { 
+          role: "user", 
+          content: [
+            { 
+              type: "text", 
+              text: userPrompt 
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`
+              }
+            }
+          ]
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 1500,
+    });
+
+    return response.choices[0].message.content || "Je n'ai pas pu analyser cette image. Veuillez réessayer avec une image plus claire.";
+  } catch (error) {
+    console.error("Error processing image query:", error);
+    return "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Veuillez vérifier que l'image est claire et réessayer.";
   }
 }

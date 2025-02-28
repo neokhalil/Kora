@@ -1,0 +1,45 @@
+Hey Replit, implement a responsive image-based feature on the Kora assistant AI chat using OpenAI's GPT-4 Vision capabilities. Please:
+
+1. Create a responsive ImageUploader component with:
+   - Drag-and-drop file upload area that adapts to screen size
+   - Native camera access for mobile devices
+   - Touch-friendly controls for image capture/selection
+   - File size and type validation
+   - Upload progress indicator
+   - Image preview with mobile-friendly cropping/rotating capabilities
+
+2. Implement the image processing backend:
+   - Set up a secure file upload handler to Supabase Storage
+   - Create an API endpoint that sends the image to OpenAI's Vision API
+   - Include appropriate prompt engineering for educational context
+   - Process and return the AI response
+
+3. Build a responsive ImageQuestionForm component that:
+   - Adapts layout for different screen sizes
+   - Allows users to add optional text context to their image
+   - Includes subject and topic selection for better context
+   - Provides specific question prompts (e.g., "Solve this," "Explain this")
+   - Shows a history of recently uploaded images
+
+4. Implement response handling:
+   - Format AI responses with proper markdown for equations (MathJax)
+   - Extract step-by-step solutions from complex problems
+   - Highlight key concepts and formulas
+   - Provide options to request clarification or simplification
+
+5. Add specialized handlers for common homework types:
+   - Math problem solving with step-by-step solutions
+   - Science diagram explanations
+   - Language and grammar corrections
+   - Historical document analysis
+
+6. Ensure mobile optimization:
+   - Compress images before upload
+   - Optimize UI for small screens and touch interaction
+   - Handle intermittent connectivity
+   - Provide offline access to previous responses
+
+7. Implement a caching mechanism specifically for image-based queries
+   - Store image hashes to identify duplicate uploads
+   - Cache responses for similar images
+   - Implement a cleanup policy for storage management

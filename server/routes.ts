@@ -4,9 +4,50 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertQuestionSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
-import { generateTutoringResponse, generateReExplanation, generateChallengeProblem } from './openai';
+import multer from 'multer';
+import { generateTutoringResponse, generateReExplanation, generateChallengeProblem, processImageQuery } from './openai';
+import fs from 'fs';
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure file upload storage
+  const uploadDir = path.join(process.cwd(), 'uploads');
+  
+  // Create uploads directory if it doesn't exist
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+  
+  // Configure multer for image uploads
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      // Create a unique filename with original extension
+      const uniqueFilename = `${uuidv4()}${path.extname(file.originalname)}`;
+      cb(null, uniqueFilename);
+    }
+  });
+  
+  // File filter to only allow image files
+  const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    // Accept only images
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  };
+  
+  const upload = multer({ 
+    storage, 
+    fileFilter,
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    }
+  });
   // Questions API endpoints
   app.get('/api/questions/recent', async (req: Request, res: Response) => {
     try {
