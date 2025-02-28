@@ -609,26 +609,57 @@ const ChatAssistant: React.FC = () => {
                           const equationMatch = originalContent.match(/\$([^$]+?)(?:\s*=\s*\?)?\$/);
                           
                           if (equationMatch && equationMatch[1]) {
-                            // Nettoyer l'équation en enlevant tout "= ?" éventuel
-                            equationStr = equationMatch[1].replace(/=\s*\?/, '').trim();
-                            console.log("Extracted equation:", equationStr);
+                            // Approche simplifiée: ne pas essayer de parser l'équation
+                            // car elle peut être complexe
                             
-                            // Générer une solution basée sur l'opération
-                            if (equationStr.includes('+')) {
-                              const [a, b] = equationStr.split('+').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les nombres $${a}$ et $${b}$\n2. $${a} + ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
-                            } 
-                            else if (equationStr.includes('-')) {
-                              const [a, b] = equationStr.split('-').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** $${b}$ de $${a}$\n2. $${a} - ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
-                            } 
-                            else if (equationStr.includes('×')) {
-                              const [a, b] = equationStr.split('×').map(part => part.trim());
-                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les nombres $${a}$ et $${b}$\n2. $${a} \\times ${b} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                            // Construire une solution adaptée en fonction du type de challenge
+                            // Pour les opérations simples générées par notre système
+                            
+                            // Cas d'une équation simple
+                            if (message.challengeData && answer) {
+                              // Pour les défis que nous générons automatiquement, l'équation est simple
+                              if (equationStr.includes('+') && !equationStr.includes('=')) {
+                                // Addition simple
+                                const parts = equationStr.split('+').map(p => p.trim());
+                                if (parts.length === 2) {
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} + ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                                } 
+                                else {
+                                  // Fallback pour addition avec format inconnu
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Additionner** les termes\n\nLa réponse est **$${answer}$**`;
+                                }
+                              }
+                              else if (equationStr.includes('-') && !equationStr.includes('=')) {
+                                // Soustraction simple
+                                const parts = equationStr.split('-').map(p => p.trim());
+                                if (parts.length === 2) {
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** $${parts[1]}$ de $${parts[0]}$\n2. $${parts[0]} - ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                                }
+                                else {
+                                  // Fallback pour soustraction avec format inconnu
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Soustraire** les termes correctement\n\nLa réponse est **$${answer}$**`;
+                                }
+                              }
+                              else if (equationStr.includes('×') && !equationStr.includes('=')) {
+                                // Multiplication simple
+                                const parts = equationStr.split('×').map(p => p.trim());
+                                if (parts.length === 2) {
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les nombres $${parts[0]}$ et $${parts[1]}$\n2. $${parts[0]} \\times ${parts[1]} = ${answer}$\n\nLa réponse est donc **$${answer}$**`;
+                                }
+                                else {
+                                  // Fallback pour multiplication avec format inconnu
+                                  solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Multiplier** les facteurs\n\nLa réponse est **$${answer}$**`;
+                                }
+                              }
+                              else {
+                                // Équation plus complexe ou format non reconnu
+                                // Fournir une solution générique basée seulement sur la réponse
+                                solution = `Pour résoudre cette expression :\n\n1. **Simplifier** les termes\n2. **Calculer** la valeur finale\n\nLa réponse est **$${answer}$**`;
+                              }
                             } 
                             else {
-                              // Équation générique
-                              solution = `Pour résoudre $${equationStr} = ?$ :\n\n1. **Effectuer** l'opération indiquée\n2. **Simplifier** l'expression\n\nLa réponse est donc **$${answer}$**`;
+                              // Solution par défaut si nous n'avons pas de réponse attendue
+                              solution = `Pour résoudre cette expression :\n\n1. **Simplifier** les termes\n2. **Calculer** la valeur finale\n\nVérifie tes calculs attentivement.`;
                             }
                           } 
                           else {
