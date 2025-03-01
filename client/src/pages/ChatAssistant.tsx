@@ -1180,8 +1180,8 @@ const ChatAssistant: React.FC = () => {
     <div className="flex flex-col h-full max-w-4xl mx-auto">
       
       <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Chat messages area */}
-        <div className="flex-1 overflow-y-auto p-4">
+        {/* Chat messages area with padding bottom to account for fixed input area */}
+        <div className="flex-1 overflow-y-auto p-4 pb-[170px]">
           {messages.map(renderMessage)}
           
           {/* Thinking indicator */}
@@ -1199,8 +1199,9 @@ const ChatAssistant: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
         
-        {/* Input area - fixed at bottom */}
-        <div className="border-t p-3 sticky bottom-0 bg-white dark:bg-gray-900 z-10">
+        {/* Input area - fixed at bottom with shadow */}
+        <div className="border-t p-3 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+          <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           
           {/* Image preview area (shown when an image is selected) */}
@@ -1384,6 +1385,7 @@ const ChatAssistant: React.FC = () => {
           
           <div className="mt-2 text-xs text-gray-500 text-center">
             Kora est un assistant IA. Pose une question sur tes devoirs ou études.
+          </div>
           </div>
         </div>
       </div>
