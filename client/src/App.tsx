@@ -5,10 +5,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
-import Header from "@/components/layout/Header";
 import SideNavigation from "@/components/layout/SideNavigation";
 import ChatAssistant from "@/pages/ChatAssistant";
-import { MenuProvider } from "@/hooks/use-menu";
+import { MenuProvider, useMenu } from "@/hooks/use-menu";
 
 // Configuration des routes
 const routes = [
@@ -31,73 +30,63 @@ const AppRouter: React.FC = () => {
   );
 };
 
-// Fonctions utilitaires de détection d'appareil
-const detectDevice = () => {
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream;
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isMobile = isIOS || isAndroid;
+// Conteneur principal de l'application
+const AppContainer: React.FC = () => {
+  const { toggleMenu } = useMenu();
   
-  return { isIOS, isAndroid, isMobile };
+  useEffect(() => {
+    // Ajouter un écouteur pour l'événement personnalisé du bouton de menu
+    const handleToggleMenu = () => {
+      toggleMenu();
+    };
+    
+    document.addEventListener('toggle-menu', handleToggleMenu);
+    
+    // Nettoyer l'écouteur
+    return () => {
+      document.removeEventListener('toggle-menu', handleToggleMenu);
+    };
+  }, [toggleMenu]);
+  
+  return (
+    <div className="app-content">
+      <div className="flex flex-1 relative">
+        <SideNavigation />
+        <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
+          <AppRouter />
+        </main>
+      </div>
+    </div>
+  );
 };
 
 // Composant principal de l'application
 const App: React.FC = () => {
-  // Effet pour configurer les ajustements mobiles
   useEffect(() => {
-    const { isIOS, isAndroid, isMobile } = detectDevice();
+    // Détecter le type d'appareil pour les styles spécifiques
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream;
+    const isAndroid = /Android/i.test(navigator.userAgent);
     
-    // Ajouter des classes au body pour le ciblage CSS
-    if (isMobile) document.body.classList.add('mobile-device');
     if (isIOS) document.body.classList.add('ios-device');
     if (isAndroid) document.body.classList.add('android-device');
     
-    // Créer un header mobile distinct qui ne disparaît jamais
-    const mobileHeader = document.createElement('div');
-    mobileHeader.id = 'header-mobile';
-    document.body.prepend(mobileHeader);
-    
-    // Déplacer le contenu du header normal vers mobileHeader
-    const renderHeaderIntoContainer = () => {
-      const headerContent = document.querySelector('header.app-header');
-      const mobileHeaderElement = document.getElementById('header-mobile');
-      
-      if (headerContent && mobileHeaderElement) {
-        // Rendre le header normal invisible s'il s'agit d'un appareil mobile
-        if (isMobile) {
-          headerContent.classList.add('invisible-header');
-          headerContent.setAttribute('aria-hidden', 'true');
-        }
-        
-        // Cloner et insérer le contenu du header dans le container mobile
-        if (mobileHeaderElement.children.length === 0) {
-          const headerClone = headerContent.cloneNode(true) as HTMLElement;
-          headerClone.style.position = 'static';
-          headerClone.style.paddingTop = '0';
-          mobileHeaderElement.appendChild(headerClone);
-        }
-      }
-    };
-    
-    // Exécuter une fois et configurer un observateur pour les changements
-    renderHeaderIntoContainer();
-    
-    // Observer les changements dans le DOM
-    const observer = new MutationObserver(() => {
-      renderHeaderIntoContainer();
-    });
-    
-    observer.observe(document.body, { childList: true, subtree: true });
-    
-    // Pour le clavier mobile, suivre l'état de visualViewport
+    // Gestion du clavier avec visualViewport
     if ('visualViewport' in window) {
       const handleViewportChange = () => {
         const viewportHeight = window.visualViewport?.height || 0;
         const windowHeight = window.innerHeight;
         const keyboardHeight = windowHeight - viewportHeight;
         
-        // Mettre à jour les propriétés CSS
+        // Le clavier est considéré ouvert si la différence est > 100px
         if (keyboardHeight > 100) {
           document.body.classList.add('keyboard-open');
+          
+          // Assurer que le header est toujours visible
+          const fixedHeader = document.getElementById('fixed-header');
+          if (fixedHeader) {
+            fixedHeader.style.position = 'fixed';
+            fixedHeader.style.top = '0';
+          }
         } else {
           document.body.classList.remove('keyboard-open');
         }
@@ -109,30 +98,15 @@ const App: React.FC = () => {
       return () => {
         window.visualViewport?.removeEventListener('resize', handleViewportChange);
         window.visualViewport?.removeEventListener('scroll', handleViewportChange);
-        observer.disconnect();
       };
     }
-    
-    return () => {
-      observer.disconnect();
-    };
   }, []);
   
   return (
     <QueryClientProvider client={queryClient}>
       <MenuProvider>
-        {/* Container principal avec id 'content' pour le style CSS */}
-        <div id="content" className="min-h-screen flex flex-col">
-          {/* Le vrai header (caché sur mobile, remplacé par #header-mobile) */}
-          <Header />
-          
-          <div className="flex flex-1 relative">
-            <SideNavigation />
-            <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
-              <AppRouter />
-            </main>
-          </div>
-        </div>
+        {/* Contenu principal de l'application (le header est ajouté par le script HTML) */}
+        <AppContainer />
         <Toaster />
       </MenuProvider>
     </QueryClientProvider>

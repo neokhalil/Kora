@@ -192,12 +192,11 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto pt-14">
-      <div className="flex-1 overflow-hidden flex flex-col app-content">
+    <div className="flex flex-col h-full max-w-4xl mx-auto">
+      <div className="flex-1 overflow-hidden flex flex-col">
         {/* Zone des messages */}
         <div 
-          className="flex-1 overflow-y-auto p-4" 
-          style={{ paddingBottom: "calc(170px + var(--keyboard-height, 0px))" }}
+          className="flex-1 overflow-y-auto p-4 messages-container" 
         >
           {messages.length === 0 ? (
             <div className="h-full flex flex-col justify-start pt-12">
@@ -271,11 +270,8 @@ const ChatAssistant: React.FC = () => {
               className="bg-gray-100 dark:bg-gray-800 p-4 rounded-3xl"
               ref={composerRef}
               onFocus={() => {
-                // Force la visibilité du header lorsque le composeur reçoit le focus
-                const header = document.querySelector('header.app-header');
-                if (header) {
-                  header.classList.remove('transform', '-translate-y-full');
-                }
+                // Déclenche la classe keyboard-open pour adapter l'UI
+                document.body.classList.add('keyboard-open');
                 
                 // Scroll vers la fin des messages après un court délai
                 setTimeout(() => {
@@ -308,10 +304,14 @@ const ChatAssistant: React.FC = () => {
                     className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
-                      // Force la visibilité du header lorsque l'input reçoit le focus
-                      const header = document.querySelector('header.app-header');
-                      if (header) {
-                        header.classList.remove('transform', '-translate-y-full');
+                      // Marquer que le clavier est ouvert
+                      document.body.classList.add('keyboard-open');
+                      
+                      // S'assurer que le header fixe est visible
+                      const fixedHeader = document.getElementById('fixed-header');
+                      if (fixedHeader) {
+                        fixedHeader.style.position = 'fixed';
+                        fixedHeader.style.top = '0';
                       }
                     }}
                   />
