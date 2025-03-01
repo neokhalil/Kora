@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Route, Router as WouterRouter, Switch } from "wouter";
+import { Route, Router as WouterRouter, Switch, useLocation } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -18,7 +18,6 @@ import { MenuProvider } from "@/hooks/use-menu";
 // Set up static route config for debugging
 const routes = [
   { path: "/", Component: Home },
-  { path: "/aide-aux-devoirs", Component: HomeworkHelp },
   { path: "/preparation-examens", Component: ExamPrep },
   { path: "/lecons-interactives", Component: InteractiveLessons },
   { path: "/chat-assistant", Component: ChatAssistant },
@@ -36,8 +35,22 @@ const AppRouter: React.FC = () => {
     }, []);
   }
   
+  // Create router with redirect
+  const Redirect = ({ to }: { to: string }) => {
+    const [_, setLocation] = useLocation();
+    React.useEffect(() => {
+      setLocation(to);
+    }, [to, setLocation]);
+    return null;
+  };
+  
   return (
     <Switch>
+      {/* Redirect /aide-aux-devoirs to /chat-assistant */}
+      <Route path="/aide-aux-devoirs">
+        <Redirect to="/chat-assistant" />
+      </Route>
+      
       {routes.map(({ path, Component }) => (
         <Route key={path} path={path}>
           <Component />

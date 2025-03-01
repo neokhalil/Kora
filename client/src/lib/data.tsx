@@ -10,7 +10,7 @@ export const navItems: NavItem[] = [
   },
   {
     label: 'Aide aux Devoirs',
-    path: '/aide-aux-devoirs',
+    path: '/chat-assistant',
     icon: <Brain className="text-primary mr-3 h-5 w-5" />
   },
   {
@@ -22,11 +22,6 @@ export const navItems: NavItem[] = [
     label: 'Leçons interactives',
     path: '/lecons-interactives',
     icon: <Book className="text-primary mr-3 h-5 w-5" />
-  },
-  {
-    label: 'Assistant Kora',
-    path: '/chat-assistant',
-    icon: <MessageSquare className="text-primary mr-3 h-5 w-5" />
   },
   {
     label: 'Historique d\'apprentissage',
