@@ -1,8 +1,8 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage as dbStorage } from "./storage"; // Rename to avoid conflict with multer storage
+import { storage as dbStorage, HistoryFilterOptions } from "./storage"; // Rename to avoid conflict with multer storage
 import { z } from "zod";
-import { insertQuestionSchema } from "@shared/schema";
+import { insertQuestionSchema, insertInteractionSchema, insertTagSchema, insertInteractionTagSchema, insertFieldSchema, insertTopicSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
 import multer from 'multer';
 import { generateTutoringResponse, generateReExplanation, generateChallengeProblem, processImageQuery } from './openai';
