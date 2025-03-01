@@ -675,6 +675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/topics/with-counts', async (req: Request, res: Response) => {
     try {
       const topics = await dbStorage.getTopicsWithCount();
+      console.log('Retrieved topics with counts:', topics);
       res.json(topics);
     } catch (error) {
       console.error('Error fetching topics with counts:', error);
