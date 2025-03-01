@@ -35,7 +35,7 @@ export interface TopicWithCount {
   id: number;
   title: string;
   description: string | null;
-  fieldId: number;
+  fieldId: number | null;
   interactionCount: number;
 }
 
@@ -442,15 +442,17 @@ export class MemStorage implements IStorage {
     const now = new Date();
     
     const interaction: Interaction = {
-      ...insertInteraction,
       id,
+      userId: insertInteraction.userId || null,
+      topicId: insertInteraction.topicId || null,
+      question: insertInteraction.question,
+      answer: insertInteraction.answer,
+      type: insertInteraction.type || 'text', // default to 'text' type
+      imageUrl: insertInteraction.imageUrl || null,
       createdAt: now,
       updatedAt: now,
       starred: insertInteraction.starred || false,
-      metadata: insertInteraction.metadata || {},
-      imageUrl: insertInteraction.imageUrl || null,
-      userId: insertInteraction.userId || null,
-      topicId: insertInteraction.topicId || null
+      metadata: insertInteraction.metadata || {}
     };
     
     this.interactions.set(id, interaction);
@@ -499,8 +501,9 @@ export class MemStorage implements IStorage {
     const now = new Date();
     
     const tag: Tag = {
-      ...insertTag,
       id,
+      name: insertTag.name,
+      type: insertTag.type || 'user', // default to 'user' type
       createdAt: now
     };
     

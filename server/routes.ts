@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage as dbStorage, HistoryFilterOptions } from "./storage"; // Rename to avoid conflict with multer storage
+import { storage as dbStorage, HistoryFilterOptions, InteractionWithDetails, InteractionInsight, FieldWithCount, TopicWithCount, TagWithCount } from "./storage"; // Rename to avoid conflict with multer storage
 import { z } from "zod";
 import { insertQuestionSchema, insertInteractionSchema, insertTagSchema, insertInteractionTagSchema, insertFieldSchema, insertTopicSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
@@ -608,6 +608,363 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Note: We don't remove the conversation history when client disconnects
       // to allow it to be used across sessions
     });
+  });
+  
+  // Learning History API Routes
+  
+  // Fields endpoints
+  app.get('/api/fields', async (req: Request, res: Response) => {
+    try {
+      const fields = await dbStorage.getAllFields();
+      res.json(fields);
+    } catch (error) {
+      console.error('Error fetching fields:', error);
+      res.status(500).json({ message: 'Failed to fetch academic fields' });
+    }
+  });
+  
+  app.get('/api/fields/with-counts', async (req: Request, res: Response) => {
+    try {
+      const fields = await dbStorage.getFieldsWithInteractionCounts();
+      res.json(fields);
+    } catch (error) {
+      console.error('Error fetching fields with counts:', error);
+      res.status(500).json({ message: 'Failed to fetch fields with interaction counts' });
+    }
+  });
+  
+  app.get('/api/fields/:id', async (req: Request, res: Response) => {
+    try {
+      const field = await dbStorage.getField(parseInt(req.params.id));
+      if (!field) {
+        return res.status(404).json({ message: 'Field not found' });
+      }
+      res.json(field);
+    } catch (error) {
+      console.error('Error fetching field:', error);
+      res.status(500).json({ message: 'Failed to fetch field' });
+    }
+  });
+  
+  app.post('/api/fields', async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertFieldSchema.parse(req.body);
+      const newField = await dbStorage.createField(validatedData);
+      res.status(201).json(newField);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid field data', errors: error.errors });
+      } else {
+        console.error('Error creating field:', error);
+        res.status(500).json({ message: 'Failed to create field' });
+      }
+    }
+  });
+  
+  // Topics with field filter endpoints
+  app.get('/api/topics/by-field/:fieldId', async (req: Request, res: Response) => {
+    try {
+      const topics = await dbStorage.getTopicsByField(parseInt(req.params.fieldId));
+      res.json(topics);
+    } catch (error) {
+      console.error('Error fetching topics by field:', error);
+      res.status(500).json({ message: 'Failed to fetch topics by field' });
+    }
+  });
+  
+  app.get('/api/topics/with-counts', async (req: Request, res: Response) => {
+    try {
+      const topics = await dbStorage.getTopicsWithCount();
+      res.json(topics);
+    } catch (error) {
+      console.error('Error fetching topics with counts:', error);
+      res.status(500).json({ message: 'Failed to fetch topics with interaction counts' });
+    }
+  });
+  
+  app.post('/api/topics', async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertTopicSchema.parse(req.body);
+      const newTopic = await dbStorage.createTopic(validatedData);
+      res.status(201).json(newTopic);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid topic data', errors: error.errors });
+      } else {
+        console.error('Error creating topic:', error);
+        res.status(500).json({ message: 'Failed to create topic' });
+      }
+    }
+  });
+  
+  // Interactions endpoints
+  app.get('/api/interactions', async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+      
+      // Extract filter parameters from query
+      const filters: HistoryFilterOptions = {};
+      
+      if (req.query.type && ['text', 'image', 'voice', 'all'].includes(req.query.type as string)) {
+        filters.type = req.query.type as 'text' | 'image' | 'voice' | 'all';
+      }
+      
+      if (req.query.fieldId) {
+        filters.fieldId = parseInt(req.query.fieldId as string);
+      }
+      
+      if (req.query.topicId) {
+        filters.topicId = parseInt(req.query.topicId as string);
+      }
+      
+      if (req.query.startDate) {
+        filters.startDate = new Date(req.query.startDate as string);
+      }
+      
+      if (req.query.endDate) {
+        filters.endDate = new Date(req.query.endDate as string);
+      }
+      
+      if (req.query.searchTerm) {
+        filters.searchTerm = req.query.searchTerm as string;
+      }
+      
+      if (req.query.tag) {
+        filters.tag = req.query.tag as string;
+      }
+      
+      if (req.query.starred) {
+        filters.starred = req.query.starred === 'true';
+      }
+      
+      if (req.query.limit) {
+        filters.limit = parseInt(req.query.limit as string);
+      }
+      
+      if (req.query.offset) {
+        filters.offset = parseInt(req.query.offset as string);
+      }
+      
+      const interactions = await dbStorage.getInteractionsByUser(userId, filters);
+      res.json(interactions);
+    } catch (error) {
+      console.error('Error fetching interactions:', error);
+      res.status(500).json({ message: 'Failed to fetch interactions' });
+    }
+  });
+  
+  app.get('/api/interactions/:id', async (req: Request, res: Response) => {
+    try {
+      const interaction = await dbStorage.getInteractionWithDetails(parseInt(req.params.id));
+      if (!interaction) {
+        return res.status(404).json({ message: 'Interaction not found' });
+      }
+      res.json(interaction);
+    } catch (error) {
+      console.error('Error fetching interaction:', error);
+      res.status(500).json({ message: 'Failed to fetch interaction details' });
+    }
+  });
+  
+  app.post('/api/interactions', async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertInteractionSchema.parse(req.body);
+      const newInteraction = await dbStorage.createInteraction(validatedData);
+      res.status(201).json(newInteraction);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid interaction data', errors: error.errors });
+      } else {
+        console.error('Error creating interaction:', error);
+        res.status(500).json({ message: 'Failed to create interaction' });
+      }
+    }
+  });
+  
+  app.patch('/api/interactions/:id', async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      // Only allow certain fields to be updated
+      const allowedUpdates = ['starred', 'topicId', 'metadata'];
+      const filteredUpdates: Record<string, any> = {};
+      
+      for (const key of allowedUpdates) {
+        if (updates[key] !== undefined) {
+          filteredUpdates[key] = updates[key];
+        }
+      }
+      
+      const updatedInteraction = await dbStorage.updateInteraction(id, filteredUpdates);
+      
+      if (!updatedInteraction) {
+        return res.status(404).json({ message: 'Interaction not found' });
+      }
+      
+      res.json(updatedInteraction);
+    } catch (error) {
+      console.error('Error updating interaction:', error);
+      res.status(500).json({ message: 'Failed to update interaction' });
+    }
+  });
+  
+  app.delete('/api/interactions/:id', async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await dbStorage.deleteInteraction(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: 'Interaction not found' });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error('Error deleting interaction:', error);
+      res.status(500).json({ message: 'Failed to delete interaction' });
+    }
+  });
+  
+  // Tags endpoints
+  app.get('/api/tags', async (req: Request, res: Response) => {
+    try {
+      const tags = await dbStorage.getAllTags();
+      res.json(tags);
+    } catch (error) {
+      console.error('Error fetching tags:', error);
+      res.status(500).json({ message: 'Failed to fetch tags' });
+    }
+  });
+  
+  app.get('/api/tags/with-counts', async (req: Request, res: Response) => {
+    try {
+      const tags = await dbStorage.getTagsWithCount();
+      res.json(tags);
+    } catch (error) {
+      console.error('Error fetching tags with counts:', error);
+      res.status(500).json({ message: 'Failed to fetch tags with counts' });
+    }
+  });
+  
+  app.get('/api/interactions/:id/tags', async (req: Request, res: Response) => {
+    try {
+      const interactionId = parseInt(req.params.id);
+      const tags = await dbStorage.getTagsByInteraction(interactionId);
+      res.json(tags);
+    } catch (error) {
+      console.error('Error fetching interaction tags:', error);
+      res.status(500).json({ message: 'Failed to fetch tags for interaction' });
+    }
+  });
+  
+  app.post('/api/tags', async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertTagSchema.parse(req.body);
+      const newTag = await dbStorage.createTag(validatedData);
+      res.status(201).json(newTag);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ message: 'Invalid tag data', errors: error.errors });
+      } else {
+        console.error('Error creating tag:', error);
+        res.status(500).json({ message: 'Failed to create tag' });
+      }
+    }
+  });
+  
+  app.post('/api/interactions/:id/tags', async (req: Request, res: Response) => {
+    try {
+      const interactionId = parseInt(req.params.id);
+      const { tagId } = req.body;
+      
+      if (!tagId) {
+        return res.status(400).json({ message: 'Tag ID is required' });
+      }
+      
+      const interactionTag = await dbStorage.addTagToInteraction(interactionId, tagId);
+      res.status(201).json(interactionTag);
+    } catch (error) {
+      console.error('Error adding tag to interaction:', error);
+      res.status(500).json({ message: 'Failed to add tag to interaction' });
+    }
+  });
+  
+  app.delete('/api/interactions/:interactionId/tags/:tagId', async (req: Request, res: Response) => {
+    try {
+      const interactionId = parseInt(req.params.interactionId);
+      const tagId = parseInt(req.params.tagId);
+      
+      const success = await dbStorage.removeTagFromInteraction(interactionId, tagId);
+      
+      if (!success) {
+        return res.status(404).json({ message: 'Tag not found for this interaction' });
+      }
+      
+      res.status(204).end();
+    } catch (error) {
+      console.error('Error removing tag from interaction:', error);
+      res.status(500).json({ message: 'Failed to remove tag from interaction' });
+    }
+  });
+  
+  // Learning history insights endpoints
+  app.get('/api/insights/frequent-topics', async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+      
+      const insights = await dbStorage.getFrequentTopics(userId, limit);
+      res.json(insights);
+    } catch (error) {
+      console.error('Error fetching frequent topics insights:', error);
+      res.status(500).json({ message: 'Failed to fetch frequent topics insights' });
+    }
+  });
+  
+  app.get('/api/insights/recent-interactions', async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+      
+      const recentInteractions = await dbStorage.getRecentInteractions(userId, limit);
+      res.json(recentInteractions);
+    } catch (error) {
+      console.error('Error fetching recent interactions:', error);
+      res.status(500).json({ message: 'Failed to fetch recent interactions' });
+    }
+  });
+  
+  app.get('/api/search', async (req: Request, res: Response) => {
+    try {
+      const userId = parseInt(req.query.userId as string);
+      const query = req.query.q as string;
+      
+      if (!userId) {
+        return res.status(400).json({ message: 'User ID is required' });
+      }
+      
+      if (!query) {
+        return res.status(400).json({ message: 'Search query is required' });
+      }
+      
+      const searchResults = await dbStorage.searchInteractions(userId, query);
+      res.json(searchResults);
+    } catch (error) {
+      console.error('Error searching interactions:', error);
+      res.status(500).json({ message: 'Failed to search interactions' });
+    }
   });
 
   return httpServer;
