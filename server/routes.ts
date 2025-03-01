@@ -184,6 +184,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to fetch topics' });
     }
   });
+  
+  // Important: Routes with specific string segments must come BEFORE routes with dynamic parameters
+  // to prevent Express from interpreting the segment as a parameter
+  app.get('/api/topics/with-counts', async (req: Request, res: Response) => {
+    try {
+      const topics = await dbStorage.getTopicsWithCount();
+      console.log('Retrieved topics with counts:', topics);
+      res.json(topics);
+    } catch (error) {
+      console.error('Error fetching topics with counts:', error);
+      res.status(500).json({ message: 'Failed to fetch topics with interaction counts' });
+    }
+  });
 
   app.get('/api/topics/:id', async (req: Request, res: Response) => {
     try {
