@@ -208,11 +208,10 @@ Respond in ${process.env.LANGUAGE || "French"}.`;
       ? `J'ai besoin d'aide avec cette image. ${textQuery}`
       : "Peux-tu m'aider à comprendre ce qui est montré dans cette image?";
 
-    // Note: gpt-3.5-turbo n'est pas optimisé pour l'analyse d'images
-    // mais on l'utilise comme demandé par l'utilisateur.
-    // Idéalement, il faudrait utiliser gpt-4-vision-preview ou gpt-4o pour cette fonctionnalité.
+    // Utilisation de gpt-4-vision-preview pour l'analyse d'images
+    // Ce modèle est spécifiquement conçu pour cette tâche
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4-vision-preview",
       messages: [
         { 
           role: "system", 
