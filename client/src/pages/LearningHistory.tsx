@@ -579,7 +579,7 @@ export default function LearningHistory() {
     queryKey: ['/api/interactions', buildQueryParams()],
     queryFn: () => {
       const queryParams = buildQueryParams();
-      return apiRequest<InteractionWithDetails[]>(`/api/interactions?${queryParams}`);
+      return apiRequest(`/api/interactions?${queryParams}`);
     }
   });
   
