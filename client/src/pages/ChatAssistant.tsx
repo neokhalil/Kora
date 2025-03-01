@@ -1253,18 +1253,35 @@ const ChatAssistant: React.FC = () => {
             </div>
           )}
           
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
+          <div className="space-y-3">
+            {/* Champ de saisie principal - maintenant au-dessus */}
+            <div className="relative">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
-                className="flex-1"
+                className="w-full pr-[60px]" // Espace pour le bouton d'envoi
                 disabled={isThinking || isUploadingImage}
               />
               
-              {/* Hidden file input pour la galerie d'images (sans l'attribut capture) */}
+              {/* Bouton d'envoi positionné absolument à droite du champ */}
+              <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                <Button 
+                  size="icon"
+                  variant="ghost"
+                  disabled={(selectedImage ? false : !inputValue.trim()) || isThinking || isUploadingImage} 
+                  onClick={selectedImage ? handleImageAnalysis : handleSendMessage}
+                  className="h-8 w-8"
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+              </div>
+            </div>
+            
+            {/* Barre d'outils sous le champ de saisie - style ChatGPT */}
+            <div className="flex items-center justify-center space-x-2 pt-1">
+              {/* Hidden file input pour la galerie d'images */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -1277,95 +1294,95 @@ const ChatAssistant: React.FC = () => {
                 }}
               />
               
-              {/* Bouton pour choisir une image depuis la galerie */}
-              <Button
-                size="icon"
-                variant="outline"
-                disabled={isThinking || isUploadingImage}
-                onClick={handleOpenFileBrowser}
-                title="Choisir une image depuis la galerie"
-              >
-                <ImageIcon className="h-5 w-5" />
-              </Button>
-              
-              {/* Bouton pour prendre une photo avec l'appareil photo (mobile uniquement) */}
-              {isMobileDevice && (
+              {/* Boutons d'action centrés */}
+              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-1">
+                {/* Bouton galerie */}
                 <Button
-                  size="icon"
-                  variant="outline"
+                  size="sm"
+                  variant="ghost"
                   disabled={isThinking || isUploadingImage}
-                  onClick={() => {
-                    // Créer un nouvel élément input temporaire avec l'attribut capture
-                    const tempInput = document.createElement('input');
-                    tempInput.type = 'file';
-                    tempInput.accept = 'image/*';
-                    tempInput.capture = 'environment';
-                    
-                    // Ajouter le gestionnaire d'événements
-                    tempInput.onchange = (e) => {
-                      handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                    };
-                    
-                    // Simuler un clic sur cet élément
-                    tempInput.click();
-                  }}
-                  title="Prendre une photo avec l'appareil photo"
+                  onClick={handleOpenFileBrowser}
+                  title="Choisir une image depuis la galerie"
+                  className="rounded-full"
                 >
-                  <Camera className="h-5 w-5" />
+                  <ImageIcon className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Galerie</span>
                 </Button>
-              )}
-              
-              {/* Voice input button */}
-              <VoiceRecorder 
-                onTranscriptionComplete={(text) => {
-                  // When transcription is complete, set the input value
-                  setInputValue(text);
-                  
-                  // Optionally, send the message immediately
-                  if (text.trim().length > 0) {
-                    setTimeout(() => {
-                      // Add user message to chat
-                      const userMessage: Message = {
-                        id: Date.now().toString(),
-                        content: text,
-                        sender: 'user',
+                
+                {/* Bouton appareil photo (mobile uniquement) */}
+                {isMobileDevice && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={isThinking || isUploadingImage}
+                    onClick={() => {
+                      // Créer un input temporaire avec capture
+                      const tempInput = document.createElement('input');
+                      tempInput.type = 'file';
+                      tempInput.accept = 'image/*';
+                      tempInput.capture = 'environment';
+                      
+                      // Ajouter le gestionnaire d'événements
+                      tempInput.onchange = (e) => {
+                        handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
                       };
                       
-                      setMessages(prev => [...prev, userMessage]);
+                      // Simuler un clic 
+                      tempInput.click();
+                    }}
+                    title="Prendre une photo"
+                    className="rounded-full"
+                  >
+                    <Camera className="h-4 w-4 mr-1" />
+                    <span className="text-xs">Photo</span>
+                  </Button>
+                )}
+                
+                {/* Bouton vocal */}
+                <div className="flex items-center">
+                  <VoiceRecorder 
+                    onTranscriptionComplete={(text) => {
+                      // When transcription is complete, set the input value
+                      setInputValue(text);
                       
-                      // Send to WebSocket server if connected
-                      if (sendMessage('chat', { content: text })) {
-                        // Message sent successfully
-                      } else {
-                        // WebSocket not connected, use fallback
-                        setIsThinking(true);
-                        
-                        // Simulate a response delay
+                      // Optionally, send the message immediately
+                      if (text.trim().length > 0) {
                         setTimeout(() => {
-                          setIsThinking(false);
-                          setMessages(prev => [...prev, {
+                          // Add user message to chat
+                          const userMessage: Message = {
                             id: Date.now().toString(),
-                            content: "Je ne suis pas connecté au serveur actuellement. Mais je peux t'aider avec des mathématiques, des sciences, ou d'autres sujets. Pose-moi une question!",
-                            sender: 'kora',
-                          }]);
-                        }, 1500);
+                            content: text,
+                            sender: 'user',
+                          };
+                          
+                          setMessages(prev => [...prev, userMessage]);
+                          
+                          // Send to WebSocket server if connected
+                          if (sendMessage('chat', { content: text })) {
+                            // Message sent successfully
+                          } else {
+                            // WebSocket not connected, use fallback
+                            setIsThinking(true);
+                            
+                            // Simulate a response delay
+                            setTimeout(() => {
+                              setIsThinking(false);
+                              setMessages(prev => [...prev, {
+                                id: Date.now().toString(),
+                                content: "Je ne suis pas connecté au serveur actuellement. Mais je peux t'aider avec des mathématiques, des sciences, ou d'autres sujets. Pose-moi une question!",
+                                sender: 'kora',
+                              }]);
+                            }, 1500);
+                          }
+                        }, 500);
                       }
-                    }, 500);
-                  }
-                }}
-                disabled={isThinking || isUploadingImage}
-                maxRecordingTimeMs={30000} // 30 secondes maximum
-                language="fr" // langue française par défaut
-              />
-              
-              {/* Send message button */}
-              <Button 
-                size="icon" 
-                disabled={(selectedImage ? false : !inputValue.trim()) || isThinking || isUploadingImage} 
-                onClick={selectedImage ? handleImageAnalysis : handleSendMessage}
-              >
-                <Send className="h-5 w-5" />
-              </Button>
+                    }}
+                    disabled={isThinking || isUploadingImage}
+                    maxRecordingTimeMs={30000} // 30 secondes maximum
+                    language="fr" // langue française par défaut
+                  />
+                </div>
+              </div>
             </div>
           </div>
           
