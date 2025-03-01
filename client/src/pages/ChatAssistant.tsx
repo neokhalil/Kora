@@ -601,97 +601,131 @@ const ChatAssistant: React.FC = () => {
   // Camera functions
   const startCamera = async () => {
     try {
-      console.log('Starting camera initialization...');
+      console.log('Démarrage de la caméra...');
       
-      // Check if the browser supports mediaDevices
+      // Vérifier si le navigateur prend en charge mediaDevices
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        console.error('Browser does not support getUserMedia');
-        alert('Votre navigateur ne supporte pas l\'accès à la caméra');
+        console.error('Le navigateur ne prend pas en charge getUserMedia');
+        alert('Votre navigateur ne permet pas d\'accéder à la caméra.');
+        setIsCameraActive(false);
         return;
       }
       
-      // Make sure to stop any existing streams first
+      // S'assurer d'arrêter les flux existants d'abord
       if (videoRef.current && videoRef.current.srcObject) {
         stopCamera();
       }
       
-      // Force camera active state to true first - this will show the UI element
-      setIsCameraActive(true);
-      
-      // Wait a moment for the UI to update
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
-      // Check if video element exists after UI update
+      // S'assurer que l'interface est visible
       if (!videoRef.current) {
-        console.error('Video element not found after waiting for UI update');
-        alert('Erreur d\'initialisation de la caméra: élément vidéo introuvable');
-        setIsCameraActive(false);
+        console.log('Élément vidéo non trouvé, attendez que l\'interface s\'affiche');
+        
+        // Donner du temps à l'interface pour se mettre à jour et essayer à nouveau
+        setTimeout(() => {
+          if (!videoRef.current) {
+            console.error('Élément vidéo toujours non trouvé après délai');
+            alert('Erreur: impossible de trouver l\'élément vidéo');
+            setIsCameraActive(false);
+            return;
+          }
+          // Réessayer après le délai
+          startCamera();
+        }, 500);
         return;
       }
       
-      console.log('Video element found', videoRef.current);
+      console.log('Élément vidéo trouvé, demande d\'accès à la caméra');
       
-      // Use simpler constraints first to ensure compatibility
+      // Configuration simple pour la compatibilité
       const constraints = { 
-        video: {
-          facingMode: 'environment', // Use back camera if available
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
+        video: true,
         audio: false
       };
       
-      console.log('Requesting camera access with constraints:', constraints);
+      // Demander l'accès à la caméra
+      console.log('Demande d\'accès avec paramètres:', constraints);
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log('Accès à la caméra accordé, flux obtenu');
       
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        console.log('Camera access granted, stream obtained');
-        
-        // Check again if we still have the video element (user hasn't navigated away)
-        if (!videoRef.current) {
-          console.error('Video reference lost during camera initialization');
-          setIsCameraActive(false);
-          return;
-        }
-        
-        // Set video source and make sure it's visible
-        console.log('Setting video source to stream');
-        videoRef.current.srcObject = stream;
-        videoRef.current.style.display = 'block';
-        
-        // Attempt to play the video
-        await videoRef.current.play();
-        console.log('Video playback started successfully');
-        
-        // Make sure we can actually see content from the camera
-        setTimeout(() => {
-          if (videoRef.current && !videoRef.current.videoWidth) {
-            console.warn('Video element has no dimensions after timeout');
-          } else if (videoRef.current) {
-            console.log('Video dimensions:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
-          }
-        }, 1000);
-      } catch (e) {
-        console.error('Error accessing camera or playing video:', e);
-        alert('Problème lors de l\'initialisation de la caméra. Veuillez vérifier les permissions.');
+      // Vérifier si l'élément vidéo existe toujours
+      if (!videoRef.current) {
+        console.error('Référence vidéo perdue pendant l\'initialisation');
+        stream.getTracks().forEach(track => track.stop());
         setIsCameraActive(false);
         return;
       }
+      
+      // Définir la source vidéo
+      videoRef.current.srcObject = stream;
+      
+      // S'assurer que la vidéo est visible
+      videoRef.current.style.display = 'block';
+      
+      try {
+        // Commencer la lecture vidéo
+        await videoRef.current.play();
+        console.log('Lecture vidéo démarrée avec succès');
+        
+        // Vérifier que le contenu de la caméra est visible
+        setTimeout(() => {
+          if (videoRef.current && !videoRef.current.videoWidth) {
+            console.warn('L\'élément vidéo n\'a pas de dimensions après délai');
+          } else if (videoRef.current) {
+            console.log('Dimensions vidéo:', videoRef.current.videoWidth, 'x', videoRef.current.videoHeight);
+          }
+        }, 1000);
+      } catch (e) {
+        console.error('Erreur lors de la lecture vidéo:', e);
+        stopCamera();
+        alert('Problème avec la caméra. Veuillez réessayer.');
+      }
     } catch (error) {
-      console.error('Error starting camera:', error);
-      alert('Impossible d\'accéder à la caméra. Veuillez vérifier les permissions.');
+      console.error('Erreur lors du démarrage de la caméra:', error);
+      // Afficher un message d'erreur plus précis
+      let errorMessage = 'Impossible d\'accéder à la caméra. ';
+      
+      if (error instanceof DOMException) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage += 'Vous avez refusé l\'accès. Veuillez autoriser l\'accès à la caméra.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage += 'Aucune caméra n\'a été trouvée sur votre appareil.';
+        } else {
+          errorMessage += 'Veuillez vérifier vos paramètres et réessayer.';
+        }
+      }
+      
+      alert(errorMessage);
       setIsCameraActive(false);
     }
   };
   
   const stopCamera = () => {
+    console.log('Arrêt de la caméra');
+    // Toujours mettre à jour l'état UI immédiatement
+    setIsCameraActive(false);
+    
+    // Arrêter tous les flux vidéo
     if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      const tracks = stream.getTracks();
-      
-      tracks.forEach(track => track.stop());
-      videoRef.current.srcObject = null;
-      setIsCameraActive(false);
+      try {
+        const stream = videoRef.current.srcObject as MediaStream;
+        const tracks = stream.getTracks();
+        
+        console.log('Arrêt de', tracks.length, 'pistes média');
+        tracks.forEach(track => {
+          track.stop();
+          console.log('Piste arrêtée:', track.kind);
+        });
+        
+        // Nettoyer la source vidéo
+        videoRef.current.srcObject = null;
+        videoRef.current.src = '';
+        
+        console.log('Caméra arrêtée avec succès');
+      } catch (e) {
+        console.error('Erreur lors de l\'arrêt de la caméra:', e);
+      }
+    } else {
+      console.log('Pas de flux vidéo actif à arrêter');
     }
   };
   
@@ -1367,7 +1401,7 @@ const ChatAssistant: React.FC = () => {
         <div className="border-t p-3">
           {/* Camera interface (shown when camera is active) */}
           {isCameraActive && (
-            <div className="mb-3 relative">
+            <div className="mb-3 relative z-10">
               <div className="relative bg-gray-900 rounded-lg" style={{ height: '300px', overflow: 'hidden' }}>
                 <p className="text-white text-center py-2">Caméra</p>
                 <div className="absolute inset-0 flex justify-center items-center">
@@ -1377,6 +1411,7 @@ const ChatAssistant: React.FC = () => {
                     autoPlay
                     playsInline
                     muted
+                    style={{ display: 'block' }}
                   />
                 </div>
                 <canvas ref={canvasRef} className="hidden" />
