@@ -83,44 +83,9 @@ const SideNavigation = () => {
           </ul>
         </nav>
         
-        {/* Version info */}
+        {/* Version info simple */}
         <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50 dark:bg-gray-800">
-          <p>Kora Learning Platform v1.0</p>
-          {process.env.NODE_ENV === 'development' && (
-            <details className="mt-1">
-              <summary>Developer Info</summary>
-              <div className="mt-1">
-                <p>Current route: {location}</p>
-                <p>Navigation items: {navItems.length}</p>
-                <ul className="pl-2 mt-1 space-y-1">
-                  {navItems.map((item, index) => (
-                    <li key={index} className="flex justify-between">
-                      <span>{item.label}</span>
-                      <button 
-                        className="text-indigo-600 hover:underline text-xs" 
-                        onClick={() => handleNavigation(item.path)}
-                      >
-                        Go
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </details>
-          )}
-        </div>
-        
-        {/* Footer section */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-800">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-              <span className="text-sm">👤</span>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Invité</p>
-              <p className="text-xs text-gray-500">Connectez-vous</p>
-            </div>
-          </div>
+          <p>Kora - Aide aux devoirs</p>
         </div>
       </aside>
     </>
