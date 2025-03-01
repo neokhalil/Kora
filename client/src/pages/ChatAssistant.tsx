@@ -105,11 +105,26 @@ const ChatAssistant: React.FC = () => {
       if (window.visualViewport) {
         const offsetHeight = window.innerHeight - window.visualViewport.height;
         setKeyboardHeight(offsetHeight > 150 ? offsetHeight : 0);
+        
+        // Force composer position update
+        if (composerRef.current) {
+          composerRef.current.style.bottom = `${offsetHeight > 150 ? offsetHeight : 0}px`;
+        }
+      }
+    };
+    
+    // Handle scroll events to ensure composer stays fixed
+    const handleScroll = () => {
+      if (composerRef.current) {
+        // Force update of composer position on scroll
+        composerRef.current.style.position = 'fixed';
+        composerRef.current.style.bottom = `${keyboardHeight}px`;
       }
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     
     // Add visual viewport event listeners if available
     if (window.visualViewport) {
@@ -119,6 +134,7 @@ const ChatAssistant: React.FC = () => {
     
     return () => {
       window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('scroll', handleScroll);
       
       // Remove visual viewport event listeners
       if (window.visualViewport) {
@@ -126,7 +142,7 @@ const ChatAssistant: React.FC = () => {
         window.visualViewport.removeEventListener('scroll', handleVisualViewportChange);
       }
     };
-  }, []);
+  }, [keyboardHeight]);
   
   // Nous n'avons plus besoin de nettoyer les ressources de la caméra puisque
   // nous utilisons l'appareil photo intégré du navigateur
@@ -1227,10 +1243,14 @@ const ChatAssistant: React.FC = () => {
         {/* Input area - fixed at bottom with shadow */}
         <div 
           ref={composerRef}
-          className="border-t p-3 fixed left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]"
+          className="border-t p-3 fixed left-0 right-0 bg-white dark:bg-gray-900 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]"
           style={{ 
             bottom: `${keyboardHeight}px`,
-            transition: keyboardHeight > 0 ? 'none' : 'bottom 0.3s ease-out'
+            transition: keyboardHeight > 0 ? 'none' : 'bottom 0.3s ease-out',
+            position: 'fixed', /* Force fixed position */
+            width: '100%', /* Ensure full width */
+            transform: 'translateZ(0)', /* Force hardware acceleration */
+            willChange: 'transform, bottom' /* Optimize for animations */
           }}>
           <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
