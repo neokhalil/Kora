@@ -73,8 +73,8 @@ const ChatAssistant: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Nous n'avons plus besoin des références vidéo et canvas
+  // puisque nous utilisons l'appareil photo natif du téléphone
   
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -1261,7 +1261,7 @@ const ChatAssistant: React.FC = () => {
                 onKeyPress={handleKeyPress}
                 placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
                 className="flex-1"
-                disabled={isThinking || isUploadingImage || isCameraActive}
+                disabled={isThinking || isUploadingImage}
               />
               
               {/* Hidden file input for image upload, incluant l'appareil photo sur mobile */}
@@ -1327,7 +1327,7 @@ const ChatAssistant: React.FC = () => {
                     }, 500);
                   }
                 }}
-                disabled={isThinking || isUploadingImage || isCameraActive}
+                disabled={isThinking || isUploadingImage}
                 maxRecordingTimeMs={30000} // 30 secondes maximum
                 language="fr" // langue française par défaut
               />
