@@ -455,7 +455,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           size="icon"
           variant="ghost"
           onClick={stopRecording}
-          className="h-10 w-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex-shrink-0 
+          className="h-10 w-10 bg-black hover:bg-gray-900 text-white rounded-full flex-shrink-0 
                     relative overflow-hidden active:scale-95 transform transition-transform"
           aria-label="Terminer l'enregistrement"
         >
