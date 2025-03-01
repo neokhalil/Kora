@@ -70,9 +70,11 @@ const ChatAssistant: React.FC = () => {
   // Retirer l'état de la caméra active car nous utiliserons l'appareil photo intégré
   // const [isCameraActive, setIsCameraActive] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
   // Nous n'avons plus besoin des références vidéo et canvas
   // puisque nous utilisons l'appareil photo natif du téléphone
   
@@ -83,7 +85,7 @@ const ChatAssistant: React.FC = () => {
     }
   }, [messages, isMobileDevice]);
   
-  // Detect mobile device
+  // Detect mobile device and handle visual viewport changes (for keyboard)
   useEffect(() => {
     const checkMobile = () => {
       // Forcer la détection comme mobile pour les tests
@@ -98,11 +100,31 @@ const ChatAssistant: React.FC = () => {
       setIsMobileDevice(isMobile);
     };
     
+    // Handle keyboard on mobile (using VisualViewport API)
+    const handleVisualViewportChange = () => {
+      if (window.visualViewport) {
+        const offsetHeight = window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(offsetHeight > 150 ? offsetHeight : 0);
+      }
+    };
+    
     checkMobile();
     window.addEventListener('resize', checkMobile);
     
+    // Add visual viewport event listeners if available
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+      window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
+    }
+    
     return () => {
       window.removeEventListener('resize', checkMobile);
+      
+      // Remove visual viewport event listeners
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+        window.visualViewport.removeEventListener('scroll', handleVisualViewportChange);
+      }
     };
   }, []);
   
@@ -1200,7 +1222,13 @@ const ChatAssistant: React.FC = () => {
         </div>
         
         {/* Input area - fixed at bottom with shadow */}
-        <div className="border-t p-3 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+        <div 
+          ref={composerRef}
+          className="border-t p-3 fixed left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]"
+          style={{ 
+            bottom: `${keyboardHeight}px`,
+            transition: keyboardHeight > 0 ? 'none' : 'bottom 0.3s ease-out'
+          }}>
           <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           
