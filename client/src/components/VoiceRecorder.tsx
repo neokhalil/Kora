@@ -513,24 +513,66 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                 style={{ height: '24px' }}
               />
               
-              {/* Visualiseur style WhatsApp - ligne pointillée avec données audio en temps réel */}
-              <div className="w-full h-5 flex items-center justify-center gap-[2px]">
-                {/* Utiliser les niveaux audio réels pour les hauteurs des barres */}
-                {audioLevels.map((height, i) => {
+              {/* Visualiseur style WhatsApp - barres animées comme dans WhatsApp */}
+              <div className="w-full h-6 flex items-center justify-center gap-[2px]">
+                {Array.from({ length: 44 }).map((_, i) => {
+                  // Utiliser un pattern d'animation WhatsApp-like
+                  const getHeight = () => {
+                    // Créer un motif de vague avec des hauteurs variées
+                    // Le centre est plus haut (forme d'onde typique)
+                    const center = 44 / 2;
+                    const distance = Math.abs(i - center);
+                    const heightFactor = 1 - (distance / center) * 0.5;
+                    
+                    // Hauteur de base variée pour un effet plus naturel
+                    let baseHeight;
+                    if (i % 4 === 0) baseHeight = 8 * heightFactor;
+                    else if (i % 3 === 0) baseHeight = 6 * heightFactor;
+                    else if (i % 2 === 0) baseHeight = 4 * heightFactor;
+                    else baseHeight = 3 * heightFactor;
+                    
+                    // Ajouter une variation aléatoire pour un effet naturel
+                    return Math.max(2, Math.round(baseHeight));
+                  };
+                  
+                  // Calcul des paramètres d'animation
+                  const height = getHeight();
+                  const animationDuration = 0.7 + (i % 3) * 0.15; // 0.7s à 1.0s
+                  const animationDelay = (i * 25) % 500; // ms
+                  
                   return (
                     <div 
                       key={i}
-                      className="rounded-full"
                       style={{ 
                         width: '2px',
                         height: `${height}px`,
-                        backgroundColor: '#00A884', // Couleur de WhatsApp
-                        opacity: 0.9,
-                        transition: 'height 30ms linear'
+                        backgroundColor: '#00A884', // Couleur WhatsApp
+                        borderRadius: '1px',
+                        animation: `recording-visualizer ${animationDuration}s ease-in-out ${animationDelay}ms infinite alternate`,
+                        opacity: 0.85,
+                        willChange: 'height, transform',
+                        transformOrigin: 'center'
                       }}
                     />
                   );
                 })}
+                
+                {/* Style pour l'animation des barres - inséré directement */}
+                <style>
+                  {`
+                    @keyframes recording-visualizer {
+                      0% {
+                        transform: scaleY(0.8);
+                      }
+                      50% {
+                        transform: scaleY(1.1);
+                      }
+                      100% {
+                        transform: scaleY(0.9);
+                      }
+                    }
+                  `}
+                </style>
               </div>
             </div>
             
