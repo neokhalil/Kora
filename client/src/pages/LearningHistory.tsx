@@ -245,7 +245,9 @@ const TopicList = ({
           onClick={() => onSelectTopic(topic.id)}
         >
           <span className="text-left truncate max-w-[80%]">{topic.title}</span>
-          <Badge variant="secondary">{topic.interactionCount}</Badge>
+          <Badge variant="secondary">
+            {topic.interactionCount} {topic.interactionCount === 1 ? 'interaction' : 'interactions'}
+          </Badge>
         </Button>
       ))}
     </div>
