@@ -44,7 +44,7 @@ const SideNavigation = () => {
       {/* Side Navigation */}
       <aside 
         className={cn(
-          "w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed inset-y-0 left-0 z-40 md:z-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative flex flex-col",
+          "w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed top-16 bottom-0 left-0 z-40 md:z-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative flex flex-col",
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
