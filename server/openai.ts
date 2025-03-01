@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import fs from "fs";
 import { Buffer } from "buffer";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Utilisation de ChatGPT 3.5 Turbo comme demandé par l'utilisateur
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // System prompt for Kora's educational assistant
@@ -83,7 +83,7 @@ export async function generateTutoringResponse(
 ): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
         ...previousMessages,
@@ -109,7 +109,7 @@ export async function generateReExplanation(
 ): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a re-explanation. Provide an alternative explanation of the same concept using different wording, examples, or approaches. Your re-explanation should be substantially different from the original explanation.` },
         { role: "user", content: originalQuestion },
@@ -136,7 +136,7 @@ export async function generateChallengeProblem(
 ): Promise<string> {
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. Generate a related problem of slightly higher difficulty that tests the same concept. The problem should be challenging but solvable using the same principles.` },
         { role: "user", content: originalQuestion },
@@ -208,8 +208,11 @@ Respond in ${process.env.LANGUAGE || "French"}.`;
       ? `J'ai besoin d'aide avec cette image. ${textQuery}`
       : "Peux-tu m'aider à comprendre ce qui est montré dans cette image?";
 
+    // Note: gpt-3.5-turbo n'est pas optimisé pour l'analyse d'images
+    // mais on l'utilise comme demandé par l'utilisateur.
+    // Idéalement, il faudrait utiliser gpt-4-vision-preview ou gpt-4o pour cette fonctionnalité.
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [
         { 
           role: "system", 
