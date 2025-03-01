@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Correctifs mobiles spécifiques pour iOS et Android */
+:root {
+  height: -webkit-fill-available;
+  height: 100%;
+}
+
+html, body {
+  height: 100vh;
+  /* Hack pour iOS */
+  height: -webkit-fill-available;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Empêcher le défilement du body */
+body {
+  overflow: hidden;
+  touch-action: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+}
+
+/* Activer défilement uniquement dans les conteneurs scrollables */
+.overflow-y-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 @layer base {
   * {
     @apply border-border;

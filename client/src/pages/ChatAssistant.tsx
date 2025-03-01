@@ -136,44 +136,94 @@ const ChatAssistant: React.FC = () => {
       setIsMobileDevice(isMobile);
     };
     
-    // Handle keyboard on mobile (using VisualViewport API)
+    // Handle keyboard on mobile (using VisualViewport API) - nouvelle approche plus robuste
     const handleVisualViewportChange = () => {
       if (window.visualViewport) {
-        // Calcul de la hauteur du clavier
-        const offsetHeight = window.innerHeight - window.visualViewport.height;
-        const isKeyboardVisible = offsetHeight > 150;
+        // Calcul plus précis de la hauteur du clavier en tenant compte des variations entre appareils
+        const offsetHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
+        const isKeyboardVisible = offsetHeight > 100; // Seuil plus bas pour la détection
+        const keyboardHeightToUse = isKeyboardVisible ? (offsetHeight + 2) : 0; // +2px pour éviter le gap
         
         // Mettre à jour l'état uniquement si nécessaire pour éviter des re-renders inutiles
-        if ((isKeyboardVisible && offsetHeight !== keyboardHeight) || 
-            (!isKeyboardVisible && keyboardHeight !== 0)) {
-          setKeyboardHeight(isKeyboardVisible ? offsetHeight : 0);
+        if (keyboardHeightToUse !== keyboardHeight) {
+          setKeyboardHeight(keyboardHeightToUse);
         }
         
         // Force composer position update directement sur le DOM pour une réponse immédiate
         if (composerRef.current) {
-          // Sauvegarde de la position actuelle du scroll
-          const scrollY = window.scrollY;
+          // Blocage du scroll du corps pendant les ajustements
+          document.body.style.overflow = 'hidden';
           
-          // Application du style avec fallbacks
-          composerRef.current.style.bottom = `${isKeyboardVisible ? offsetHeight : 0}px`;
+          // Positionnement précis en tenant compte des hacks pour iOS/Android
           composerRef.current.style.position = 'fixed';
+          composerRef.current.style.bottom = `${keyboardHeightToUse}px`;
+          composerRef.current.style.left = '0px';
+          composerRef.current.style.right = '0px';
           composerRef.current.style.width = '100%';
-          composerRef.current.style.zIndex = '999';
+          composerRef.current.style.zIndex = '9999';
           
-          // Sur certains appareils, l'ouverture du clavier modifie le scroll - nous le restaurons
+          // Styles supplémentaires pour garantir la visibilité
+          composerRef.current.style.backgroundColor = 'white';
+          composerRef.current.style.borderTop = '1px solid #e5e7eb';
+          composerRef.current.style.transform = 'translateZ(0)';
+          
+          // En mode clavier visible, on s'assure que la barre de composition est adjacente au clavier
           if (isKeyboardVisible) {
-            setTimeout(() => window.scrollTo(0, scrollY), 50);
+            // Technique d'animation désactivée pendant la transition
+            composerRef.current.style.transition = 'none';
+            
+            // Force le rafraîchissement du navigateur
+            void composerRef.current.offsetHeight;
+            
+            // Ajustement du scroll pour s'assurer que le dernier message est visible
+            setTimeout(() => {
+              if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+              }
+            }, 50);
+          } else {
+            // Réactive les transitions quand le clavier est fermé
+            setTimeout(() => {
+              if (composerRef.current) {
+                composerRef.current.style.transition = 'bottom 0.3s ease-out';
+              }
+            }, 50);
           }
         }
       }
     };
     
-    // Handle scroll events to ensure composer stays fixed
+    // Handle scroll events to ensure composer stays fixed - approche améliorée
     const handleScroll = () => {
       if (composerRef.current) {
-        // Force update of composer position on scroll
+        // Empêcher complètement le défilement du body pendant l'interaction
+        document.body.style.overflow = 'hidden';
+        
+        // Force update de la position avec hardware acceleration
         composerRef.current.style.position = 'fixed';
         composerRef.current.style.bottom = `${keyboardHeight}px`;
+        composerRef.current.style.left = '0px';
+        composerRef.current.style.right = '0px';
+        composerRef.current.style.width = '100%';
+        composerRef.current.style.zIndex = '9999';
+        composerRef.current.style.transform = 'translateZ(0)';
+        composerRef.current.style.willChange = 'transform';
+        
+        // S'assurer que la barre est visible et bien collée au clavier
+        if (keyboardHeight > 0) {
+          // Désactiver les transitions pendant le défilement
+          composerRef.current.style.transition = 'none';
+          
+          // Forcer le redressage du DOM
+          void composerRef.current.offsetHeight;
+        }
+        
+        // Faire défiler jusqu'au dernier message après un court délai
+        if (messagesEndRef.current && keyboardHeight > 0) {
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+          }, 10);
+        }
       }
     };
     
@@ -1295,7 +1345,7 @@ const ChatAssistant: React.FC = () => {
       {/* Input area - fixed at bottom with improved mobile stability */}
       <div 
         ref={composerRef}
-        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3"
+        className={`chat-composer ${keyboardHeight > 0 ? 'with-keyboard' : ''} fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3`}
         style={{ 
           bottom: `${keyboardHeight}px`,
           transform: 'translateZ(0)',
