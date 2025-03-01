@@ -401,9 +401,11 @@ const ChatAssistant: React.FC = () => {
       setMessages(prev => [...prev, challengeMessage]);
       setIsThinking(false);
       
-      // Scroll to the new message
+      // Scroll to the new message without smooth animation on mobile
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: isMobileDevice ? 'auto' : 'smooth' });
+        }
       }, 100);
     }, 800);
     
@@ -1066,9 +1068,11 @@ const ChatAssistant: React.FC = () => {
                             messageId: message.id
                           });
                           
-                          // Scroll to the new message
+                          // Scroll to the new message without smooth animation on mobile
                           setTimeout(() => {
-                            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                            if (messagesEndRef.current) {
+                              messagesEndRef.current.scrollIntoView({ behavior: isMobileDevice ? 'auto' : 'smooth' });
+                            }
                           }, 100);
                         }}
                         className="text-xs"
@@ -1123,9 +1127,11 @@ const ChatAssistant: React.FC = () => {
                         
                         setMessages(prev => [...prev, challengeMessage]);
                         
-                        // Scroll to the new message
+                        // Scroll to the new message without smooth animation on mobile
                         setTimeout(() => {
-                          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                          if (messagesEndRef.current) {
+                            messagesEndRef.current.scrollIntoView({ behavior: isMobileDevice ? 'auto' : 'smooth' });
+                          }
                         }, 100);
                         
                         // Nous n'avons pas besoin d'envoyer un message au serveur ici
