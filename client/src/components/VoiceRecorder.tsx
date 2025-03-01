@@ -70,7 +70,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     height: 24,  // Hauteur du canvas style WhatsApp
     barWidth: 2,  // Barres plus fines
     barGap: 1,    // Espace entre les barres
-    sensitivity: 1.8 // Sensibilité plus élevée pour mieux voir les variations
+    sensitivity: 5.0 // Sensibilité extrêmement élevée pour mieux voir les variations minimes
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -118,7 +118,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     const analyser = audioContext.createAnalyser();
     analyserRef.current = analyser;
     analyser.fftSize = 512; // Plus précis pour la détection vocale
-    analyser.smoothingTimeConstant = 0.5; // Ajouter un peu de lissage pour une apparence naturelle
+    analyser.smoothingTimeConstant = 0.2; // Réduire le lissage pour une réactivité maximale
     
     // Connecter le flux audio à l'analyser
     const source = audioContext.createMediaStreamSource(stream);
@@ -149,8 +149,17 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       // Planifier la prochaine frame d'animation 
       animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
       
-      // Obtenir les données de fréquence audio
+      // Obtenir les données de fréquence audio avec une meilleure sensibilité aux variations
       analyser.getByteFrequencyData(dataArray);
+      
+      // Simuler un peu de bruit aléatoire pour un effet plus vivant quand il n'y a pas de son
+      let hasSound = false;
+      for (let i = 0; i < bufferLength; i++) {
+        if (dataArray[i] > 10) { // Détection de son au-dessus du seuil de bruit
+          hasSound = true;
+          break;
+        }
+      }
       
       // Calculer le pas pour répartir les fréquences sur toutes les barres
       // Se concentrer sur les fréquences vocales (200-3500 Hz)
@@ -173,8 +182,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         }
         const avgValue = sum / (endIdx - startIdx + 1);
         
-        // Appliquer une sensibilité augmentée pour mieux voir les variations
-        const sensitivity = 2.5;
+        // Appliquer une sensibilité beaucoup plus élevée pour mieux voir les variations
+        const sensitivity = visualizerConfig.sensitivity;
         const amplifiedValue = avgValue * sensitivity;
         
         // Convertir en hauteur de barre avec une valeur minimum et maximum
