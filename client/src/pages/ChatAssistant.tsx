@@ -82,10 +82,9 @@ const ChatAssistant: React.FC = () => {
   // Detect mobile device and handle visual viewport changes (for keyboard)
   useEffect(() => {
     const checkMobile = () => {
-      // Forcer la détection comme mobile pour les tests
-      const isMobile = true;
-      // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
-      //                (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+      // Détection réelle de l'appareil mobile
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                     (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
       console.log('Device detection:', { 
         userAgent: navigator.userAgent,
         isMediaQueryMatch: window.matchMedia && window.matchMedia('(max-width: 768px)').matches,
@@ -153,11 +152,9 @@ const ChatAssistant: React.FC = () => {
             
             if (data.type === 'welcome') {
               // Handle welcome message
-              setMessages([{
-                id: Date.now().toString(),
-                content: data.message,
-                sender: 'kora',
-              }]);
+              console.log('Received welcome message');
+              // Nous ne définissons plus de message initial ici
+              // L'écran d'accueil se charge automatiquement quand messages est vide
             } else if (data.type === 'chat') {
               // Handle chat message from AI
               setIsThinking(false);
