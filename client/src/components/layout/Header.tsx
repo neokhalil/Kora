@@ -7,7 +7,7 @@ const Header: React.FC = () => {
   const { toggleMenu } = useMenu();
   
   return (
-    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
+    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 fixed top-0 left-0 right-0 z-50 fixed-header">
       <div className="flex items-center justify-between px-4 h-full">
         {/* Menu button - Visible on all screen sizes now */}
         <div className="flex items-center">

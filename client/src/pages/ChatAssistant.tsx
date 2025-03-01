@@ -1177,7 +1177,7 @@ const ChatAssistant: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
+    <div className="flex flex-col h-full max-w-4xl mx-auto pt-16">
       
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Chat messages area with padding bottom to account for fixed input area */}
@@ -1199,8 +1199,8 @@ const ChatAssistant: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
         
-        {/* Input area - fixed at bottom with shadow */}
-        <div className="border-t p-3 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]">
+        {/* Input area - fixed at bottom with shadow and high z-index to stay above keyboard */}
+        <div className="border-t p-3 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] input-bar-fixed">
           <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           

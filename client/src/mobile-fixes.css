@@ -1,0 +1,57 @@
+/**
+ * CSS fixes for mobile devices, particularly iOS
+ * Ensures header and input areas stay visible when keyboard is open
+ */
+
+/* Fix pour la barre d'en-tête */
+@supports (-webkit-touch-callout: none) {
+  /* CSS spécifique iOS */
+  header.fixed-header {
+    position: fixed;
+    top: env(safe-area-inset-top);
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+}
+
+/* Fix pour la barre de saisie */
+@supports (-webkit-touch-callout: none) {
+  /* CSS spécifique iOS */
+  .input-bar-fixed {
+    position: fixed;
+    bottom: env(safe-area-inset-bottom);
+    left: 0;
+    right: 0;
+    z-index: 40;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+}
+
+/* Eviter que le clavier iOS pousse la vue vers le haut */
+@media screen and (max-width: 768px) {
+  html {
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
+  }
+  
+  .chat-container {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .messages-area {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
