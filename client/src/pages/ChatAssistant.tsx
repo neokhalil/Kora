@@ -1201,18 +1201,32 @@ const ChatAssistant: React.FC = () => {
           className="flex-1 overflow-y-auto p-4" 
           style={{ paddingBottom: `calc(170px + ${keyboardHeight}px)` }}
         >
-          {messages.map(renderMessage)}
-          
-          {/* Thinking indicator */}
-          {isThinking && (
-            <div className="flex mb-4">
-              <div className="bg-blue-50 dark:bg-gray-700 rounded-lg py-3 px-4">
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                  <span className="text-gray-500 text-sm">Kora réfléchit...</span>
-                </div>
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col justify-start pt-12">
+              <div className="max-w-md px-4">
+                <h2 className="text-3xl font-bold mb-1">Hello,</h2>
+                <h2 className="text-3xl font-bold mb-3">Ibrahima</h2>
+                <p className="text-gray-500 text-xl">
+                  Comment puis-je t'aider aujourd'hui ?
+                </p>
               </div>
             </div>
+          ) : (
+            <>
+              {messages.map(renderMessage)}
+            
+              {/* Thinking indicator */}
+              {isThinking && (
+                <div className="flex mb-4">
+                  <div className="bg-blue-50 dark:bg-gray-700 rounded-lg py-3 px-4">
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                      <span className="text-gray-500 text-sm">Kora réfléchit...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
           
           <div ref={messagesEndRef} />
@@ -1282,8 +1296,8 @@ const ChatAssistant: React.FC = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question à Kora..."}
-                className="w-full pr-[60px]" // Espace pour le bouton d'envoi
+                placeholder={selectedImage ? "Décris ce que tu cherches à comprendre..." : "Pose ta question"}
+                className="w-full pr-[60px] rounded-full pl-4" // Espace pour le bouton d'envoi
                 disabled={isThinking || isUploadingImage}
               />
               
