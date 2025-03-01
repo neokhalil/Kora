@@ -76,10 +76,12 @@ const ChatAssistant: React.FC = () => {
   // Nous n'avons plus besoin des références vidéo et canvas
   // puisque nous utilisons l'appareil photo natif du téléphone
   
-  // Auto-scroll to bottom when messages change
+  // Auto-scroll to bottom when messages change - without smooth animation on mobile to avoid visual cues
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: isMobileDevice ? 'auto' : 'smooth' });
+    }
+  }, [messages, isMobileDevice]);
   
   // Detect mobile device
   useEffect(() => {
