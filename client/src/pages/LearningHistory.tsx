@@ -506,27 +506,27 @@ export default function LearningHistory() {
   // Queries for data fetching
   const { data: fields, isLoading: isLoadingFields } = useQuery({
     queryKey: ['/api/fields/with-counts'],
-    queryFn: () => apiRequest<Field[]>('/api/fields/with-counts')
+    queryFn: () => apiRequest('/api/fields/with-counts')
   });
   
   const { data: topics, isLoading: isLoadingTopics } = useQuery({
     queryKey: ['/api/topics/with-counts', selectedFieldId],
     queryFn: () => {
       if (selectedFieldId) {
-        return apiRequest<Topic[]>(`/api/topics/by-field/${selectedFieldId}`);
+        return apiRequest(`/api/topics/by-field/${selectedFieldId}`);
       }
-      return apiRequest<Topic[]>('/api/topics/with-counts');
+      return apiRequest('/api/topics/with-counts');
     }
   });
   
   const { data: tags, isLoading: isLoadingTags } = useQuery({
     queryKey: ['/api/tags/with-counts'],
-    queryFn: () => apiRequest<Tag[]>('/api/tags/with-counts')
+    queryFn: () => apiRequest('/api/tags/with-counts')
   });
   
   const { data: insights, isLoading: isLoadingInsights } = useQuery({
     queryKey: ['/api/insights/frequent-topics', userId],
-    queryFn: () => apiRequest<InteractionInsight[]>(`/api/insights/frequent-topics?userId=${userId}&limit=5`)
+    queryFn: () => apiRequest(`/api/insights/frequent-topics?userId=${userId}&limit=5`)
   });
   
   // Build query params for interactions
