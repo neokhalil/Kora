@@ -106,22 +106,19 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
-  // Visualiseur audio optimisé
+  // Visualiseur audio optimisé avec détection active du volume
   const setupAudioVisualizer = (stream: MediaStream) => {
     if (!canvasRef.current) return;
     
-    const canvas = canvasRef.current;
-    const canvasCtx = canvas.getContext('2d');
-    if (!canvasCtx) return;
-    
-    // Créer le contexte audio
-    const audioContext = new AudioContext();
+    // Créer le contexte audio avec la méthode moderne
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
     audioContextRef.current = audioContext;
     
-    // Créer un analyser
+    // Créer un analyser avec une taille FFT plus grande pour une meilleure précision
     const analyser = audioContext.createAnalyser();
     analyserRef.current = analyser;
-    analyser.fftSize = 256;
+    analyser.fftSize = 512; // Plus précis pour la détection vocale
+    analyser.smoothingTimeConstant = 0.5; // Ajouter un peu de lissage pour une apparence naturelle
     
     // Connecter le flux audio à l'analyser
     const source = audioContext.createMediaStreamSource(stream);
@@ -131,13 +128,17 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
     
-    // Configuration du canvas (toujours utilisé pour le traitement, mais non affiché)
+    // Configuration du canvas pour le débogage si nécessaire
+    const canvas = canvasRef.current;
     canvas.width = visualizerConfig.width;
     canvas.height = visualizerConfig.height;
     
-    // Fonction pour mettre à jour les niveaux audio qui sera utilisée pour actualiser l'état
+    // Nombre de barres à afficher
+    const totalBars = 44; // Correspond au nombre dans le rendu
+    
+    // Fonction pour mettre à jour les niveaux audio en temps réel
     const updateAudioLevels = () => {
-      // Continuer l'animation si le state est toujours 'recording'
+      // Vérifier si nous sommes toujours en enregistrement
       if (recorderState !== 'recording') {
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
@@ -145,45 +146,62 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         return;
       }
       
-      // Planifier la prochaine frame
+      // Planifier la prochaine frame d'animation 
       animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
       
-      // Obtenir les données audio
+      // Obtenir les données de fréquence audio
       analyser.getByteFrequencyData(dataArray);
       
-      // Calculer le nombre de barres à afficher (44 pour correspondre à notre rendu)
-      const totalBars = 44;
-      const step = Math.floor(bufferLength / totalBars);
+      // Calculer le pas pour répartir les fréquences sur toutes les barres
+      // Se concentrer sur les fréquences vocales (200-3500 Hz)
+      const vocalRange = Math.floor(bufferLength * 0.7); // Approximation des fréquences vocales
+      const step = Math.max(1, Math.floor(vocalRange / totalBars));
       
-      // Créer un nouveau tableau pour les hauteurs des barres
-      const newLevels = [];
+      // Nouvelle approche - récupérer les niveaux d'amplitude pour chaque barre
+      const newLevels = Array(totalBars).fill(0);
       
-      // Calculer les hauteurs des barres en fonction de l'audio
+      // Parcourir les données de fréquence pour calculer les hauteurs des barres
       for (let i = 0; i < totalBars; i++) {
-        // Calculer l'index dans le dataArray pour cette barre
-        const dataIndex = Math.floor(i * step);
+        // Trouver la plage de fréquences pour cette barre
+        const startIdx = Math.min(bufferLength - 1, i * step);
+        const endIdx = Math.min(bufferLength - 1, startIdx + step - 1);
         
-        if (dataIndex < bufferLength) {
-          // Obtenir la valeur d'amplitude et appliquer la sensibilité
-          const value = dataArray[dataIndex] * visualizerConfig.sensitivity;
-          
-          // Normaliser entre 1 et 12 pixels pour la hauteur
-          // Ajouter une hauteur minimum pour les barres WhatsApp
-          const minHeight = 1; 
-          const maxHeight = 12;
-          const barHeight = minHeight + Math.min(maxHeight - minHeight, Math.floor((value / 255.0) * maxHeight));
-          
-          newLevels.push(barHeight);
-        } else {
-          newLevels.push(1); // Hauteur minimale par défaut
+        // Calculer la valeur moyenne pour cette plage
+        let sum = 0;
+        for (let j = startIdx; j <= endIdx; j++) {
+          sum += dataArray[j];
         }
+        const avgValue = sum / (endIdx - startIdx + 1);
+        
+        // Appliquer une sensibilité augmentée pour mieux voir les variations
+        const sensitivity = 2.5;
+        const amplifiedValue = avgValue * sensitivity;
+        
+        // Convertir en hauteur de barre avec une valeur minimum et maximum
+        const minHeight = 1;  // Hauteur minimum (jamais à zéro)
+        const maxHeight = 14; // Hauteur maximum
+        
+        const barHeight = minHeight + Math.min(
+          maxHeight - minHeight, 
+          Math.floor((amplifiedValue / 255.0) * (maxHeight - minHeight))
+        );
+        
+        newLevels[i] = barHeight;
       }
       
+      // Modifier légèrement la distribution pour obtenir un effet plus naturel
+      // Appliquer une légère courbe sinusoïdale pour éviter l'aspect trop uniforme
+      const finalLevels = newLevels.map((height, i) => {
+        // Ajouter un effet d'onde pour un aspect plus naturel
+        const waveFactor = 1 + 0.15 * Math.sin(i * 0.3);
+        return Math.max(1, Math.round(height * waveFactor));
+      });
+      
       // Mettre à jour l'état avec les nouvelles hauteurs
-      setAudioLevels(newLevels);
+      setAudioLevels(finalLevels);
     };
     
-    // Démarrer la mise à jour des niveaux audio
+    // Démarrer la mise à jour des niveaux audio immédiatement
     updateAudioLevels();
   };
   
@@ -499,7 +517,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
                         height: `${height}px`,
                         backgroundColor: '#00A884', // Couleur de WhatsApp
                         opacity: 0.9,
-                        transition: 'height 50ms ease-in-out'
+                        transition: 'height 30ms linear'
                       }}
                     />
                   );
