@@ -193,7 +193,7 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto pt-14">
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-hidden flex flex-col app-content">
         {/* Zone des messages */}
         <div 
           className="flex-1 overflow-y-auto p-4" 
