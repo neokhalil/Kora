@@ -85,6 +85,42 @@ const ChatAssistant: React.FC = () => {
     }
   }, [messages, isMobileDevice]);
   
+  // Add a specific event listener for input focus/blur to handle keyboard better on mobile
+  useEffect(() => {
+    const handleInputFocus = () => {
+      // When input is focused, ensure the keyboard adjustment is applied
+      if (window.visualViewport) {
+        const offsetHeight = window.innerHeight - window.visualViewport.height;
+        if (offsetHeight > 150 && composerRef.current) {
+          composerRef.current.style.bottom = `${offsetHeight}px`;
+        }
+      }
+      // Scroll to bottom after a short delay
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+        }
+      }, 300);
+    };
+    
+    // Find all input elements within the composer
+    const inputElements = composerRef.current?.querySelectorAll('input, textarea');
+    if (inputElements) {
+      inputElements.forEach(input => {
+        input.addEventListener('focus', handleInputFocus);
+      });
+    }
+    
+    return () => {
+      // Clean up event listeners
+      if (inputElements) {
+        inputElements.forEach(input => {
+          input.removeEventListener('focus', handleInputFocus);
+        });
+      }
+    };
+  }, []);
+  
   // Detect mobile device and handle visual viewport changes (for keyboard)
   useEffect(() => {
     const checkMobile = () => {
@@ -103,12 +139,31 @@ const ChatAssistant: React.FC = () => {
     // Handle keyboard on mobile (using VisualViewport API)
     const handleVisualViewportChange = () => {
       if (window.visualViewport) {
+        // Calcul de la hauteur du clavier
         const offsetHeight = window.innerHeight - window.visualViewport.height;
-        setKeyboardHeight(offsetHeight > 150 ? offsetHeight : 0);
+        const isKeyboardVisible = offsetHeight > 150;
         
-        // Force composer position update
+        // Mettre à jour l'état uniquement si nécessaire pour éviter des re-renders inutiles
+        if ((isKeyboardVisible && offsetHeight !== keyboardHeight) || 
+            (!isKeyboardVisible && keyboardHeight !== 0)) {
+          setKeyboardHeight(isKeyboardVisible ? offsetHeight : 0);
+        }
+        
+        // Force composer position update directement sur le DOM pour une réponse immédiate
         if (composerRef.current) {
-          composerRef.current.style.bottom = `${offsetHeight > 150 ? offsetHeight : 0}px`;
+          // Sauvegarde de la position actuelle du scroll
+          const scrollY = window.scrollY;
+          
+          // Application du style avec fallbacks
+          composerRef.current.style.bottom = `${isKeyboardVisible ? offsetHeight : 0}px`;
+          composerRef.current.style.position = 'fixed';
+          composerRef.current.style.width = '100%';
+          composerRef.current.style.zIndex = '999';
+          
+          // Sur certains appareils, l'ouverture du clavier modifie le scroll - nous le restaurons
+          if (isKeyboardVisible) {
+            setTimeout(() => window.scrollTo(0, scrollY), 50);
+          }
         }
       }
     };
@@ -1237,13 +1292,16 @@ const ChatAssistant: React.FC = () => {
         </div>
       </div>
       
-      {/* Input area - fixed at bottom */}
+      {/* Input area - fixed at bottom with improved mobile stability */}
       <div 
         ref={composerRef}
-        className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3"
+        className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3"
         style={{ 
           bottom: `${keyboardHeight}px`,
-          transform: 'translateZ(0)'
+          transform: 'translateZ(0)',
+          position: 'fixed', /* Redundant but helps ensure position */
+          width: '100vw',
+          maxWidth: '100%'
         }}>
         <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
