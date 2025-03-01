@@ -18,7 +18,7 @@
   <title>Kora - Plateforme Éducative</title>
   <style>
     :root {
-      --header-height: 3.5rem;  /* 56px ou 14px * 4 */
+      --header-height: 3.5rem;  /* 56px */
       --keyboard-height: 0px;
       --safe-area-top: env(safe-area-inset-top, 0px);
       --safe-area-bottom: env(safe-area-inset-bottom, 0px);
@@ -27,11 +27,12 @@
     body {
       font-family: 'Inter', sans-serif;
       overscroll-behavior: none;
-      padding-top: calc(var(--header-height) + var(--safe-area-top));
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
       position: relative;
       height: 100%;
       width: 100%;
-      -webkit-tap-highlight-color: transparent;
     }
     
     html {
@@ -40,107 +41,112 @@
       overflow: hidden;
     }
     
-    /* Styles spécifiques pour le header fixe */
-    header.app-header {
+    /* Nouvelle solution pour le header mobile */
+    .fixed-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      z-index: 9999; /* Valeur très élevée pour être au-dessus de tout */
-      height: var(--header-height);
+      z-index: 10000;
+    }
+    
+    .sticky-top {
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 10000;
+    }
+    
+    /* Style du header simple */
+    header.app-header {
       background-color: white;
-      transition: all 0.3s ease;
-      -webkit-transform: translateZ(0); /* Force hardware acceleration sur iOS */
-      transform: translateZ(0);
-      will-change: transform, opacity;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      padding-top: var(--safe-area-top);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      opacity: 1;
     }
     
-    /* Classes pour la gestion du clavier mobile */
-    body.keyboard-open header.app-header {
-      opacity: 1 !important;
-      transform: none !important;
-      visibility: visible !important;
+    /* Wrapper de l'application avec padding pour le header */
+    .app-wrapper {
+      padding-top: calc(var(--header-height) + var(--safe-area-top));
     }
     
-    body.input-focused header.app-header {
-      opacity: 1 !important;
-      transform: none !important;
-    }
-    
-    /* Pour les appareils mobiles */
-    body.mobile-device .fixed-bottom-bar {
-      transition: bottom 0.3s;
-    }
-    
-    /* Spécifique à iOS */
-    body.ios-device .fixed-bottom-bar {
-      padding-bottom: var(--safe-area-bottom);
-    }
-    
-    body.ios-device.keyboard-open .fixed-bottom-bar {
-      bottom: var(--keyboard-height);
-    }
-    
-    /* Pour Android */
-    body.android-device.keyboard-open .app-content {
-      height: calc(100vh - var(--keyboard-height));
-    }
-    
-    /* Pour éviter le recadrage par le clavier virtuel */
-    @supports (-webkit-touch-callout: none) {
-      .ios-fix {
-        padding-bottom: var(--safe-area-bottom);
-      }
-    }
-    
-    /* Fix pour l'apparition du header au focus */
-    input:focus, textarea:focus {
-      font-size: 16px !important; /* Prévient le zoom automatique sur iOS */
-    }
-    
-    /* Fix pour contourner le comportement du clavier */
+    /* Contenu principal scrollable */
     .app-content {
       overflow-x: hidden;
       overflow-y: auto;
-      height: 100%;
       -webkit-overflow-scrolling: touch;
       padding-bottom: var(--keyboard-height, 0px);
     }
     
-    /* Force le header à rester visible pendant l'utilisation du clavier */
-    body.keyboard-open header.app-header,
-    body.input-focused header.app-header {
-      position: fixed !important;
+    /* Gestion du clavier */
+    body.keyboard-open .fixed-header,
+    body.input-focused .fixed-header {
+      transform: none !important;
+      -webkit-transform: none !important;
       visibility: visible !important;
       opacity: 1 !important;
-      transform: none !important;
-      top: 0 !important;
-      z-index: 9999 !important;
     }
     
-    /* Spécifique à Android pour éviter les problèmes d'affichage */
-    @supports (-webkit-appearance:none) and (not (overflow:-webkit-marquee)) and (not (-ms-ime-align:auto)) and (not (-moz-appearance:none)) {
-      body.android-device header.app-header {
-        position: sticky !important;
+    /* Zone du bas (composeur, etc.) */
+    .fixed-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background-color: white;
+      transition: bottom 0.3s;
+    }
+    
+    /* Ajustements pour les appareils mobiles spécifiques */
+    @media screen and (-webkit-min-device-pixel-ratio:0) {
+      /* Android */
+      body.android-device .fixed-header {
+        position: fixed !important;
         top: 0 !important;
       }
       
-      body.android-device.keyboard-open {
-        height: calc(100% - var(--keyboard-height, 0px));
-        overflow: hidden;
+      input:focus, textarea:focus {
+        font-size: 16px !important;
       }
     }
     
-    /* Pour les anciens navigateurs Android */
-    @supports (-webkit-tap-highlight-color: transparent) {
-      .android-fix {
-        position: sticky;
-        top: 0;
-        z-index: 9999;
+    @supports (-webkit-touch-callout: none) {
+      /* iOS */
+      body.ios-device .fixed-header {
+        position: fixed !important;
+        top: 0 !important;
+      }
+      
+      body.ios-device .fixed-bottom-bar {
+        padding-bottom: var(--safe-area-bottom);
+      }
+      
+      body.ios-device.keyboard-open .fixed-bottom-bar {
+        bottom: var(--keyboard-height);
+      }
+    }
+    
+    /* Utilisation des classes importantes pour forcer la visibilité du header */
+    body.keyboard-open .fixed-header,
+    body.input-focused .fixed-header,
+    input:focus ~ .fixed-header,
+    textarea:focus ~ .fixed-header {
+      display: block !important;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 10000 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      -webkit-transform: none !important;
+    }
+    
+    /* Pour les appareils avec notch/encoche */
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .fixed-header {
+        padding-top: env(safe-area-inset-top);
       }
     }
   </style>
