@@ -1315,9 +1315,9 @@ const ChatAssistant: React.FC = () => {
               </div>
             </div>
             
-            {/* Barre d'outils sous le champ de saisie - style ChatGPT */}
-            <div className="flex items-center justify-center space-x-2 pt-1">
-              {/* Hidden file input pour la galerie d'images */}
+            {/* Barre d'outils simplifiée sous le champ de saisie */}
+            <div className="flex items-center justify-between space-x-2 pt-2">
+              {/* Hidden file input pour les images */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -1330,51 +1330,21 @@ const ChatAssistant: React.FC = () => {
                 }}
               />
               
-              {/* Boutons d'action centrés */}
-              <div className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-800 rounded-full px-2 py-1">
+              {/* Boutons d'action simplifiés */}
+              <div className="flex items-center space-x-3">
                 {/* Bouton galerie */}
                 <Button
-                  size="sm"
+                  size="icon"
                   variant="ghost"
                   disabled={isThinking || isUploadingImage}
                   onClick={handleOpenFileBrowser}
-                  title="Choisir une image depuis la galerie"
-                  className="rounded-full"
+                  title="Choisir une image"
+                  className="rounded-full h-10 w-10"
                 >
-                  <ImageIcon className="h-4 w-4 mr-1" />
-                  <span className="text-xs">Galerie</span>
+                  <ImageIcon className="h-5 w-5" />
                 </Button>
                 
-                {/* Bouton appareil photo (mobile uniquement) */}
-                {isMobileDevice && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={isThinking || isUploadingImage}
-                    onClick={() => {
-                      // Créer un input temporaire avec capture
-                      const tempInput = document.createElement('input');
-                      tempInput.type = 'file';
-                      tempInput.accept = 'image/*';
-                      tempInput.capture = 'environment';
-                      
-                      // Ajouter le gestionnaire d'événements
-                      tempInput.onchange = (e) => {
-                        handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                      };
-                      
-                      // Simuler un clic 
-                      tempInput.click();
-                    }}
-                    title="Prendre une photo"
-                    className="rounded-full"
-                  >
-                    <Camera className="h-4 w-4 mr-1" />
-                    <span className="text-xs">Photo</span>
-                  </Button>
-                )}
-                
-                {/* Bouton vocal */}
+                {/* Bouton microphone */}
                 <div className="flex items-center">
                   <VoiceRecorder 
                     onTranscriptionComplete={(text) => {

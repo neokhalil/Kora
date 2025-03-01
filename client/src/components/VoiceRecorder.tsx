@@ -419,15 +419,15 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Retourner le composant
   return (
     <div className="relative flex items-center justify-center">
-      {/* Version inactive - juste un bouton mic */}
+      {/* Version inactive - bouton mic stylisé */}
       {recorderState === 'inactive' && (
         <Button
           size="icon"
-          variant="outline"
+          variant="ghost"
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative hover:bg-primary/10 hover:text-primary transition-colors 
+          className="relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors 
                      h-10 w-10 rounded-full
                      active:scale-95 transform transition-transform
                      touch-manipulation"
@@ -440,76 +440,39 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       {recorderState === 'processing' && (
         <Button
           size="icon"
-          variant="outline"
+          variant="ghost"
           disabled={true}
           aria-label="Traitement en cours"
-          className="relative h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800"
+          className="relative h-10 w-10 rounded-full"
         >
           <Loader2 className="h-5 w-5 animate-spin" />
         </Button>
       )}
       
-      {/* Version enregistrement - style compact pour mobile */}
+      {/* Version enregistrement - style minimaliste */}
       {recorderState === 'recording' && (
-        <div className="flex items-center w-full bg-white dark:bg-slate-900 rounded-full shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 max-w-[170px]">
-          {/* Bouton pour annuler l'enregistrement */}
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={() => {
-              // Annuler l'enregistrement sans traiter l'audio
-              if (mediaRecorderRef.current) {
-                mediaRecorderRef.current.onstop = null;
-                audioChunksRef.current = [];
-                mediaRecorderRef.current.stop();
-                
-                if (mediaStreamRef.current) {
-                  mediaStreamRef.current.getTracks().forEach(track => track.stop());
-                }
-                
-                setRecorderState('inactive');
-                
-                toast({
-                  title: "Enregistrement annulé",
-                  description: "L'enregistrement a été annulé",
-                });
-              }
-            }}
-            className="h-8 w-8 text-gray-500 hover:text-red-500 rounded-l-full flex-shrink-0 p-0"
-            aria-label="Annuler l'enregistrement"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-          
-          {/* Contenu central plus compact */}
-          <div className="flex-1 flex items-center justify-center overflow-hidden px-1">
-            {/* Cercle rouge d'enregistrement */}
-            <div className="flex-shrink-0 mr-1">
-              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            </div>
-            
-            {/* Compteur uniquement */}
-            <span className="text-sm font-mono font-semibold">
-              {formatDuration(recordingDuration)}
-            </span>
-            
-            {/* Canvas caché pour le traitement audio */}
-            <canvas ref={canvasRef} className="hidden" />
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={stopRecording}
+          className="h-10 w-10 bg-red-500 hover:bg-red-600 text-white rounded-full flex-shrink-0 
+                    relative overflow-hidden active:scale-95 transform transition-transform"
+          aria-label="Terminer l'enregistrement"
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span 
+              className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-300 opacity-75"
+              style={{ 
+                animationDuration: '1.5s',
+                animationIterationCount: 'infinite'
+              }}
+            ></span>
+            <StopCircle className="h-5 w-5 relative" />
           </div>
           
-          {/* Bouton pour envoyer */}
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={stopRecording}
-            className="h-8 w-8 bg-[#00A884] hover:bg-[#009670] text-white rounded-r-full flex-shrink-0 p-0"
-            aria-label="Envoyer l'enregistrement"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m5 12 5 5 9-9"></path>
-            </svg>
-          </Button>
-        </div>
+          {/* Canvas caché pour le traitement audio */}
+          <canvas ref={canvasRef} className="hidden" />
+        </Button>
       )}
       
       {/* État d'erreur */}
