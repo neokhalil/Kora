@@ -50,7 +50,10 @@ export function setupMobileViewportFix() {
         input.setAttribute('autocapitalize', 'none');
         input.setAttribute('autocomplete', 'off');
         input.setAttribute('autocorrect', 'off');
-        input.style.fontSize = '16px'; // Minimum 16px pour éviter le zoom auto sur iOS
+        // On doit caster l'élément en HTMLInputElement ou HTMLTextAreaElement pour accéder à style
+        if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+          input.style.fontSize = '16px'; // Minimum 16px pour éviter le zoom auto sur iOS
+        }
       });
     };
     
@@ -70,12 +73,16 @@ export function setupMobileViewportFix() {
   }
   
   // Empêcher le comportement de pull-to-refresh sur les appareils mobiles
-  document.body.style.overscrollBehavior = 'none';
-  
-  // Empêcher les rebonds iOS
-  document.body.addEventListener('touchmove', (e) => {
-    if (e.touches.length > 1) {
-      e.preventDefault();
-    }
-  }, { passive: false });
+  if (document.body) {
+    // Nous devons caster le body en HTMLElement pour accéder à style
+    const body = document.body as HTMLElement;
+    body.style.overscrollBehavior = 'none';
+    
+    // Empêcher les rebonds iOS
+    body.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+  }
 }

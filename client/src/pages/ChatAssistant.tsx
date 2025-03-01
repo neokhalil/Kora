@@ -75,6 +75,13 @@ const ChatAssistant: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
   
+  // Initialisation du fix pour mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setupMobileViewportFix();
+    }
+  }, []);
+
   // Détecter l'appareil mobile
   useEffect(() => {
     setIsMobileDevice(isMobile);
@@ -91,6 +98,12 @@ const ChatAssistant: React.FC = () => {
           // Calculer la hauteur approximative du clavier
           const keyboardH = windowHeight - currentHeight;
           setKeyboardHeight(keyboardH);
+          
+          // S'assurer que le header est visible
+          const header = document.querySelector('header.app-header');
+          if (header) {
+            header.classList.remove('transform', '-translate-y-full');
+          }
         } else {
           setKeyboardHeight(0);
         }
@@ -109,6 +122,20 @@ const ChatAssistant: React.FC = () => {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isThinking]);
+  
+  // Surveiller les focus sur les champs de saisie pour assurer la visibilité du header
+  useEffect(() => {
+    const handleFocusIn = () => {
+      // Force la visibilité du header quand un élément reçoit le focus
+      const header = document.querySelector('header.app-header');
+      if (header) {
+        header.classList.remove('transform', '-translate-y-full');
+      }
+    };
+    
+    document.addEventListener('focusin', handleFocusIn);
+    return () => document.removeEventListener('focusin', handleFocusIn);
+  }, []);
   
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
@@ -195,7 +222,7 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
+    <div className="flex flex-col h-full max-w-4xl mx-auto pt-14">
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Zone des messages */}
         <div 

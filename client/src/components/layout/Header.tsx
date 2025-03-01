@@ -43,9 +43,9 @@ const Header: React.FC = () => {
   
   return (
     <header 
-      className={`app-header safe-area-top bg-white dark:bg-gray-900 border-b border-gray-200/10 ${isHeaderVisible ? '' : 'transform -translate-y-full'}`}
+      className={`app-header fixed top-0 left-0 right-0 z-50 safe-area-top bg-white dark:bg-gray-900 border-b border-gray-200/10 transition-transform duration-300 ${isHeaderVisible ? '' : 'transform -translate-y-full'}`}
     >
-      <div className="flex items-center justify-between px-4 h-full">
+      <div className="flex items-center justify-between px-4 h-14">
         {/* Menu button - Left aligned */}
         <div className="flex items-center">
           <Button 
