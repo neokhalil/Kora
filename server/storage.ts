@@ -21,6 +21,7 @@ export interface HistoryFilterOptions {
   starred?: boolean;
   limit?: number;
   offset?: number;
+  userId?: number; // Ajouté pour filtrer par userId dans les méthodes de filtre spécifiques
 }
 
 export interface FieldWithCount {
@@ -371,20 +372,59 @@ export class MemStorage implements IStorage {
   }
   
   async getInteractionsByTopic(topicId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    console.log(`Fetching interactions for topicId: ${topicId}`);
+    
+    // Filtrer les interactions par topicId
     let interactions = Array.from(this.interactions.values())
       .filter(interaction => interaction.topicId === topicId);
     
-    return this.applyHistoryFilters(interactions, options);
+    console.log(`Found ${interactions.length} interactions for topic ${topicId} before filters`);
+    
+    // Si userId est spécifié dans les options, appliquer ce filtre également
+    if (options.userId) {
+      interactions = interactions.filter(i => i.userId === options.userId);
+      console.log(`After userId filter: ${interactions.length} interactions`);
+    }
+    
+    // Appliquer les autres filtres
+    const result = this.applyHistoryFilters(interactions, options);
+    console.log(`Final result after all filters: ${result.length} interactions`);
+    
+    return result;
   }
   
   async getInteractionsByField(fieldId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    console.log(`Fetching interactions for fieldId: ${fieldId}`);
+    
+    // Récupérer les sujets liés à ce domaine
     const topics = await this.getTopicsByField(fieldId);
     const topicIds = topics.map(t => t.id);
     
-    let interactions = Array.from(this.interactions.values())
-      .filter(interaction => interaction.topicId && topicIds.includes(interaction.topicId));
+    console.log(`Topics for fieldId ${fieldId}:`, topicIds);
     
-    return this.applyHistoryFilters(interactions, options);
+    // Filtrer les interactions par topicId qui appartiennent à ce domaine
+    let interactions = Array.from(this.interactions.values())
+      .filter(interaction => {
+        const match = interaction.topicId && topicIds.includes(interaction.topicId);
+        if (match) {
+          console.log(`Matching interaction ${interaction.id} with topicId ${interaction.topicId}`);
+        }
+        return match;
+      });
+    
+    console.log(`Found ${interactions.length} interactions for field ${fieldId} before filters`);
+    
+    // Si userId est spécifié dans les options, appliquer ce filtre également
+    if (options.userId) {
+      interactions = interactions.filter(i => i.userId === options.userId);
+      console.log(`After userId filter: ${interactions.length} interactions`);
+    }
+    
+    // Appliquer les autres filtres
+    const result = this.applyHistoryFilters(interactions, options);
+    console.log(`Final result after all filters: ${result.length} interactions`);
+    
+    return result;
   }
   
   private applyHistoryFilters(interactions: Interaction[], options: HistoryFilterOptions): Interaction[] {
