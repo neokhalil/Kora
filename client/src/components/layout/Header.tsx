@@ -7,23 +7,24 @@ const Header: React.FC = () => {
   const { toggleMenu } = useMenu();
   
   return (
-    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-30">
+    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200/10 sticky top-0 z-30">
       <div className="flex items-center justify-between px-4 h-full">
-        {/* Menu button - Visible on all screen sizes now */}
+        {/* Menu button - Left aligned */}
         <div className="flex items-center">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={toggleMenu}
             aria-label="Menu"
+            className="text-black"
           >
             <Menu className="h-6 w-6" />
           </Button>
         </div>
         
-        {/* Logo or app name in center */}
+        {/* Logo in center */}
         <div className="flex items-center justify-center">
-          <h1 className="text-lg font-semibold text-primary">Kora</h1>
+          <h1 className="text-xl font-bold tracking-tight uppercase">Kora</h1>
         </div>
         
         {/* Empty div to balance the layout */}
