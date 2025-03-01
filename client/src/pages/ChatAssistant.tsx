@@ -136,13 +136,15 @@ const ChatAssistant: React.FC = () => {
       setIsMobileDevice(isMobile);
     };
     
-    // Handle keyboard on mobile (using VisualViewport API) - nouvelle approche plus robuste
+    // Handle keyboard on mobile (using VisualViewport API) - approche ultra-robuste
     const handleVisualViewportChange = () => {
       if (window.visualViewport) {
-        // Calcul plus précis de la hauteur du clavier en tenant compte des variations entre appareils
+        // Calcul super précis de la hauteur du clavier avec marge de sécurité
         const offsetHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
-        const isKeyboardVisible = offsetHeight > 100; // Seuil plus bas pour la détection
-        const keyboardHeightToUse = isKeyboardVisible ? (offsetHeight + 2) : 0; // +2px pour éviter le gap
+        const isKeyboardVisible = offsetHeight > 80; // Seuil bas pour la détection
+        
+        // Ajouter 4px pour compenser l'espace - ceci est critique pour éliminer le gap
+        const keyboardHeightToUse = isKeyboardVisible ? (offsetHeight + 4) : 0;
         
         // Mettre à jour l'état uniquement si nécessaire pour éviter des re-renders inutiles
         if (keyboardHeightToUse !== keyboardHeight) {
@@ -151,10 +153,13 @@ const ChatAssistant: React.FC = () => {
         
         // Force composer position update directement sur le DOM pour une réponse immédiate
         if (composerRef.current) {
-          // Blocage du scroll du corps pendant les ajustements
+          // Blocage complet du scroll du corps pendant les ajustements
           document.body.style.overflow = 'hidden';
+          document.body.style.position = 'fixed';
+          document.body.style.width = '100%';
+          document.body.style.height = '100%';
           
-          // Positionnement précis en tenant compte des hacks pour iOS/Android
+          // Positionnement précis avec techniques avancées pour iOS/Android
           composerRef.current.style.position = 'fixed';
           composerRef.current.style.bottom = `${keyboardHeightToUse}px`;
           composerRef.current.style.left = '0px';
@@ -162,30 +167,48 @@ const ChatAssistant: React.FC = () => {
           composerRef.current.style.width = '100%';
           composerRef.current.style.zIndex = '9999';
           
-          // Styles supplémentaires pour garantir la visibilité
-          composerRef.current.style.backgroundColor = 'white';
-          composerRef.current.style.borderTop = '1px solid #e5e7eb';
-          composerRef.current.style.transform = 'translateZ(0)';
-          
-          // En mode clavier visible, on s'assure que la barre de composition est adjacente au clavier
+          // Pour éliminer le gap, on ajoute un padding négatif et d'autres tricks
           if (isKeyboardVisible) {
-            // Technique d'animation désactivée pendant la transition
+            // Désactiver toutes les transitions et animations pendant l'apparition du clavier
             composerRef.current.style.transition = 'none';
+            composerRef.current.style.marginBottom = '-4px';
+            composerRef.current.style.paddingBottom = 'calc(0.75rem + 4px)';
+            composerRef.current.style.borderTop = 'none';
+            composerRef.current.style.boxShadow = 'none';
             
-            // Force le rafraîchissement du navigateur
+            // Styles supplémentaires pour assurer l'absence de gap
+            composerRef.current.style.backgroundColor = 'white';
+            composerRef.current.style.transform = 'translate3d(0,0,0)';
+            composerRef.current.style.willChange = 'transform, bottom';
+            
+            // Force le rafraîchissement du navigateur et forcer la prise en compte des changements
             void composerRef.current.offsetHeight;
             
-            // Ajustement du scroll pour s'assurer que le dernier message est visible
+            // Ajuster le scroll après un court délai pour voir le dernier message
             setTimeout(() => {
               if (messagesEndRef.current) {
                 messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
               }
-            }, 50);
+            }, 10);
+            
+            // Forcer à nouveau après un délai plus long pour s'assurer
+            setTimeout(() => {
+              if (composerRef.current) {
+                composerRef.current.style.marginBottom = '-4px';
+              }
+              if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+              }
+            }, 300);
           } else {
-            // Réactive les transitions quand le clavier est fermé
+            // Réactiver les transitions quand le clavier est fermé
             setTimeout(() => {
               if (composerRef.current) {
                 composerRef.current.style.transition = 'bottom 0.3s ease-out';
+                composerRef.current.style.marginBottom = '0';
+                composerRef.current.style.paddingBottom = '0.75rem';
+                composerRef.current.style.borderTop = '1px solid #e5e7eb';
+                composerRef.current.style.boxShadow = '0 -2px 10px rgba(0, 0, 0, 0.1)';
               }
             }, 50);
           }
@@ -1319,10 +1342,52 @@ const ChatAssistant: React.FC = () => {
     );
   };
 
+  // Effet pour injecter des styles spécifiques pour résoudre le problème d'espace entre le clavier et la barre
+  useEffect(() => {
+    // Style inline pour résoudre le problème d'espace blanc
+    const styleElement = document.createElement('style');
+    styleElement.innerHTML = `
+      /* Correctif pour l'espace entre le clavier et la barre de composition */
+      .chat-composer.with-keyboard {
+        margin-bottom: -4px !important;
+        box-shadow: none !important;
+        padding-bottom: calc(0.75rem + 2px) !important;
+        border-top: none !important;
+      }
+      
+      /* Empêcher les comportements de défilement indésirables */
+      .messages-container {
+        overscroll-behavior: none !important;
+      }
+      
+      /* Désactiver tous les effets visuels au tap qui peuvent créer des problèmes visuels */
+      * {
+        -webkit-tap-highlight-color: transparent !important;
+      }
+      
+      /* Assurer une hauteur fixe sur mobile */
+      @media (max-width: 768px) {
+        html, body {
+          overflow: hidden !important;
+          height: 100% !important;
+        }
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
+    
   return (
     <div className="flex flex-col h-screen w-full fixed inset-0 overflow-hidden">
       {/* Messages area (scrollable) */}
-      <div className="flex-1 overflow-y-auto pb-32">
+      <div className="flex-1 overflow-y-auto pb-32 messages-container" style={{
+        WebkitOverflowScrolling: 'touch',
+        overscrollBehavior: 'contain',
+        paddingBottom: keyboardHeight > 0 ? `calc(100px + ${keyboardHeight}px)` : '100px'
+      }}>
         <div className="max-w-4xl mx-auto p-4">
           {messages.map(renderMessage)}
           
@@ -1348,10 +1413,15 @@ const ChatAssistant: React.FC = () => {
         className={`chat-composer ${keyboardHeight > 0 ? 'with-keyboard' : ''} fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3`}
         style={{ 
           bottom: `${keyboardHeight}px`,
-          transform: 'translateZ(0)',
+          transform: 'translate3d(0,0,0)',
           position: 'fixed', /* Redundant but helps ensure position */
           width: '100vw',
-          maxWidth: '100%'
+          maxWidth: '100%',
+          willChange: 'transform, bottom',
+          backfaceVisibility: 'hidden',
+          marginBottom: keyboardHeight > 0 ? '-4px' : '0', /* Hack pour réduire l'espace blanc */
+          borderBottom: keyboardHeight > 0 ? '4px solid transparent' : 'none', /* Autre hack pour combler le gap */
+          borderTop: keyboardHeight > 0 ? 'none' : '1px solid #e5e7eb',
         }}>
         <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}

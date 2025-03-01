@@ -7,29 +7,40 @@
 .chat-composer {
   /* Styles pour la barre de composition */
   position: fixed;
-  bottom: 0;
+  bottom: 0 !important; /* Forcer la position bottom */
   left: 0;
   right: 0;
   width: 100%;
-  z-index: 100;
+  z-index: 9999 !important; /* Z-index très élevé pour assurer la visibilité */
   background-color: white;
   border-top: 1px solid #e5e7eb;
   padding: 0.5rem;
   
-  /* Hardware Acceleration */
-  transform: translateZ(0);
-  will-change: transform;
-  transition: transform 0.3s ease-out, bottom 0.3s ease-out;
-  -webkit-overflow-scrolling: touch;
+  /* Hardware Acceleration plus agressive */
+  transform: translate3d(0, 0, 0) !important;
+  will-change: transform, bottom;
+  backface-visibility: hidden;
+  perspective: 1000;
+  -webkit-font-smoothing: antialiased;
   
   /* Prévention de flicker et de gaps */
-  margin-bottom: -1px; /* Éviter l'espace blanc potentiel */
+  margin-bottom: -2px !important; /* Compensation plus importante pour l'espace blanc */
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  
+  /* Corrections spécifiques pour iOS et Android */
+  -webkit-touch-callout: none;
+  -webkit-text-size-adjust: none;
+  -webkit-user-select: none;
+  -webkit-highlight: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 
 .chat-composer.with-keyboard {
   /* Ajustements quand le clavier est visible */
-  transition: none; /* Désactiver les transitions pour un rendu immédiat */
+  transition: none !important; /* Désactiver les transitions pour un rendu immédiat */
+  bottom: 0 !important; /* Forcer le collage au bord */
+  margin-bottom: -1.5px !important; /* Valeur exacte pour éviter tout espace */
+  padding-bottom: calc(0.5rem + 1px); /* Augmenter légèrement le padding en bas */
 }
 
 /* Conteneur de messages pour éviter que le contenu ne soit caché sous la zone de composition */
