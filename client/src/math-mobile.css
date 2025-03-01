@@ -42,18 +42,14 @@
     scrollbar-width: thin;
   }
   
-  /* Masquer la barre de défilement tout en permettant le défilement */
+  /* Masquer complètement la barre de défilement tout en permettant le défilement */
   .math-content::-webkit-scrollbar {
-    height: 4px;
+    display: none;
   }
   
-  .math-content::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 2px;
-  }
-  
-  .dark .math-content::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
+  /* Pour Firefox */
+  .math-content {
+    scrollbar-width: none;
   }
 }
 
