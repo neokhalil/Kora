@@ -1449,8 +1449,8 @@ const ChatAssistant: React.FC = () => {
                 <ImageIcon className="h-5 w-5" />
               </Button>
               
-              {/* Temporarily disabled camera button until we can fix cross-platform compatibility */}
-              {/* {isMobileDevice && (
+              {/* Camera button for mobile devices */}
+              {isMobileDevice && (
                 <Button
                   size="icon"
                   variant="outline"
@@ -1460,7 +1460,7 @@ const ChatAssistant: React.FC = () => {
                 >
                   <Camera className={`h-5 w-5 ${isCameraActive ? 'text-red-500' : ''}`} />
                 </Button>
-              )} */}
+              )}
               
               {/* Voice input button */}
               <VoiceRecorder 
