@@ -64,7 +64,6 @@ const ChatAssistant: React.FC = () => {
   const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
   
   // Vérifier si c'est un appareil mobile
   const isMobile = useIsMobile();
@@ -85,35 +84,6 @@ const ChatAssistant: React.FC = () => {
   // Détecter l'appareil mobile
   useEffect(() => {
     setIsMobileDevice(isMobile);
-    
-    // Initialiser la détection du clavier mobile
-    if (typeof window !== 'undefined' && 'visualViewport' in window) {
-      const viewportHandler = () => {
-        // Si la hauteur du viewport est significativement réduite, le clavier est probablement ouvert
-        const currentHeight = window.visualViewport?.height || 0;
-        const windowHeight = window.innerHeight;
-        
-        // Si le viewport est plus petit que la fenêtre, cela signifie probablement que le clavier est ouvert
-        if (currentHeight < windowHeight * 0.75) {
-          // Calculer la hauteur approximative du clavier
-          const keyboardH = windowHeight - currentHeight;
-          setKeyboardHeight(keyboardH);
-          
-          // S'assurer que le header est visible
-          const header = document.querySelector('header.app-header');
-          if (header) {
-            header.classList.remove('transform', '-translate-y-full');
-          }
-        } else {
-          setKeyboardHeight(0);
-        }
-      };
-      
-      window.visualViewport?.addEventListener('resize', viewportHandler);
-      return () => {
-        window.visualViewport?.removeEventListener('resize', viewportHandler);
-      };
-    }
   }, [isMobile]);
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
@@ -227,7 +197,7 @@ const ChatAssistant: React.FC = () => {
         {/* Zone des messages */}
         <div 
           className="flex-1 overflow-y-auto p-4" 
-          style={{ paddingBottom: `calc(170px + ${keyboardHeight}px)` }}
+          style={{ paddingBottom: "calc(170px + var(--keyboard-height, 0px))" }}
         >
           {messages.length === 0 ? (
             <div className="h-full flex flex-col justify-start pt-12">
@@ -261,7 +231,7 @@ const ChatAssistant: React.FC = () => {
         </div>
         
         {/* Zone de saisie fixe en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-50 ios-fix">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-50 ios-fix fixed-bottom-bar">
           <div className="max-w-4xl mx-auto">
             {/* Zone d'aperçu d'image */}
             {imagePreview && (
