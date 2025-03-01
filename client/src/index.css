@@ -2,59 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Correctifs mobiles spécifiques pour iOS et Android */
-:root {
-  height: -webkit-fill-available;
-  height: 100%;
-}
-
-html, body {
-  height: 100vh;
-  /* Hack pour iOS */
-  height: -webkit-fill-available;
-  width: 100%;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-/* Empêcher le défilement du body */
-body {
-  overflow: hidden;
-  touch-action: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: none;
-}
-
-/* Désactiver le highlight lors du tap sur les éléments */
-.sans-tap-highlight, .sans-tap-highlight * {
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Styles spécifiques pour la barre de composition */
-.chat-composer {
-  transition: bottom 0.2s ease-out, transform 0.2s ease-out;
-  transform: translateZ(0);
-  will-change: transform, bottom;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-}
-
-/* Styles quand le clavier est visible */
-.chat-composer.with-keyboard {
-  margin-bottom: -2px;
-  box-shadow: none;
-  border-top: none !important;
-}
-
-/* Activer défilement uniquement dans les conteneurs scrollables */
-.overflow-y-auto {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
 @layer base {
   * {
     @apply border-border;

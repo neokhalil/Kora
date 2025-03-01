@@ -85,42 +85,6 @@ const ChatAssistant: React.FC = () => {
     }
   }, [messages, isMobileDevice]);
   
-  // Add a specific event listener for input focus/blur to handle keyboard better on mobile
-  useEffect(() => {
-    const handleInputFocus = () => {
-      // When input is focused, ensure the keyboard adjustment is applied
-      if (window.visualViewport) {
-        const offsetHeight = window.innerHeight - window.visualViewport.height;
-        if (offsetHeight > 150 && composerRef.current) {
-          composerRef.current.style.bottom = `${offsetHeight}px`;
-        }
-      }
-      // Scroll to bottom after a short delay
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
-        }
-      }, 300);
-    };
-    
-    // Find all input elements within the composer
-    const inputElements = composerRef.current?.querySelectorAll('input, textarea');
-    if (inputElements) {
-      inputElements.forEach(input => {
-        input.addEventListener('focus', handleInputFocus);
-      });
-    }
-    
-    return () => {
-      // Clean up event listeners
-      if (inputElements) {
-        inputElements.forEach(input => {
-          input.removeEventListener('focus', handleInputFocus);
-        });
-      }
-    };
-  }, []);
-  
   // Detect mobile device and handle visual viewport changes (for keyboard)
   useEffect(() => {
     const checkMobile = () => {
@@ -136,65 +100,16 @@ const ChatAssistant: React.FC = () => {
       setIsMobileDevice(isMobile);
     };
     
-    // Handle keyboard on mobile (using VisualViewport API) - solution modérée
+    // Handle keyboard on mobile (using VisualViewport API)
     const handleVisualViewportChange = () => {
       if (window.visualViewport) {
-        // Calculer la hauteur du clavier en évitant les faux positifs
-        const offsetHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
-        const isKeyboardVisible = offsetHeight > 100; // Seuil plus élevé pour éviter les faux positifs
-        
-        // Ne pas appliquer de compensation supplémentaire qui causait des problèmes
-        const keyboardHeightToUse = isKeyboardVisible ? offsetHeight : 0;
-        
-        // Mettre à jour l'état uniquement si nécessaire
-        if (keyboardHeightToUse !== keyboardHeight) {
-          setKeyboardHeight(keyboardHeightToUse);
-        }
-        
-        // Mise à jour plus simple de la position du composer
-        if (composerRef.current) {
-          // Ne pas bloquer complètement le scroll
-          document.body.style.overflow = 'auto';
-          
-          // Position de base avec hardware acceleration
-          composerRef.current.style.position = 'fixed';
-          composerRef.current.style.bottom = `${keyboardHeightToUse}px`;
-          composerRef.current.style.left = '0px';
-          composerRef.current.style.right = '0px';
-          composerRef.current.style.width = '100%';
-          composerRef.current.style.zIndex = '50';
-          composerRef.current.style.transform = 'translateZ(0)';
-          
-          // Forcer le scroll vers le bas pour voir le dernier message
-          if (isKeyboardVisible && messagesEndRef.current) {
-            setTimeout(() => {
-              messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-          }
-        }
-      }
-    };
-    
-    // Handle scroll events to ensure composer stays fixed - approche simplifiée
-    const handleScroll = () => {
-      if (composerRef.current) {
-        // Mise à jour simple du style
-        composerRef.current.style.position = 'fixed';
-        composerRef.current.style.bottom = `${keyboardHeight}px`;
-        composerRef.current.style.transform = 'translateZ(0)';
-        
-        // Faire défiler jusqu'au dernier message seulement si le clavier est ouvert
-        if (messagesEndRef.current && keyboardHeight > 0) {
-          setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          }, 200);
-        }
+        const offsetHeight = window.innerHeight - window.visualViewport.height;
+        setKeyboardHeight(offsetHeight > 150 ? offsetHeight : 0);
       }
     };
     
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    window.addEventListener('scroll', handleScroll, { passive: true });
     
     // Add visual viewport event listeners if available
     if (window.visualViewport) {
@@ -204,7 +119,6 @@ const ChatAssistant: React.FC = () => {
     
     return () => {
       window.removeEventListener('resize', checkMobile);
-      window.removeEventListener('scroll', handleScroll);
       
       // Remove visual viewport event listeners
       if (window.visualViewport) {
@@ -212,7 +126,7 @@ const ChatAssistant: React.FC = () => {
         window.visualViewport.removeEventListener('scroll', handleVisualViewportChange);
       }
     };
-  }, [keyboardHeight]);
+  }, []);
   
   // Nous n'avons plus besoin de nettoyer les ressources de la caméra puisque
   // nous utilisons l'appareil photo intégré du navigateur
@@ -1284,24 +1198,15 @@ const ChatAssistant: React.FC = () => {
     );
   };
 
-  // Effet simplifié pour ajouter juste la classe sans-tap-highlight au body
-  useEffect(() => {
-    document.body.classList.add('sans-tap-highlight');
-    
-    return () => {
-      document.body.classList.remove('sans-tap-highlight');
-    };
-  }, []);
-    
   return (
-    <div className="flex flex-col h-screen w-full fixed inset-0 overflow-hidden">
-      {/* Messages area (scrollable) */}
-      <div className="flex-1 overflow-y-auto pb-32 messages-container" style={{
-        WebkitOverflowScrolling: 'touch',
-        overscrollBehavior: 'contain',
-        paddingBottom: keyboardHeight > 0 ? `calc(100px + ${keyboardHeight}px)` : '100px'
-      }}>
-        <div className="max-w-4xl mx-auto p-4">
+    <div className="flex flex-col h-full max-w-4xl mx-auto">
+      
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {/* Chat messages area with padding bottom to account for fixed input area */}
+        <div 
+          className="flex-1 overflow-y-auto p-4" 
+          style={{ paddingBottom: `calc(170px + ${keyboardHeight}px)` }}
+        >
           {messages.map(renderMessage)}
           
           {/* Thinking indicator */}
@@ -1318,17 +1223,16 @@ const ChatAssistant: React.FC = () => {
           
           <div ref={messagesEndRef} />
         </div>
-      </div>
-      
-      {/* Input area - fixed at bottom with improved mobile stability */}
-      <div 
-        ref={composerRef}
-        className={`chat-composer ${keyboardHeight > 0 ? 'with-keyboard' : ''} fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 border-t p-3`}
-        style={{ 
-          bottom: `${keyboardHeight}px`,
-          width: '100%'
-        }}>
-        <div className="max-w-4xl mx-auto">
+        
+        {/* Input area - fixed at bottom with shadow */}
+        <div 
+          ref={composerRef}
+          className="border-t p-3 fixed left-0 right-0 bg-white dark:bg-gray-900 z-10 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]"
+          style={{ 
+            bottom: `${keyboardHeight}px`,
+            transition: keyboardHeight > 0 ? 'none' : 'bottom 0.3s ease-out'
+          }}>
+          <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           
           {/* Image preview area (shown when an image is selected) */}
@@ -1512,6 +1416,7 @@ const ChatAssistant: React.FC = () => {
           
           <div className="mt-2 text-xs text-gray-500 text-center">
             Kora est un assistant IA. Pose une question sur tes devoirs ou études.
+          </div>
           </div>
         </div>
       </div>
