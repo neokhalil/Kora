@@ -25,6 +25,7 @@ import VoiceRecorder from '@/components/VoiceRecorder';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Define the message types
 interface ChallengeData {
@@ -64,11 +65,49 @@ const ChatAssistant: React.FC = () => {
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   
+  // Vérifier si c'est un appareil mobile
+  const isMobile = useIsMobile();
+  
   // Références
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
+  
+  // Détecter l'appareil mobile
+  useEffect(() => {
+    setIsMobileDevice(isMobile);
+    
+    // Initialiser la détection du clavier mobile
+    if (typeof window !== 'undefined' && 'visualViewport' in window) {
+      const viewportHandler = () => {
+        // Si la hauteur du viewport est significativement réduite, le clavier est probablement ouvert
+        const currentHeight = window.visualViewport?.height || 0;
+        const windowHeight = window.innerHeight;
+        
+        // Si le viewport est plus petit que la fenêtre, cela signifie probablement que le clavier est ouvert
+        if (currentHeight < windowHeight * 0.75) {
+          // Calculer la hauteur approximative du clavier
+          const keyboardH = windowHeight - currentHeight;
+          setKeyboardHeight(keyboardH);
+        } else {
+          setKeyboardHeight(0);
+        }
+      };
+      
+      window.visualViewport?.addEventListener('resize', viewportHandler);
+      return () => {
+        window.visualViewport?.removeEventListener('resize', viewportHandler);
+      };
+    }
+  }, [isMobile]);
+  
+  // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isThinking]);
   
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");

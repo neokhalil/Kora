@@ -44,7 +44,7 @@ const App: React.FC = () => {
       <MenuProvider>
         <div className="min-h-screen flex flex-col">
           <Header />
-          <div className="flex flex-1 relative">
+          <div className="flex flex-1 relative pt-16"> {/* Ajout de pt-16 pour compenser la hauteur du header */}
             <SideNavigation />
             <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
               <AppRouter />
