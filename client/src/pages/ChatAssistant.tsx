@@ -26,6 +26,7 @@ import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
 import ReactMarkdown from 'react-markdown';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 
 // Define the message types
 interface ChallengeData {
@@ -233,7 +234,7 @@ const ChatAssistant: React.FC = () => {
         </div>
         
         {/* Zone de saisie fixe en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-10">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-50 ios-fix">
           <div className="max-w-4xl mx-auto">
             {/* Zone d'aperçu d'image */}
             {imagePreview && (
@@ -269,7 +270,24 @@ const ChatAssistant: React.FC = () => {
             )}
             
             {/* Composeur de message style iOS */}
-            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-3xl">
+            <div 
+              className="bg-gray-100 dark:bg-gray-800 p-4 rounded-3xl"
+              ref={composerRef}
+              onFocus={() => {
+                // Force la visibilité du header lorsque le composeur reçoit le focus
+                const header = document.querySelector('header.app-header');
+                if (header) {
+                  header.classList.remove('transform', '-translate-y-full');
+                }
+                
+                // Scroll vers la fin des messages après un court délai
+                setTimeout(() => {
+                  if (messagesEndRef.current) {
+                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 300);
+              }}
+            >
               {/* Hidden file input pour les images */}
               <input
                 type="file"
@@ -292,6 +310,13 @@ const ChatAssistant: React.FC = () => {
                     placeholder="Pose ta question"
                     className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
                     disabled={isThinking || isUploadingImage}
+                    onFocus={() => {
+                      // Force la visibilité du header lorsque l'input reçoit le focus
+                      const header = document.querySelector('header.app-header');
+                      if (header) {
+                        header.classList.remove('transform', '-translate-y-full');
+                      }
+                    }}
                   />
                 </div>
                 

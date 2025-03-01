@@ -42,9 +42,9 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <MenuProvider>
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col ios-fix">
           <Header />
-          <div className="flex flex-1 relative pt-16"> {/* Ajout de pt-16 pour compenser la hauteur du header */}
+          <div className="flex flex-1 relative"> {/* Nous n'avons plus besoin de pt-16 car body a un padding-top */}
             <SideNavigation />
             <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
               <AppRouter />

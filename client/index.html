@@ -2,12 +2,13 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#64748B" />
   <meta name="description" content="Kora - Plateforme éducative d'aide aux devoirs et de préparation aux examens" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Kora" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <link rel="icon" type="image/svg+xml" href="/assets/brain-icon.svg" />
   <link rel="apple-touch-icon" href="/assets/brain-icon.svg" />
   <link rel="manifest" href="/manifest.json" />
@@ -16,9 +17,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <title>Kora - Plateforme Éducative</title>
   <style>
+    :root {
+      --header-height: 4rem;  /* 64px ou 16px * 4 */
+    }
+    
     body {
       font-family: 'Inter', sans-serif;
       overscroll-behavior-y: none;
+      padding-top: var(--header-height); /* Espace pour le header fixe */
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+    
+    html {
+      height: 100%;
+      width: 100%;
+    }
+    
+    /* Styles spécifiques pour le header fixe */
+    header.app-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000; /* Valeur très élevée pour être au-dessus de tout */
+      height: var(--header-height);
+      background-color: white;
+      transition: transform 0.3s ease;
+      -webkit-transform: translateZ(0); /* Force hardware acceleration sur iOS */
+      transform: translateZ(0);
+    }
+    
+    /* Classe pour éviter le recadrage sous l'encoche/notch sur iPhone X et plus */
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    /* Pour éviter le recadrage par le clavier virtuel */
+    @supports (-webkit-touch-callout: none) {
+      .ios-fix {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
     }
   </style>
 </head>
