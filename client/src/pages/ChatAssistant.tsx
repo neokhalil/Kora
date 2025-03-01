@@ -170,10 +170,18 @@ const ChatAssistant: React.FC = () => {
   // Send a message via WebSocket
   const sendMessage = (type: string, payload: any): boolean => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      // Créer un ID de session unique s'il n'existe pas déjà
+      const sessionId = localStorage.getItem('sessionId') || `session_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+      localStorage.setItem('sessionId', sessionId);
+      
+      // Format du message compatible avec le serveur
       const message = {
         type,
-        payload
+        sessionId,
+        ...payload // Intégrer directement les propriétés du payload au lieu de les imbriquer
       };
+      
+      console.log('Sending message:', message);
       socketRef.current.send(JSON.stringify(message));
       return true;
     }
