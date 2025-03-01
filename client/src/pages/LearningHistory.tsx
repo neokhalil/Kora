@@ -342,19 +342,19 @@ const InteractionCard = ({
         </div>
         <div className="flex items-center gap-2 mt-1">
           <Badge variant="secondary">
-            {getFieldIcon(interaction.field.iconName)}
-            <span className="ml-1">{interaction.field.name}</span>
+            {getFieldIcon(interaction.field?.iconName)}
+            <span className="ml-1">{interaction.field?.name || 'Champ inconnu'}</span>
           </Badge>
           <Badge variant="secondary">
-            {interaction.topic.title}
+            {interaction.topic?.title || 'Sujet inconnu'}
           </Badge>
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
-          {interaction.tags.map(tag => (
+          {interaction.tags?.map(tag => (
             <Badge key={tag.id} variant="outline" className="text-xs">
               {tag.name}
             </Badge>
-          ))}
+          )) || null}
         </div>
       </CardHeader>
       <CardContent>
@@ -363,7 +363,7 @@ const InteractionCard = ({
             "prose dark:prose-invert max-w-none text-sm", 
             !expanded && "line-clamp-3"
           )}
-          dangerouslySetInnerHTML={{ __html: interaction.answer.replace(/\n/g, '<br />') }}
+          dangerouslySetInnerHTML={{ __html: interaction.answer?.replace(/\n/g, '<br />') || 'Pas de réponse disponible' }}
         />
         <Button
           variant="ghost"
