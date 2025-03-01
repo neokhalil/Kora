@@ -449,9 +449,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </Button>
       )}
       
-      {/* Version enregistrement - style WhatsApp */}
+      {/* Version enregistrement - style compact pour mobile */}
       {recorderState === 'recording' && (
-        <div className="flex items-center w-full max-w-xl bg-white dark:bg-slate-900 rounded-full shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="flex items-center w-full bg-white dark:bg-slate-900 rounded-full shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 max-w-[170px]">
           {/* Bouton pour annuler l'enregistrement */}
           <Button
             size="icon"
@@ -459,138 +459,53 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             onClick={() => {
               // Annuler l'enregistrement sans traiter l'audio
               if (mediaRecorderRef.current) {
-                // Arrêter le mediaRecorder sans traiter les données
                 mediaRecorderRef.current.onstop = null;
-                
-                // Vider les chunks audio
                 audioChunksRef.current = [];
-                
-                // Arrêter l'enregistrement
                 mediaRecorderRef.current.stop();
                 
-                // Fermer le flux
                 if (mediaStreamRef.current) {
                   mediaStreamRef.current.getTracks().forEach(track => track.stop());
                 }
                 
-                // Réinitialiser l'état
                 setRecorderState('inactive');
                 
-                // Afficher un toast pour informer l'utilisateur
                 toast({
                   title: "Enregistrement annulé",
                   description: "L'enregistrement a été annulé",
                 });
               }
             }}
-            className="h-12 w-12 text-gray-500 hover:text-red-500 rounded-l-full flex-shrink-0"
+            className="h-8 w-8 text-gray-500 hover:text-red-500 rounded-l-full flex-shrink-0 p-0"
             aria-label="Annuler l'enregistrement"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M18 6 6 18"></path>
-              <path d="m6 6 12 12"></path>
-            </svg>
+            <X className="h-4 w-4" />
           </Button>
           
-          {/* Indicateur de durée et visualiseur audio */}
-          <div className="flex-1 px-2 flex items-center overflow-hidden">
-            {/* Cercle rouge d'enregistrement avec animation pulse */}
-            <div className="flex-shrink-0 mr-3">
+          {/* Contenu central plus compact */}
+          <div className="flex-1 flex items-center justify-center overflow-hidden px-1">
+            {/* Cercle rouge d'enregistrement */}
+            <div className="flex-shrink-0 mr-1">
               <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
             </div>
             
-            {/* Durée d'enregistrement */}
-            <span className="text-sm font-mono flex-shrink-0 mr-2 font-semibold">
+            {/* Compteur uniquement */}
+            <span className="text-sm font-mono font-semibold">
               {formatDuration(recordingDuration)}
             </span>
             
-            {/* Visualiseur audio style WhatsApp - série de points/tirets */}
-            <div className="flex-1 mx-2 h-6 flex items-center justify-center overflow-hidden">
-              {/* Nous cachons le canvas mais l'utilisons toujours pour analyser l'audio */}
-              <canvas 
-                ref={canvasRef} 
-                className="hidden"
-                style={{ height: '24px' }}
-              />
-              
-              {/* Visualiseur style WhatsApp - barres animées comme dans WhatsApp */}
-              <div className="w-full h-6 flex items-center justify-center gap-[2px]">
-                {Array.from({ length: 44 }).map((_, i) => {
-                  // Utiliser un pattern d'animation WhatsApp-like
-                  const getHeight = () => {
-                    // Créer un motif de vague avec des hauteurs variées
-                    // Le centre est plus haut (forme d'onde typique)
-                    const center = 44 / 2;
-                    const distance = Math.abs(i - center);
-                    const heightFactor = 1 - (distance / center) * 0.5;
-                    
-                    // Hauteur de base variée pour un effet plus naturel
-                    let baseHeight;
-                    if (i % 4 === 0) baseHeight = 8 * heightFactor;
-                    else if (i % 3 === 0) baseHeight = 6 * heightFactor;
-                    else if (i % 2 === 0) baseHeight = 4 * heightFactor;
-                    else baseHeight = 3 * heightFactor;
-                    
-                    // Ajouter une variation aléatoire pour un effet naturel
-                    return Math.max(2, Math.round(baseHeight));
-                  };
-                  
-                  // Calcul des paramètres d'animation
-                  const height = getHeight();
-                  const animationDuration = 0.7 + (i % 3) * 0.15; // 0.7s à 1.0s
-                  const animationDelay = (i * 25) % 500; // ms
-                  
-                  return (
-                    <div 
-                      key={i}
-                      style={{ 
-                        width: '2px',
-                        height: `${height}px`,
-                        backgroundColor: '#00A884', // Couleur WhatsApp
-                        borderRadius: '1px',
-                        animation: `recording-visualizer ${animationDuration}s ease-in-out ${animationDelay}ms infinite alternate`,
-                        opacity: 0.85,
-                        willChange: 'height, transform',
-                        transformOrigin: 'center'
-                      }}
-                    />
-                  );
-                })}
-                
-                {/* Style pour l'animation des barres - inséré directement */}
-                <style>
-                  {`
-                    @keyframes recording-visualizer {
-                      0% {
-                        transform: scaleY(0.8);
-                      }
-                      50% {
-                        transform: scaleY(1.1);
-                      }
-                      100% {
-                        transform: scaleY(0.9);
-                      }
-                    }
-                  `}
-                </style>
-              </div>
-            </div>
-            
-            {/* Durée restante (optionnel) */}
-            <span className="text-xs text-gray-500 font-mono flex-shrink-0 mr-1 hidden sm:block">
-              {formatDuration(maxRecordingTimeMs - recordingDuration)}
-            </span>
+            {/* Canvas caché pour le traitement audio */}
+            <canvas ref={canvasRef} className="hidden" />
           </div>
           
-          {/* Bouton pour envoyer l'enregistrement */}
+          {/* Bouton pour envoyer */}
           <Button
             size="icon"
             variant="ghost"
             onClick={stopRecording}
-            className="h-12 w-12 bg-[#00A884] hover:bg-[#009670] text-white rounded-r-full flex-shrink-0"
+            className="h-8 w-8 bg-[#00A884] hover:bg-[#009670] text-white rounded-r-full flex-shrink-0 p-0"
             aria-label="Envoyer l'enregistrement"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="m5 12 5 5 9-9"></path>
             </svg>
           </Button>
