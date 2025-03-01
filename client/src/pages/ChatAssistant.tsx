@@ -775,7 +775,7 @@ const ChatAssistant: React.FC = () => {
         if (mathExpr) {
           if (mathExpr.isBlock) {
             parts.push(
-              <div key={id} className="my-2 math-block-container overflow-x-auto">
+              <div key={id} className="my-2 math-block-container overflow-x-auto max-w-full">
                 <BlockMath math={mathExpr.formula} />
               </div>
             );
@@ -806,7 +806,7 @@ const ChatAssistant: React.FC = () => {
     }
     
     return (
-      <div className="message-content math-content">
+      <div className="message-content math-content overflow-x-auto">
         <ReactMarkdown components={components}>{processedContent}</ReactMarkdown>
       </div>
     );
@@ -819,7 +819,7 @@ const ChatAssistant: React.FC = () => {
     if (message.sender === 'user') {
       return (
         <div key={message.id} className="flex justify-end mb-4">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg py-3 px-4 max-w-[80%]">
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg py-3 px-4 max-w-[90%] overflow-hidden">
             <p className="text-gray-800 dark:text-gray-200">{message.content}</p>
           </div>
         </div>
@@ -828,7 +828,7 @@ const ChatAssistant: React.FC = () => {
     
     return (
       <div key={message.id} className="flex mb-4">
-        <div className="bg-blue-50 dark:bg-gray-700 rounded-lg py-3 px-4 max-w-[80%]">
+        <div className="bg-blue-50 dark:bg-gray-700 rounded-lg py-3 px-4 max-w-[90%] overflow-hidden">
           {message.isReExplanation && (
             <div className="flex items-center mb-2 text-sm text-blue-600 dark:text-blue-400">
               <RefreshCw className="h-4 w-4 mr-1" />

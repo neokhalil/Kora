@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import "./styles/math.css";
+import "./math-mobile.css"; // Styles spécifiques pour les formules mathématiques sur mobile
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
