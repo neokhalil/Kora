@@ -718,11 +718,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (req.query.fieldId) {
-        filters.fieldId = parseInt(req.query.fieldId as string);
+        const fieldId = parseInt(req.query.fieldId as string);
+        filters.fieldId = fieldId;
+        console.log(`Filtering by fieldId: ${fieldId}`);
       }
       
       if (req.query.topicId) {
-        filters.topicId = parseInt(req.query.topicId as string);
+        const topicId = parseInt(req.query.topicId as string);
+        filters.topicId = topicId;
+        console.log(`Filtering by topicId: ${topicId}`);
       }
       
       if (req.query.startDate) {
@@ -753,7 +757,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         filters.offset = parseInt(req.query.offset as string);
       }
       
-      const interactions = await dbStorage.getInteractionsByUser(userId, filters);
+      console.log('Applying filters:', JSON.stringify(filters));
+      
+      let interactions;
+      if (filters.fieldId) {
+        // Si nous filtrons par domaine, nous utilisons une méthode différente
+        interactions = await dbStorage.getInteractionsByField(filters.fieldId, filters);
+      } else if (filters.topicId) {
+        // Si nous filtrons par sujet, nous utilisons une autre méthode
+        interactions = await dbStorage.getInteractionsByTopic(filters.topicId, filters);
+      } else {
+        // Sinon, nous obtenons toutes les interactions de l'utilisateur
+        interactions = await dbStorage.getInteractionsByUser(userId, filters);
+      }
+      
+      console.log(`Found ${interactions.length} interactions after filtering`);
       res.json(interactions);
     } catch (error) {
       console.error('Error fetching interactions:', error);
