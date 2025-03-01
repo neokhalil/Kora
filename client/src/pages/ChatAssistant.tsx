@@ -1215,14 +1215,10 @@ const ChatAssistant: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
-      
-      <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Chat messages area with padding bottom to account for fixed input area */}
-        <div 
-          className="flex-1 overflow-y-auto p-4" 
-          style={{ paddingBottom: `calc(170px + ${keyboardHeight}px)` }}
-        >
+    <div className="flex flex-col h-screen w-full fixed inset-0 overflow-hidden">
+      {/* Messages area (scrollable) */}
+      <div className="flex-1 overflow-y-auto pb-32">
+        <div className="max-w-4xl mx-auto p-4">
           {messages.map(renderMessage)}
           
           {/* Thinking indicator */}
@@ -1239,20 +1235,17 @@ const ChatAssistant: React.FC = () => {
           
           <div ref={messagesEndRef} />
         </div>
-        
-        {/* Input area - fixed at bottom with shadow */}
-        <div 
-          ref={composerRef}
-          className="border-t p-3 fixed left-0 right-0 bg-white dark:bg-gray-900 z-20 shadow-[0_-2px_10px_rgba(0,0,0,0.1)]"
-          style={{ 
-            bottom: `${keyboardHeight}px`,
-            transition: keyboardHeight > 0 ? 'none' : 'bottom 0.3s ease-out',
-            position: 'fixed', /* Force fixed position */
-            width: '100%', /* Ensure full width */
-            transform: 'translateZ(0)', /* Force hardware acceleration */
-            willChange: 'transform, bottom' /* Optimize for animations */
-          }}>
-          <div className="max-w-4xl mx-auto">
+      </div>
+      
+      {/* Input area - fixed at bottom */}
+      <div 
+        ref={composerRef}
+        className="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] border-t p-3"
+        style={{ 
+          bottom: `${keyboardHeight}px`,
+          transform: 'translateZ(0)'
+        }}>
+        <div className="max-w-4xl mx-auto">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           
           {/* Image preview area (shown when an image is selected) */}
@@ -1436,7 +1429,6 @@ const ChatAssistant: React.FC = () => {
           
           <div className="mt-2 text-xs text-gray-500 text-center">
             Kora est un assistant IA. Pose une question sur tes devoirs ou études.
-          </div>
           </div>
         </div>
       </div>
