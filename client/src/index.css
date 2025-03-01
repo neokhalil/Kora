@@ -11,3 +11,44 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Styles pour la gestion du header sur mobile */
+.invisible-header {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  top: -100px;
+}
+
+/* Assurer que la zone de chatbot a un espace adéquat */
+.chat-messages-container {
+  padding-bottom: 80px;
+}
+
+/* Styles pour la barre de saisie en bas */
+.composer-container {
+  background-color: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Ciblage spécifique pour iOS */
+.ios-device .composer-container {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+/* Assurez-vous que le contenu principal n'est pas masqué */
+#content {
+  padding-top: var(--header-height);
+  padding-bottom: 80px;
+}
+
+/* Assurer que le header mobile est toujours visible */
+body:has(input:focus) #header-mobile,
+body:has(textarea:focus) #header-mobile,
+body.keyboard-open #header-mobile {
+  display: block !important;
+  position: fixed !important;
+  top: 0 !important;
+}

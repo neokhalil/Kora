@@ -12,8 +12,6 @@ const Header: React.FC = () => {
       style={{
         height: 'var(--header-height)',
         paddingTop: 'var(--safe-area-top, 0px)',
-        WebkitTransform: 'translateZ(0)',
-        transform: 'translateZ(0)',
       }}
     >
       <div className="flex items-center justify-between px-4 h-full">

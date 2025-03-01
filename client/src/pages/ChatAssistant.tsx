@@ -231,7 +231,7 @@ const ChatAssistant: React.FC = () => {
         </div>
         
         {/* Zone de saisie fixe en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-50 ios-fix fixed-bottom-bar">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-4 py-2 z-50 composer-container">
           <div className="max-w-4xl mx-auto">
             {/* Zone d'aperçu d'image */}
             {imagePreview && (

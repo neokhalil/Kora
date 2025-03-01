@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useEffect, useRef } from "react";
-import { Route, Router as WouterRouter, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
+import { Route, Switch } from "wouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
@@ -10,21 +10,13 @@ import SideNavigation from "@/components/layout/SideNavigation";
 import ChatAssistant from "@/pages/ChatAssistant";
 import { MenuProvider } from "@/hooks/use-menu";
 
-// Set up static route config with only the ChatAssistant
+// Configuration des routes
 const routes = [
   { path: "/", Component: ChatAssistant }
 ];
 
-// Router component
+// Composant de routage
 const AppRouter: React.FC = () => {
-  // Only log in development
-  if (process.env.NODE_ENV === 'development') {
-    // Log all registered routes once during initialization
-    React.useEffect(() => {
-      console.log("Available routes:", routes.map(r => r.path));
-    }, []);
-  }
-  
   return (
     <Switch>
       {routes.map(({ path, Component }) => (
@@ -39,115 +31,102 @@ const AppRouter: React.FC = () => {
   );
 };
 
-// Fonction pour détecter les appareils mobiles
-const isMobile = (): boolean => {
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+// Fonctions utilitaires de détection d'appareil
+const detectDevice = () => {
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream;
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isMobile = isIOS || isAndroid;
+  
+  return { isIOS, isAndroid, isMobile };
 };
 
-// Fonction pour détecter iOS
-const isIOS = (): boolean => {
-  return /iPhone|iPad|iPod/i.test(navigator.userAgent) && !(window as any).MSStream;
-};
-
-// Fonction pour détecter Android
-const isAndroid = (): boolean => {
-  return /Android/i.test(navigator.userAgent);
-};
-
+// Composant principal de l'application
 const App: React.FC = () => {
-  const headerRef = useRef<HTMLDivElement>(null);
-
-  // Effet pour suivre l'ouverture/fermeture du clavier
+  // Effet pour configurer les ajustements mobiles
   useEffect(() => {
-    const handleVisibilityFix = () => {
-      // Forcer le header à être visible et bien positionné
-      if (headerRef.current) {
-        headerRef.current.style.position = 'fixed';
-        headerRef.current.style.top = '0';
-        headerRef.current.style.zIndex = '10000';
-        headerRef.current.style.opacity = '1';
-        headerRef.current.style.transform = 'none';
-        headerRef.current.style.visibility = 'visible';
+    const { isIOS, isAndroid, isMobile } = detectDevice();
+    
+    // Ajouter des classes au body pour le ciblage CSS
+    if (isMobile) document.body.classList.add('mobile-device');
+    if (isIOS) document.body.classList.add('ios-device');
+    if (isAndroid) document.body.classList.add('android-device');
+    
+    // Créer un header mobile distinct qui ne disparaît jamais
+    const mobileHeader = document.createElement('div');
+    mobileHeader.id = 'header-mobile';
+    document.body.prepend(mobileHeader);
+    
+    // Déplacer le contenu du header normal vers mobileHeader
+    const renderHeaderIntoContainer = () => {
+      const headerContent = document.querySelector('header.app-header');
+      const mobileHeaderElement = document.getElementById('header-mobile');
+      
+      if (headerContent && mobileHeaderElement) {
+        // Rendre le header normal invisible s'il s'agit d'un appareil mobile
+        if (isMobile) {
+          headerContent.classList.add('invisible-header');
+          headerContent.setAttribute('aria-hidden', 'true');
+        }
+        
+        // Cloner et insérer le contenu du header dans le container mobile
+        if (mobileHeaderElement.children.length === 0) {
+          const headerClone = headerContent.cloneNode(true) as HTMLElement;
+          headerClone.style.position = 'static';
+          headerClone.style.paddingTop = '0';
+          mobileHeaderElement.appendChild(headerClone);
+        }
       }
     };
-
-    // Détecter le type d'appareil et ajouter les classes appropriées
-    const mobile = isMobile();
-    const ios = isIOS();
-    const android = isAndroid();
     
-    if (mobile) document.body.classList.add('mobile-device');
-    if (ios) document.body.classList.add('ios-device');
-    if (android) document.body.classList.add('android-device');
+    // Exécuter une fois et configurer un observateur pour les changements
+    renderHeaderIntoContainer();
     
-    // Événements pour garder le header visible
-    document.addEventListener('focusin', handleVisibilityFix);
-    document.addEventListener('click', handleVisibilityFix);
-    
-    // Pour les appareils avec visualViewport API
-    if ('visualViewport' in window) {
-      window.visualViewport?.addEventListener('resize', handleVisibilityFix);
-      window.visualViewport?.addEventListener('scroll', handleVisibilityFix);
-    }
-    
-    // Focus sur un champ avec le header visible
-    const handleInputFocus = (e: Event) => {
-      handleVisibilityFix();
-      document.body.classList.add('input-focused');
-    };
-    
-    const handleInputBlur = () => {
-      document.body.classList.remove('input-focused');
-    };
-    
-    // Attacher les gestionnaires d'événements aux entrées existantes
-    const addFocusHandlers = () => {
-      const inputs = document.querySelectorAll('input, textarea');
-      inputs.forEach(input => {
-        input.addEventListener('focus', handleInputFocus as EventListener);
-        input.addEventListener('blur', handleInputBlur as EventListener);
-      });
-    };
-    
-    // Ajouter les gestionnaires maintenant
-    addFocusHandlers();
-    
-    // Observer les nouvelles entrées
+    // Observer les changements dans le DOM
     const observer = new MutationObserver(() => {
-      addFocusHandlers();
+      renderHeaderIntoContainer();
     });
     
     observer.observe(document.body, { childList: true, subtree: true });
     
-    // Nettoyage
+    // Pour le clavier mobile, suivre l'état de visualViewport
+    if ('visualViewport' in window) {
+      const handleViewportChange = () => {
+        const viewportHeight = window.visualViewport?.height || 0;
+        const windowHeight = window.innerHeight;
+        const keyboardHeight = windowHeight - viewportHeight;
+        
+        // Mettre à jour les propriétés CSS
+        if (keyboardHeight > 100) {
+          document.body.classList.add('keyboard-open');
+        } else {
+          document.body.classList.remove('keyboard-open');
+        }
+      };
+      
+      window.visualViewport?.addEventListener('resize', handleViewportChange);
+      window.visualViewport?.addEventListener('scroll', handleViewportChange);
+      
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleViewportChange);
+        window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+        observer.disconnect();
+      };
+    }
+    
     return () => {
-      document.removeEventListener('focusin', handleVisibilityFix);
-      document.removeEventListener('click', handleVisibilityFix);
-      
-      if ('visualViewport' in window) {
-        window.visualViewport?.removeEventListener('resize', handleVisibilityFix);
-        window.visualViewport?.removeEventListener('scroll', handleVisibilityFix);
-      }
-      
-      const inputs = document.querySelectorAll('input, textarea');
-      inputs.forEach(input => {
-        input.removeEventListener('focus', handleInputFocus as EventListener);
-        input.removeEventListener('blur', handleInputBlur as EventListener);
-      });
-      
       observer.disconnect();
     };
   }, []);
   
-  // Retourner l'application avec les wrapper pour forcer le header à rester visible
   return (
     <QueryClientProvider client={queryClient}>
       <MenuProvider>
-        <div className="app-wrapper min-h-screen flex flex-col ios-fix android-fix" style={{ paddingTop: 'calc(var(--header-height) + var(--safe-area-top, 0px))' }}>
-          <div ref={headerRef} className="fixed-header sticky-top">
-            <Header />
-          </div>
-          <div className="flex flex-1 relative app-content">
+        {/* Container principal avec id 'content' pour le style CSS */}
+        <div id="content" className="min-h-screen flex flex-col">
+          {/* Le vrai header (caché sur mobile, remplacé par #header-mobile) */}
+          <Header />
+          
+          <div className="flex flex-1 relative">
             <SideNavigation />
             <main className="flex-1 mx-auto w-full max-w-screen-xl p-4">
               <AppRouter />
