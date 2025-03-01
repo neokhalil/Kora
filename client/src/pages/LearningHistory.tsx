@@ -184,9 +184,9 @@ const FieldSelector = ({
           className="w-full justify-between"
           onClick={() => onSelectField(field.id)}
         >
-          <div className="flex items-center truncate max-w-[70%]">
+          <div className="flex items-center max-w-[65%]">
             {getFieldIcon(field.iconName)}
-            <span className="ml-2 truncate">{field.name}</span>
+            <span className="ml-2 overflow-hidden text-ellipsis whitespace-nowrap">{field.name}</span>
           </div>
           <Badge variant="secondary" className="ml-2">
             {field.interactionCount} {field.interactionCount === 1 ? 'interaction' : 'interactions'}
@@ -246,7 +246,7 @@ const TopicList = ({
           className="w-full justify-between"
           onClick={() => onSelectTopic(topic.id)}
         >
-          <span className="text-left truncate max-w-[80%]">{topic.title}</span>
+          <span className="text-left overflow-hidden text-ellipsis whitespace-nowrap max-w-[65%]">{topic.title}</span>
           <Badge variant="secondary" className="ml-2">
             {topic.interactionCount} {topic.interactionCount === 1 ? 'interaction' : 'interactions'}
           </Badge>
