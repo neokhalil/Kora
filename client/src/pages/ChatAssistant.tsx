@@ -1264,13 +1264,12 @@ const ChatAssistant: React.FC = () => {
                 disabled={isThinking || isUploadingImage}
               />
               
-              {/* Hidden file input for image upload, incluant l'appareil photo sur mobile */}
+              {/* Hidden file input pour la galerie d'images (sans l'attribut capture) */}
               <input
                 type="file"
                 ref={fileInputRef}
                 className="hidden"
                 accept="image/*"
-                capture={isMobileDevice ? "environment" : undefined}
                 onChange={handleImageSelect}
                 onClick={(e) => {
                   // Reset the value to allow selecting the same file again
@@ -1278,16 +1277,43 @@ const ChatAssistant: React.FC = () => {
                 }}
               />
               
-              {/* Image upload button (on non-mobile) or photo capture button (on mobile) */}
+              {/* Bouton pour choisir une image depuis la galerie */}
               <Button
                 size="icon"
                 variant="outline"
                 disabled={isThinking || isUploadingImage}
                 onClick={handleOpenFileBrowser}
-                title={isMobileDevice ? "Prendre une photo ou choisir une image" : "Télécharger une image"}
+                title="Choisir une image depuis la galerie"
               >
-                {isMobileDevice ? <Camera className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
+                <ImageIcon className="h-5 w-5" />
               </Button>
+              
+              {/* Bouton pour prendre une photo avec l'appareil photo (mobile uniquement) */}
+              {isMobileDevice && (
+                <Button
+                  size="icon"
+                  variant="outline"
+                  disabled={isThinking || isUploadingImage}
+                  onClick={() => {
+                    // Créer un nouvel élément input temporaire avec l'attribut capture
+                    const tempInput = document.createElement('input');
+                    tempInput.type = 'file';
+                    tempInput.accept = 'image/*';
+                    tempInput.capture = 'environment';
+                    
+                    // Ajouter le gestionnaire d'événements
+                    tempInput.onchange = (e) => {
+                      handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
+                    };
+                    
+                    // Simuler un clic sur cet élément
+                    tempInput.click();
+                  }}
+                  title="Prendre une photo avec l'appareil photo"
+                >
+                  <Camera className="h-5 w-5" />
+                </Button>
+              )}
               
               {/* Voice input button */}
               <VoiceRecorder 
