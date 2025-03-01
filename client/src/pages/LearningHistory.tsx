@@ -184,11 +184,13 @@ const FieldSelector = ({
           className="w-full justify-between"
           onClick={() => onSelectField(field.id)}
         >
-          <div className="flex items-center">
+          <div className="flex items-center truncate max-w-[70%]">
             {getFieldIcon(field.iconName)}
-            <span className="ml-2">{field.name}</span>
+            <span className="ml-2 truncate">{field.name}</span>
           </div>
-          <Badge variant="secondary">{field.interactionCount}</Badge>
+          <Badge variant="secondary" className="ml-2">
+            {field.interactionCount} {field.interactionCount === 1 ? 'interaction' : 'interactions'}
+          </Badge>
         </Button>
       ))}
     </div>
@@ -245,7 +247,7 @@ const TopicList = ({
           onClick={() => onSelectTopic(topic.id)}
         >
           <span className="text-left truncate max-w-[80%]">{topic.title}</span>
-          <Badge variant="secondary">
+          <Badge variant="secondary" className="ml-2">
             {topic.interactionCount} {topic.interactionCount === 1 ? 'interaction' : 'interactions'}
           </Badge>
         </Button>
@@ -573,16 +575,15 @@ export default function LearningHistory() {
   };
   
   // Query for filtered interactions
+  const queryParams = buildQueryParams();
   const { 
     data: interactions, 
     isLoading: isLoadingInteractions,
     refetch: refetchInteractions
   } = useQuery({
-    queryKey: ['/api/interactions', buildQueryParams()],
-    queryFn: () => {
-      const queryParams = buildQueryParams();
-      return apiRequest(`/api/interactions?${queryParams}`);
-    }
+    queryKey: ['/api/interactions', queryParams],
+    queryFn: () => apiRequest(`/api/interactions?${queryParams}`),
+    enabled: true,
   });
   
   // Handle toggling star status
@@ -623,6 +624,11 @@ export default function LearningHistory() {
     });
     setStarredOnly(false);
   };
+  
+  // Effect to refetch interactions when filters change
+  useEffect(() => {
+    refetchInteractions();
+  }, [selectedFieldId, selectedTopicId, selectedTagName, selectedType, searchQuery, starredOnly, dateRange]);
   
   // Render mobile layout
   if (isMobile) {
