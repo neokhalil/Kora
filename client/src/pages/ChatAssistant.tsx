@@ -1203,7 +1203,10 @@ const ChatAssistant: React.FC = () => {
       
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* Chat messages area with padding bottom to account for fixed input area */}
-        <div className="flex-1 overflow-y-auto p-4 pb-[170px]">
+        <div 
+          className="flex-1 overflow-y-auto p-4" 
+          style={{ paddingBottom: `calc(170px + ${keyboardHeight}px)` }}
+        >
           {messages.map(renderMessage)}
           
           {/* Thinking indicator */}
