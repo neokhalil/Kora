@@ -58,6 +58,22 @@
   display: flex;
   justify-content: center;
   width: 100%;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin: 0.75rem auto;
+  position: relative;
+  overflow: hidden; /* Cache complètement tout débordement */
+}
+
+.dark .math-block-container {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Supprimer les gradients et ombres qui pourraient être ajoutés automatiquement */
+.math-block-container::after,
+.math-block-container::before {
+  display: none !important;
 }
 
 /* Style pour les équations inline */

@@ -775,7 +775,7 @@ const ChatAssistant: React.FC = () => {
         if (mathExpr) {
           if (mathExpr.isBlock) {
             parts.push(
-              <div key={id} className="my-2 math-block-container overflow-x-auto max-w-full">
+              <div key={id} className="math-block-container">
                 <BlockMath math={mathExpr.formula} />
               </div>
             );
@@ -806,7 +806,7 @@ const ChatAssistant: React.FC = () => {
     }
     
     return (
-      <div className="message-content math-content overflow-x-auto">
+      <div className="message-content math-content">
         <ReactMarkdown components={components}>{processedContent}</ReactMarkdown>
       </div>
     );
@@ -1199,8 +1199,8 @@ const ChatAssistant: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
         
-        {/* Input area */}
-        <div className="border-t p-3">
+        {/* Input area - fixed at bottom */}
+        <div className="border-t p-3 sticky bottom-0 bg-white dark:bg-gray-900 z-10">
           {/* Nous avons supprimé l'interface de caméra personnalisée */}
           
           {/* Image preview area (shown when an image is selected) */}
