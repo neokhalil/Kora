@@ -11,6 +11,7 @@ import HomeworkHelp from "@/pages/HomeworkHelp";
 import ExamPrep from "@/pages/ExamPrep";
 import InteractiveLessons from "@/pages/InteractiveLessons";
 import ChatAssistant from "@/pages/ChatAssistant";
+import LearningHistory from "@/pages/LearningHistory";
 import TestPage from "@/pages/TestPage";
 import { MenuProvider } from "@/hooks/use-menu";
 
@@ -21,6 +22,7 @@ const routes = [
   { path: "/preparation-examens", Component: ExamPrep },
   { path: "/lecons-interactives", Component: InteractiveLessons },
   { path: "/chat-assistant", Component: ChatAssistant },
+  { path: "/historique", Component: LearningHistory },
   { path: "/test", Component: TestPage }
 ];
 
