@@ -13,6 +13,57 @@
     font-family: 'Tenon', 'Inter', sans-serif;
     font-weight: 500;
   }
+  
+  /* Style pour améliorer le rendu des formules mathématiques */
+  .math-content ol {
+    counter-reset: list-counter;
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .math-content ol li {
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 2rem;
+  }
+  
+  .math-content ol li::before {
+    counter-increment: list-counter;
+    content: counter(list-counter) ".";
+    position: absolute;
+    left: 0;
+    font-weight: 600;
+  }
+  
+  .math-content blockquote {
+    margin: 1rem 0;
+    padding: 0.5rem 0;
+    border-left: none;
+    font-style: normal;
+    text-align: center;
+  }
+  
+  /* Mise en forme des équations et expressions mathématiques */
+  .math-content p {
+    margin-bottom: 0.75rem;
+  }
+  
+  .math-content strong {
+    font-weight: 600;
+  }
+  
+  /* Rendu des équations sur leur propre ligne */
+  .math-content .katex-display {
+    margin: 1rem 0;
+    text-align: center;
+  }
+  
+  /* Amélioration de l'espacement entre les étapes */
+  .math-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
 }
 
 /* Styles pour la zone de messages */
