@@ -184,13 +184,22 @@
 .math-content br + br {
   display: block;
   content: "";
-  margin-top: 0.5rem;
+  margin-top: 0.8rem;
 }
 
 /* Assurer que chaque phrase numérotée est sur une ligne séparée */
 .math-content p span.step-number {
   display: block;
   margin-bottom: 0.5rem;
+}
+
+/* Style pour les éléments numérotés d'exercice */
+.math-content .numbered-exercise {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #f9f9f9;
 }
 
 /* Style pour les titres de section */
@@ -255,6 +264,32 @@ aside {
 /* Style du bouton d'envoi */
 .send-button {
   @apply h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center;
+}
+
+/* Style des boutons redessinés pour Kora */
+.kora-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(240, 255, 240, 0.9);
+  color: rgb(46, 125, 50);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 999px;
+  padding: 0.5rem 1.25rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.kora-action-button:hover {
+  background-color: rgba(230, 255, 230, 1);
+}
+
+.kora-action-button svg {
+  margin-right: 0.5rem;
 }
 
 /* Masquer tous les headers React */

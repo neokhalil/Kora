@@ -134,8 +134,14 @@ const formatMathContent = (content: string): string => {
   // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
   formatted = formatted.replace(/^(\d+)\.\s+([^<]*[^:])/gm, '<span class="step-number">$1.</span> $2');
   
-  // S'assurer que chaque phrase numérotée est sur une ligne séparée
-  formatted = formatted.replace(/(\d+\.\s+[^.]+\.\s+)(\d+\.)/g, '$1<br /><br />$2');
+  // S'assurer que chaque phrase numérotée est sur une ligne séparée - cas général pour tous types de contenu
+  formatted = formatted.replace(/(\d+\.\s+[^.]+\.)\s+(\d+\.)/g, '$1<br /><br />$2');
+  
+  // Format spécifique pour les listes d'exercices (séparation plus agressive)
+  formatted = formatted.replace(/(\d+\..*?\.)\s*/g, '<div class="numbered-exercise">$1</div>');
+  
+  // Assurer que les phrases numérotées commençant par "Je" sont correctement formatées
+  formatted = formatted.replace(/(\d+\.\s+Je\s+.*?\.)\s+(\d+\.)/g, '$1<br /><br />$2');
   
   // Améliorer l'indentation des étapes
   formatted = formatted.replace(/<span class="step-number">(\d+)\.<\/span>/g, 
@@ -680,13 +686,11 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
-              <div className="mt-3 flex flex-wrap gap-2 justify-start">
+              <div className="mt-4 flex flex-wrap gap-3 justify-start">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs h-7"
+                  <button 
+                    className="kora-action-button"
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -709,16 +713,17 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    Explique différemment
-                  </Button>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 16V17C4 19.2091 5.79086 21 8 21H16C18.2091 21 20 19.2091 20 17V16M4 8V7C4 4.79086 5.79086 3 8 3H16C18.2091 3 20 4.79086 20 7V8M2 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    Rephrase
+                  </button>
                 )}
                 
                 {/* Bouton Indice - uniquement visible pour les défis */}
                 {message.isChallenge && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs h-7"
+                  <button 
+                    className="kora-action-button"
                     onClick={async () => {
                       if (isThinking) return;
                       
