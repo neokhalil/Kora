@@ -49,7 +49,7 @@ interface Message {
   allowActions?: boolean;
   messageId?: string;
   challengeData?: ChallengeData;
-  imageUrl?: string;
+  imageUrl?: string | null;
 }
 
 const ChatAssistant: React.FC = () => {
@@ -245,7 +245,86 @@ const ChatAssistant: React.FC = () => {
     }
   };
   
-  // Fonction simplifiée pour afficher les messages
+  const handleSubmitImage = async () => {
+    if (!selectedImage || isUploadingImage) return;
+    
+    setIsUploadingImage(true);
+    
+    try {
+      // Créer le message utilisateur avec prévisualisation de l'image
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        content: inputValue || "Analyse cette image s'il te plaît",
+        sender: 'user',
+        imageUrl: imagePreview || undefined,
+      };
+      
+      // Ajouter le message à la liste
+      setMessages(prev => [...prev, userMessage]);
+      
+      // Vider les champs
+      setInputValue('');
+      
+      // Afficher l'indicateur de réflexion
+      setIsThinking(true);
+      
+      // Créer un FormData pour envoyer l'image
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+      
+      // Ajouter le texte de question s'il existe
+      if (inputValue.trim()) {
+        formData.append('query', inputValue);
+      }
+      
+      // Ajouter le sessionId
+      formData.append('sessionId', sessionId);
+      
+      // Envoyer l'image au serveur pour analyse
+      const response = await fetch('/api/image-analysis', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de l\'analyse de l\'image');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de l'IA aux messages
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        isImageAnalysis: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse de l\'image:', error);
+      
+      // Message d'erreur à l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Pourriez-vous réessayer avec une autre image ou une question différente?",
+        sender: 'kora',
+      }]);
+    } finally {
+      // Nettoyage
+      setIsThinking(false);
+      setIsUploadingImage(false);
+      setSelectedImage(null);
+      setImagePreview(null);
+      
+      // Faire défiler vers le bas
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  };
+  
+  // Fonction pour afficher les messages
   const renderMessage = (message: Message) => {
     const isKora = message.sender === 'kora';
     
@@ -259,9 +338,54 @@ const ChatAssistant: React.FC = () => {
                 : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none"
             }`}
           >
+            {/* Image de l'utilisateur si présente */}
+            {message.imageUrl && (
+              <div className="mb-3">
+                <div className="relative rounded-lg overflow-hidden">
+                  <img 
+                    src={message.imageUrl} 
+                    alt="Uploaded content" 
+                    className="w-full max-h-60 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+            
+            {/* Contenu du message */}
             <div className="prose dark:prose-invert text-base leading-relaxed">
               {message.content}
             </div>
+            
+            {/* Actions supplémentaires (réexpliquer, défi) */}
+            {message.allowActions && isKora && (
+              <div className="mt-3 flex flex-wrap gap-2 justify-start">
+                {message.isReExplanation ? null : (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-7"
+                    onClick={() => {
+                      // Implémenter la réexplication
+                    }}
+                  >
+                    Explique différemment
+                  </Button>
+                )}
+                
+                {message.isChallenge ? null : (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-7"
+                    onClick={() => {
+                      // Implémenter le défi
+                    }}
+                  >
+                    Donne-moi un exercice
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -447,8 +571,27 @@ const ChatAssistant: React.FC = () => {
                 
                 {/* Conteneur à droite pour les boutons micro et envoi */}
                 <div className="flex items-center gap-2">
-                  {/* Bouton d'envoi - visible seulement si du texte est présent */}
-                  {inputValue.trim() ? (
+                  {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
+                  {selectedImage ? (
+                    <button
+                      type="button"
+                      onClick={handleSubmitImage}
+                      disabled={isThinking || isUploadingImage}
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-5 w-5"
+                      >
+                        <path
+                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
+                        />
+                      </svg>
+                    </button>
+                  ) : inputValue.trim() ? (
+                    /* Bouton d'envoi de texte - visible seulement si du texte est présent */
                     <button
                       type="button"
                       onClick={handleSendMessage}
