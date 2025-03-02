@@ -55,34 +55,67 @@ interface Message {
 const formatMathContent = (content: string): string => {
   if (!content) return '';
 
-  // Regex pour trouver les expressions mathématiques
+  // Regex pour trouver les expressions mathématiques dans différents formats
   const inlineMathRegex = /\$([^$]+)\$/g;
+  const inlineMathRegex2 = /\\\\([^\s][^\\]*\\\\)/g; // Format \( ... \)
   const blockMathRegex = /\$\$([^$]+)\$\$/g;
+  const blockMathRegex2 = /\\\[(.*?)\\\]/gs; // Format \[ ... \]
+  
+  // Remplacer les espaces blancs dans les formules pour éviter les problèmes
+  const cleanFormula = (formula: string) => formula.replace(/&nbsp;/g, ' ').trim();
 
-  // Convertir d'abord les blocs (équations sur leur propre ligne)
-  let formatted = content.replace(blockMathRegex, (match, formula) => {
+  // Convertir d'abord les blocs avec le format \[ ... \]
+  let formatted = content.replace(blockMathRegex2, (match, formula) => {
     try {
-      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(formula, { 
+      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(cleanFormula(formula), { 
         displayMode: true,
         throwOnError: false,
         strict: false
       })}</span></div>`;
     } catch (error) {
-      console.error('Error rendering block math:', error);
+      console.error('Error rendering block math format 2:', error, formula);
       return match; // En cas d'erreur, garder le texte original
     }
   });
 
-  // Ensuite, convertir les expressions inline
-  formatted = formatted.replace(inlineMathRegex, (match, formula) => {
+  // Convertir les blocs avec le format $$ ... $$
+  formatted = formatted.replace(blockMathRegex, (match, formula) => {
     try {
-      return `<span class="katex-inline">${katex.renderToString(formula, { 
+      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(cleanFormula(formula), { 
+        displayMode: true,
+        throwOnError: false,
+        strict: false
+      })}</span></div>`;
+    } catch (error) {
+      console.error('Error rendering block math format 1:', error, formula);
+      return match; // En cas d'erreur, garder le texte original
+    }
+  });
+
+  // Convertir les expressions inline avec le format \( ... \)
+  formatted = formatted.replace(inlineMathRegex2, (match, formula) => {
+    try {
+      return `<span class="katex-inline">${katex.renderToString(cleanFormula(formula), { 
         displayMode: false,
         throwOnError: false,
         strict: false
       })}</span>`;
     } catch (error) {
-      console.error('Error rendering inline math:', error);
+      console.error('Error rendering inline math format 2:', error, formula);
+      return match; // En cas d'erreur, garder le texte original
+    }
+  });
+
+  // Convertir les expressions inline avec le format $ ... $
+  formatted = formatted.replace(inlineMathRegex, (match, formula) => {
+    try {
+      return `<span class="katex-inline">${katex.renderToString(cleanFormula(formula), { 
+        displayMode: false,
+        throwOnError: false,
+        strict: false
+      })}</span>`;
+    } catch (error) {
+      console.error('Error rendering inline math format 1:', error, formula);
       return match; // En cas d'erreur, garder le texte original
     }
   });

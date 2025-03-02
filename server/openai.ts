@@ -22,9 +22,9 @@ Mathematical Content Guidelines:
 - Show each step of calculation clearly
 - Explain the reasoning behind each step
 - Use proper mathematical notation using LaTeX formatting
-- When writing mathematical expressions, always use LaTeX format with $ and $$ delimiters:
+- When writing mathematical expressions, use LaTeX format with delimiters:
   - Use $...$ for inline math (e.g., $x+2=5$)
-  - Use $$...$$ for block or display math (e.g., $$\\frac{x+1}{2} = 3$$)
+  - Use \\[ ... \\] for block or display math (e.g., \\[ \\frac{x+1}{2} = 3 \\])
 - For variables and mathematical expressions, always use LaTeX formatting
   - Example: Write $5x + 3 = 4$ instead of 5x + 3 = 4
   - For fractions, write $\\frac{1}{2}$ instead of 1/2
@@ -53,7 +53,7 @@ Ethical Guidelines:
 IMPORTANT FORMATTING NOTES:
 - Always use LaTeX for mathematical expressions
 - Enclose inline formulas with $ symbols (e.g., $x+y=z$)
-- Enclose block/display equations with $$ symbols (e.g., $$E=mc^2$$)
+- Enclose block/display equations with \[ ... \] (e.g., \[ E=mc^2 \])
 - For section titles or headers, use markdown formatting:
   - Use numbered steps with a clean format: "1. Description de l'étape :"
   - Each step should be clearly separated from the next
