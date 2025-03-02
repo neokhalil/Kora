@@ -93,18 +93,56 @@ const ChatAssistant: React.FC = () => {
     }
   }, [messages, isThinking]);
   
-  // Surveiller les focus sur les champs de saisie pour assurer la visibilité du header
+  // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
   useEffect(() => {
+    // Ajouter une classe pour indiquer que le Visual Viewport API est actif
+    const visualViewport = window.visualViewport;
+    if (visualViewport) {
+      document.body.classList.add('visual-viewport-supported');
+      
+      // Fonction de gestion du redimensionnement
+      const handleViewportResize = () => {
+        if (visualViewport.height < window.innerHeight) {
+          // Le clavier est probablement ouvert
+          document.body.classList.add('keyboard-open');
+          document.body.classList.add('visual-viewport-active');
+        } else {
+          // Le clavier est probablement fermé
+          document.body.classList.remove('keyboard-open');
+          document.body.classList.remove('visual-viewport-active');
+        }
+      };
+      
+      // Écouter les changements de dimension du viewport visuel (quand le clavier apparaît)
+      visualViewport.addEventListener('resize', handleViewportResize);
+    }
+    
+    // Supprimer les modifications du DOM standard, car nous utilisons maintenant notre propre header
     const handleFocusIn = () => {
-      // Force la visibilité du header quand un élément reçoit le focus
-      const header = document.querySelector('header.app-header');
-      if (header) {
-        header.classList.remove('transform', '-translate-y-full');
-      }
+      // Assurer que le clavier s'ouvre correctement
+      document.body.classList.add('keyboard-open');
+    };
+    
+    const handleFocusOut = () => {
+      // Retirer la classe quand un champ perd le focus
+      document.body.classList.remove('keyboard-open');
     };
     
     document.addEventListener('focusin', handleFocusIn);
-    return () => document.removeEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    
+    // Fonction de nettoyage
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+      
+      // Si Visual Viewport API est disponible, supprimer l'écouteur d'événements
+      const viewport = window.visualViewport;
+      if (viewport) {
+        // Référence à la fonction de gestion définie plus tôt
+        viewport.removeEventListener('resize', handleViewportResize);
+      }
+    };
   }, []);
   
   // Mock sessionId pour le développement
@@ -308,11 +346,19 @@ const ChatAssistant: React.FC = () => {
                       document.body.classList.add('keyboard-open');
                       
                       // S'assurer que le header fixe est visible
-                      const fixedHeader = document.getElementById('fixed-header');
-                      if (fixedHeader) {
-                        fixedHeader.style.position = 'fixed';
-                        fixedHeader.style.top = '0';
+                      const headerContainer = document.getElementById('kora-header-container');
+                      if (headerContainer) {
+                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.top = '0';
+                        headerContainer.style.zIndex = '9999';
                       }
+                      
+                      // Scroll vers le bas après l'ouverture du clavier
+                      setTimeout(() => {
+                        if (messagesEndRef.current) {
+                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
                     }}
                   />
                 </div>

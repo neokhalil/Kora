@@ -13,20 +13,13 @@
   }
 }
 
-/* Style du conteneur principal */
-#root {
-  padding-top: calc(var(--header-height) + var(--safe-area-top));
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Styles pour la liste des messages */
+/* Styles pour la zone de messages */
 .chat-messages-container {
   padding-bottom: 120px; /* Espace pour le compositeur */
   -webkit-overflow-scrolling: touch;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Style du conteneur de saisie en bas */
@@ -54,21 +47,29 @@ input, textarea, select, button {
 
 /* Classes pour le menu latéral */
 .menu-overlay {
-  @apply fixed inset-0 bg-black/50 z-[900] lg:hidden;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 950;
   transition: opacity 150ms ease-in-out;
 }
 
-/* Style pour le conteneur principal de l'application */
-main {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 80px;
+@media (min-width: 1024px) {
+  .menu-overlay {
+    display: none;
+  }
 }
 
 /* Assurer que le SideNavigation a un bon z-index */
 aside {
+  position: fixed;
+  top: calc(var(--header-height) + var(--safe-area-top));
+  bottom: 0;
   z-index: 950;
+  background-color: white;
 }
 
 /* Style du bouton d'envoi */
@@ -76,27 +77,10 @@ aside {
   @apply h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center;
 }
 
-/* Masquer le header React pour éviter les doublons */
-.app-header {
+/* Masquer tous les headers React */
+.app-header, 
+header:not(#kora-header) {
   display: none !important;
-}
-
-/* Ajustements pour le header spécial */
-#kora-header {
-  /* Ces règles sont ici pour renforcer celles dans index.html */
-  position: fixed !important;
-  top: 0 !important; 
-  left: 0 !important;
-  width: 100% !important;
-  z-index: 9999 !important;
-  visibility: visible !important;
-  transform: none !important;
-}
-
-/* Support du clavier mobile */
-.keyboard-open .composer-container {
-  position: absolute !important;
-  bottom: 0 !important;
 }
 
 /* Améliorer l'affichage des messages */
@@ -122,4 +106,31 @@ aside {
   color: #333;
   margin-right: auto;
   border-bottom-left-radius: 0.25rem;
+}
+
+/* Gestion des conteneurs principaux */
+.app-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: auto;
+}
+
+/* Prévenir les bugs de défilement sur iOS */
+.ios-device {
+  /* Force le rendu matériel sur iOS pour éviter les bugs de défilement */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Support du Visual Viewport */
+.visual-viewport-active #kora-header-container {
+  position: absolute;
+  top: 0;
 }

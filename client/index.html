@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#64748B" />
   <meta name="description" content="Kora - Plateforme éducative d'aide aux devoirs et de préparation aux examens" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Kora" />
   <meta name="mobile-web-app-capable" content="yes" />
   <link rel="icon" type="image/svg+xml" href="/assets/brain-icon.svg" />
@@ -17,82 +17,75 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <title>Kora - Plateforme Éducative</title>
   
-  <!-- Variables globales -->
   <style>
+    /* Variables globales */
     :root {
+      --app-height: 100%;
       --header-height: 56px;
       --safe-area-top: env(safe-area-inset-top, 0px);
       --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     }
-  </style>
-  
-  <!-- Styles pour le header fixe et les ajustements de mise en page -->
-  <style>
-    /* Réinitialisation de base */
+    
+    /* Styles de base */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
     
-    html {
-      height: -webkit-fill-available;
+    html, body {
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
       height: 100%;
+      max-height: 100%;
+      overscroll-behavior: none;
+      touch-action: pan-y;
     }
     
     body {
-      min-height: 100vh;
-      /* Support mobile */
-      min-height: -webkit-fill-available;
-      width: 100%;
-      padding-top: calc(var(--header-height) + var(--safe-area-top));
       font-family: 'Inter', sans-serif;
+      background-color: #fff;
+      /* padding-top de 0 ici, nous allons ajuster le root */
     }
     
-    /* Le header primaire qui reste toujours visible */
-    #kora-header {
-      /* Position absolue au viewport */
-      position: fixed;
+    /* Conteneur principal */
+    #root {
+      position: absolute;
+      top: calc(var(--header-height) + var(--safe-area-top));
+      bottom: 0;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      height: calc(100% - var(--header-height) - var(--safe-area-top));
+    }
+    
+    /* Le header qui reste vraiment fixe */
+    #kora-header-container {
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: var(--header-height);
+      right: 0;
+      height: calc(var(--header-height) + var(--safe-area-top));
+      padding-top: var(--safe-area-top);
+      z-index: 9999;
+      pointer-events: none;
+    }
+    
+    #kora-header {
       background-color: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      padding-top: var(--safe-area-top);
-      
-      /* Super z-index pour rester toujours au-dessus */
-      z-index: 9999;
-      
-      /* Disposition interne */
+      height: var(--header-height);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-left: 1rem;
-      padding-right: 1rem;
-      
-      /* Animation pour une meilleure visibilité */
-      transition: none;
-      
-      /* Forcer la visibilité */
-      visibility: visible !important;
-      opacity: 1 !important;
-      display: flex !important;
+      padding: 0 1rem;
+      pointer-events: auto;
     }
     
-    /* Masquer le header React */
-    .app-header,
-    header:not(#kora-header) {
-      display: none !important;
-    }
-    
-    /* Régler les polices pour éviter le zoom sur focus */
-    input, textarea, select, button {
-      font-size: 16px !important;
-    }
-    
-    /* Centrer les éléments du header */
     #kora-header-title {
       font-size: 1.25rem;
       font-weight: bold;
@@ -100,60 +93,76 @@
       text-transform: uppercase;
     }
     
-    /* Éviter le scroll de l'ensemble de la page */
-    body.keyboard-open {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
+    #kora-menu-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Masquer tous les autres headers */
+    .app-header, header:not(#kora-header) {
+      display: none !important;
+    }
+    
+    /* S'assurer que les inputs ont la bonne taille de police */
+    input, textarea, select, button {
+      font-size: 16px !important;
     }
   </style>
   
-  <script>
-    // Fonction d'initialisation avancée
+  <script type="text/javascript">
+    // Fonction d'initialisation
     (function() {
-      // Détection de la plateforme
+      // Détecter le système d'exploitation
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
       const isAndroid = /Android/.test(navigator.userAgent);
       
-      // Fonction pour créer le header fixe spécial
-      function createStableHeader() {
-        // Créer l'élément avec un ID unique
+      // Correction pour la hauteur de l'application mobile
+      function resetAppHeight() {
+        const doc = document.documentElement;
+        doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+      }
+      
+      // Créer le header fixe
+      function createFixedHeader() {
+        // Créer le conteneur externe qui ne sera jamais touché par le scroll
+        const headerContainer = document.createElement('div');
+        headerContainer.id = 'kora-header-container';
+        
+        // Créer le header lui-même
         const header = document.createElement('div');
         header.id = 'kora-header';
         
-        // Insérer le contenu du header
+        // Contenu du header
         header.innerHTML = `
-          <div>
-            <button id="kora-menu-button" style="background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          <div>
-            <h1 id="kora-header-title">Kora</h1>
-          </div>
+          <button id="kora-menu-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <h1 id="kora-header-title">Kora</h1>
           <div style="width: 40px;"></div>
         `;
         
-        // Placer le header en premier dans le body
-        if (document.body) {
-          document.body.prepend(header);
-        } else {
-          window.addEventListener('DOMContentLoaded', () => {
-            document.body.prepend(header);
-          });
-        }
+        // Ajouter le header au conteneur
+        headerContainer.appendChild(header);
+        
+        // Ajouter le conteneur au body
+        document.body.appendChild(headerContainer);
         
         return header;
       }
       
-      // Function pour configurer les écouteurs d'événements
-      function setupEventListeners() {
-        // Écouteur pour le bouton de menu
+      // Initialiser les événements
+      function setupEvents() {
+        // Événement pour le bouton de menu
         const menuButton = document.getElementById('kora-menu-button');
         if (menuButton) {
           menuButton.addEventListener('click', function() {
@@ -161,53 +170,45 @@
           });
         }
         
-        // Écouteurs pour le clavier
-        document.addEventListener('focusin', function(e) {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            // Ajouter une classe spéciale au body
-            document.body.classList.add('keyboard-open');
-            
-            // Forcer encore plus le header
-            const header = document.getElementById('kora-header');
-            if (header) {
-              header.style.position = 'fixed';
-              header.style.top = '0';
-              header.style.transform = 'none';
-              header.style.willChange = 'transform';
-              header.style.opacity = '1';
-              header.style.visibility = 'visible';
-              header.style.zIndex = '9999';
-            }
-          }
-        });
+        // Recalculer la hauteur à chaque changement d'orientation ou redimensionnement
+        window.addEventListener('resize', resetAppHeight);
         
-        // Quand le focus est perdu
-        document.addEventListener('focusout', function(e) {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            // Enlever la classe spéciale
-            document.body.classList.remove('keyboard-open');
-          }
-        });
+        // Recalculer aussi quand le clavier apparaît/disparaît
+        if (isIOS) {
+          window.visualViewport.addEventListener('resize', function() {
+            resetAppHeight();
+            
+            // Forcer le header à rester au sommet
+            const headerContainer = document.getElementById('kora-header-container');
+            if (headerContainer) {
+              headerContainer.style.top = '0';
+              headerContainer.style.position = 'absolute';
+            }
+          });
+        }
       }
       
-      // Configuration initiale de la page
-      function setupPage() {
-        // Ajouter des classes pour la détection de plateforme
+      // Initialisation complète quand la page est chargée
+      function initApp() {
+        // Ajouter les classes pour détecter le système d'exploitation
         if (isIOS) document.body.classList.add('ios-device');
         if (isAndroid) document.body.classList.add('android-device');
         
-        // Créer le header stable
-        createStableHeader();
+        // Créer un header fixe absolu
+        createFixedHeader();
         
-        // Configurer les écouteurs d'événements
-        setupEventListeners();
+        // Configurer les événements
+        setupEvents();
+        
+        // Initialiser la hauteur
+        resetAppHeight();
       }
       
-      // Exécuter la configuration au chargement
+      // Démarrer l'initialisation au chargement de la page
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupPage);
+        document.addEventListener('DOMContentLoaded', initApp);
       } else {
-        setupPage();
+        initApp();
       }
     })();
   </script>
