@@ -143,8 +143,8 @@ const ChatAssistant: React.FC = () => {
   const [sessionId] = useState("session_dev_123456789");
   
   // Fonctions simplifiées pour le prototype
-  const handleSendMessage = () => {
-    if (inputValue.trim() === '') return;
+  const handleSendMessage = async () => {
+    if (inputValue.trim() === '' || isThinking) return;
     
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -152,20 +152,69 @@ const ChatAssistant: React.FC = () => {
       sender: 'user',
     };
     
+    // Garder une copie du message pour la requête API
+    const questionText = inputValue;
+    
+    // Ajouter le message à la liste
     setMessages(prev => [...prev, userMessage]);
     
-    // Simuler une réponse après un délai
+    // Vider le champ d'entrée
+    setInputValue('');
+    
+    // Marquer comme "en train de réfléchir"
     setIsThinking(true);
-    setTimeout(() => {
-      setIsThinking(false);
+    
+    try {
+      // Préparer les messages précédents pour le contexte de la conversation
+      const messageHistory = messages.map(msg => ({
+        content: msg.content,
+        sender: msg.sender
+      }));
+      
+      // Appel API à OpenAI via notre serveur
+      const response = await fetch('/api/tutoring/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: questionText,
+          messages: messageHistory
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête API');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de l'IA aux messages
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        content: "Je suis KORA, ton assistant d'études. Comment puis-je t'aider aujourd'hui avec tes mathématiques ou sciences?",
+        content: data.content,
         sender: 'kora',
       }]);
-    }, 1500);
-    
-    setInputValue('');
+    } catch (error) {
+      console.error('Erreur lors de la communication avec le serveur:', error);
+      
+      // Message d'erreur à l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
+        sender: 'kora',
+      }]);
+    } finally {
+      // Dans tous les cas, arrêter l'indicateur de réflexion
+      setIsThinking(false);
+      
+      // Faire défiler vers le bas après l'ajout du message
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
   };
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -421,10 +470,11 @@ const ChatAssistant: React.FC = () => {
                     /* Bouton microphone */
                     <div className="w-10 h-10 flex items-center justify-center">
                       <VoiceRecorder 
-                        onTranscriptionComplete={(text) => {
-                          setInputValue(text);
+                        onTranscriptionComplete={async (text) => {
+                          setInputValue('');
                           
                           if (text.trim().length > 0) {
+                            // Créer et ajouter le message de l'utilisateur
                             const userMessage: Message = {
                               id: Date.now().toString(),
                               content: text,
@@ -434,14 +484,56 @@ const ChatAssistant: React.FC = () => {
                             setMessages(prev => [...prev, userMessage]);
                             setIsThinking(true);
                             
-                            setTimeout(() => {
-                              setIsThinking(false);
+                            try {
+                              // Préparer les messages précédents pour le contexte
+                              const messageHistory = messages.map(msg => ({
+                                content: msg.content,
+                                sender: msg.sender
+                              }));
+                              
+                              // Appel API à OpenAI via notre serveur
+                              const response = await fetch('/api/tutoring/ask', {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                  question: text,
+                                  messages: messageHistory
+                                }),
+                              });
+                              
+                              if (!response.ok) {
+                                throw new Error('Erreur lors de la requête API');
+                              }
+                              
+                              const data = await response.json();
+                              
+                              // Ajouter la réponse de l'IA aux messages
                               setMessages(prev => [...prev, {
                                 id: Date.now().toString(),
-                                content: "Je suis KORA, ton assistant d'études. Comment puis-je t'aider aujourd'hui avec tes mathématiques ou sciences?",
+                                content: data.content,
                                 sender: 'kora',
                               }]);
-                            }, 1500);
+                            } catch (error) {
+                              console.error('Erreur lors de la communication avec le serveur:', error);
+                              
+                              // Message d'erreur à l'utilisateur
+                              setMessages(prev => [...prev, {
+                                id: Date.now().toString(),
+                                content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
+                                sender: 'kora',
+                              }]);
+                            } finally {
+                              setIsThinking(false);
+                              
+                              // Faire défiler vers le bas 
+                              setTimeout(() => {
+                                if (messagesEndRef.current) {
+                                  messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                                }
+                              }, 100);
+                            }
                           }
                         }}
                         disabled={isThinking || isUploadingImage}
