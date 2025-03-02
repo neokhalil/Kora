@@ -134,6 +134,9 @@ const formatMathContent = (content: string): string => {
   // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
   formatted = formatted.replace(/^(\d+)\.\s+([^<]*[^:])/gm, '<span class="step-number">$1.</span> $2');
   
+  // S'assurer que chaque phrase numérotée est sur une ligne séparée
+  formatted = formatted.replace(/(\d+\.\s+[^.]+\.\s+)(\d+\.)/g, '$1<br /><br />$2');
+  
   // Améliorer l'indentation des étapes
   formatted = formatted.replace(/<span class="step-number">(\d+)\.<\/span>/g, 
     '<span class="step-number">$1.</span>');

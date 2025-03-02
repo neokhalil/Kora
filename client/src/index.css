@@ -177,6 +177,20 @@
   padding-left: 0.5rem;
   font-weight: 500;
   margin-bottom: 1rem;
+  display: block;
+}
+
+/* Amélioration du formatage des exercices numérotés */
+.math-content br + br {
+  display: block;
+  content: "";
+  margin-top: 0.5rem;
+}
+
+/* Assurer que chaque phrase numérotée est sur une ligne séparée */
+.math-content p span.step-number {
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 /* Style pour les titres de section */
