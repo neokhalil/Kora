@@ -73,6 +73,14 @@
     font-size: 1.05rem;
   }
   
+  /* Séparateur de sections */
+  .math-content .section-divider {
+    margin: 1.5rem 0;
+    border: 0;
+    height: 1px;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
   /* Style pour les équations du message */
   .math-content .katex-inline {
     font-size: 1.1em;
@@ -132,11 +140,28 @@
 
 /* Styles pour la zone de messages */
 .chat-messages-container {
-  padding-bottom: 120px; /* Espace pour le compositeur */
+  padding-bottom: 160px; /* Espace plus grand pour le compositeur pour éviter les chevauchements */
   -webkit-overflow-scrolling: touch;
   padding-top: 16px;
   display: flex;
   flex-direction: column;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Style pour les éléments numérotés */
+.math-content .numbered-item {
+  padding-left: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+/* Style pour les titres de section */
+.math-content .section-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Style du conteneur de saisie en bas */

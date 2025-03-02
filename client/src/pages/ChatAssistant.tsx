@@ -104,6 +104,29 @@ const formatMathContent = (content: string): string => {
   
   // Mise en forme de la conclusion
   formatted = formatted.replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, '<div class="conclusion">$1, $2 est </div>');
+  
+  // Reformater les séparateurs de sections
+  formatted = formatted.replace(/###/g, '<hr class="section-divider" />');
+  
+  // Restructurer les paragraphes pour une meilleure lisibilité
+  formatted = formatted.replace(/(\n{2,})/g, '</p><p>');
+  
+  // Assurer que tout est bien dans des paragraphes
+  if (!formatted.startsWith('<h3>') && !formatted.startsWith('<p>')) {
+    formatted = '<p>' + formatted;
+  }
+  if (!formatted.endsWith('</p>') && !formatted.endsWith('</div>')) {
+    formatted = formatted + '</p>';
+  }
+  
+  // Assurer que les sections ###-séparées sont bien formatées
+  formatted = formatted.replace(/<p><hr class="section-divider" \/><\/p>/g, '<hr class="section-divider" />');
+  
+  // Utiliser des div pour les titres et sous-titres
+  formatted = formatted.replace(/<p>([^<]+)<\/p>\s*<hr class="section-divider" \/>/g, '<div class="section-title">$1</div><hr class="section-divider" />');
+  
+  // Formater correctement les listes numérotées
+  formatted = formatted.replace(/<p><strong>(\d+)\.<\/strong>/g, '<p class="numbered-item"><strong>$1.</strong>');
 
   return formatted;
 };
@@ -145,7 +168,10 @@ const ChatAssistant: React.FC = () => {
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
     }
   }, [messages, isThinking]);
   
