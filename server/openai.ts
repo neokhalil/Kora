@@ -151,7 +151,7 @@ export async function generateReExplanation(
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a re-explanation. Provide an alternative explanation of the same concept using different wording, examples, or approaches. Your re-explanation should be substantially different from the original explanation.` },
+        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a re-explanation. Provide an alternative explanation of the same concept using different wording, examples, or approaches. Your re-explanation should be substantially different from the original explanation.\n\nCRITICAL INSTRUCTION: Just like in your primary tutoring approach, you must NEVER solve the specific problem in the student's original question. Instead, explain the general concept differently, use different examples with different numbers, and continue to guide the student toward their own solution with questions.` },
         { role: "user", content: originalQuestion },
         { role: "assistant", content: originalExplanation },
         { role: "user", content: "Pourrais-tu m'expliquer cela différemment?" }
@@ -178,7 +178,18 @@ export async function generateChallengeProblem(
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. Generate a related problem of slightly higher difficulty that tests the same concept. The problem should be challenging but solvable using the same principles.` },
+        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. Generate a related problem of slightly higher difficulty that tests the same concept. The problem should be challenging but solvable using the same principles.\n\nIMPORTANT GUIDELINES FOR CHALLENGE PROBLEMS:
+1. Create a structured challenge with clear instructions
+2. Include a step-by-step approach to guide the student without giving away the solution
+3. Provide hints that help them understand how to tackle the problem
+4. Include thinking questions that help them reflect on the approach
+5. End with encouragement and an invitation to try solving it
+6. Structure the challenge in a clear format:
+   - First present the challenge problem clearly
+   - Then provide a "### Guide d'approche" (Approach Guide) section with steps
+   - Include a "### Indices" (Hints) section with 2-3 progressive hints
+   - End with a "### Questions de réflexion" (Reflection Questions) section
+7. NEVER provide the full solution to the challenge problem` },
         { role: "user", content: originalQuestion },
         { role: "assistant", content: explanation },
         { role: "user", content: "Peux-tu me donner un problème similaire mais un peu plus difficile pour me mettre au défi?" }

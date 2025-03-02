@@ -126,12 +126,19 @@ const formatMathContent = (content: string): string => {
   // Sections avec ###
   formatted = formatted.replace(/###\s*(.*?)$/gm, '<h3>$1</h3>');
   
-  // Améliorer la numérotation et les étapes
+  // Améliorer la numérotation et les étapes - en limitant l'usage du formatage en gras
   formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
-  formatted = formatted.replace(/(\d+)\.\s+([^\*<$][^<]*)/g, '<strong>$1.</strong> $2');
+  
+  // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
+  formatted = formatted.replace(/^(\d+)\.\s+([^<]*[^:])/gm, '<span class="step-number">$1.</span> $2');
+  
+  // Améliorer l'indentation des étapes
+  formatted = formatted.replace(/<span class="step-number">(\d+)\.<\/span>/g, 
+    '<span class="step-number">$1.</span>');
   
   // Assurer que les variables mathématiques ne sont pas en gras
-  formatted = formatted.replace(/<strong>([^<]*?)(\$[^$]+\$)([^<]*?)<\/strong>/g, '<strong>$1</strong>$2<strong>$3</strong>');
+  formatted = formatted.replace(/<strong>([^<]*?)(\$[^$]+\$)([^<]*?)<\/strong>/g, 
+    '<strong>$1</strong>$2<strong>$3</strong>');
   
   // Mettre en valeur les étapes importantes
   formatted = formatted.replace(/\*\*([^*:]+)\*\*/g, '<strong>$1</strong>');
