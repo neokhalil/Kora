@@ -127,12 +127,9 @@ const formatMathContent = (content: string): string => {
   formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
   formatted = formatted.replace(/(\d+)\.\s+/g, '<strong>$1.</strong> ');
   
-  // Traiter les marqueurs de texte en gras (**texte**)
+  // Mettre en valeur les étapes importantes
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-  // Mettre en gras les étapes numérotées
-  formatted = formatted.replace(/(\d+\.\s*\*\*[^*]+\*\*)/g, '<strong>$1</strong>');
-
+  
   // Mise en forme des résultats intermédiaires
   formatted = formatted.replace(/(Ce qui donne|On obtient|Ce qui nous donne|Ceci donne)\s*:/g, '<div class="result">$1 :</div>');
   
@@ -450,7 +447,7 @@ const ChatAssistant: React.FC = () => {
           <div 
             className={`inline-block rounded-2xl px-4 py-3 ${
               isKora 
-                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 max-w-full w-[100%]" 
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 max-w-[95%]" 
                 : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%]"
             }`}
           >
