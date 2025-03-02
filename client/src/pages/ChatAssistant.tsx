@@ -659,10 +659,10 @@ const ChatAssistant: React.FC = () => {
       <div key={message.id} className="px-4 py-2 mb-4">
         <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
           <div 
-            className={`inline-block rounded-2xl px-4 py-3 ${
+            className={`inline-block rounded-2xl ${
               isKora 
-                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full" 
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%]"
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full px-4 py-3" 
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-2 flex items-center justify-center"
             }`}
           >
             {/* Image de l'utilisateur si présente */}
