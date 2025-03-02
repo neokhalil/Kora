@@ -189,6 +189,11 @@ const ChatAssistant: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [progressiveText, setProgressiveText] = useState<{id: string, fullText: string, currentText: string, intervalId?: NodeJS.Timeout}>({
+    id: '',
+    fullText: '',
+    currentText: ''
+  });
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   
   // Vérifier si c'est un appareil mobile
@@ -271,6 +276,61 @@ const ChatAssistant: React.FC = () => {
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
   
+  // Fonction pour simuler l'écriture progressive du texte
+  const simulateProgressiveTyping = (messageId: string, fullText: string) => {
+    // Nettoyer tout intervalle précédent si existant
+    if (progressiveText.intervalId) {
+      clearInterval(progressiveText.intervalId);
+    }
+    
+    let currentCharIndex = 0;
+    const typingSpeed = 15; // Temps en ms entre chaque caractère
+    
+    // Initialiser l'état de texte progressif
+    setProgressiveText({
+      id: messageId,
+      fullText: fullText,
+      currentText: ''
+    });
+    
+    // Créer un intervalle pour ajouter progressivement des caractères
+    const intervalId = setInterval(() => {
+      if (currentCharIndex < fullText.length) {
+        // Ajouter le caractère suivant au texte actuel
+        currentCharIndex++;
+        const newCurrentText = fullText.substring(0, currentCharIndex);
+        
+        // Mettre à jour à la fois l'état progressif et le message
+        setProgressiveText(prev => ({
+          ...prev,
+          currentText: newCurrentText
+        }));
+        
+        // Mettre à jour le message dans la liste
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, content: newCurrentText } 
+              : msg
+          )
+        );
+      } else {
+        // Arrêter l'intervalle une fois le texte complet
+        clearInterval(intervalId);
+        setProgressiveText(prev => ({
+          ...prev,
+          intervalId: undefined
+        }));
+      }
+    }, typingSpeed);
+    
+    // Stocker l'ID d'intervalle pour pouvoir le nettoyer plus tard
+    setProgressiveText(prev => ({
+      ...prev,
+      intervalId
+    }));
+  };
+  
   // Fonctions simplifiées pour le prototype
   const handleSendMessage = async () => {
     if (inputValue.trim() === '' || isThinking) return;
@@ -318,13 +378,19 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de l'IA aux messages
+      // Générer un ID unique pour ce message
+      const messageId = Date.now().toString();
+      
+      // Ajouter la réponse avec du contenu initial vide
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: data.content,
+        id: messageId,
+        content: '',
         sender: 'kora',
         allowActions: true,
       }]);
+      
+      // Afficher le texte progressivement
+      simulateProgressiveTyping(messageId, data.content);
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -488,14 +554,20 @@ const ChatAssistant: React.FC = () => {
         sender: 'user',
       }]);
       
-      // Ajouter la nouvelle explication
+      // Générer un ID unique pour ce message
+      const messageId = (Date.now() + 1).toString();
+      
+      // Ajouter la nouvelle explication avec contenu vide au début
       setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: data.content,
+        id: messageId,
+        content: '',
         sender: 'kora',
         isReExplanation: true,
         allowActions: true,
       }]);
+      
+      // Simuler l'écriture progressive
+      simulateProgressiveTyping(messageId, data.content);
     } catch (error) {
       console.error('Erreur lors de la requête de réexplication:', error);
       
@@ -545,15 +617,18 @@ const ChatAssistant: React.FC = () => {
         sender: 'user',
       }]);
       
-      // Ajouter le défi
+      // Ajouter le défi avec contenu vide au début
       setMessages(prev => [...prev, {
         id: challengeId,
-        content: data.content,
+        content: '',
         sender: 'kora',
         isChallenge: true,
         allowActions: true,
         challengeId: challengeId,
       }]);
+      
+      // Simuler l'écriture progressive
+      simulateProgressiveTyping(challengeId, data.content);
     } catch (error) {
       console.error('Erreur lors de la requête de défi:', error);
       
@@ -603,8 +678,8 @@ const ChatAssistant: React.FC = () => {
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
               <div className="mt-3 flex flex-wrap gap-2 justify-start">
-                {/* Bouton Explique différemment - caché pour les défis */}
-                {(!message.isChallenge && !message.isReExplanation) && (
+                {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
+                {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -672,14 +747,20 @@ const ChatAssistant: React.FC = () => {
                           sender: 'user',
                         }]);
                         
-                        // Ajouter l'indice
+                        // Générer un ID unique pour ce message d'indice
+                        const hintId = (Date.now() + 1).toString();
+                        
+                        // Ajouter l'indice avec contenu vide au début
                         setMessages(prev => [...prev, {
-                          id: (Date.now() + 1).toString(),
-                          content: data.content,
+                          id: hintId,
+                          content: '',
                           sender: 'kora',
                           isHint: true,
                           challengeId: message.id,
                         }]);
+                        
+                        // Simuler l'écriture progressive
+                        simulateProgressiveTyping(hintId, data.content);
                       } catch (error) {
                         console.error('Erreur lors de la requête d\'indice:', error);
                         setMessages(prev => [...prev, {
@@ -696,8 +777,8 @@ const ChatAssistant: React.FC = () => {
                   </Button>
                 )}
                 
-                {/* Bouton exercice - non visible pour les défis */}
-                {!message.isChallenge && !message.isHint && (
+                {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
+                {(!message.isChallenge || message.isHint) && (
                   <Button 
                     variant="outline" 
                     size="sm" 
