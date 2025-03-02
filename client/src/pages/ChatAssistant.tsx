@@ -89,11 +89,21 @@ const formatMathContent = (content: string): string => {
     }
   });
 
-  // Améliorer la numérotation
+  // Améliorer les titres et les étapes
+  formatted = formatted.replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>');
+  
+  // Améliorer la numérotation et les étapes
+  formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
   formatted = formatted.replace(/(\d+)\.\s+/g, '<strong>$1.</strong> ');
   
   // Mettre en valeur les étapes importantes
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  
+  // Mise en forme des résultats intermédiaires
+  formatted = formatted.replace(/(Ce qui donne|On obtient|Ce qui nous donne|Ceci donne)\s*:/g, '<div class="result">$1 :</div>');
+  
+  // Mise en forme de la conclusion
+  formatted = formatted.replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, '<div class="conclusion">$1, $2 est </div>');
 
   return formatted;
 };
@@ -378,10 +388,10 @@ const ChatAssistant: React.FC = () => {
       <div key={message.id} className="px-4 py-2 mb-4">
         <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
           <div 
-            className={`inline-block rounded-2xl px-4 py-3 max-w-[80%] ${
+            className={`inline-block rounded-2xl px-4 py-3 ${
               isKora 
-                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" 
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none"
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 max-w-[95%]" 
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%]"
             }`}
           >
             {/* Image de l'utilisateur si présente */}
@@ -399,7 +409,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Contenu du message avec formatage amélioré pour les maths */}
             <div 
-              className="prose dark:prose-invert text-base leading-relaxed math-content"
+              className="prose dark:prose-invert text-base leading-relaxed math-content px-1"
               dangerouslySetInnerHTML={{ __html: formatMathContent(message.content) }}
             ></div>
             

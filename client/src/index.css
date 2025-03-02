@@ -66,13 +66,60 @@
     font-size: 1.15em;
   }
   
+  /* Mise en forme des éléments de texte du message */
+  .math-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    font-size: 1.05rem;
+  }
+  
+  /* Style pour les équations du message */
+  .math-content .katex-inline {
+    font-size: 1.1em;
+  }
+  
   /* Bloc pour les équations */
   .math-content .katex-block {
-    margin: 1rem 0;
+    margin: 1.5rem 0;
     text-align: center;
     overflow-x: auto;
     overflow-y: hidden;
     max-width: 100%;
+  }
+  
+  /* Style pour les étapes numérotées */
+  .math-content ol {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    list-style-position: outside;
+  }
+  
+  .math-content ol li {
+    margin-bottom: 1.5rem;
+    padding-left: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .math-content ol li strong {
+    font-weight: 700;
+  }
+  
+  /* Mise en valeur des titres et étapes */
+  .math-content h3, 
+  .math-content h4 {
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+  }
+  
+  /* Style pour les conclusions et résultats importants */
+  .math-content .result,
+  .math-content .conclusion {
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
   }
   
   /* Amélioration de l'espacement entre les étapes */
