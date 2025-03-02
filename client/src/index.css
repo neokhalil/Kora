@@ -56,6 +56,23 @@
   .math-content .katex-display {
     margin: 1rem 0;
     text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5em 0;
+  }
+  
+  /* Amélioration de la visibilité des formules mathématiques */
+  .math-content .katex {
+    font-size: 1.15em;
+  }
+  
+  /* Bloc pour les équations */
+  .math-content .katex-block {
+    margin: 1rem 0;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
   }
   
   /* Amélioration de l'espacement entre les étapes */
