@@ -24,6 +24,7 @@ import { useToast } from '@/hooks/use-toast';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import 'katex/dist/katex.min.css';
 import { InlineMath, BlockMath } from 'react-katex';
+import katex from 'katex';
 import ReactMarkdown from 'react-markdown';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
@@ -51,6 +52,51 @@ interface Message {
   challengeData?: ChallengeData;
   imageUrl?: string | null;
 }
+
+// Fonction pour formater le contenu mathématique avec KaTeX
+const formatMathContent = (content: string): string => {
+  if (!content) return '';
+
+  // Regex pour trouver les expressions mathématiques
+  const inlineMathRegex = /\$([^$]+)\$/g;
+  const blockMathRegex = /\$\$([^$]+)\$\$/g;
+
+  // Convertir d'abord les blocs (équations sur leur propre ligne)
+  let formatted = content.replace(blockMathRegex, (match, formula) => {
+    try {
+      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(formula, { 
+        displayMode: true,
+        throwOnError: false,
+        strict: false
+      })}</span></div>`;
+    } catch (error) {
+      console.error('Error rendering block math:', error);
+      return match; // En cas d'erreur, garder le texte original
+    }
+  });
+
+  // Ensuite, convertir les expressions inline
+  formatted = formatted.replace(inlineMathRegex, (match, formula) => {
+    try {
+      return `<span class="katex-inline">${katex.renderToString(formula, { 
+        displayMode: false,
+        throwOnError: false,
+        strict: false
+      })}</span>`;
+    } catch (error) {
+      console.error('Error rendering inline math:', error);
+      return match; // En cas d'erreur, garder le texte original
+    }
+  });
+
+  // Améliorer la numérotation
+  formatted = formatted.replace(/(\d+)\.\s+/g, '<strong>$1.</strong> ');
+  
+  // Mettre en valeur les étapes importantes
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  return formatted;
+};
 
 const ChatAssistant: React.FC = () => {
   // État principal
@@ -352,9 +398,10 @@ const ChatAssistant: React.FC = () => {
             )}
             
             {/* Contenu du message avec formatage amélioré pour les maths */}
-            <div className="prose dark:prose-invert text-base leading-relaxed math-content">
-              {message.content}
-            </div>
+            <div 
+              className="prose dark:prose-invert text-base leading-relaxed math-content"
+              dangerouslySetInnerHTML={{ __html: formatMathContent(message.content) }}
+            ></div>
             
             {/* Actions supplémentaires (réexpliquer, défi) */}
             {message.allowActions && isKora && (
