@@ -781,16 +781,19 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 8L12 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M16 14L12 18L8 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+                    </svg>
                     Indice
-                  </Button>
+                  </button>
                 )}
                 
                 {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
                 {(!message.isChallenge || message.isHint) && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="text-xs h-7"
+                  <button 
+                    className="kora-action-button"
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -813,8 +816,12 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    Donne-moi un exercice
-                  </Button>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 5L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      <path d="M5 12L19 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    Ask Follow Up
+                  </button>
                 )}
               </div>
             )}
