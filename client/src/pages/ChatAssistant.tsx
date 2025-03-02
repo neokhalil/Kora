@@ -748,17 +748,10 @@ const ChatAssistant: React.FC = () => {
                         
                         const data = await response.json();
                         
-                        // Ajouter la demande de l'utilisateur
-                        setMessages(prev => [...prev, {
-                          id: Date.now().toString(),
-                          content: "Peux-tu me donner un indice pour cet exercice?",
-                          sender: 'user',
-                        }]);
-                        
                         // Générer un ID unique pour ce message d'indice
-                        const hintId = (Date.now() + 1).toString();
+                        const hintId = Date.now().toString();
                         
-                        // Ajouter l'indice avec contenu vide au début
+                        // Ajouter l'indice directement (sans message utilisateur)
                         setMessages(prev => [...prev, {
                           id: hintId,
                           content: '',
