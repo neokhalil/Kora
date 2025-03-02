@@ -45,10 +45,12 @@ interface Message {
   isReExplanation?: boolean;
   isChallenge?: boolean;
   isImageAnalysis?: boolean;
+  isHint?: boolean;
   allowActions?: boolean;
   messageId?: string;
   challengeData?: ChallengeData;
   imageUrl?: string | null;
+  challengeId?: string; // Pour associer un indice à un défi spécifique
 }
 
 // Fonction pour formater le contenu mathématique avec KaTeX
@@ -533,20 +535,24 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
+      // Générer un ID unique pour ce défi
+      const challengeId = Date.now().toString();
+      
       // Ajouter la demande de l'utilisateur
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: challengeId + "-req",
         content: "Peux-tu me donner un exercice pour pratiquer?",
         sender: 'user',
       }]);
       
       // Ajouter le défi
       setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
+        id: challengeId,
         content: data.content,
         sender: 'kora',
         isChallenge: true,
         allowActions: true,
+        challengeId: challengeId,
       }]);
     } catch (error) {
       console.error('Erreur lors de la requête de défi:', error);
@@ -594,10 +600,11 @@ const ChatAssistant: React.FC = () => {
               dangerouslySetInnerHTML={{ __html: formatMathContent(message.content) }}
             ></div>
             
-            {/* Actions supplémentaires (réexpliquer, défi) */}
+            {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
               <div className="mt-3 flex flex-wrap gap-2 justify-start">
-                {message.isReExplanation ? null : (
+                {/* Bouton Explique différemment - caché pour les défis */}
+                {(!message.isChallenge && !message.isReExplanation) && (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -628,7 +635,69 @@ const ChatAssistant: React.FC = () => {
                   </Button>
                 )}
                 
-                {message.isChallenge ? null : (
+                {/* Bouton Indice - uniquement visible pour les défis */}
+                {message.isChallenge && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="text-xs h-7"
+                    onClick={async () => {
+                      if (isThinking) return;
+                      
+                      setIsThinking(true);
+                      
+                      try {
+                        // Pour la simplicité, nous utilisons la même fonction de réexplication avec un message spécial
+                        const response = await fetch('/api/tutoring/reexplain', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            originalQuestion: "Indice pour le défi: " + message.content,
+                            originalExplanation: "Génère des indices sans donner la solution complète."
+                          }),
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error('Erreur lors de la requête d\'indice');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Ajouter la demande de l'utilisateur
+                        setMessages(prev => [...prev, {
+                          id: Date.now().toString(),
+                          content: "Peux-tu me donner un indice pour cet exercice?",
+                          sender: 'user',
+                        }]);
+                        
+                        // Ajouter l'indice
+                        setMessages(prev => [...prev, {
+                          id: (Date.now() + 1).toString(),
+                          content: data.content,
+                          sender: 'kora',
+                          isHint: true,
+                          challengeId: message.id,
+                        }]);
+                      } catch (error) {
+                        console.error('Erreur lors de la requête d\'indice:', error);
+                        setMessages(prev => [...prev, {
+                          id: Date.now().toString(),
+                          content: "Désolé, je ne peux pas fournir d'indice pour le moment.",
+                          sender: 'kora',
+                        }]);
+                      } finally {
+                        setIsThinking(false);
+                      }
+                    }}
+                  >
+                    Indice
+                  </Button>
+                )}
+                
+                {/* Bouton exercice - non visible pour les défis */}
+                {!message.isChallenge && !message.isHint && (
                   <Button 
                     variant="outline" 
                     size="sm" 

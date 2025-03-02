@@ -213,17 +213,13 @@ export async function generateChallengeProblem(
         { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. ${subjectSpecificPrompt} The challenge should be slightly more difficult than the original but solvable using the same principles.\n\nIMPORTANT GUIDELINES FOR CHALLENGE PROBLEMS:
 1. Create a structured challenge with clear instructions
 2. The challenge MUST be on the EXACT SAME SUBJECT as the original conversation (${subjectCategory})
-3. Include a step-by-step approach to guide the student without giving away the solution
-4. Provide hints that help them understand how to tackle the problem
-5. Include thinking questions that help them reflect on the approach
-6. End with encouragement and an invitation to try solving it
-7. Structure the challenge in a clear format:
-   - First present the challenge problem clearly
-   - Then provide a "### Guide d'approche" (Approach Guide) section with steps
-   - Include a "### Indices" (Hints) section with 2-3 progressive hints
-   - End with a "### Questions de réflexion" (Reflection Questions) section
-8. NEVER provide the full solution to the challenge problem
-9. DO NOT switch to a different subject - if the conversation was about grammar, don't create a math problem` },
+3. Present ONLY the challenge problem itself clearly and concisely
+4. Include a brief "### Guide d'approche" (Approach Guide) section with just 1-2 sentences of general guidance
+5. DO NOT include any Indices/Hints section - these will be provided separately when requested
+6. DO NOT include any Questions de réflexion section - keep it simple
+7. NEVER provide the full solution to the challenge problem
+8. DO NOT switch to a different subject - if the conversation was about grammar, don't create a math problem
+9. Keep the challenge clear and direct, with minimal extra text` },
         { role: "user", content: originalQuestion },
         { role: "assistant", content: explanation },
         { role: "user", content: "Peux-tu me donner un exercice similaire mais un peu plus difficile pour pratiquer ce concept?" }
