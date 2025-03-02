@@ -140,7 +140,7 @@
 
 /* Styles pour la zone de messages */
 .chat-messages-container {
-  padding-bottom: 160px; /* Espace plus grand pour le compositeur pour éviter les chevauchements */
+  padding-bottom: 180px; /* Espace très important pour le compositeur pour éviter les chevauchements */
   -webkit-overflow-scrolling: touch;
   padding-top: 16px;
   display: flex;
