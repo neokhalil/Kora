@@ -125,12 +125,13 @@ const formatMathContent = (content: string): string => {
   
   // Améliorer la numérotation et les étapes
   formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
-  formatted = formatted.replace(/(\d+)\.\s+([^<])/g, '<strong>$1. $2</strong>');
+  formatted = formatted.replace(/(\d+)\.\s+\*\*(.*?)\*\*/g, '<strong>$1. $2</strong>');
   // Assurer que les variables mathématiques ne sont pas en gras
   formatted = formatted.replace(/<strong>([^<]*?)(\$[^$]+\$)([^<]*?)<\/strong>/g, '<strong>$1</strong>$2<strong>$3</strong>');
   
   // Mettre en valeur les étapes importantes
-  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  formatted = formatted.replace(/\*\*([^*:]+)\*\*/g, '<strong>$1</strong>');
+  formatted = formatted.replace(/\*\*([^*:]+):([^*]*)\*\*/g, '<strong>$1:</strong>$2');
   
   // Mise en forme des résultats intermédiaires
   formatted = formatted.replace(/(Ce qui donne|On obtient|Ce qui nous donne|Ceci donne)\s*:/g, '<div class="result">$1 :</div>');
