@@ -271,8 +271,8 @@ aside {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(240, 255, 240, 0.9);
-  color: rgb(46, 125, 50);
+  background-color: #F0F3F8;
+  color: #2d3648;
   font-size: 0.9rem;
   font-weight: 500;
   border-radius: 999px;
@@ -285,11 +285,7 @@ aside {
 }
 
 .kora-action-button:hover {
-  background-color: rgba(230, 255, 230, 1);
-}
-
-.kora-action-button svg {
-  margin-right: 0.5rem;
+  background-color: #e6eaf2;
 }
 
 /* Masquer tous les headers React */
@@ -313,6 +309,9 @@ header:not(#kora-header) {
   color: white;
   margin-left: auto;
   border-bottom-right-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .kora-message {
