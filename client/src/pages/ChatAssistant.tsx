@@ -201,21 +201,28 @@ const ChatAssistant: React.FC = () => {
     const isKora = message.sender === 'kora';
     
     return (
-      <div key={message.id} className="chat-message mb-4">
-        <div className={`flex ${isKora ? 'justify-start' : 'justify-end'}`}>
-          {isKora && (
-            <div className="flex-shrink-0 mr-3">
+      <div key={message.id} className={`chat-message py-6 px-4 ${isKora ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
+        <div className="max-w-3xl mx-auto flex gap-4">
+          {isKora ? (
+            <div className="flex-shrink-0">
               <Avatar className="h-8 w-8">
-                <div className="flex h-full items-center justify-center bg-blue-600 text-white font-semibold">K</div>
+                <div className="flex h-full items-center justify-center bg-black text-white font-semibold">K</div>
+              </Avatar>
+            </div>
+          ) : (
+            <div className="flex-shrink-0">
+              <Avatar className="h-8 w-8">
+                <div className="flex h-full items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold">U</div>
               </Avatar>
             </div>
           )}
           
-          <div className={`flex flex-col ${isKora ? 'items-start' : 'items-end'}`}>
-            <div className={`flex max-w-[80%] ${isKora ? 'bg-blue-50 dark:bg-gray-700' : 'bg-blue-500 text-white'} rounded-lg py-3 px-4`}>
-              <div className="prose dark:prose-invert text-sm max-w-none">
-                {message.content}
-              </div>
+          <div className="flex-1">
+            <div className="text-sm font-medium mb-1">
+              {isKora ? 'Kora' : 'Vous'}
+            </div>
+            <div className="prose dark:prose-invert text-sm max-w-none">
+              {message.content}
             </div>
           </div>
         </div>
@@ -248,11 +255,24 @@ const ChatAssistant: React.FC = () => {
               
               {/* Indicateur de réflexion */}
               {isThinking && (
-                <div className="flex mb-4">
-                  <div className="bg-blue-50 dark:bg-gray-700 rounded-lg py-3 px-4">
-                    <div className="flex items-center space-x-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
-                      <span className="text-gray-500 text-sm">Réflexion en cours...</span>
+                <div className="chat-message py-6 px-4 bg-gray-50 dark:bg-gray-800">
+                  <div className="max-w-3xl mx-auto flex gap-4">
+                    <div className="flex-shrink-0">
+                      <Avatar className="h-8 w-8">
+                        <div className="flex h-full items-center justify-center bg-black text-white font-semibold">K</div>
+                      </Avatar>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-medium mb-1">
+                        Kora
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="flex space-x-1">
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
