@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Base styles appliqués globalement */
 @layer base {
   * {
     @apply border-border;
@@ -9,22 +10,23 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    padding-top: var(--header-height); /* Espace pour le header fixe */
   }
-  
-  #root {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+}
+
+/* Style du conteneur principal */
+#root {
+  padding-top: calc(var(--header-height) + var(--safe-area-top));
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* Styles pour la liste des messages */
 .chat-messages-container {
   padding-bottom: 120px; /* Espace pour le compositeur */
-  -webkit-overflow-scrolling: touch; /* Scrolling fluide sur iOS */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Style du conteneur de saisie en bas */
@@ -47,7 +49,7 @@
 
 /* S'assurer que les inputs ont la bonne taille de police */
 input, textarea, select, button {
-  font-size: 16px !important; /* Empêche le zoom automatique sur focus */
+  font-size: 16px !important; 
 }
 
 /* Classes pour le menu latéral */
@@ -61,6 +63,7 @@ main {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px;
 }
 
 /* Assurer que le SideNavigation a un bon z-index */
@@ -68,14 +71,55 @@ aside {
   z-index: 950;
 }
 
-/* S'assurer que le formulaire reste visible quand le clavier est ouvert */
-.ios-device .composer-container,
-.android-device .composer-container {
-  bottom: 0 !important;
-  position: fixed !important;
-}
-
 /* Style du bouton d'envoi */
 .send-button {
   @apply h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center;
+}
+
+/* Masquer le header React pour éviter les doublons */
+.app-header {
+  display: none !important;
+}
+
+/* Ajustements pour le header spécial */
+#kora-header {
+  /* Ces règles sont ici pour renforcer celles dans index.html */
+  position: fixed !important;
+  top: 0 !important; 
+  left: 0 !important;
+  width: 100% !important;
+  z-index: 9999 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+/* Support du clavier mobile */
+.keyboard-open .composer-container {
+  position: absolute !important;
+  bottom: 0 !important;
+}
+
+/* Améliorer l'affichage des messages */
+.chat-message {
+  position: relative;
+  max-width: 80%;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #1e88e5;
+  color: white;
+  margin-left: auto;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.kora-message {
+  align-self: flex-start;
+  background-color: #f5f5f5;
+  color: #333;
+  margin-right: auto;
+  border-bottom-left-radius: 0.25rem;
 }

@@ -17,112 +17,199 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <title>Kora - Plateforme Éducative</title>
   
-  <!-- Styles pour le header fixe et les ajustements de mise en page -->
+  <!-- Variables globales -->
   <style>
-    /* Variables globales */
     :root {
       --header-height: 56px;
       --safe-area-top: env(safe-area-inset-top, 0px);
       --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     }
+  </style>
+  
+  <!-- Styles pour le header fixe et les ajustements de mise en page -->
+  <style>
+    /* Réinitialisation de base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     
-    /* Style du header fixe */
-    #fixed-header {
+    html {
+      height: -webkit-fill-available;
+      height: 100%;
+    }
+    
+    body {
+      min-height: 100vh;
+      /* Support mobile */
+      min-height: -webkit-fill-available;
+      width: 100%;
+      padding-top: calc(var(--header-height) + var(--safe-area-top));
+      font-family: 'Inter', sans-serif;
+    }
+    
+    /* Le header primaire qui reste toujours visible */
+    #kora-header {
+      /* Position absolue au viewport */
       position: fixed;
       top: 0;
       left: 0;
-      right: 0;
+      width: 100%;
       height: var(--header-height);
       background-color: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       padding-top: var(--safe-area-top);
+      
+      /* Super z-index pour rester toujours au-dessus */
+      z-index: 9999;
+      
+      /* Disposition interne */
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding-left: 1rem;
       padding-right: 1rem;
+      
+      /* Animation pour une meilleure visibilité */
+      transition: none;
+      
+      /* Forcer la visibilité */
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: flex !important;
     }
     
-    /* Masquer le header React pour éviter la duplication */
-    .app-header {
+    /* Masquer le header React */
+    .app-header,
+    header:not(#kora-header) {
       display: none !important;
     }
     
-    /* Ajuster l'espace pour le contenu principal */
-    body {
-      padding-top: calc(var(--header-height) + var(--safe-area-top));
-    }
-    
-    /* Style pour les entrées de texte */
+    /* Régler les polices pour éviter le zoom sur focus */
     input, textarea, select, button {
-      font-size: 16px !important; /* Empêche le zoom sur iOS */
+      font-size: 16px !important;
     }
     
-    /* Composer en bas de l'écran */
-    .composer-container {
-      background-color: white;
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
-      padding-bottom: var(--safe-area-bottom);
+    /* Centrer les éléments du header */
+    #kora-header-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+      letter-spacing: -0.025em;
+      text-transform: uppercase;
     }
     
-    /* Ajuster l'espace pour les messages */
-    .chat-messages-container {
-      padding-bottom: 120px;
+    /* Éviter le scroll de l'ensemble de la page */
+    body.keyboard-open {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
     }
   </style>
   
   <script>
-    // Création du header fixe
-    document.addEventListener('DOMContentLoaded', function() {
-      // Créer l'élément header
-      const headerElement = document.createElement('div');
-      headerElement.id = 'fixed-header';
+    // Fonction d'initialisation avancée
+    (function() {
+      // Détection de la plateforme
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isAndroid = /Android/.test(navigator.userAgent);
       
-      // Structure du header
-      headerElement.innerHTML = `
-        <div>
-          <button id="menu-toggle" style="background: none; border: none; cursor: pointer; padding: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <div>
-          <h1 style="font-size: 1.25rem; font-weight: bold; letter-spacing: -0.025em; text-transform: uppercase;">Kora</h1>
-        </div>
-        <div style="width: 40px;"></div>
-      `;
+      // Fonction pour créer le header fixe spécial
+      function createStableHeader() {
+        // Créer l'élément avec un ID unique
+        const header = document.createElement('div');
+        header.id = 'kora-header';
+        
+        // Insérer le contenu du header
+        header.innerHTML = `
+          <div>
+            <button id="kora-menu-button" style="background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+          <div>
+            <h1 id="kora-header-title">Kora</h1>
+          </div>
+          <div style="width: 40px;"></div>
+        `;
+        
+        // Placer le header en premier dans le body
+        if (document.body) {
+          document.body.prepend(header);
+        } else {
+          window.addEventListener('DOMContentLoaded', () => {
+            document.body.prepend(header);
+          });
+        }
+        
+        return header;
+      }
       
-      // Ajouter au body
-      document.body.prepend(headerElement);
-      
-      // Ajouter l'écouteur d'événement pour le bouton de menu
-      setTimeout(() => {
-        const menuButton = document.getElementById('menu-toggle');
+      // Function pour configurer les écouteurs d'événements
+      function setupEventListeners() {
+        // Écouteur pour le bouton de menu
+        const menuButton = document.getElementById('kora-menu-button');
         if (menuButton) {
           menuButton.addEventListener('click', function() {
             document.dispatchEvent(new CustomEvent('toggle-menu'));
           });
         }
-      }, 300);
-      
-      // Gestion des événements de focus pour le clavier
-      document.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-          // Forcer le header à rester visible
-          const header = document.getElementById('fixed-header');
-          if (header) {
-            header.style.position = 'fixed';
-            header.style.top = '0';
-            header.style.zIndex = '1000';
+        
+        // Écouteurs pour le clavier
+        document.addEventListener('focusin', function(e) {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Ajouter une classe spéciale au body
+            document.body.classList.add('keyboard-open');
+            
+            // Forcer encore plus le header
+            const header = document.getElementById('kora-header');
+            if (header) {
+              header.style.position = 'fixed';
+              header.style.top = '0';
+              header.style.transform = 'none';
+              header.style.willChange = 'transform';
+              header.style.opacity = '1';
+              header.style.visibility = 'visible';
+              header.style.zIndex = '9999';
+            }
           }
-        }
-      });
-    });
+        });
+        
+        // Quand le focus est perdu
+        document.addEventListener('focusout', function(e) {
+          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            // Enlever la classe spéciale
+            document.body.classList.remove('keyboard-open');
+          }
+        });
+      }
+      
+      // Configuration initiale de la page
+      function setupPage() {
+        // Ajouter des classes pour la détection de plateforme
+        if (isIOS) document.body.classList.add('ios-device');
+        if (isAndroid) document.body.classList.add('android-device');
+        
+        // Créer le header stable
+        createStableHeader();
+        
+        // Configurer les écouteurs d'événements
+        setupEventListeners();
+      }
+      
+      // Exécuter la configuration au chargement
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupPage);
+      } else {
+        setupPage();
+      }
+    })();
   </script>
 </head>
 <body>
