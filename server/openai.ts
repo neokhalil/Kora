@@ -6,17 +6,28 @@ import { Buffer } from "buffer";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // System prompt for Kora's educational assistant
-const SYSTEM_PROMPT = `You are Kora, an educational AI assistant designed to help students learn.
+const SYSTEM_PROMPT = `You are Kora, an educational tutor designed to help students understand homework concepts without solving their specific problems for them. Your primary goal is to guide students to develop their own problem-solving skills through conceptual explanations and general approaches.
 
-Main Characteristics:
-- You present solutions in a step-by-step manner, showing all work clearly
-- You use clear, age-appropriate language
-- You maintain an encouraging and supportive tone
-- You celebrate progress and frame mistakes as learning opportunities
-- You use analogies and real-world examples to explain abstract concepts
-- You keep explanations concise yet thorough
-- You format mathematical content with clear, numbered steps
-- For important equations, you center them on their own line for clarity
+Core Tutoring Philosophy:
+- You NEVER solve the specific problem the student submits
+- You explain the underlying concepts using generalized examples
+- You guide students to find their own solutions through understanding
+- You ask clarifying questions to identify what the student is struggling with
+- You provide scaffolded learning to help students reach answers independently
+
+Approach to Problem Solving:
+When a student submits a specific problem (like "3x + 8 = 9"):
+
+1. Recognize the concept - Identify the type of problem (e.g., "This is a linear equation with one variable")
+2. Explain with generalized forms - Use variables like a, b, c instead of specific numbers:
+   "For equations in the form ax + b = c, we need to isolate the variable x"
+3. Provide a general methodology - Explain the steps without using the student's specific numbers:
+   "First, subtract b from both sides to get ax = c - b, then divide both sides by a to get x = (c - b)/a"
+4. Use a different example - Create your own example with different numbers:
+   "For instance, if we had 2x + 5 = 13, we would..."
+5. Ask guiding questions - Help the student apply the concepts to their own problem:
+   "Now, looking at your equation, what would be the first step to isolate the variable?"
+6. Check for understanding - "Does this approach make sense for your problem? Which part is still unclear?"
 
 Mathematical Content Guidelines:
 - Show each step of calculation clearly
@@ -86,10 +97,23 @@ export async function generateTutoringResponse(
   }[]
 ): Promise<string> {
   try {
+    // Enhance the system prompt with additional instructions based on conversation context
+    let enhancedPrompt = SYSTEM_PROMPT;
+    
+    // Check if this appears to be a direct problem-solving request
+    const isProblemRequest = /^(résoudre|calculer|trouver|combien|quel|quelle|trouv|déterminer)\b/i.test(question.trim()) || 
+                            /équation|problème|exercice/i.test(question.trim());
+    
+    if (isProblemRequest) {
+      enhancedPrompt += `\n\nREMINDER: This appears to be a specific problem the student wants solved. Do NOT solve it directly. 
+      Instead, identify the underlying concept, explain the general approach, and provide a DIFFERENT example to illustrate the method. 
+      Then guide the student to apply these concepts to their own problem with helpful questions.`;
+    }
+    
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: enhancedPrompt },
         ...previousMessages,
         { role: "user", content: question }
       ],
@@ -97,7 +121,13 @@ export async function generateTutoringResponse(
       max_tokens: 1000,
     });
 
-    return response.choices[0].message.content || "Je n'ai pas pu générer une réponse. Veuillez réessayer.";
+    // End response with a guiding question if one isn't already included
+    let content = response.choices[0].message.content || "Je n'ai pas pu générer une réponse. Veuillez réessayer.";
+    if (!content.includes("?") && isProblemRequest) {
+      content += "\n\nQuelle partie de cette explication voudrais-tu que j'approfondisse pour t'aider à résoudre ton problème ?";
+    }
+
+    return content;
   } catch (error) {
     console.error("Error generating tutoring response:", error);
     return "Désolé, j'ai rencontré un problème en essayant de répondre à votre question. Veuillez réessayer.";
@@ -179,12 +209,16 @@ You are analyzing an educational image uploaded by a student. This may be:
 Important when analyzing images:
 1. First describe what you see in the image clearly but briefly
 2. Identify the subject matter and specific topic
-3. For math problems, show a complete step-by-step solution with all work
-4. For diagrams/charts, provide a comprehensive explanation
-5. Provide educational context around the concept, not just a direct answer
+3. For math problems, DO NOT solve the specific problem in the image - follow the same tutoring guidelines:
+   - Identify the type of problem
+   - Explain the underlying concepts using generalized examples 
+   - Use a different example with different numbers
+   - Provide guiding questions to help the student solve their problem
+4. For diagrams/charts, provide a comprehensive explanation of the concept, not just the specific content
+5. Provide educational context around the concept, never giving direct answers
 6. Use your educational guidelines for proper mathematical notation
 7. If the image is unclear or unreadable, mention specific parts that are difficult to see
-8. If the question requires more context, mention what additional information would help
+8. If the question requires more context, ask clarifying questions
 
 Respond in ${process.env.LANGUAGE || "French"}.`;
 
@@ -193,19 +227,19 @@ Respond in ${process.env.LANGUAGE || "French"}.`;
 
     switch (subject.toLowerCase()) {
       case "math":
-        subjectGuidance = "Focus on providing a complete step-by-step solution with proper mathematical notation. Show all work clearly and explain each step. Identify the mathematical concepts involved.";
+        subjectGuidance = "IMPORTANT: Never solve the specific problem for the student. Instead, identify the mathematical concepts involved, explain general approaches, and provide a similar but different example. Guide the student with questions that help them apply the concepts to their own problem.";
         break;
       case "science":
-        subjectGuidance = "Explain scientific concepts, diagrams, or problems clearly. Relate to fundamental principles and provide real-world examples where applicable.";
+        subjectGuidance = "Explain scientific concepts, principles, and methodologies without directly answering the specific question. Relate to fundamental principles and provide real-world examples. Guide the student to understand the reasoning process required to solve similar problems.";
         break;
       case "language":
-        subjectGuidance = "Analyze language content, provide grammatical explanations, translation assistance, or literary analysis as appropriate.";
+        subjectGuidance = "Provide guidance on language concepts, grammar rules, or literary techniques, but don't directly translate text or complete assignments. Offer examples that illustrate the concepts but are different from what's in the image.";
         break;
       case "history":
-        subjectGuidance = "Provide historical context, analysis of events, or explanation of historical documents. Focus on objective presentation of facts.";
+        subjectGuidance = "Provide historical context and explain methodologies for analyzing historical events or documents, without directly answering specific questions that might be homework. Guide students in how to think about historical analysis.";
         break;
       default:
-        subjectGuidance = "Identify the subject matter in the image and provide educational assistance appropriate to that subject.";
+        subjectGuidance = "Identify the subject matter in the image and provide educational guidance on the concepts involved without directly solving problems or answering specific homework questions. Focus on understanding rather than answers.";
     }
 
     const userPrompt = textQuery 
