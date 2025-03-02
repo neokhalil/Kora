@@ -201,22 +201,16 @@ const ChatAssistant: React.FC = () => {
     const isKora = message.sender === 'kora';
     
     return (
-      <div key={message.id} className={`chat-message py-6 px-4 ${isKora ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
-        <div className="max-w-3xl mx-auto flex gap-4">
-          <div className="flex-shrink-0 flex items-center justify-center">
-            {isKora ? (
-              <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold">
-                K
-              </div>
-            ) : (
-              <div className="h-9 w-9 rounded-full bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 flex items-center justify-center font-semibold">
-                U
-              </div>
-            )}
-          </div>
-          
-          <div className="flex-1">
-            <div className="prose dark:prose-invert text-sm max-w-none">
+      <div key={message.id} className="px-4 py-2 mb-4">
+        <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
+          <div 
+            className={`inline-block rounded-2xl px-4 py-3 max-w-[80%] ${
+              isKora 
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" 
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none"
+            }`}
+          >
+            <div className="prose dark:prose-invert text-base leading-relaxed">
               {message.content}
             </div>
           </div>
@@ -250,20 +244,13 @@ const ChatAssistant: React.FC = () => {
               
               {/* Indicateur de réflexion */}
               {isThinking && (
-                <div className="chat-message py-6 px-4 bg-gray-50 dark:bg-gray-800">
-                  <div className="max-w-3xl mx-auto flex gap-4">
-                    <div className="flex-shrink-0 flex items-center justify-center">
-                      <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold">
-                        K
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <div className="flex space-x-1">
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-                        </div>
+                <div className="px-4 py-2 mb-4">
+                  <div className="max-w-3xl mx-auto">
+                    <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                      <div className="flex space-x-1">
+                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                       </div>
                     </div>
                   </div>
