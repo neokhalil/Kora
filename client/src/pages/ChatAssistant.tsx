@@ -123,9 +123,13 @@ const formatMathContent = (content: string): string => {
   // Améliorer les titres et les étapes
   formatted = formatted.replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>');
   
+  // Sections avec ###
+  formatted = formatted.replace(/###\s*(.*?)$/gm, '<h3>$1</h3>');
+  
   // Améliorer la numérotation et les étapes
   formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
-  formatted = formatted.replace(/(\d+)\.\s+\*\*(.*?)\*\*/g, '<strong>$1. $2</strong>');
+  formatted = formatted.replace(/(\d+)\.\s+([^\*<$][^<]*)/g, '<strong>$1.</strong> $2');
+  
   // Assurer que les variables mathématiques ne sont pas en gras
   formatted = formatted.replace(/<strong>([^<]*?)(\$[^$]+\$)([^<]*?)<\/strong>/g, '<strong>$1</strong>$2<strong>$3</strong>');
   
@@ -310,6 +314,7 @@ const ChatAssistant: React.FC = () => {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
+        allowActions: true,
       }]);
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
@@ -414,6 +419,7 @@ const ChatAssistant: React.FC = () => {
         content: data.content,
         sender: 'kora',
         isImageAnalysis: true,
+        allowActions: true,
       }]);
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
@@ -441,6 +447,114 @@ const ChatAssistant: React.FC = () => {
   };
   
   // Fonction pour afficher les messages
+  // Fonction pour demander une nouvelle explication
+  const handleRequestReExplanation = async (originalQuestion: string, originalExplanation: string) => {
+    if (isThinking) return;
+    
+    setIsThinking(true);
+    
+    try {
+      // Appel API pour la réexplication
+      const response = await fetch('/api/tutoring/reexplain', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          originalQuestion,
+          originalExplanation
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête de réexplication');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la demande de l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Peux-tu me l'expliquer différemment ?",
+        sender: 'user',
+      }]);
+      
+      // Ajouter la nouvelle explication
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        content: data.content,
+        sender: 'kora',
+        isReExplanation: true,
+        allowActions: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la requête de réexplication:', error);
+      
+      // Message d'erreur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, je ne peux pas fournir une explication alternative pour le moment.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+  
+  // Fonction pour demander un problème de défi
+  const handleRequestChallenge = async (originalQuestion: string, explanation: string) => {
+    if (isThinking) return;
+    
+    setIsThinking(true);
+    
+    try {
+      // Appel API pour le défi
+      const response = await fetch('/api/tutoring/challenge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          originalQuestion,
+          explanation
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête de défi');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la demande de l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Peux-tu me donner un exercice pour pratiquer?",
+        sender: 'user',
+      }]);
+      
+      // Ajouter le défi
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        content: data.content,
+        sender: 'kora',
+        isChallenge: true,
+        allowActions: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la requête de défi:', error);
+      
+      // Message d'erreur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, je ne peux pas créer un défi pour le moment.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
   const renderMessage = (message: Message) => {
     const isKora = message.sender === 'kora';
     
@@ -474,7 +588,7 @@ const ChatAssistant: React.FC = () => {
             ></div>
             
             {/* Actions supplémentaires (réexpliquer, défi) */}
-            {message.allowActions && isKora && (
+            {isKora && (
               <div className="mt-3 flex flex-wrap gap-2 justify-start">
                 {message.isReExplanation ? null : (
                   <Button 
@@ -482,7 +596,25 @@ const ChatAssistant: React.FC = () => {
                     size="sm" 
                     className="text-xs h-7"
                     onClick={() => {
-                      // Implémenter la réexplication
+                      // Trouver le message d'utilisateur précédent
+                      const messagesArray = [...messages];
+                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
+                      let userMessageIndex = -1;
+                      
+                      // Chercher le message utilisateur le plus récent avant cette réponse
+                      for (let i = currentIndex - 1; i >= 0; i--) {
+                        if (messagesArray[i].sender === 'user') {
+                          userMessageIndex = i;
+                          break;
+                        }
+                      }
+                      
+                      if (userMessageIndex !== -1) {
+                        handleRequestReExplanation(
+                          messagesArray[userMessageIndex].content,
+                          message.content
+                        );
+                      }
                     }}
                   >
                     Explique différemment
@@ -495,7 +627,25 @@ const ChatAssistant: React.FC = () => {
                     size="sm" 
                     className="text-xs h-7"
                     onClick={() => {
-                      // Implémenter le défi
+                      // Trouver le message d'utilisateur précédent
+                      const messagesArray = [...messages];
+                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
+                      let userMessageIndex = -1;
+                      
+                      // Chercher le message utilisateur le plus récent avant cette réponse
+                      for (let i = currentIndex - 1; i >= 0; i--) {
+                        if (messagesArray[i].sender === 'user') {
+                          userMessageIndex = i;
+                          break;
+                        }
+                      }
+                      
+                      if (userMessageIndex !== -1) {
+                        handleRequestChallenge(
+                          messagesArray[userMessageIndex].content,
+                          message.content
+                        );
+                      }
                     }}
                   >
                     Donne-moi un exercice

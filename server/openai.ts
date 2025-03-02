@@ -121,10 +121,16 @@ export async function generateTutoringResponse(
       max_tokens: 1000,
     });
 
-    // End response with a guiding question if one isn't already included
+    // Format content and add structured clarification questions
     let content = response.choices[0].message.content || "Je n'ai pas pu générer une réponse. Veuillez réessayer.";
-    if (!content.includes("?") && isProblemRequest) {
-      content += "\n\nQuelle partie de cette explication voudrais-tu que j'approfondisse pour t'aider à résoudre ton problème ?";
+    
+    // Ensure proper formatting at the end of the response
+    if (isProblemRequest) {
+      // Check if there's already a question section
+      if (!content.includes("Questions de clarification") && !content.includes("questions suivantes")) {
+        // Add a structured clarification questions section
+        content += `\n\n### Questions de clarification\n\n1. Quelle partie de cette explication n'est pas claire pour toi ?\n2. En appliquant ces principes à ton problème spécifique, où te sens-tu bloqué(e) ?\n3. Souhaites-tu voir un autre exemple similaire ?\n\nN'hésite pas à me dire ce qui t'aiderait le plus à comprendre ce concept !`;
+      }
     }
 
     return content;
