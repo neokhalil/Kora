@@ -8,7 +8,7 @@ const Header: React.FC = () => {
   
   return (
     <header 
-      className="app-header bg-white dark:bg-gray-900 border-b border-gray-200/10 w-full"
+      className="app-header bg-white dark:bg-gray-900 w-full"
       style={{
         height: 'var(--header-height)',
         paddingTop: 'var(--safe-area-top, 0px)',
