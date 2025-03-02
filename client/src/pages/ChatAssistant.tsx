@@ -713,9 +713,6 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4 16V17C4 19.2091 5.79086 21 8 21H16C18.2091 21 20 19.2091 20 17V16M4 8V7C4 4.79086 5.79086 3 8 3H16C18.2091 3 20 4.79086 20 7V8M2 12H22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
                     Ré-explique
                   </button>
                 )}
