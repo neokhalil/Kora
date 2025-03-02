@@ -175,26 +175,60 @@ export async function generateChallengeProblem(
   explanation: string
 ): Promise<string> {
   try {
+    // Analyser le contexte pour déterminer le sujet
+    const subjectAnalysisResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { 
+          role: "system", 
+          content: "Analyze the conversation and determine the primary subject or concept being discussed. Is it mathematics, language (grammar, conjugation, etc.), science, history, or something else? Return ONLY the subject category as a single word." 
+        },
+        { role: "user", content: originalQuestion },
+        { role: "assistant", content: explanation }
+      ],
+      temperature: 0.3,
+      max_tokens: 50,
+    });
+    
+    const subjectCategory = subjectAnalysisResponse.choices[0].message.content?.trim().toLowerCase() || "general";
+    console.log("Detected subject category:", subjectCategory);
+    
+    // Construire les guidelines adaptées au sujet
+    let subjectSpecificPrompt = "";
+    if (subjectCategory.includes("math") || subjectCategory.includes("équation") || subjectCategory.includes("algebre")) {
+      subjectSpecificPrompt = `Create a mathematical challenge problem that tests the same concepts from the original question.`;
+    } else if (subjectCategory.includes("language") || subjectCategory.includes("grammaire") || subjectCategory.includes("conjugaison") || subjectCategory.includes("français") || subjectCategory.includes("subjonctif")) {
+      subjectSpecificPrompt = `Create a grammar or language exercise that tests the same linguistic concepts (like verb conjugation, grammar rules, or syntax) from the original conversation. DO NOT create a math problem.`;
+    } else if (subjectCategory.includes("science") || subjectCategory.includes("physique") || subjectCategory.includes("chimie") || subjectCategory.includes("biologie")) {
+      subjectSpecificPrompt = `Create a science challenge that tests the same scientific concepts from the original conversation.`;
+    } else if (subjectCategory.includes("histoire") || subjectCategory.includes("history")) {
+      subjectSpecificPrompt = `Create a history-related challenge that tests understanding of historical concepts or analysis methods from the original conversation.`;
+    } else {
+      subjectSpecificPrompt = `Create a challenge that is directly related to the subject matter of the original question and explanation. Make sure it tests the same concepts.`;
+    }
+
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. Generate a related problem of slightly higher difficulty that tests the same concept. The problem should be challenging but solvable using the same principles.\n\nIMPORTANT GUIDELINES FOR CHALLENGE PROBLEMS:
+        { role: "system", content: `${SYSTEM_PROMPT}\n\nThe student has requested a challenge problem. ${subjectSpecificPrompt} The challenge should be slightly more difficult than the original but solvable using the same principles.\n\nIMPORTANT GUIDELINES FOR CHALLENGE PROBLEMS:
 1. Create a structured challenge with clear instructions
-2. Include a step-by-step approach to guide the student without giving away the solution
-3. Provide hints that help them understand how to tackle the problem
-4. Include thinking questions that help them reflect on the approach
-5. End with encouragement and an invitation to try solving it
-6. Structure the challenge in a clear format:
+2. The challenge MUST be on the EXACT SAME SUBJECT as the original conversation (${subjectCategory})
+3. Include a step-by-step approach to guide the student without giving away the solution
+4. Provide hints that help them understand how to tackle the problem
+5. Include thinking questions that help them reflect on the approach
+6. End with encouragement and an invitation to try solving it
+7. Structure the challenge in a clear format:
    - First present the challenge problem clearly
    - Then provide a "### Guide d'approche" (Approach Guide) section with steps
    - Include a "### Indices" (Hints) section with 2-3 progressive hints
    - End with a "### Questions de réflexion" (Reflection Questions) section
-7. NEVER provide the full solution to the challenge problem` },
+8. NEVER provide the full solution to the challenge problem
+9. DO NOT switch to a different subject - if the conversation was about grammar, don't create a math problem` },
         { role: "user", content: originalQuestion },
         { role: "assistant", content: explanation },
-        { role: "user", content: "Peux-tu me donner un problème similaire mais un peu plus difficile pour me mettre au défi?" }
+        { role: "user", content: "Peux-tu me donner un exercice similaire mais un peu plus difficile pour pratiquer ce concept?" }
       ],
-      temperature: 0.8,
+      temperature: 0.7,
       max_tokens: 1000,
     });
 
