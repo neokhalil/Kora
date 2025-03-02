@@ -15,6 +15,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Importation des polices Elza et Tenon via @font-face -->
+  <style>
+    @font-face {
+      font-family: 'Elza';
+      src: url('https://cdn.jsdelivr.net/gh/korabrand/test-fonts/ElzaText-Black.woff2') format('woff2');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    
+    @font-face {
+      font-family: 'Tenon';
+      src: url('https://cdn.jsdelivr.net/gh/korabrand/test-fonts/Tenon-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
   <title>Kora - Plateforme Éducative</title>
   
   <style>
@@ -87,10 +105,12 @@
     }
     
     #kora-header-title {
-      font-size: 1.25rem;
-      font-weight: bold;
+      font-family: 'Elza', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
       letter-spacing: -0.025em;
       text-transform: uppercase;
+      margin-left: 8px;
     }
     
     #kora-menu-button {
@@ -101,6 +121,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    
+    /* Container pour le menu et le titre, pour les mettre ensemble */
+    .header-left-group {
+      display: flex;
+      align-items: center;
+      flex: 1;
     }
     
     /* Masquer tous les autres headers */
@@ -139,15 +166,17 @@
         
         // Contenu du header
         header.innerHTML = `
-          <button id="kora-menu-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
-          <h1 id="kora-header-title">Kora</h1>
+          <div class="header-left-group">
+            <button id="kora-menu-button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <h1 id="kora-header-title">Kora</h1>
+          </div>
           <div style="width: 40px;"></div>
         `;
         

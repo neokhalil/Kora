@@ -9,7 +9,9 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply antialiased bg-background text-foreground;
+    font-family: 'Tenon', 'Inter', sans-serif;
+    font-weight: 500;
   }
 }
 
@@ -42,7 +44,9 @@
 
 /* S'assurer que les inputs ont la bonne taille de police */
 input, textarea, select, button {
-  font-size: 16px !important; 
+  font-size: 16px !important;
+  font-family: 'Tenon', 'Inter', sans-serif;
+  font-weight: 500;
 }
 
 /* Classes pour le menu latéral */

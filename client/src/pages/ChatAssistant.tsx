@@ -95,29 +95,7 @@ const ChatAssistant: React.FC = () => {
   
   // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
   useEffect(() => {
-    // Ajouter une classe pour indiquer que le Visual Viewport API est actif
-    const visualViewport = window.visualViewport;
-    if (visualViewport) {
-      document.body.classList.add('visual-viewport-supported');
-      
-      // Fonction de gestion du redimensionnement
-      const handleViewportResize = () => {
-        if (visualViewport.height < window.innerHeight) {
-          // Le clavier est probablement ouvert
-          document.body.classList.add('keyboard-open');
-          document.body.classList.add('visual-viewport-active');
-        } else {
-          // Le clavier est probablement fermé
-          document.body.classList.remove('keyboard-open');
-          document.body.classList.remove('visual-viewport-active');
-        }
-      };
-      
-      // Écouter les changements de dimension du viewport visuel (quand le clavier apparaît)
-      visualViewport.addEventListener('resize', handleViewportResize);
-    }
-    
-    // Supprimer les modifications du DOM standard, car nous utilisons maintenant notre propre header
+    // Gestion des événements de focus
     const handleFocusIn = () => {
       // Assurer que le clavier s'ouvre correctement
       document.body.classList.add('keyboard-open');
@@ -128,19 +106,35 @@ const ChatAssistant: React.FC = () => {
       document.body.classList.remove('keyboard-open');
     };
     
+    // Gestion des événements du Visual Viewport API (pour iOS)
+    const handleVisualViewportChange = () => {
+      const vv = window.visualViewport;
+      if (vv && vv.height < window.innerHeight) {
+        document.body.classList.add('keyboard-open');
+        document.body.classList.add('visual-viewport-active');
+      } else {
+        document.body.classList.remove('keyboard-open');
+        document.body.classList.remove('visual-viewport-active');
+      }
+    };
+    
+    // Enregistrement des écouteurs d'événements
     document.addEventListener('focusin', handleFocusIn);
     document.addEventListener('focusout', handleFocusOut);
+    
+    // Si VisualViewport API est disponible (principalement iOS)
+    if (window.visualViewport) {
+      document.body.classList.add('visual-viewport-supported');
+      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+    }
     
     // Fonction de nettoyage
     return () => {
       document.removeEventListener('focusin', handleFocusIn);
       document.removeEventListener('focusout', handleFocusOut);
       
-      // Si Visual Viewport API est disponible, supprimer l'écouteur d'événements
-      const viewport = window.visualViewport;
-      if (viewport) {
-        // Référence à la fonction de gestion définie plus tôt
-        viewport.removeEventListener('resize', handleViewportResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
       }
     };
   }, []);
