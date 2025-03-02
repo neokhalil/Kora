@@ -301,7 +301,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Composeur de message style iOS */}
             <div 
-              className="bg-gray-100 dark:bg-gray-800 p-4 rounded-3xl"
+              className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
               ref={composerRef}
               onFocus={() => {
                 // Déclenche la classe keyboard-open pour adapter l'UI
@@ -328,8 +328,46 @@ const ChatAssistant: React.FC = () => {
               />
               
               <div className="flex items-center justify-between gap-2">
+                {/* Boutons d'action à gauche */}
+                <div className="flex gap-2">
+                  {/* Bouton galerie */}
+                  <button
+                    type="button"
+                    disabled={isThinking || isUploadingImage}
+                    onClick={handleOpenFileBrowser}
+                    title="Choisir une image"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                  >
+                    <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                  </button>
+                  
+                  {/* Bouton appareil photo (mobile uniquement) */}
+                  {isMobileDevice && (
+                    <button
+                      type="button"
+                      disabled={isThinking || isUploadingImage}
+                      onClick={() => {
+                        const tempInput = document.createElement('input');
+                        tempInput.type = 'file';
+                        tempInput.accept = 'image/*';
+                        tempInput.capture = 'environment';
+                        
+                        tempInput.onchange = (e) => {
+                          handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
+                        };
+                        
+                        tempInput.click();
+                      }}
+                      title="Prendre une photo"
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                    >
+                      <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                    </button>
+                  )}
+                </div>
+                
                 {/* Champ de saisie au centre */}
-                <div className="flex items-center flex-1">
+                <div className="flex items-center flex-1 px-2">
                   <Input
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
@@ -359,74 +397,60 @@ const ChatAssistant: React.FC = () => {
                   />
                 </div>
                 
-                {/* Boutons d'action à gauche */}
-                <div className="flex gap-2">
-                  {/* Bouton galerie */}
-                  <button
-                    type="button"
-                    disabled={isThinking || isUploadingImage}
-                    onClick={handleOpenFileBrowser}
-                    title="Choisir une image"
-                    className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                  >
-                    <ImageIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-                  </button>
-                  
-                  {/* Bouton appareil photo (mobile uniquement) */}
-                  {isMobileDevice && (
+                {/* Conteneur à droite pour les boutons micro et envoi */}
+                <div className="flex items-center gap-2">
+                  {/* Bouton d'envoi - visible seulement si du texte est présent */}
+                  {inputValue.trim() ? (
                     <button
                       type="button"
+                      onClick={handleSendMessage}
                       disabled={isThinking || isUploadingImage}
-                      onClick={() => {
-                        const tempInput = document.createElement('input');
-                        tempInput.type = 'file';
-                        tempInput.accept = 'image/*';
-                        tempInput.capture = 'environment';
-                        
-                        tempInput.onchange = (e) => {
-                          handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                        };
-                        
-                        tempInput.click();
-                      }}
-                      title="Prendre une photo"
-                      className="w-9 h-9 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
                     >
-                      <Camera className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-5 w-5"
+                      >
+                        <path
+                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
+                        />
+                      </svg>
                     </button>
+                  ) : (
+                    /* Bouton microphone */
+                    <div className="w-10 h-10 flex items-center justify-center">
+                      <VoiceRecorder 
+                        onTranscriptionComplete={(text) => {
+                          setInputValue(text);
+                          
+                          if (text.trim().length > 0) {
+                            const userMessage: Message = {
+                              id: Date.now().toString(),
+                              content: text,
+                              sender: 'user',
+                            };
+                            
+                            setMessages(prev => [...prev, userMessage]);
+                            setIsThinking(true);
+                            
+                            setTimeout(() => {
+                              setIsThinking(false);
+                              setMessages(prev => [...prev, {
+                                id: Date.now().toString(),
+                                content: "Je suis KORA, ton assistant d'études. Comment puis-je t'aider aujourd'hui avec tes mathématiques ou sciences?",
+                                sender: 'kora',
+                              }]);
+                            }, 1500);
+                          }
+                        }}
+                        disabled={isThinking || isUploadingImage}
+                        maxRecordingTimeMs={30000}
+                        language="fr"
+                      />
+                    </div>
                   )}
-                </div>
-                
-                {/* Bouton microphone */}
-                <div className="flex items-center ml-2">
-                  <VoiceRecorder 
-                    onTranscriptionComplete={(text) => {
-                      setInputValue(text);
-                      
-                      if (text.trim().length > 0) {
-                        const userMessage: Message = {
-                          id: Date.now().toString(),
-                          content: text,
-                          sender: 'user',
-                        };
-                        
-                        setMessages(prev => [...prev, userMessage]);
-                        setIsThinking(true);
-                        
-                        setTimeout(() => {
-                          setIsThinking(false);
-                          setMessages(prev => [...prev, {
-                            id: Date.now().toString(),
-                            content: "Je suis KORA, ton assistant d'études. Comment puis-je t'aider aujourd'hui avec tes mathématiques ou sciences?",
-                            sender: 'kora',
-                          }]);
-                        }, 1500);
-                      }
-                    }}
-                    disabled={isThinking || isUploadingImage}
-                    maxRecordingTimeMs={30000}
-                    language="fr"
-                  />
                 </div>
               </div>
             </div>

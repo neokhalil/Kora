@@ -427,7 +427,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors 
+          className="relative bg-black hover:bg-gray-800 text-white transition-colors 
                      h-10 w-10 rounded-full
                      active:scale-95 transform transition-transform
                      touch-manipulation"
