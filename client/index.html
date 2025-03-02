@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, target-densitydpi=device-dpi" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#64748B" />
   <meta name="description" content="Kora - Plateforme éducative d'aide aux devoirs et de préparation aux examens" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <title>Kora - Plateforme Éducative</title>
   
-  <!-- Styles de base avec une approche très simple -->
+  <!-- Styles pour le header fixe et les ajustements de mise en page -->
   <style>
     /* Variables globales */
     :root {
@@ -26,176 +26,103 @@
       --safe-area-bottom: env(safe-area-inset-bottom, 0px);
     }
     
-    /* Réinitialisation de base */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    html, body {
-      width: 100%;
-      height: 100%;
-      font-family: 'Inter', sans-serif;
-      overflow: hidden;
-      position: fixed;
-    }
-    
-    /* Conteneur principal */
-    #root {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
-    
-    /* Désactiver les styles React sur le header original pour éviter le double header */
-    .app-header {
-      display: none !important;
-    }
-    
-    /* Contenu scrollable */
-    .app-content {
-      position: fixed;
-      top: calc(var(--header-height) + var(--safe-area-top));
-      left: 0;
-      right: 0;
-      bottom: 0;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    
-    /* La barre de fond à l'endroit où le clavier apparaît */
-    #keyboard-fix {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 500px;  /* Hauteur délibérément grande pour couvrir le clavier */
-      background-color: transparent;
-      z-index: -1;
-    }
-    
-    /* Composeur en bas */
-    .composer-container {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding-bottom: var(--safe-area-bottom);
-      background-color: white;
-      border-top: 1px solid rgba(0, 0, 0, 0.1);
-      z-index: 100;
-    }
-    
-    /* Header fixe qui ne peut jamais disparaître */
-    #permanent-header {
+    /* Style du header fixe */
+    #fixed-header {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       height: var(--header-height);
-      padding-top: var(--safe-area-top);
       background-color: white;
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-      z-index: 999999;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding-top: var(--safe-area-top);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-left: 16px;
-      padding-right: 16px;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
     
-    /* Empêcher le changement de taille des polices sur focus (mobile) */
+    /* Masquer le header React pour éviter la duplication */
+    .app-header {
+      display: none !important;
+    }
+    
+    /* Ajuster l'espace pour le contenu principal */
+    body {
+      padding-top: calc(var(--header-height) + var(--safe-area-top));
+    }
+    
+    /* Style pour les entrées de texte */
     input, textarea, select, button {
-      font-size: 16px !important;
+      font-size: 16px !important; /* Empêche le zoom sur iOS */
     }
     
-    /* Ajouter de l'espace en bas */
-    .messages-container {
-      padding-bottom: 160px;
+    /* Composer en bas de l'écran */
+    .composer-container {
+      background-color: white;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding-bottom: var(--safe-area-bottom);
+    }
+    
+    /* Ajuster l'espace pour les messages */
+    .chat-messages-container {
+      padding-bottom: 120px;
     }
   </style>
   
   <script>
-    // Fonction d'initialisation qui s'exécute immédiatement 
-    (function() {
-      // Créer un élément de header permanent qui ne peut jamais disparaître
-      function createHeader() {
-        // Créer le conteneur de header
-        const header = document.createElement('div');
-        header.id = 'permanent-header';
-        
-        // Structure interne du header
-        header.innerHTML = `
-          <div>
-            <button id="menu-toggle" style="background: none; border: none; cursor: pointer; padding: 8px;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
-          </div>
-          <div>
-            <h1 style="font-size: 1.25rem; font-weight: bold; letter-spacing: -0.025em; text-transform: uppercase;">Kora</h1>
-          </div>
-          <div style="width: 40px;"></div>
-        `;
-        
-        // Ajouter au document
-        document.body.appendChild(header);
-        
-        // Ajouter l'élément qui empêche le clavier de pousser la page
-        const keyboardFix = document.createElement('div');
-        keyboardFix.id = 'keyboard-fix';
-        document.body.appendChild(keyboardFix);
-        
-        // Gestionnaire d'événements pour le menu
-        setTimeout(() => {
-          const menuButton = document.getElementById('menu-toggle');
-          if (menuButton) {
-            menuButton.addEventListener('click', function() {
-              document.dispatchEvent(new CustomEvent('toggle-menu'));
-            });
-          }
-        }, 500);
-      }
+    // Création du header fixe
+    document.addEventListener('DOMContentLoaded', function() {
+      // Créer l'élément header
+      const headerElement = document.createElement('div');
+      headerElement.id = 'fixed-header';
       
-      // S'assurer que le header est créé après le chargement du DOM
-      document.addEventListener('DOMContentLoaded', function() {
-        createHeader();
-        
-        // Détection de l'appareil pour les styles spécifiques
-        const UA = navigator.userAgent;
-        const isIOS = /iPhone|iPad|iPod/i.test(UA);
-        const isAndroid = /Android/i.test(UA);
-        
-        if (isIOS) document.body.classList.add('ios-device');
-        if (isAndroid) document.body.classList.add('android-device');
-        
-        // Empêcher le scroll du document lorsque le clavier est affiché
-        document.addEventListener('focusin', function(e) {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            // Assurer que le header reste visible
-            const header = document.getElementById('permanent-header');
-            if (header) {
-              header.style.position = 'fixed';
-              header.style.top = '0';
-              header.style.transform = 'none';
-              header.style.opacity = '1';
-              header.style.visibility = 'visible';
-            }
+      // Structure du header
+      headerElement.innerHTML = `
+        <div>
+          <button id="menu-toggle" style="background: none; border: none; cursor: pointer; padding: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div>
+          <h1 style="font-size: 1.25rem; font-weight: bold; letter-spacing: -0.025em; text-transform: uppercase;">Kora</h1>
+        </div>
+        <div style="width: 40px;"></div>
+      `;
+      
+      // Ajouter au body
+      document.body.prepend(headerElement);
+      
+      // Ajouter l'écouteur d'événement pour le bouton de menu
+      setTimeout(() => {
+        const menuButton = document.getElementById('menu-toggle');
+        if (menuButton) {
+          menuButton.addEventListener('click', function() {
+            document.dispatchEvent(new CustomEvent('toggle-menu'));
+          });
+        }
+      }, 300);
+      
+      // Gestion des événements de focus pour le clavier
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+          // Forcer le header à rester visible
+          const header = document.getElementById('fixed-header');
+          if (header) {
+            header.style.position = 'fixed';
+            header.style.top = '0';
+            header.style.zIndex = '1000';
           }
-        }, false);
-        
-        // Réinitialiser quand le clavier se ferme
-        document.addEventListener('focusout', function(e) {
-          if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            // Rien à faire, le header reste en place
-          }
-        }, false);
+        }
       });
-    })();
+    });
   </script>
 </head>
 <body>

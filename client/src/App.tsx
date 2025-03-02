@@ -8,16 +8,16 @@ import SideNavigation from "@/components/layout/SideNavigation";
 import ChatAssistant from "@/pages/ChatAssistant";
 import { MenuProvider, useMenu } from "@/hooks/use-menu";
 
-// Configuration des routes simples
+// Configuration des routes
 const routes = [
   { path: "/", Component: ChatAssistant }
 ];
 
-// Application principale
-const App: React.FC = () => {
-  const { toggleMenu } = useMenu();
+// App avec menu latéral
+const AppContainer = () => {
+  const { isMenuOpen, toggleMenu } = useMenu();
   
-  // Écouter l'événement toggle-menu du header HTML
+  // Connecter l'événement du header HTML au toggle du menu
   useEffect(() => {
     const handleToggleMenu = () => {
       toggleMenu();
@@ -29,25 +29,43 @@ const App: React.FC = () => {
       document.removeEventListener('toggle-menu', handleToggleMenu);
     };
   }, [toggleMenu]);
-  
+
+  return (
+    <div className="flex h-full">
+      {/* Menu latéral */}
+      <SideNavigation />
+      
+      {/* Overlay pour fermer le menu sur mobile */}
+      {isMenuOpen && (
+        <div 
+          className="menu-overlay"
+          onClick={toggleMenu}
+        />
+      )}
+      
+      {/* Contenu principal */}
+      <main className="flex-1 overflow-y-auto w-full">
+        <Switch>
+          {routes.map(({ path, Component }) => (
+            <Route key={path} path={path}>
+              <Component />
+            </Route>
+          ))}
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </main>
+    </div>
+  );
+};
+
+// Application principale
+const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <MenuProvider>
-        <div className="flex h-full">
-          <SideNavigation />
-          <main className="flex-1 overflow-y-auto">
-            <Switch>
-              {routes.map(({ path, Component }) => (
-                <Route key={path} path={path}>
-                  <Component />
-                </Route>
-              ))}
-              <Route>
-                <NotFound />
-              </Route>
-            </Switch>
-          </main>
-        </div>
+        <AppContainer />
         <Toaster />
       </MenuProvider>
     </QueryClientProvider>
