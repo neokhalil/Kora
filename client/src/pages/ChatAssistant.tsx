@@ -203,24 +203,19 @@ const ChatAssistant: React.FC = () => {
     return (
       <div key={message.id} className={`chat-message py-6 px-4 ${isKora ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'}`}>
         <div className="max-w-3xl mx-auto flex gap-4">
-          {isKora ? (
-            <div className="flex-shrink-0">
-              <Avatar className="h-8 w-8">
-                <div className="flex h-full items-center justify-center bg-black text-white font-semibold">K</div>
-              </Avatar>
-            </div>
-          ) : (
-            <div className="flex-shrink-0">
-              <Avatar className="h-8 w-8">
-                <div className="flex h-full items-center justify-center bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold">U</div>
-              </Avatar>
-            </div>
-          )}
+          <div className="flex-shrink-0 flex items-center justify-center">
+            {isKora ? (
+              <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                K
+              </div>
+            ) : (
+              <div className="h-9 w-9 rounded-full bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 flex items-center justify-center font-semibold">
+                U
+              </div>
+            )}
+          </div>
           
           <div className="flex-1">
-            <div className="text-sm font-medium mb-1">
-              {isKora ? 'Kora' : 'Vous'}
-            </div>
             <div className="prose dark:prose-invert text-sm max-w-none">
               {message.content}
             </div>
@@ -257,15 +252,12 @@ const ChatAssistant: React.FC = () => {
               {isThinking && (
                 <div className="chat-message py-6 px-4 bg-gray-50 dark:bg-gray-800">
                   <div className="max-w-3xl mx-auto flex gap-4">
-                    <div className="flex-shrink-0">
-                      <Avatar className="h-8 w-8">
-                        <div className="flex h-full items-center justify-center bg-black text-white font-semibold">K</div>
-                      </Avatar>
+                    <div className="flex-shrink-0 flex items-center justify-center">
+                      <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold">
+                        K
+                      </div>
                     </div>
                     <div className="flex-1">
-                      <div className="text-sm font-medium mb-1">
-                        Kora
-                      </div>
                       <div className="flex items-center space-x-2">
                         <div className="flex space-x-1">
                           <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
