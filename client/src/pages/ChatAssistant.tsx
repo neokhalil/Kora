@@ -202,7 +202,12 @@ const ChatAssistant: React.FC = () => {
     });
     
     // Prétraiter le texte pour trouver les formules mathématiques
-    const mathFormulas = [];
+    interface FormulaRange {
+      start: number;
+      end: number;
+    }
+    
+    const mathFormulas: FormulaRange[] = [];
     
     // Détecter les formules en ligne et en bloc pour les ajouter en une seule fois
     const regexInline = /\$([^$\n]+?)\$/g;
@@ -210,7 +215,7 @@ const ChatAssistant: React.FC = () => {
     const regexLatexInline = /\\\\?\(([^)]+?)\\\\?\)/g;
     const regexLatexBlock = /\\\\?\[([\s\S]+?)\\\\?\]/g;
     
-    let match;
+    let match: RegExpExecArray | null;
     while ((match = regexInline.exec(fullText)) !== null) {
       mathFormulas.push({ start: match.index, end: match.index + match[0].length });
     }

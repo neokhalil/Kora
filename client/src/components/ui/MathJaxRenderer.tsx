@@ -19,8 +19,21 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
   
+  // Traiter le formatage Markdown basique
+  const markdownFormatted = formattedContent
+    // Gras - Gérer le cas avec ** (format Markdown)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    // Italique - Gérer le cas avec * (format Markdown)
+    .replace(/\*([^\*]+)\*/g, '<em>$1</em>')
+    // Soulignement - Gérer le cas avec __ (double underscore)
+    .replace(/\_\_([^\_]+)\_\_/g, '<u>$1</u>')
+    // Liste avec puces avec * ou -
+    .replace(/^[\*\-]\s+(.*?)$/gm, '<li>$1</li>')
+    // Barré avec ~~ (format Markdown)
+    .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>');
+  
   // Améliorer les titres et les étapes numérotées pour une meilleure mise en page
-  const enhancedContent = formattedContent
+  const enhancedContent = markdownFormatted
     // Améliorer les titres
     .replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>')
     // Sections avec ###
