@@ -8,20 +8,12 @@ interface MathContentProps {
 
 /**
  * Composant pour rendre du contenu mathématique avec MathJax, 
- * tout en évitant les "sauts" d'affichage lors de l'apparition progressive.
- * Utilise une approche en deux étapes pour le rendu:
- * 1. Pré-rendu invisible pour calculer les dimensions finales
- * 2. Rendu visible avec hauteur stable
+ * optimisé pour éviter les tremblements tout en permettant
+ * une animation de texte fluide et naturelle.
  */
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
   // Référence pour obtenir les dimensions du conteneur
   const containerRef = useRef<HTMLDivElement>(null);
-  // Référence pour le conteneur invisible qui pré-calcule les dimensions
-  const preRenderRef = useRef<HTMLDivElement>(null);
-  // État pour stocker les dimensions stables
-  const [stableHeight, setStableHeight] = useState<number | null>(null);
-  // État pour suivre si le contenu est entièrement affiché
-  const [isFullyRendered, setIsFullyRendered] = useState(false);
   
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
@@ -71,66 +63,26 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     .replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, 
       '<div class="conclusion">$1, $2 est </div>');
 
-  // Pré-calcul des dimensions et rendu en deux phases
-  useEffect(() => {
-    // Si le contenu est vide, ne pas définir de hauteur minimale
-    if (!content || content.length < 20) {
-      setStableHeight(null);
-      setIsFullyRendered(true);
-      return;
-    }
-
-    // Réinitialiser l'état de rendu lors du changement de contenu
-    setIsFullyRendered(false);
-    
-    // Première phase: Calculer la hauteur avec le pré-rendu invisible
-    const preRenderTimer = setTimeout(() => {
-      if (preRenderRef.current) {
-        // Calculer la hauteur du contenu complet dans le conteneur invisible
-        const estimatedHeight = preRenderRef.current.offsetHeight + 30; // Marge de sécurité
-        setStableHeight(estimatedHeight);
-        
-        // Passer à la deuxième phase après un court délai
-        const visibleRenderTimer = setTimeout(() => {
-          setIsFullyRendered(true);
-        }, 50);
-        
-        return () => clearTimeout(visibleRenderTimer);
-      }
-    }, 100); // Délai court pour laisser le DOM se mettre à jour
-    
-    return () => clearTimeout(preRenderTimer);
-  }, [content]);
-
   return (
-    <>
-      {/* Pré-rendu invisible pour calculer les dimensions finales */}
-      <div 
-        ref={preRenderRef}
-        aria-hidden="true"
-        className="invisible fixed top-0 left-0 w-full opacity-0 pointer-events-none"
-        style={{ position: 'absolute', zIndex: -1000 }}
-      >
-        <MathJax>
-          <div dangerouslySetInnerHTML={{ __html: enhancedContent }} />
-        </MathJax>
-      </div>
-      
-      {/* Conteneur visible avec hauteur stable */}
-      <div 
-        ref={containerRef}
-        className={`math-content ${className} ${isFullyRendered ? 'opacity-100' : 'opacity-0'}`}
-        style={{ 
-          minHeight: stableHeight ? `${stableHeight}px` : undefined,
-          transition: 'opacity 0.2s ease-in-out',
-          willChange: 'opacity, transform'
-        }}
-      >
-        <MathJax>
-          <div dangerouslySetInnerHTML={{ __html: enhancedContent }} />
-        </MathJax>
-      </div>
-    </>
+    <div 
+      ref={containerRef}
+      className={`math-content ${className}`}
+      style={{ 
+        willChange: 'transform',
+        transform: 'translateZ(0)',
+        position: 'relative', 
+        // Utiliser une hauteur d'une ligne minimum pour stabiliser le contenu
+        minHeight: '20px'
+      }}
+    >
+      <MathJax>
+        <div 
+          dangerouslySetInnerHTML={{ __html: enhancedContent }}
+          style={{ transform: 'translateZ(0)' }}
+          className="math-content-inner"
+        />
+      </MathJax>
+    </div>
   );
 };
 

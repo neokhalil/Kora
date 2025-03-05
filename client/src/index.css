@@ -17,13 +17,15 @@
   /* Style pour améliorer le rendu des formules mathématiques */
   .math-content {
     transition: min-height 0.3s ease-out;
-    will-change: height, opacity;
+    will-change: transform, opacity;
     overflow-wrap: break-word;
     contain: content;
     transform: translateZ(0); /* Force GPU acceleration */
     backface-visibility: hidden; /* Reduce flickering */
     font-feature-settings: "tnum";
-    min-height: fit-content;
+    min-height: 20px; /* Hauteur minimale pour stabiliser le contenu */
+    perspective: 1000px; /* Améliore la stabilité GPU */
+    position: relative;
   }
 
   .math-content .katex-display {
@@ -39,6 +41,13 @@
     outline: none;
     text-rendering: geometricPrecision;
     contain: layout style paint;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  .math-content-inner {
+    transform: translateZ(0);
+    position: relative;
   }
   
   .math-content h3 {
