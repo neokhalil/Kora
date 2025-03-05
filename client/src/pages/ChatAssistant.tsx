@@ -194,55 +194,88 @@ const ChatAssistant: React.FC = () => {
       fragmentSize = 16; // Texte très long = ajout encore plus rapide
     }
     
-    // Initialiser l'état de texte progressif
+    // Initialiser l'état de texte progressif avec les 20 premiers caractères déjà affichés
+    // pour permettre une meilleure stabilisation initiale du conteneur
+    const initialText = fullText.length > 20 ? fullText.substring(0, 20) : '';
     setProgressiveText({
       id: messageId,
       fullText: fullText,
-      currentText: ''
+      currentText: initialText
     });
     
-    // Prétraiter le texte pour trouver les formules mathématiques
-    interface FormulaRange {
-      start: number;
-      end: number;
+    // Mettre à jour également le message dans la liste avec le texte initial
+    if (initialText) {
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, content: initialText } 
+            : msg
+        )
+      );
+      
+      // Mettre à jour l'index en conséquence
+      currentCharIndex = initialText.length;
     }
     
-    const mathFormulas: FormulaRange[] = [];
+    // Prétraiter le texte pour trouver les formules mathématiques et les sections markdown
+    interface ContentRange {
+      start: number;
+      end: number;
+      type: 'math' | 'markdown' | 'heading';
+    }
     
-    // Détecter les formules en ligne et en bloc pour les ajouter en une seule fois
+    const specialRanges: ContentRange[] = [];
+    
+    // Détecter les formules mathématiques
     const regexInline = /\$([^$\n]+?)\$/g;
     const regexBlock = /\$\$([\s\S]+?)\$\$/g;
     const regexLatexInline = /\\\\?\(([^)]+?)\\\\?\)/g;
     const regexLatexBlock = /\\\\?\[([\s\S]+?)\\\\?\]/g;
     
+    // Détecter le markdown et les titres
+    const regexBold = /\*\*(.*?)\*\*/g;
+    const regexHeading = /^###\s*(.*?)$/gm;
+    
     let match: RegExpExecArray | null;
+    
+    // Trouver toutes les formules mathématiques
     while ((match = regexInline.exec(fullText)) !== null) {
-      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'math' });
     }
     while ((match = regexBlock.exec(fullText)) !== null) {
-      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'math' });
     }
     while ((match = regexLatexInline.exec(fullText)) !== null) {
-      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'math' });
     }
     while ((match = regexLatexBlock.exec(fullText)) !== null) {
-      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'math' });
     }
     
-    // Trier les formules par position de début
-    mathFormulas.sort((a, b) => a.start - b.start);
+    // Trouver tout le texte en gras
+    while ((match = regexBold.exec(fullText)) !== null) {
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'markdown' });
+    }
+    
+    // Trouver tous les titres avec ###
+    while ((match = regexHeading.exec(fullText)) !== null) {
+      specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'heading' });
+    }
+    
+    // Trier les plages spéciales par position de début
+    specialRanges.sort((a, b) => a.start - b.start);
     
     // Créer un intervalle pour ajouter progressivement des caractères
     const intervalId = setInterval(() => {
       if (currentCharIndex < fullText.length) {
-        // Déterminer si nous sommes dans une formule mathématique
-        const formula = mathFormulas.find(f => 
-          currentCharIndex >= f.start && currentCharIndex < f.end
+        // Déterminer si nous sommes dans une section spéciale
+        const specialRange = specialRanges.find(r => 
+          currentCharIndex >= r.start && currentCharIndex < r.end
         );
         
-        if (formula) {
-          // Si nous sommes dans une formule, ajouter la formule complète d'un coup
-          currentCharIndex = formula.end;
+        if (specialRange) {
+          // Si nous sommes dans une section spéciale, l'ajouter en entier
+          currentCharIndex = specialRange.end;
         } else {
           // Sinon, ajouter un fragment de texte
           currentCharIndex = Math.min(currentCharIndex + fragmentSize, fullText.length);

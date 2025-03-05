@@ -30,14 +30,14 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Liste avec puces avec * ou -
     .replace(/^[\*\-]\s+(.*?)$/gm, '<li>$1</li>')
     // Barré avec ~~ (format Markdown)
-    .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>');
+    .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>')
+    // Sections avec ### (doit être traité avant les autres titres)
+    .replace(/###\s*(.*?)$/gm, '<h3>$1</h3>');
   
   // Améliorer les titres et les étapes numérotées pour une meilleure mise en page
   const enhancedContent = markdownFormatted
     // Améliorer les titres
     .replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>')
-    // Sections avec ###
-    .replace(/###\s*(.*?)$/gm, '<h3>$1</h3>')
     // Améliorer la numérotation des étapes
     .replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>')
     // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
@@ -58,18 +58,46 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       return;
     }
 
-    // Si le contenu semble complet, mesurer la hauteur
-    if (content.length > 100 && containerRef.current) {
-      const currentHeight = containerRef.current.offsetHeight;
-      
-      // Seulement mettre à jour la hauteur si elle est plus grande que la précédente
-      setStableHeight(prev => {
-        if (!prev || currentHeight > prev) {
-          return currentHeight;
+    // Timer pour laisser MathJax terminer le rendu initial
+    const initialRenderTimer = setTimeout(() => {
+      if (containerRef.current) {
+        // Ajouter un petit tampon pour éviter les ajustements mineurs
+        const currentHeight = containerRef.current.offsetHeight + 10;
+        
+        // Seulement mettre à jour la hauteur si elle est plus grande que la précédente
+        setStableHeight(prev => {
+          if (!prev || currentHeight > prev) {
+            return currentHeight;
+          }
+          return prev;
+        });
+      }
+    }, 50); // Petit délai pour le rendu initial
+    
+    // Si le contenu semble complet, mesurer la hauteur à nouveau après un délai plus long
+    // pour s'assurer que les formules mathématiques sont complètement rendues
+    if (content.length > 100) {
+      const fullRenderTimer = setTimeout(() => {
+        if (containerRef.current) {
+          // Ajouter un tampon plus grand pour le rendu final
+          const finalHeight = containerRef.current.offsetHeight + 20;
+          
+          setStableHeight(prev => {
+            if (!prev || finalHeight > prev) {
+              return finalHeight;
+            }
+            return prev;
+          });
         }
-        return prev;
-      });
+      }, 300); // Délai plus long pour laisser MathJax terminer complètement
+      
+      return () => {
+        clearTimeout(initialRenderTimer);
+        clearTimeout(fullRenderTimer);
+      };
     }
+    
+    return () => clearTimeout(initialRenderTimer);
   }, [content]);
 
   return (

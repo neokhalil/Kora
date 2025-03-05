@@ -16,19 +16,36 @@
   
   /* Style pour améliorer le rendu des formules mathématiques */
   .math-content {
-    transition: min-height 0.2s ease-out;
-    will-change: height;
+    transition: min-height 0.3s ease-out;
+    will-change: height, opacity;
     overflow-wrap: break-word;
+    contain: content;
+    transform: translateZ(0); /* Force GPU acceleration */
+    backface-visibility: hidden; /* Reduce flickering */
+    font-feature-settings: "tnum";
+    min-height: fit-content;
   }
 
   .math-content .katex-display {
     margin: 1.2em 0;
     overflow-x: auto;
     overflow-y: hidden;
+    padding: 0.4em 0;
+    will-change: transform;
+    transform: translateZ(0);
   }
 
   .math-content .MathJax {
     outline: none;
+    text-rendering: geometricPrecision;
+    contain: layout style paint;
+  }
+  
+  .math-content h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
   }
   
   .math-content ol {
