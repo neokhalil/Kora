@@ -22,8 +22,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import 'katex/dist/katex.min.css';
-import katex from 'katex';
+import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
+import { MathJaxContext } from 'better-react-mathjax';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 
