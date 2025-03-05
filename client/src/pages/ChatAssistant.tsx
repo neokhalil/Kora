@@ -722,307 +722,308 @@ const ChatAssistant: React.FC = () => {
     <MathJaxContext config={mathJaxConfig}>
       <div className="flex flex-col h-full max-w-4xl mx-auto">
         <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Zone des messages */}
-        <div 
-          className="flex-1 overflow-y-auto p-4 chat-messages-container" 
-        >
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col justify-start pt-12">
-              <div className="max-w-md px-4">
-                <h2 className="text-4xl font-bold mb-1">Hello,</h2>
-                <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
-                <p className="text-gray-600 text-3xl leading-tight">
-                  Comment<br />
-                  puis-je t'aider<br />
-                  aujourd'hui ?
-                </p>
+          {/* Zone des messages */}
+          <div 
+            className="flex-1 overflow-y-auto p-4 chat-messages-container" 
+          >
+            {messages.length === 0 ? (
+              <div className="h-full flex flex-col justify-start pt-12">
+                <div className="max-w-md px-4">
+                  <h2 className="text-4xl font-bold mb-1">Hello,</h2>
+                  <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
+                  <p className="text-gray-600 text-3xl leading-tight">
+                    Comment<br />
+                    puis-je t'aider<br />
+                    aujourd'hui ?
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <>
-              {messages.map(renderMessage)}
-              
-              {/* Indicateur de réflexion */}
-              {isThinking && (
-                <div className="px-4 py-2 mb-4">
-                  <div className="max-w-3xl mx-auto">
-                    <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                      <div className="flex space-x-1">
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+            ) : (
+              <>
+                {messages.map(renderMessage)}
+                
+                {/* Indicateur de réflexion */}
+                {isThinking && (
+                  <div className="px-4 py-2 mb-4">
+                    <div className="max-w-3xl mx-auto">
+                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                        <div className="flex space-x-1">
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                        </div>
                       </div>
                     </div>
+                  </div>
+                )}
+                
+                <div ref={messagesEndRef} />
+              </>
+            )}
+          </div>
+          
+          {/* Zone de saisie fixe en bas */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
+            <div className="max-w-4xl mx-auto">
+              {/* Zone d'aperçu d'image */}
+              {imagePreview && (
+                <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
+                  <div className="flex items-start">
+                    <div className="flex-1 flex space-x-2 items-center">
+                      <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
+                        <img 
+                          src={imagePreview} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover" 
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">Image sélectionnée</div>
+                        <div className="text-xs text-gray-500">{selectedImage?.name}</div>
+                      </div>
+                    </div>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-7 w-7 rounded-full p-0"
+                      onClick={() => {
+                        setImagePreview(null);
+                        setSelectedImage(null);
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               )}
               
-              <div ref={messagesEndRef} />
-            </>
-          )}
-        </div>
-        
-        {/* Zone de saisie fixe en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
-          <div className="max-w-4xl mx-auto">
-            {/* Zone d'aperçu d'image */}
-            {imagePreview && (
-              <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-                <div className="flex items-start">
-                  <div className="flex-1 flex space-x-2 items-center">
-                    <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
-                      <img 
-                        src={imagePreview} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium">Image sélectionnée</div>
-                      <div className="text-xs text-gray-500">{selectedImage?.name}</div>
-                    </div>
-                  </div>
+              {/* Composeur de message style iOS */}
+              <div 
+                className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
+                ref={composerRef}
+                onFocus={() => {
+                  // Déclenche la classe keyboard-open pour adapter l'UI
+                  document.body.classList.add('keyboard-open');
                   
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 w-7 rounded-full p-0"
-                    onClick={() => {
-                      setImagePreview(null);
-                      setSelectedImage(null);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {/* Composeur de message style iOS */}
-            <div 
-              className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
-              ref={composerRef}
-              onFocus={() => {
-                // Déclenche la classe keyboard-open pour adapter l'UI
-                document.body.classList.add('keyboard-open');
-                
-                // Scroll vers la fin des messages après un court délai
-                setTimeout(() => {
-                  if (messagesEndRef.current) {
-                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }, 300);
-              }}
-            >
-              {/* Hidden file input pour les images */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageSelect}
-                onClick={(e) => {
-                  (e.target as HTMLInputElement).value = '';
+                  // Scroll vers la fin des messages après un court délai
+                  setTimeout(() => {
+                    if (messagesEndRef.current) {
+                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }, 300);
                 }}
-              />
-              
-              <div className="flex items-center justify-between gap-2">
-                {/* Boutons d'action à gauche */}
-                <div className="flex gap-2">
-                  {/* Bouton galerie */}
-                  <button
-                    type="button"
-                    disabled={isThinking || isUploadingImage}
-                    onClick={handleOpenFileBrowser}
-                    title="Choisir une image"
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                  >
-                    <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                  </button>
-                  
-                  {/* Bouton appareil photo (mobile uniquement) */}
-                  {isMobileDevice && (
+              >
+                {/* Hidden file input pour les images */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                  onClick={(e) => {
+                    (e.target as HTMLInputElement).value = '';
+                  }}
+                />
+                
+                <div className="flex items-center justify-between gap-2">
+                  {/* Boutons d'action à gauche */}
+                  <div className="flex gap-2">
+                    {/* Bouton galerie */}
                     <button
                       type="button"
                       disabled={isThinking || isUploadingImage}
-                      onClick={() => {
-                        const tempInput = document.createElement('input');
-                        tempInput.type = 'file';
-                        tempInput.accept = 'image/*';
-                        tempInput.capture = 'environment';
-                        
-                        tempInput.onchange = (e) => {
-                          handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                        };
-                        
-                        tempInput.click();
-                      }}
-                      title="Prendre une photo"
+                      onClick={handleOpenFileBrowser}
+                      title="Choisir une image"
                       className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
                     >
-                      <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                      <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
                     </button>
-                  )}
-                </div>
-                
-                {/* Champ de saisie au centre */}
-                <div className="flex items-center flex-1 px-2">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Pose ta question"
-                    className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
-                    disabled={isThinking || isUploadingImage}
-                    onFocus={() => {
-                      // Marquer que le clavier est ouvert
-                      document.body.classList.add('keyboard-open');
-                      
-                      // S'assurer que le header fixe est visible
-                      const headerContainer = document.getElementById('kora-header-container');
-                      if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
-                        headerContainer.style.top = '0';
-                        headerContainer.style.zIndex = '9999';
-                      }
-                      
-                      // Scroll vers le bas après l'ouverture du clavier
-                      setTimeout(() => {
-                        if (messagesEndRef.current) {
-                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                  />
-                </div>
-                
-                {/* Conteneur à droite pour les boutons micro et envoi */}
-                <div className="flex items-center gap-2">
-                  {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
-                  {selectedImage ? (
-                    <button
-                      type="button"
-                      onClick={handleSubmitImage}
-                      disabled={isThinking || isUploadingImage}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                        />
-                      </svg>
-                    </button>
-                  ) : inputValue.trim() ? (
-                    /* Bouton d'envoi de texte - visible seulement si du texte est présent */
-                    <button
-                      type="button"
-                      onClick={handleSendMessage}
-                      disabled={isThinking || isUploadingImage}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                        />
-                      </svg>
-                    </button>
-                  ) : (
-                    /* Bouton microphone */
-                    <div className="w-10 h-10 flex items-center justify-center">
-                      <VoiceRecorder 
-                        onTranscriptionComplete={async (text) => {
-                          setInputValue('');
-                          
-                          if (text.trim().length > 0) {
-                            // Créer et ajouter le message de l'utilisateur
-                            const userMessage: Message = {
-                              id: Date.now().toString(),
-                              content: text,
-                              sender: 'user',
-                            };
-                            
-                            setMessages(prev => [...prev, userMessage]);
-                            setIsThinking(true);
-                            
-                            try {
-                              // Préparer les messages précédents pour le contexte
-                              const messageHistory = messages.map(msg => ({
-                                content: msg.content,
-                                sender: msg.sender
-                              }));
-                              
-                              // Appel API à OpenAI via notre serveur
-                              const response = await fetch('/api/tutoring/ask', {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                  question: text,
-                                  messages: messageHistory
-                                }),
-                              });
-                              
-                              if (!response.ok) {
-                                throw new Error('Erreur lors de la requête API');
-                              }
-                              
-                              const data = await response.json();
-                              
-                              // Ajouter la réponse de l'IA aux messages
-                              setMessages(prev => [...prev, {
-                                id: Date.now().toString(),
-                                content: data.content,
-                                sender: 'kora',
-                              }]);
-                            } catch (error) {
-                              console.error('Erreur lors de la communication avec le serveur:', error);
-                              
-                              // Message d'erreur à l'utilisateur
-                              setMessages(prev => [...prev, {
-                                id: Date.now().toString(),
-                                content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
-                                sender: 'kora',
-                              }]);
-                            } finally {
-                              setIsThinking(false);
-                              
-                              // Faire défiler vers le bas 
-                              setTimeout(() => {
-                                if (messagesEndRef.current) {
-                                  messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                                }
-                              }, 100);
-                            }
-                          }
-                        }}
+                    
+                    {/* Bouton appareil photo (mobile uniquement) */}
+                    {isMobileDevice && (
+                      <button
+                        type="button"
                         disabled={isThinking || isUploadingImage}
-                        maxRecordingTimeMs={30000}
-                        language="fr"
-                      />
-                    </div>
-                  )}
+                        onClick={() => {
+                          const tempInput = document.createElement('input');
+                          tempInput.type = 'file';
+                          tempInput.accept = 'image/*';
+                          tempInput.capture = 'environment';
+                          
+                          tempInput.onchange = (e) => {
+                            handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
+                          };
+                          
+                          tempInput.click();
+                        }}
+                        title="Prendre une photo"
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                      >
+                        <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Champ de saisie au centre */}
+                  <div className="flex items-center flex-1 px-2">
+                    <Input
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Pose ta question"
+                      className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
+                      disabled={isThinking || isUploadingImage}
+                      onFocus={() => {
+                        // Marquer que le clavier est ouvert
+                        document.body.classList.add('keyboard-open');
+                        
+                        // S'assurer que le header fixe est visible
+                        const headerContainer = document.getElementById('kora-header-container');
+                        if (headerContainer) {
+                          headerContainer.style.position = 'absolute';
+                          headerContainer.style.top = '0';
+                          headerContainer.style.zIndex = '9999';
+                        }
+                        
+                        // Scroll vers le bas après l'ouverture du clavier
+                        setTimeout(() => {
+                          if (messagesEndRef.current) {
+                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 100);
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Conteneur à droite pour les boutons micro et envoi */}
+                  <div className="flex items-center gap-2">
+                    {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
+                    {selectedImage ? (
+                      <button
+                        type="button"
+                        onClick={handleSubmitImage}
+                        disabled={isThinking || isUploadingImage}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path
+                            d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
+                          />
+                        </svg>
+                      </button>
+                    ) : inputValue.trim() ? (
+                      /* Bouton d'envoi de texte - visible seulement si du texte est présent */
+                      <button
+                        type="button"
+                        onClick={handleSendMessage}
+                        disabled={isThinking || isUploadingImage}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-5 w-5"
+                        >
+                          <path
+                            d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
+                          />
+                        </svg>
+                      </button>
+                    ) : (
+                      /* Bouton microphone */
+                      <div className="w-10 h-10 flex items-center justify-center">
+                        <VoiceRecorder 
+                          onTranscriptionComplete={async (text) => {
+                            setInputValue('');
+                            
+                            if (text.trim().length > 0) {
+                              // Créer et ajouter le message de l'utilisateur
+                              const userMessage: Message = {
+                                id: Date.now().toString(),
+                                content: text,
+                                sender: 'user',
+                              };
+                              
+                              setMessages(prev => [...prev, userMessage]);
+                              setIsThinking(true);
+                              
+                              try {
+                                // Préparer les messages précédents pour le contexte
+                                const messageHistory = messages.map(msg => ({
+                                  content: msg.content,
+                                  sender: msg.sender
+                                }));
+                                
+                                // Appel API à OpenAI via notre serveur
+                                const response = await fetch('/api/tutoring/ask', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    question: text,
+                                    messages: messageHistory
+                                  }),
+                                });
+                                
+                                if (!response.ok) {
+                                  throw new Error('Erreur lors de la requête API');
+                                }
+                                
+                                const data = await response.json();
+                                
+                                // Ajouter la réponse de l'IA aux messages
+                                setMessages(prev => [...prev, {
+                                  id: Date.now().toString(),
+                                  content: data.content,
+                                  sender: 'kora',
+                                }]);
+                              } catch (error) {
+                                console.error('Erreur lors de la communication avec le serveur:', error);
+                                
+                                // Message d'erreur à l'utilisateur
+                                setMessages(prev => [...prev, {
+                                  id: Date.now().toString(),
+                                  content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
+                                  sender: 'kora',
+                                }]);
+                              } finally {
+                                setIsThinking(false);
+                                
+                                // Faire défiler vers le bas 
+                                setTimeout(() => {
+                                  if (messagesEndRef.current) {
+                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                                  }
+                                }, 100);
+                              }
+                            }
+                          }}
+                          disabled={isThinking || isUploadingImage}
+                          maxRecordingTimeMs={30000}
+                          language="fr"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="mt-2 text-xs text-gray-500 text-center">
-              KORA, ton assistant IA pour réviser et faire tes exercices.
+              
+              <div className="mt-2 text-xs text-gray-500 text-center">
+                KORA, ton assistant IA pour réviser et faire tes exercices.
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </MathJaxContext>
   );
 };
 
