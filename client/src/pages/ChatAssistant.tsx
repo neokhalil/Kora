@@ -53,174 +53,26 @@ interface Message {
   challengeId?: string; // Pour associer un indice à un défi spécifique
 }
 
-// Fonction pour formater le contenu mathématique avec KaTeX
-const formatMathContent = (content: string): string => {
-  if (!content) return '';
-
-  // Regex pour trouver les expressions mathématiques dans différents formats
-  const inlineMathRegex = /\$([^$\n]+?)\$/g;  // Format $ ... $ (non-greedy pour éviter de capturer trop)
-  const inlineMathRegex2 = /\\\\?\(([^)]+?)\\\\?\)/g;  // Format \( ... \) (plus tolérant)
-  const blockMathRegex = /\$\$([\s\S]+?)\$\$/g;  // Format $$ ... $$ (multi-ligne)
-  const blockMathRegex2 = /\\\\?\[([\s\S]+?)\\\\?\]/g;  // Format \[ ... \] (multi-ligne et plus tolérant)
-  
-  // Fonction pour nettoyer les formules - supprimer les attributs CSS et traiter les caractères spéciaux
-  const cleanFormula = (formula: string) => {
-    console.log('Raw formula:', formula);
-    
-    // Extraire uniquement le contenu mathématique en supprimant les attributs HTML/CSS
-    // Première étape: supprimer tous les attributs de style
-    formula = formula.replace(/style="[^"]*"/g, '');
-    
-    // Supprimer les attributs isolés comme vertical-align:-0.0833em
-    formula = formula.replace(/[a-z-]+:[^;>]+/g, '');
-    
-    // Deuxième étape: supprimer tous les tags HTML
-    formula = formula.replace(/<[^>]+>/g, '');
-    
-    // Troisième étape: supprimer les attributs CSS restants qui causent des problèmes
-    let cleaned = formula
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/(\d+(?:\.\d+)?)em/g, '$1') // Supprimer em après des nombres
-      .replace(/vertical-align:[^;]*/g, '')
-      .replace(/text-align:[^;]*/g, '')
-      .replace(/(?:([0-9.]+)(em|px))+/g, '$1') // Supprimer les unités CSS
-      .replace(/\\em(?![a-zA-Z])/g, '') // Enlever \em qui n'est pas suivi par une lettre
-      .replace(/\\textrm\{([^}]+)\}/g, '$1') // Remplacer \textrm{...} par son contenu
-      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}') // Garder \text{...} intact
-      .replace(/>/g, '') // Supprimer les > restants
-      .replace(/"/g, '') // Supprimer les guillemets restants
-      .trim();
-    
-    // Supprimer les fragments d'attributs CSS qui pourraient rester
-    cleaned = cleaned
-      .replace(/vertical-align/g, '')
-      .replace(/text-align/g, '')
-      .replace(/;/g, '')
-      .replace(/-0\./g, '')
-      .replace(/\.[0-9]+/g, '')
-      .replace(/em/g, '');
-    
-    console.log('Cleaned formula:', cleaned);
-    return cleaned;
-  };
-
-  // Fonction pour rendre une formule mathématique en mode block ou inline
-  const renderMath = (formula: string, displayMode: boolean): string => {
-    console.log('Rendering formula:', formula, 'displayMode:', displayMode);
-    try {
-      return katex.renderToString(cleanFormula(formula), { 
-        displayMode: displayMode,
-        throwOnError: false,
-        strict: "ignore",
-        output: "html",
-        macros: {
-          "\\em": ""  // Définir \em comme vide pour éviter les erreurs
-        }
-      });
-    } catch (error) {
-      console.error(`Error rendering ${displayMode ? 'block' : 'inline'} math:`, error, formula);
-      // En cas d'erreur, retourner la formule originale mais échappée pour HTML
-      return `<span class="math-error">${formula.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
+// Configuration MathJax
+const mathJaxConfig = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    enableMenu: false,    // Désactive le menu contextuel
+    menuOptions: {
+      settings: {
+        assistiveMml: false,
+        zoom: 'NoZoom'    // Désactive le zoom
+      }
     }
-  };
-
-  // Convertir d'abord les blocs avec le format \[ ... \] (plus prioritaire)
-  let formatted = content.replace(blockMathRegex2, (match, formula) => {
-    return `<div class="katex-block"><span class="katex-display">${renderMath(formula, true)}</span></div>`;
-  });
-
-  // Convertir les blocs avec le format $$ ... $$
-  formatted = formatted.replace(blockMathRegex, (match, formula) => {
-    return `<div class="katex-block"><span class="katex-display">${renderMath(formula, true)}</span></div>`;
-  });
-
-  // Convertir les expressions inline avec le format \( ... \)
-  formatted = formatted.replace(inlineMathRegex2, (match, formula) => {
-    return `<span class="katex-inline">${renderMath(formula, false)}</span>`;
-  });
-
-  // Convertir les expressions inline avec le format $ ... $
-  formatted = formatted.replace(inlineMathRegex, (match, formula) => {
-    return `<span class="katex-inline">${renderMath(formula, false)}</span>`;
-  });
-  
-  // Nettoyer les "em;" qui peuvent apparaître après le rendu KaTeX (problème spécifique des formules)
-  formatted = formatted.replace(/(\d+)em;/g, '$1em');
-  formatted = formatted.replace(/>(\d+)em;/g, '>$1em');
-  formatted = formatted.replace(/([a-zA-Z])em;/g, '$1em;');
-  
-  // Supprimer les occurrences de "em;" qui ne sont pas dans des balises HTML
-  formatted = formatted.replace(/([^"'])em;/g, '$1');
-  
-  // Assurer que tout est correctement échappé
-  formatted = formatted.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-
-  // Améliorer les titres et les étapes
-  formatted = formatted.replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>');
-  
-  // Sections avec ###
-  formatted = formatted.replace(/###\s*(.*?)$/gm, '<h3>$1</h3>');
-  
-  // Améliorer la numérotation et les étapes - en limitant l'usage du formatage en gras
-  formatted = formatted.replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>');
-  
-  // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
-  formatted = formatted.replace(/^(\d+)\.\s+([^<]*[^:])/gm, '<span class="step-number">$1.</span> $2');
-  
-  // S'assurer que chaque phrase numérotée est sur une ligne séparée - cas général pour tous types de contenu
-  formatted = formatted.replace(/(\d+\.\s+[^.]+\.)\s+(\d+\.)/g, '$1<br /><br />$2');
-  
-  // Format spécifique pour les listes d'exercices (séparation plus agressive)
-  formatted = formatted.replace(/(\d+\..*?\.)\s*/g, '<div class="numbered-exercise">$1</div>');
-  
-  // Assurer que les phrases numérotées commençant par "Je" sont correctement formatées
-  formatted = formatted.replace(/(\d+\.\s+Je\s+.*?\.)\s+(\d+\.)/g, '$1<br /><br />$2');
-  
-  // Améliorer l'indentation des étapes
-  formatted = formatted.replace(/<span class="step-number">(\d+)\.<\/span>/g, 
-    '<span class="step-number">$1.</span>');
-  
-  // Assurer que les variables mathématiques ne sont pas en gras
-  formatted = formatted.replace(/<strong>([^<]*?)(\$[^$]+\$)([^<]*?)<\/strong>/g, 
-    '<strong>$1</strong>$2<strong>$3</strong>');
-  
-  // Mettre en valeur les étapes importantes
-  formatted = formatted.replace(/\*\*([^*:]+)\*\*/g, '<strong>$1</strong>');
-  formatted = formatted.replace(/\*\*([^*:]+):([^*]*)\*\*/g, '<strong>$1:</strong>$2');
-  
-  // Mise en forme des résultats intermédiaires
-  formatted = formatted.replace(/(Ce qui donne|On obtient|Ce qui nous donne|Ceci donne)\s*:/g, '<div class="result">$1 :</div>');
-  
-  // Mise en forme de la conclusion
-  formatted = formatted.replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, '<div class="conclusion">$1, $2 est </div>');
-  
-  // Reformater les séparateurs de sections
-  formatted = formatted.replace(/###/g, '<hr class="section-divider" />');
-  
-  // Restructurer les paragraphes pour une meilleure lisibilité
-  formatted = formatted.replace(/(\n{2,})/g, '</p><p>');
-  
-  // Assurer que tout est bien dans des paragraphes
-  if (!formatted.startsWith('<h3>') && !formatted.startsWith('<p>')) {
-    formatted = '<p>' + formatted;
+  },
+  startup: {
+    typeset: false        // Ne pas traiter automatiquement la page (pour éviter les conflits)
   }
-  if (!formatted.endsWith('</p>') && !formatted.endsWith('</div>')) {
-    formatted = formatted + '</p>';
-  }
-  
-  // Assurer que les sections ###-séparées sont bien formatées
-  formatted = formatted.replace(/<p><hr class="section-divider" \/><\/p>/g, '<hr class="section-divider" />');
-  
-  // Utiliser des div pour les titres et sous-titres
-  formatted = formatted.replace(/<p>([^<]+)<\/p>\s*<hr class="section-divider" \/>/g, '<div class="section-title">$1</div><hr class="section-divider" />');
-  
-  // Formater correctement les listes numérotées
-  formatted = formatted.replace(/<p><strong>(\d+)\.<\/strong>/g, '<p class="numbered-item"><strong>$1.</strong>');
-
-  return formatted;
 };
 
 const ChatAssistant: React.FC = () => {
@@ -733,11 +585,10 @@ const ChatAssistant: React.FC = () => {
               </div>
             )}
             
-            {/* Contenu du message avec formatage amélioré pour les maths */}
-            <div 
-              className="prose dark:prose-invert text-base leading-relaxed math-content px-1"
-              dangerouslySetInnerHTML={{ __html: formatMathContent(message.content) }}
-            ></div>
+            {/* Contenu du message avec formatage amélioré pour les maths via MathJax */}
+            <div className="prose dark:prose-invert text-base leading-relaxed px-1">
+              <MathJaxRenderer content={message.content} />
+            </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
@@ -868,8 +719,9 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-    <div className="flex flex-col h-full max-w-4xl mx-auto">
-      <div className="flex-1 overflow-hidden flex flex-col">
+    <MathJaxContext config={mathJaxConfig}>
+      <div className="flex flex-col h-full max-w-4xl mx-auto">
+        <div className="flex-1 overflow-hidden flex flex-col">
         {/* Zone des messages */}
         <div 
           className="flex-1 overflow-y-auto p-4 chat-messages-container" 
