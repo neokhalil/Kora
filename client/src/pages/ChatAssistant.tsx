@@ -173,48 +173,11 @@ const ChatAssistant: React.FC = () => {
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
   
-  // Fonction pour simuler l'écriture progressive du texte
+  // Fonction pour simuler l'écriture progressive du texte avec stabilité améliorée
   const simulateProgressiveTyping = (messageId: string, fullText: string) => {
     // Nettoyer tout intervalle précédent si existant
     if (progressiveText.intervalId) {
       clearInterval(progressiveText.intervalId);
-    }
-    
-    let currentCharIndex = 0;
-    let fragmentSize = 8; // Nombre de caractères à ajouter à chaque fois
-    const typingSpeed = 30; // Temps en ms entre les mises à jour
-    
-    // Déterminer la taille du texte complet
-    const totalLength = fullText.length;
-    
-    // Ajuster le nombre de caractères à ajouter proportionnellement au contenu total
-    if (totalLength > 500) {
-      fragmentSize = 12; // Texte long = ajout plus rapide
-    } else if (totalLength > 1000) {
-      fragmentSize = 16; // Texte très long = ajout encore plus rapide
-    }
-    
-    // Initialiser l'état de texte progressif avec les 20 premiers caractères déjà affichés
-    // pour permettre une meilleure stabilisation initiale du conteneur
-    const initialText = fullText.length > 20 ? fullText.substring(0, 20) : '';
-    setProgressiveText({
-      id: messageId,
-      fullText: fullText,
-      currentText: initialText
-    });
-    
-    // Mettre à jour également le message dans la liste avec le texte initial
-    if (initialText) {
-      setMessages(prevMessages => 
-        prevMessages.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, content: initialText } 
-            : msg
-        )
-      );
-      
-      // Mettre à jour l'index en conséquence
-      currentCharIndex = initialText.length;
     }
     
     // Prétraiter le texte pour trouver les formules mathématiques et les sections markdown
@@ -265,53 +228,109 @@ const ChatAssistant: React.FC = () => {
     // Trier les plages spéciales par position de début
     specialRanges.sort((a, b) => a.start - b.start);
     
-    // Créer un intervalle pour ajouter progressivement des caractères
-    const intervalId = setInterval(() => {
-      if (currentCharIndex < fullText.length) {
-        // Déterminer si nous sommes dans une section spéciale
-        const specialRange = specialRanges.find(r => 
-          currentCharIndex >= r.start && currentCharIndex < r.end
-        );
-        
-        if (specialRange) {
-          // Si nous sommes dans une section spéciale, l'ajouter en entier
-          currentCharIndex = specialRange.end;
-        } else {
-          // Sinon, ajouter un fragment de texte
-          currentCharIndex = Math.min(currentCharIndex + fragmentSize, fullText.length);
-        }
-        
-        const newCurrentText = fullText.substring(0, currentCharIndex);
-        
-        // Mettre à jour à la fois l'état progressif et le message
-        setProgressiveText(prev => ({
-          ...prev,
-          currentText: newCurrentText
-        }));
-        
-        // Mettre à jour le message dans la liste
-        setMessages(prevMessages => 
-          prevMessages.map(msg => 
-            msg.id === messageId 
-              ? { ...msg, content: newCurrentText } 
-              : msg
-          )
-        );
-      } else {
-        // Arrêter l'intervalle une fois le texte complet
-        clearInterval(intervalId);
-        setProgressiveText(prev => ({
-          ...prev,
-          intervalId: undefined
-        }));
-      }
-    }, typingSpeed);
+    // ÉTAPE 1: Initialiser avec un placeholder contenant tout le texte (invisible)
+    // Cette technique permet au navigateur de calculer l'espace total nécessaire
+    // avant même que nous commencions à afficher progressivement le texte
+    setMessages(prevMessages => 
+      prevMessages.map(msg => 
+        msg.id === messageId 
+          ? { 
+              ...msg, 
+              content: 
+                `<div aria-hidden="true" style="position:absolute;opacity:0;pointer-events:none;z-index:-1000;">${fullText}</div>` + 
+                `<div aria-live="polite">...</div>`
+            } 
+          : msg
+      )
+    );
     
-    // Stocker l'ID d'intervalle pour pouvoir le nettoyer plus tard
-    setProgressiveText(prev => ({
-      ...prev,
-      intervalId
-    }));
+    // Donner au navigateur le temps de calculer les dimensions
+    setTimeout(() => {
+      let currentCharIndex = 0;
+      let fragmentSize = 6; // Nombre de caractères à ajouter à chaque fois (réduit pour plus de stabilité)
+      const typingSpeed = 35; // Temps en ms entre les mises à jour (légèrement plus lent pour plus de stabilité)
+      
+      // Déterminer la taille du texte complet
+      const totalLength = fullText.length;
+      
+      // Ajuster le nombre de caractères à ajouter proportionnellement au contenu total
+      if (totalLength > 500) {
+        fragmentSize = 10; // Texte long = ajout plus rapide
+      } else if (totalLength > 1000) {
+        fragmentSize = 14; // Texte très long = ajout encore plus rapide
+      }
+      
+      // Initialiser avec les premiers caractères pour une transition douce
+      const initialText = fullText.length > 20 ? fullText.substring(0, 20) : fullText;
+      currentCharIndex = initialText.length;
+      
+      setProgressiveText({
+        id: messageId,
+        fullText: fullText,
+        currentText: initialText
+      });
+      
+      // Mettre à jour le message initial
+      setMessages(prevMessages => 
+        prevMessages.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, content: initialText } 
+            : msg
+        )
+      );
+      
+      // Créer un intervalle pour ajouter progressivement des caractères
+      const intervalId = setInterval(() => {
+        if (currentCharIndex < fullText.length) {
+          // Déterminer si nous sommes dans une section spéciale (math, markdown, etc.)
+          const specialRange = specialRanges.find(r => 
+            currentCharIndex >= r.start && currentCharIndex < r.end
+          );
+          
+          if (specialRange) {
+            // Pour les formules mathématiques et sections spéciales, les ajouter d'un coup
+            // pour éviter les problèmes de rendu partiel de LaTeX
+            currentCharIndex = specialRange.end;
+          } else {
+            // Sinon, ajouter un fragment de texte normal avec légère randomisation
+            currentCharIndex = Math.min(
+              currentCharIndex + fragmentSize + Math.floor(Math.random() * 3), 
+              fullText.length
+            );
+          }
+          
+          const newCurrentText = fullText.substring(0, currentCharIndex);
+          
+          // Mettre à jour l'état interne
+          setProgressiveText(prev => ({
+            ...prev,
+            currentText: newCurrentText
+          }));
+          
+          // Mettre à jour le message dans la liste
+          setMessages(prevMessages => 
+            prevMessages.map(msg => 
+              msg.id === messageId 
+                ? { ...msg, content: newCurrentText } 
+                : msg
+            )
+          );
+        } else {
+          // Arrêter l'intervalle une fois le texte complet
+          clearInterval(intervalId);
+          setProgressiveText(prev => ({
+            ...prev,
+            intervalId: undefined
+          }));
+        }
+      }, typingSpeed);
+      
+      // Stocker l'ID d'intervalle pour pouvoir le nettoyer plus tard
+      setProgressiveText(prev => ({
+        ...prev,
+        intervalId
+      }));
+    }, 150); // Délai pour permettre le calcul des dimensions
   };
   
   // Fonctions simplifiées pour le prototype
