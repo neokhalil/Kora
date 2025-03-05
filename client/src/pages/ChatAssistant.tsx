@@ -58,69 +58,74 @@ const formatMathContent = (content: string): string => {
   if (!content) return '';
 
   // Regex pour trouver les expressions mathématiques dans différents formats
-  const inlineMathRegex = /\$([^$]+)\$/g;
-  const inlineMathRegex2 = /\\\\([^\s][^\\]*\\\\)/g; // Format \( ... \)
-  const blockMathRegex = /\$\$([^$]+)\$\$/g;
-  const blockMathRegex2 = /\\\[(.*?)\\\]/gs; // Format \[ ... \]
+  const inlineMathRegex = /\$([^$\n]+?)\$/g;  // Format $ ... $ (non-greedy pour éviter de capturer trop)
+  const inlineMathRegex2 = /\\\\?\(([^)]+?)\\\\?\)/g;  // Format \( ... \) (plus tolérant)
+  const blockMathRegex = /\$\$([\s\S]+?)\$\$/g;  // Format $$ ... $$ (multi-ligne)
+  const blockMathRegex2 = /\\\\?\[([\s\S]+?)\\\\?\]/g;  // Format \[ ... \] (multi-ligne et plus tolérant)
   
-  // Remplacer les espaces blancs dans les formules pour éviter les problèmes
-  const cleanFormula = (formula: string) => formula.replace(/&nbsp;/g, ' ').trim();
+  // Fonction pour nettoyer les formules - supprimer les espaces superflus et traiter les caractères spéciaux
+  const cleanFormula = (formula: string) => {
+    return formula
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&')
+      .replace(/\\em(?![a-zA-Z])/g, '')  // Enlever \em qui n'est pas suivi par une lettre
+      .replace(/\\textrm\{([^}]+)\}/g, '$1')  // Remplacer \textrm{...} par son contenu
+      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}')  // Garder \text{...} intact
+      .trim();
+  };
 
-  // Convertir d'abord les blocs avec le format \[ ... \]
-  let formatted = content.replace(blockMathRegex2, (match, formula) => {
+  // Fonction pour rendre une formule mathématique en mode block ou inline
+  const renderMath = (formula: string, displayMode: boolean): string => {
+    console.log('Rendering formula:', formula, 'displayMode:', displayMode);
     try {
-      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(cleanFormula(formula), { 
-        displayMode: true,
+      return katex.renderToString(cleanFormula(formula), { 
+        displayMode: displayMode,
         throwOnError: false,
-        strict: false
-      })}</span></div>`;
+        strict: "ignore",
+        output: "html",
+        macros: {
+          "\\em": ""  // Définir \em comme vide pour éviter les erreurs
+        }
+      });
     } catch (error) {
-      console.error('Error rendering block math format 2:', error, formula);
-      return match; // En cas d'erreur, garder le texte original
+      console.error(`Error rendering ${displayMode ? 'block' : 'inline'} math:`, error, formula);
+      // En cas d'erreur, retourner la formule originale mais échappée pour HTML
+      return `<span class="math-error">${formula.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
     }
+  };
+
+  // Convertir d'abord les blocs avec le format \[ ... \] (plus prioritaire)
+  let formatted = content.replace(blockMathRegex2, (match, formula) => {
+    return `<div class="katex-block"><span class="katex-display">${renderMath(formula, true)}</span></div>`;
   });
 
   // Convertir les blocs avec le format $$ ... $$
   formatted = formatted.replace(blockMathRegex, (match, formula) => {
-    try {
-      return `<div class="katex-block"><span class="katex-display">${katex.renderToString(cleanFormula(formula), { 
-        displayMode: true,
-        throwOnError: false,
-        strict: false
-      })}</span></div>`;
-    } catch (error) {
-      console.error('Error rendering block math format 1:', error, formula);
-      return match; // En cas d'erreur, garder le texte original
-    }
+    return `<div class="katex-block"><span class="katex-display">${renderMath(formula, true)}</span></div>`;
   });
 
   // Convertir les expressions inline avec le format \( ... \)
   formatted = formatted.replace(inlineMathRegex2, (match, formula) => {
-    try {
-      return `<span class="katex-inline">${katex.renderToString(cleanFormula(formula), { 
-        displayMode: false,
-        throwOnError: false,
-        strict: false
-      })}</span>`;
-    } catch (error) {
-      console.error('Error rendering inline math format 2:', error, formula);
-      return match; // En cas d'erreur, garder le texte original
-    }
+    return `<span class="katex-inline">${renderMath(formula, false)}</span>`;
   });
 
   // Convertir les expressions inline avec le format $ ... $
   formatted = formatted.replace(inlineMathRegex, (match, formula) => {
-    try {
-      return `<span class="katex-inline">${katex.renderToString(cleanFormula(formula), { 
-        displayMode: false,
-        throwOnError: false,
-        strict: false
-      })}</span>`;
-    } catch (error) {
-      console.error('Error rendering inline math format 1:', error, formula);
-      return match; // En cas d'erreur, garder le texte original
-    }
+    return `<span class="katex-inline">${renderMath(formula, false)}</span>`;
   });
+  
+  // Nettoyer les "em;" qui peuvent apparaître après le rendu KaTeX (problème spécifique des formules)
+  formatted = formatted.replace(/(\d+)em;/g, '$1em');
+  formatted = formatted.replace(/>(\d+)em;/g, '>$1em');
+  formatted = formatted.replace(/([a-zA-Z])em;/g, '$1em;');
+  
+  // Supprimer les occurrences de "em;" qui ne sont pas dans des balises HTML
+  formatted = formatted.replace(/([^"'])em;/g, '$1');
+  
+  // Assurer que tout est correctement échappé
+  formatted = formatted.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 
   // Améliorer les titres et les étapes
   formatted = formatted.replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>');

@@ -109,6 +109,18 @@
     font-size: 1.1em;
   }
   
+  /* Style pour mettre en évidence les erreurs mathématiques */
+  .math-content .math-error {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 0.1em 0.3em;
+    border: 1px solid #ffcdd2;
+    border-radius: 2px;
+    font-family: monospace;
+    white-space: pre-wrap;
+    display: inline-block;
+  }
+  
   /* Bloc pour les équations */
   .math-content .katex-block {
     margin: 1.5rem 0;
