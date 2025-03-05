@@ -65,15 +65,29 @@ const formatMathContent = (content: string): string => {
   
   // Fonction pour nettoyer les formules - supprimer les espaces superflus et traiter les caractères spéciaux
   const cleanFormula = (formula: string) => {
-    return formula
+    // Première passe: supprimer tous les attributs de style CSS qui interfèrent
+    let cleaned = formula
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&')
-      .replace(/\\em(?![a-zA-Z])/g, '')  // Enlever \em qui n'est pas suivi par une lettre
-      .replace(/\\textrm\{([^}]+)\}/g, '$1')  // Remplacer \textrm{...} par son contenu
-      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}')  // Garder \text{...} intact
+      .replace(/&amp;/g, '&');
+      
+    // Deuxième passe: supprimer spécifiquement les problèmes avec "em"
+    cleaned = cleaned
+      .replace(/(\d+(?:\.\d+)?)em(?:[;">])/g, '$1')  // ex: 0.4306em">
+      .replace(/vertical-align:-0\./g, '')
+      .replace(/text-align:-0\./g, '')
+      .replace(/([0-9.]+)em(?![a-zA-Z])/g, '$1')      // Supprimer em après un nombre s'il n'est pas une unité
+      .replace(/"[^"]*"/g, '')                        // Supprimer tous les attributs entre guillemets
+      .replace(/\\em(?![a-zA-Z])/g, '')              // Enlever \em qui n'est pas suivi par une lettre
+      .replace(/\\textrm\{([^}]+)\}/g, '$1')         // Remplacer \textrm{...} par son contenu
+      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}')   // Garder \text{...} intact
+      .replace(/<[^>]+>/g, '')                       // Supprimer toutes les balises HTML
+      .replace(/>/g, '')                             // Supprimer les > restants
       .trim();
+    
+    console.log('Cleaned formula:', cleaned);
+    return cleaned;
   };
 
   // Fonction pour rendre une formule mathématique en mode block ou inline
