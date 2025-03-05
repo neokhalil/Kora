@@ -181,7 +181,18 @@ const ChatAssistant: React.FC = () => {
     }
     
     let currentCharIndex = 0;
-    const typingSpeed = 15; // Temps en ms entre chaque caractère
+    let fragmentSize = 8; // Nombre de caractères à ajouter à chaque fois
+    const typingSpeed = 30; // Temps en ms entre les mises à jour
+    
+    // Déterminer la taille du texte complet
+    const totalLength = fullText.length;
+    
+    // Ajuster le nombre de caractères à ajouter proportionnellement au contenu total
+    if (totalLength > 500) {
+      fragmentSize = 12; // Texte long = ajout plus rapide
+    } else if (totalLength > 1000) {
+      fragmentSize = 16; // Texte très long = ajout encore plus rapide
+    }
     
     // Initialiser l'état de texte progressif
     setProgressiveText({
@@ -190,11 +201,48 @@ const ChatAssistant: React.FC = () => {
       currentText: ''
     });
     
+    // Prétraiter le texte pour trouver les formules mathématiques
+    const mathFormulas = [];
+    
+    // Détecter les formules en ligne et en bloc pour les ajouter en une seule fois
+    const regexInline = /\$([^$\n]+?)\$/g;
+    const regexBlock = /\$\$([\s\S]+?)\$\$/g;
+    const regexLatexInline = /\\\\?\(([^)]+?)\\\\?\)/g;
+    const regexLatexBlock = /\\\\?\[([\s\S]+?)\\\\?\]/g;
+    
+    let match;
+    while ((match = regexInline.exec(fullText)) !== null) {
+      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+    }
+    while ((match = regexBlock.exec(fullText)) !== null) {
+      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+    }
+    while ((match = regexLatexInline.exec(fullText)) !== null) {
+      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+    }
+    while ((match = regexLatexBlock.exec(fullText)) !== null) {
+      mathFormulas.push({ start: match.index, end: match.index + match[0].length });
+    }
+    
+    // Trier les formules par position de début
+    mathFormulas.sort((a, b) => a.start - b.start);
+    
     // Créer un intervalle pour ajouter progressivement des caractères
     const intervalId = setInterval(() => {
       if (currentCharIndex < fullText.length) {
-        // Ajouter le caractère suivant au texte actuel
-        currentCharIndex++;
+        // Déterminer si nous sommes dans une formule mathématique
+        const formula = mathFormulas.find(f => 
+          currentCharIndex >= f.start && currentCharIndex < f.end
+        );
+        
+        if (formula) {
+          // Si nous sommes dans une formule, ajouter la formule complète d'un coup
+          currentCharIndex = formula.end;
+        } else {
+          // Sinon, ajouter un fragment de texte
+          currentCharIndex = Math.min(currentCharIndex + fragmentSize, fullText.length);
+        }
+        
         const newCurrentText = fullText.substring(0, currentCharIndex);
         
         // Mettre à jour à la fois l'état progressif et le message

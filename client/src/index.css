@@ -15,6 +15,22 @@
   }
   
   /* Style pour améliorer le rendu des formules mathématiques */
+  .math-content {
+    transition: min-height 0.2s ease-out;
+    will-change: height;
+    overflow-wrap: break-word;
+  }
+
+  .math-content .katex-display {
+    margin: 1.2em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .math-content .MathJax {
+    outline: none;
+  }
+  
   .math-content ol {
     counter-reset: list-counter;
     list-style-type: none;

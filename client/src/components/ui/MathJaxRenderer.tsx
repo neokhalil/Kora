@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MathJax } from 'better-react-mathjax';
 
 interface MathContentProps {
@@ -7,9 +7,15 @@ interface MathContentProps {
 }
 
 /**
- * Composant pour rendre du contenu mathématique avec MathJax
+ * Composant pour rendre du contenu mathématique avec MathJax, 
+ * tout en évitant les "sauts" d'affichage lors de l'apparition progressive.
  */
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
+  // Référence pour obtenir les dimensions du conteneur
+  const containerRef = useRef<HTMLDivElement>(null);
+  // État pour stocker les dimensions stables
+  const [stableHeight, setStableHeight] = useState<number | null>(null);
+  
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
   
@@ -31,8 +37,34 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     .replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, 
       '<div class="conclusion">$1, $2 est </div>');
 
+  // Observer les changements de hauteur et stabiliser
+  useEffect(() => {
+    // Si le contenu est vide, ne pas définir de hauteur minimale
+    if (!content || content.length < 20) {
+      setStableHeight(null);
+      return;
+    }
+
+    // Si le contenu semble complet, mesurer la hauteur
+    if (content.length > 100 && containerRef.current) {
+      const currentHeight = containerRef.current.offsetHeight;
+      
+      // Seulement mettre à jour la hauteur si elle est plus grande que la précédente
+      setStableHeight(prev => {
+        if (!prev || currentHeight > prev) {
+          return currentHeight;
+        }
+        return prev;
+      });
+    }
+  }, [content]);
+
   return (
-    <div className={`math-content ${className}`}>
+    <div 
+      ref={containerRef}
+      className={`math-content ${className}`}
+      style={stableHeight ? { minHeight: `${stableHeight}px` } : undefined}
+    >
       <MathJax>
         <div dangerouslySetInnerHTML={{ __html: enhancedContent }} />
       </MathJax>
