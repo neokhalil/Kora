@@ -263,11 +263,29 @@
 }
 
 /* Style pour les titres de section */
-.math-content .section-title {
+.math-content .section-title,
+.math-content .section-heading,
+.math-content h3.section-heading {
   font-weight: 700;
   font-size: 1.1rem;
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
+  display: block;
+  width: 100%;
+}
+
+/* Style spécifique pour les titres avec ### */
+h3.section-heading,
+.section-heading {
+  font-weight: 700 !important;
+  font-size: 1.15rem !important;
+  margin-top: 1.75rem !important;
+  margin-bottom: 1rem !important;
+  color: #111827;
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.4rem;
 }
 
 /* Style du conteneur de saisie en bas */

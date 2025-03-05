@@ -19,8 +19,25 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
   
+  // Prétraiter les titres avec ### avant toute autre transformation
+  // Remplacer tous les ### en début de ligne ou après un saut de ligne
+  let headingsPreprocessed = formattedContent;
+  
+  // Première passe pour identifier et remplacer les sections avec ###
+  const headingRegex = /(^|<br \/>)###\s+(.*?)(?=<br|$)/g;
+  headingsPreprocessed = headingsPreprocessed.replace(
+    headingRegex, 
+    '$1<h3 class="section-heading">$2</h3>'
+  );
+  
+  // Deuxième passe pour les cas où ### est au milieu
+  headingsPreprocessed = headingsPreprocessed.replace(
+    /(?<=\s)###\s+(.*?)(?=<br|$)/g,
+    '<h3 class="section-heading">$1</h3>'
+  );
+  
   // Traiter le formatage Markdown basique
-  const markdownFormatted = formattedContent
+  const markdownFormatted = headingsPreprocessed
     // Gras - Gérer le cas avec ** (format Markdown)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     // Italique - Gérer le cas avec * (format Markdown)
@@ -30,9 +47,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Liste avec puces avec * ou -
     .replace(/^[\*\-]\s+(.*?)$/gm, '<li>$1</li>')
     // Barré avec ~~ (format Markdown)
-    .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>')
-    // Sections avec ### (doit être traité avant les autres titres)
-    .replace(/###\s*(.*?)$/gm, '<h3>$1</h3>');
+    .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>');
   
   // Améliorer les titres et les étapes numérotées pour une meilleure mise en page
   const enhancedContent = markdownFormatted

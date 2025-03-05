@@ -372,8 +372,11 @@ const ChatAssistant: React.FC = () => {
         allowActions: true,
       }]);
       
-      // Afficher le texte progressivement
-      simulateProgressiveTyping(messageId, data.content);
+      // Attendre un moment pour permettre la stabilisation des éléments DOM
+      setTimeout(() => {
+        // Afficher le texte progressivement après une courte pause
+        simulateProgressiveTyping(messageId, data.content);
+      }, 100);
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -558,8 +561,11 @@ const ChatAssistant: React.FC = () => {
         allowActions: true,
       }]);
       
-      // Simuler l'écriture progressive avec l'ID unique
-      simulateProgressiveTyping(reExplanationId, data.content);
+      // Attendre un moment pour permettre la stabilisation des éléments DOM
+      setTimeout(() => {
+        // Simuler l'écriture progressive avec l'ID unique après une courte pause
+        simulateProgressiveTyping(reExplanationId, data.content);
+      }, 100);
     } catch (error) {
       console.error('Erreur lors de la requête de réexplication:', error);
       
@@ -629,8 +635,11 @@ const ChatAssistant: React.FC = () => {
         challengeId: challengeId,
       }]);
       
-      // Simuler l'écriture progressive
-      simulateProgressiveTyping(challengeId, data.content);
+      // Appliquer un délai pour permettre la stabilisation des éléments DOM
+      setTimeout(() => {
+        // Simuler l'écriture progressive après une courte pause
+        simulateProgressiveTyping(challengeId, data.content);
+      }, 100);
     } catch (error) {
       console.error('Erreur lors de la requête de défi:', error);
       
@@ -749,8 +758,11 @@ const ChatAssistant: React.FC = () => {
                           challengeId: message.id,
                         }]);
                         
-                        // Simuler l'écriture progressive
-                        simulateProgressiveTyping(hintId, data.content);
+                        // Appliquer un délai pour permettre la stabilisation des éléments DOM
+                        setTimeout(() => {
+                          // Simuler l'écriture progressive après une courte pause
+                          simulateProgressiveTyping(hintId, data.content);
+                        }, 100);
                       } catch (error) {
                         console.error('Erreur lors de la requête d\'indice:', error);
                         setMessages(prev => [...prev, {
