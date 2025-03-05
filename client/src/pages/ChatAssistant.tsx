@@ -530,14 +530,33 @@ const ChatAssistant: React.FC = () => {
     }
   };
   
-  // Fonction pour afficher les messages
   // Fonction pour demander une nouvelle explication
   const handleRequestReExplanation = async (originalQuestion: string, originalExplanation: string) => {
     if (isThinking) return;
     
+    // Empêcher les clics multiples
+    if (progressiveText.intervalId) {
+      clearInterval(progressiveText.intervalId);
+      setProgressiveText(prev => ({
+        ...prev,
+        intervalId: undefined
+      }));
+    }
+    
     setIsThinking(true);
     
     try {
+      // Générer les IDs à l'avance pour éviter les doublons
+      const userMessageId = Date.now().toString();
+      const reExplanationId = (Date.now() + 1).toString();
+      
+      // Ajouter la demande de l'utilisateur avec l'ID unique
+      setMessages(prev => [...prev, {
+        id: userMessageId,
+        content: "Peux-tu me l'expliquer différemment ?",
+        sender: 'user',
+      }]);
+      
       // Appel API pour la réexplication
       const response = await fetch('/api/tutoring/reexplain', {
         method: 'POST',
@@ -556,27 +575,17 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
-      // Ajouter la demande de l'utilisateur
+      // Ajouter la nouvelle explication avec contenu vide au début et l'ID unique
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: "Peux-tu me l'expliquer différemment ?",
-        sender: 'user',
-      }]);
-      
-      // Générer un ID unique pour ce message
-      const messageId = (Date.now() + 1).toString();
-      
-      // Ajouter la nouvelle explication avec contenu vide au début
-      setMessages(prev => [...prev, {
-        id: messageId,
+        id: reExplanationId,
         content: '',
         sender: 'kora',
         isReExplanation: true,
         allowActions: true,
       }]);
       
-      // Simuler l'écriture progressive
-      simulateProgressiveTyping(messageId, data.content);
+      // Simuler l'écriture progressive avec l'ID unique
+      simulateProgressiveTyping(reExplanationId, data.content);
     } catch (error) {
       console.error('Erreur lors de la requête de réexplication:', error);
       
@@ -595,9 +604,29 @@ const ChatAssistant: React.FC = () => {
   const handleRequestChallenge = async (originalQuestion: string, explanation: string) => {
     if (isThinking) return;
     
+    // Empêcher les clics multiples
+    if (progressiveText.intervalId) {
+      clearInterval(progressiveText.intervalId);
+      setProgressiveText(prev => ({
+        ...prev,
+        intervalId: undefined
+      }));
+    }
+    
     setIsThinking(true);
     
     try {
+      // Générer les IDs à l'avance pour éviter les doublons
+      const userMessageId = Date.now().toString();
+      const challengeId = (Date.now() + 1).toString();
+      
+      // Ajouter la demande de l'utilisateur avec l'ID unique
+      setMessages(prev => [...prev, {
+        id: userMessageId,
+        content: "Peux-tu me donner un exercice pour pratiquer?",
+        sender: 'user',
+      }]);
+      
       // Appel API pour le défi
       const response = await fetch('/api/tutoring/challenge', {
         method: 'POST',
@@ -615,16 +644,6 @@ const ChatAssistant: React.FC = () => {
       }
       
       const data = await response.json();
-      
-      // Générer un ID unique pour ce défi
-      const challengeId = Date.now().toString();
-      
-      // Ajouter la demande de l'utilisateur
-      setMessages(prev => [...prev, {
-        id: challengeId + "-req",
-        content: "Peux-tu me donner un exercice pour pratiquer?",
-        sender: 'user',
-      }]);
       
       // Ajouter le défi avec contenu vide au début
       setMessages(prev => [...prev, {
@@ -662,7 +681,7 @@ const ChatAssistant: React.FC = () => {
             className={`inline-block rounded-2xl ${
               isKora 
                 ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full px-4 py-3" 
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-2 flex items-center justify-center"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-3 flex items-center min-h-[48px]"
             }`}
           >
             {/* Image de l'utilisateur si présente */}
