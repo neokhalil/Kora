@@ -63,28 +63,45 @@ const formatMathContent = (content: string): string => {
   const blockMathRegex = /\$\$([\s\S]+?)\$\$/g;  // Format $$ ... $$ (multi-ligne)
   const blockMathRegex2 = /\\\\?\[([\s\S]+?)\\\\?\]/g;  // Format \[ ... \] (multi-ligne et plus tolérant)
   
-  // Fonction pour nettoyer les formules - supprimer les espaces superflus et traiter les caractères spéciaux
+  // Fonction pour nettoyer les formules - supprimer les attributs CSS et traiter les caractères spéciaux
   const cleanFormula = (formula: string) => {
-    // Première passe: supprimer tous les attributs de style CSS qui interfèrent
+    console.log('Raw formula:', formula);
+    
+    // Extraire uniquement le contenu mathématique en supprimant les attributs HTML/CSS
+    // Première étape: supprimer tous les attributs de style
+    formula = formula.replace(/style="[^"]*"/g, '');
+    
+    // Supprimer les attributs isolés comme vertical-align:-0.0833em
+    formula = formula.replace(/[a-z-]+:[^;>]+/g, '');
+    
+    // Deuxième étape: supprimer tous les tags HTML
+    formula = formula.replace(/<[^>]+>/g, '');
+    
+    // Troisième étape: supprimer les attributs CSS restants qui causent des problèmes
     let cleaned = formula
       .replace(/&nbsp;/g, ' ')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
-      .replace(/&amp;/g, '&');
-      
-    // Deuxième passe: supprimer spécifiquement les problèmes avec "em"
-    cleaned = cleaned
-      .replace(/(\d+(?:\.\d+)?)em(?:[;">])/g, '$1')  // ex: 0.4306em">
-      .replace(/vertical-align:-0\./g, '')
-      .replace(/text-align:-0\./g, '')
-      .replace(/([0-9.]+)em(?![a-zA-Z])/g, '$1')      // Supprimer em après un nombre s'il n'est pas une unité
-      .replace(/"[^"]*"/g, '')                        // Supprimer tous les attributs entre guillemets
-      .replace(/\\em(?![a-zA-Z])/g, '')              // Enlever \em qui n'est pas suivi par une lettre
-      .replace(/\\textrm\{([^}]+)\}/g, '$1')         // Remplacer \textrm{...} par son contenu
-      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}')   // Garder \text{...} intact
-      .replace(/<[^>]+>/g, '')                       // Supprimer toutes les balises HTML
-      .replace(/>/g, '')                             // Supprimer les > restants
+      .replace(/&amp;/g, '&')
+      .replace(/(\d+(?:\.\d+)?)em/g, '$1') // Supprimer em après des nombres
+      .replace(/vertical-align:[^;]*/g, '')
+      .replace(/text-align:[^;]*/g, '')
+      .replace(/(?:([0-9.]+)(em|px))+/g, '$1') // Supprimer les unités CSS
+      .replace(/\\em(?![a-zA-Z])/g, '') // Enlever \em qui n'est pas suivi par une lettre
+      .replace(/\\textrm\{([^}]+)\}/g, '$1') // Remplacer \textrm{...} par son contenu
+      .replace(/\\text\{([^}]+)\}/g, '\\text{$1}') // Garder \text{...} intact
+      .replace(/>/g, '') // Supprimer les > restants
+      .replace(/"/g, '') // Supprimer les guillemets restants
       .trim();
+    
+    // Supprimer les fragments d'attributs CSS qui pourraient rester
+    cleaned = cleaned
+      .replace(/vertical-align/g, '')
+      .replace(/text-align/g, '')
+      .replace(/;/g, '')
+      .replace(/-0\./g, '')
+      .replace(/\.[0-9]+/g, '')
+      .replace(/em/g, '');
     
     console.log('Cleaned formula:', cleaned);
     return cleaned;
