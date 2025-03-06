@@ -107,16 +107,16 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       ref={containerRef}
       className={`math-content ${className}`}
       style={{ 
-        willChange: 'transform',
-        transform: 'translateZ(0)',
         position: 'relative', 
-        minHeight: stableHeight ? `${stableHeight}px` : '20px'
+        minHeight: stableHeight ? `${stableHeight}px` : '20px',
+        containIntrinsicSize: stableHeight ? `auto ${stableHeight}px` : 'auto auto'
       }}
     >
       <MathJax>
         <div 
           dangerouslySetInnerHTML={{ __html: enhancedContent }}
           className="math-content-inner"
+          style={{ contain: 'content' }}
         />
       </MathJax>
     </div>

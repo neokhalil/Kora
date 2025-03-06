@@ -317,7 +317,7 @@ const ChatAssistant: React.FC = () => {
     // Stocker l'ID d'intervalle pour pouvoir le nettoyer plus tard
     setProgressiveText(prev => ({
       ...prev,
-      intervalId
+      intervalId: intervalId as unknown as NodeJS.Timeout
     }));
   };
   

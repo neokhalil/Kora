@@ -16,16 +16,16 @@
   
   /* Style pour améliorer le rendu des formules mathématiques */
   .math-content {
-    transition: min-height 0.3s ease-out;
-    will-change: transform, opacity;
+    transition: none; /* Supprime la transition pour éviter les tremblements */
+    will-change: contents;
     overflow-wrap: break-word;
-    contain: content;
     transform: translateZ(0); /* Force GPU acceleration */
     backface-visibility: hidden; /* Reduce flickering */
     font-feature-settings: "tnum";
     min-height: 20px; /* Hauteur minimale pour stabiliser le contenu */
-    perspective: 1000px; /* Améliore la stabilité GPU */
     position: relative;
+    line-height: 1.5;
+    contain: style;
   }
 
   .math-content .katex-display {
@@ -33,21 +33,28 @@
     overflow-x: auto;
     overflow-y: hidden;
     padding: 0.4em 0;
-    will-change: transform;
+    will-change: contents;
     transform: translateZ(0);
+    contain: layout style paint;
   }
 
   .math-content .MathJax {
     outline: none;
-    text-rendering: geometricPrecision;
-    contain: layout style paint;
+    text-rendering: optimizeLegibility;
     transform: translateZ(0);
-    will-change: transform;
+    contain: style;
   }
   
   .math-content-inner {
     transform: translateZ(0);
     position: relative;
+    contain: layout style;
+  }
+  
+  /* Important pour réduire les tremblements lors de l'ajout des formules mathématiques */
+  .MathJax_Display {
+    contain: layout style;
+    transform: translateZ(0);
   }
   
   .math-content h3 {
