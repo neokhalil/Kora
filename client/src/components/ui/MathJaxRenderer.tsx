@@ -175,13 +175,11 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Améliorer les titres et les étapes numérotées pour une meilleure mise en page
   let enhancedContent = markdownFormatted
     // Améliorer les titres
-    .replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>')
-    // Améliorer la numérotation des étapes
-    .replace(/(\d+)\.\s+(.*?):/g, '<strong>$1. $2 :</strong>')
-    // Ne pas mettre les nombres en gras s'ils ne sont pas suivis de titres
-    .replace(/^(\d+)\.\s+([^<]*[^:])/gm, '<span class="step-number">$1.</span> $2')
-    // Assurer que chaque phrase numérotée est sur une ligne séparée
-    .replace(/(\d+\.\s+[^.]+\.)\s+(\d+\.)/g, '$1<br /><br />$2')
+    .replace(/^(Pour résoudre|Résolution|Résoudre|Explication)\s+(.*):$/gm, '<h3>$1 $2 :</h3>')
+    // Traiter les listes numérotées entières
+    .replace(/(^|\n|\<br \/\>)(\d+)[\.\)]\s+(.*?)(?=\n|\<br \/\>|$)/gm, (match, prefix, number, content) => {
+      return `${prefix}<div class="numbered-step"><span class="step-number">${number}.</span><span class="step-content">${content}</span></div>`;
+    })
     // Mise en forme des résultats intermédiaires
     .replace(/(Ce qui donne|On obtient|Ce qui nous donne|Ceci donne)\s*:/g, '<div class="result">$1 :</div>')
     // Mise en forme de la conclusion
@@ -231,7 +229,10 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
               const pre = block.parentElement;
               if (pre && !pre.querySelector('.language-label')) {
                 const label = document.createElement('div');
-                label.className = 'language-label';
+                
+                // Appliquer la classe spécifique du langage si elle existe
+                const langName = lang.toLowerCase();
+                label.className = `language-label ${langName ? 'language-' + langName : ''}`;
                 label.textContent = getLangDisplayName(lang);
                 pre.appendChild(label);
               }
