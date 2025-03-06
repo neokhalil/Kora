@@ -31,26 +31,40 @@
   /* Styles pour les blocs de code */
   .code-block {
     display: block;
-    background-color: #f5f5f5;
+    background-color: #f8f8f8;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
     padding: 1rem;
     margin: 1rem 0;
     overflow-x: auto;
-    white-space: pre;
+    white-space: pre-wrap;
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
     font-size: 0.9rem;
     line-height: 1.5;
     width: 100%;
     box-sizing: border-box;
-    word-break: keep-all;
-    word-wrap: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
   /* Assurer que les conteneurs pre ne sont pas trop étroits */
   pre.code-block {
     max-width: 100%;
     min-width: 200px;
+  }
+  
+  /* Gestion spécifique pour les téléphones mobiles */
+  @media (max-width: 640px) {
+    .code-block {
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      white-space: pre-wrap;
+    }
+    
+    .code-block code {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
   }
   
   /* Style pour les codes en ligne */
@@ -60,7 +74,20 @@
     padding: 0.2rem 0.4rem;
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
     font-size: 0.9em;
-    white-space: nowrap;
+    white-space: normal;
+    word-break: break-all;
+  }
+  
+  /* Pour les codes en ligne sur mobile */
+  @media (max-width: 640px) {
+    .inline-code {
+      font-size: 0.85em;
+      padding: 0.15rem 0.3rem;
+      display: inline-block;
+      max-width: 100%;
+      white-space: normal;
+      word-break: break-all;
+    }
   }
   
   /* Style spécifique pour Python */
