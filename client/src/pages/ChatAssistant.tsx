@@ -379,11 +379,14 @@ const ChatAssistant: React.FC = () => {
         allowActions: true,
       }]);
       
-      // Attendre un moment pour permettre la stabilisation des éléments DOM
-      setTimeout(() => {
-        // Afficher le texte progressivement après une courte pause
-        simulateProgressiveTyping(messageId, data.content);
-      }, 100);
+      // Afficher directement le contenu complet sans animation
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, content: data.content } 
+            : msg
+        )
+      );
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -568,11 +571,14 @@ const ChatAssistant: React.FC = () => {
         allowActions: true,
       }]);
       
-      // Attendre un moment pour permettre la stabilisation des éléments DOM
-      setTimeout(() => {
-        // Simuler l'écriture progressive avec l'ID unique après une courte pause
-        simulateProgressiveTyping(reExplanationId, data.content);
-      }, 100);
+      // Afficher directement le contenu complet sans animation
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === reExplanationId 
+            ? { ...msg, content: data.content } 
+            : msg
+        )
+      );
     } catch (error) {
       console.error('Erreur lors de la requête de réexplication:', error);
       
@@ -642,11 +648,14 @@ const ChatAssistant: React.FC = () => {
         challengeId: challengeId,
       }]);
       
-      // Appliquer un délai pour permettre la stabilisation des éléments DOM
-      setTimeout(() => {
-        // Simuler l'écriture progressive après une courte pause
-        simulateProgressiveTyping(challengeId, data.content);
-      }, 100);
+      // Afficher directement le contenu complet sans animation
+      setMessages(prev => 
+        prev.map(msg => 
+          msg.id === challengeId 
+            ? { ...msg, content: data.content } 
+            : msg
+        )
+      );
     } catch (error) {
       console.error('Erreur lors de la requête de défi:', error);
       
@@ -765,11 +774,14 @@ const ChatAssistant: React.FC = () => {
                           challengeId: message.id,
                         }]);
                         
-                        // Appliquer un délai pour permettre la stabilisation des éléments DOM
-                        setTimeout(() => {
-                          // Simuler l'écriture progressive après une courte pause
-                          simulateProgressiveTyping(hintId, data.content);
-                        }, 100);
+                        // Afficher directement le contenu complet sans animation
+                        setMessages(prev => 
+                          prev.map(msg => 
+                            msg.id === hintId 
+                              ? { ...msg, content: data.content } 
+                              : msg
+                          )
+                        );
                       } catch (error) {
                         console.error('Erreur lors de la requête d\'indice:', error);
                         setMessages(prev => [...prev, {
