@@ -53,122 +53,89 @@ interface Message {
   challengeId?: string; // Pour associer un indice à un défi spécifique
 }
 
-// Configuration MathJax
+// Configuration MathJax pour les formules mathématiques
 const mathJaxConfig = {
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true,
-    processEnvironments: true
+    tags: 'ams',
   },
-  options: {
-    enableMenu: false,    // Désactive le menu contextuel
-    menuOptions: {
-      settings: {
-        assistiveMml: false,
-        zoom: 'NoZoom'    // Désactive le zoom
-      }
-    }
+  svg: {
+    fontCache: 'global'
   },
   startup: {
-    typeset: false        // Ne pas traiter automatiquement la page (pour éviter les conflits)
+    typeset: false
   }
 };
 
-const ChatAssistant: React.FC = () => {
-  // État principal
+export default function ChatAssistant() {
+  // État des messages
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isThinking, setIsThinking] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const [challengeAnswers, setChallengeAnswers] = useState<Record<string, string>>({});
+  const [isRecording, setIsRecording] = useState(false);
+
+  // États pour les images
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [progressiveText, setProgressiveText] = useState<{id: string, fullText: string, currentText: string, intervalId?: NodeJS.Timeout}>({
+
+  // Références pour les éléments DOM
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
+
+  // État pour le texte progressif
+  const [progressiveText, setProgressiveText] = useState<{
+    id: string;
+    fullText: string;
+    currentText: string;
+    intervalId?: NodeJS.Timeout;
+  }>({
     id: '',
     fullText: '',
-    currentText: ''
+    currentText: '',
   });
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-  
-  // Vérifier si c'est un appareil mobile
-  const isMobile = useIsMobile();
-  
-  // Références
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const socketRef = useRef<WebSocket | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const composerRef = useRef<HTMLDivElement>(null);
-  
-  // Initialisation du fix pour mobile
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    // Ajouter la classe iOS-device si nécessaire
+    if (isMobile) {
+      document.body.classList.add('ios-device');
       setupMobileViewportFix();
     }
-  }, []);
 
-  // Détecter l'appareil mobile
-  useEffect(() => {
-    setIsMobileDevice(isMobile);
+    // Message de bienvenue
+    setTimeout(() => {
+      const welcomeMessage: Message = {
+        id: 'welcome',
+        content: "Bonjour ! Je suis Kora, votre assistant pour les devoirs. Posez-moi une question sur n'importe quel sujet, ou envoyez-moi une image pour que je puisse vous aider.",
+        sender: 'kora',
+      };
+      setMessages([welcomeMessage]);
+      
+      // Assurer le défilement
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 500);
+
+    // Nettoyage à la fermeture
+    return () => {
+      if (progressiveText.intervalId) {
+        clearInterval(progressiveText.intervalId);
+      }
+    };
   }, [isMobile]);
   
-  // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
+  // Effet pour gérer le défilement automatique lorsque les messages changent
   useEffect(() => {
     if (messagesEndRef.current) {
-      // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isThinking]);
-  
-  // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
-  useEffect(() => {
-    // Gestion des événements de focus
-    const handleFocusIn = () => {
-      // Assurer que le clavier s'ouvre correctement
-      document.body.classList.add('keyboard-open');
-    };
-    
-    const handleFocusOut = () => {
-      // Retirer la classe quand un champ perd le focus
-      document.body.classList.remove('keyboard-open');
-    };
-    
-    // Gestion des événements du Visual Viewport API (pour iOS)
-    const handleVisualViewportChange = () => {
-      const vv = window.visualViewport;
-      if (vv && vv.height < window.innerHeight) {
-        document.body.classList.add('keyboard-open');
-        document.body.classList.add('visual-viewport-active');
-      } else {
-        document.body.classList.remove('keyboard-open');
-        document.body.classList.remove('visual-viewport-active');
-      }
-    };
-    
-    // Enregistrement des écouteurs d'événements
-    document.addEventListener('focusin', handleFocusIn);
-    document.addEventListener('focusout', handleFocusOut);
-    
-    // Si VisualViewport API est disponible (principalement iOS)
-    if (window.visualViewport) {
-      document.body.classList.add('visual-viewport-supported');
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-    }
-    
-    // Fonction de nettoyage
-    return () => {
-      document.removeEventListener('focusin', handleFocusIn);
-      document.removeEventListener('focusout', handleFocusOut);
-      
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
-      }
-    };
-  }, []);
+  }, [messages]);
   
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
@@ -661,7 +628,194 @@ const ChatAssistant: React.FC = () => {
     }
   };
 
-  const renderMessage = (message: Message) => {
+  const MessageComponent = React.memo(({ message }: { message: Message }) => {
+    const isKora = message.sender === 'kora';
+    const [showActions, setShowActions] = useState(false);
+    
+    // Afficher les actions uniquement quand le message est complètement affiché
+    useEffect(() => {
+      if (isKora && message.content && message.content.length > 0) {
+        // Attendre que le message soit complètement affiché avant de montrer les boutons
+        // pour éviter les tremblements
+        const timer = setTimeout(() => {
+          // Vérifier si ce message est en cours d'animation
+          const isAnimating = progressiveText.id === message.id && 
+                              progressiveText.currentText.length < progressiveText.fullText.length;
+          
+          if (!isAnimating) {
+            setShowActions(true);
+          }
+        }, 300);
+        
+        return () => clearTimeout(timer);
+      }
+    }, [isKora, message.content, message.id]);
+    
+    return (
+      <div key={message.id} className="px-4 py-2 mb-4">
+        <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
+          <div 
+            className={`inline-block rounded-2xl ${
+              isKora 
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full px-4 py-3" 
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-3 flex items-center min-h-[48px]"
+            }`}
+            style={{ 
+              minHeight: isKora ? '120px' : '48px',
+              contain: 'content'
+            }}
+          >
+            {/* Image de l'utilisateur si présente */}
+            {message.imageUrl && (
+              <div className="mb-3">
+                <div className="relative rounded-lg overflow-hidden">
+                  <img 
+                    src={message.imageUrl} 
+                    alt="Uploaded content" 
+                    className="w-full max-h-60 object-contain"
+                  />
+                </div>
+              </div>
+            )}
+            
+            {/* Contenu du message avec formatage amélioré pour les maths via MathJax */}
+            <div className="prose dark:prose-invert text-base leading-relaxed px-1">
+              <MathJaxRenderer content={message.content} />
+            </div>
+            
+            {/* Actions supplémentaires (réexpliquer, défi, indice) */}
+            {isKora && showActions && (
+              <div className="mt-4 flex flex-wrap gap-3 justify-start" style={{ minHeight: '40px' }}>
+                {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
+                {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
+                  <button 
+                    className="kora-action-button"
+                    onClick={() => {
+                      // Trouver le message d'utilisateur précédent
+                      const messagesArray = [...messages];
+                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
+                      let userMessageIndex = -1;
+                      
+                      // Chercher le message utilisateur le plus récent avant cette réponse
+                      for (let i = currentIndex - 1; i >= 0; i--) {
+                        if (messagesArray[i].sender === 'user') {
+                          userMessageIndex = i;
+                          break;
+                        }
+                      }
+                      
+                      if (userMessageIndex !== -1) {
+                        handleRequestReExplanation(
+                          messagesArray[userMessageIndex].content,
+                          message.content
+                        );
+                      }
+                    }}
+                  >
+                    Ré-explique
+                  </button>
+                )}
+                
+                {/* Bouton Indice - uniquement visible pour les défis */}
+                {message.isChallenge && (
+                  <button 
+                    className="kora-action-button"
+                    onClick={async () => {
+                      if (isThinking) return;
+                      
+                      setIsThinking(true);
+                      
+                      try {
+                        // Pour la simplicité, nous utilisons la même fonction de réexplication avec un message spécial
+                        const response = await fetch('/api/tutoring/reexplain', {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          },
+                          body: JSON.stringify({
+                            originalQuestion: "Indice pour le défi: " + message.content,
+                            originalExplanation: "Génère des indices sans donner la solution complète."
+                          }),
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error('Erreur lors de la requête d\'indice');
+                        }
+                        
+                        const data = await response.json();
+                        
+                        // Générer un ID unique pour ce message d'indice
+                        const hintId = Date.now().toString();
+                        
+                        // Ajouter l'indice directement (sans message utilisateur)
+                        setMessages(prev => [...prev, {
+                          id: hintId,
+                          content: '',
+                          sender: 'kora',
+                          isHint: true,
+                          challengeId: message.id,
+                        }]);
+                        
+                        // Appliquer un délai pour permettre la stabilisation des éléments DOM
+                        setTimeout(() => {
+                          // Simuler l'écriture progressive après une courte pause
+                          simulateProgressiveTyping(hintId, data.content);
+                        }, 100);
+                      } catch (error) {
+                        console.error('Erreur lors de la requête d\'indice:', error);
+                        setMessages(prev => [...prev, {
+                          id: Date.now().toString(),
+                          content: "Désolé, je ne peux pas fournir d'indice pour le moment.",
+                          sender: 'kora',
+                        }]);
+                      } finally {
+                        setIsThinking(false);
+                      }
+                    }}
+                  >
+                    Indice
+                  </button>
+                )}
+                
+                {/* Bouton Faire un exercice - caché pour les défis mais visible pour les indices */}
+                {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
+                  <button 
+                    className="kora-action-button"
+                    onClick={() => {
+                      // Trouver le message d'utilisateur précédent
+                      const messagesArray = [...messages];
+                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
+                      let userMessageIndex = -1;
+                      
+                      // Chercher le message utilisateur le plus récent avant cette réponse
+                      for (let i = currentIndex - 1; i >= 0; i--) {
+                        if (messagesArray[i].sender === 'user') {
+                          userMessageIndex = i;
+                          break;
+                        }
+                      }
+                      
+                      if (userMessageIndex !== -1) {
+                        handleRequestChallenge(
+                          messagesArray[userMessageIndex].content,
+                          message.content
+                        );
+                      }
+                    }}
+                  >
+                    Faire un exercice
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Fonction pour rendre chaque message avec ses actions
+  const MessageItem = (message: Message) => {
     const isKora = message.sender === 'kora';
     
     return (
@@ -693,7 +847,7 @@ const ChatAssistant: React.FC = () => {
             </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
-            {isKora && (
+            {isKora && message.allowActions && (
               <div className="mt-4 flex flex-wrap gap-3 justify-start">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
@@ -786,8 +940,8 @@ const ChatAssistant: React.FC = () => {
                   </button>
                 )}
                 
-                {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
-                {(!message.isChallenge || message.isHint) && (
+                {/* Bouton Défi - visible seulement pour les réponses normales et les ré-explications */}
+                {!message.isChallenge && !message.isHint && (
                   <button 
                     className="kora-action-button"
                     onClick={() => {
@@ -825,311 +979,115 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <MathJaxContext config={mathJaxConfig}>
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Zone des messages */}
-          <div 
-            className="flex-1 overflow-y-auto p-4 chat-messages-container" 
-          >
-            {messages.length === 0 ? (
-              <div className="h-full flex flex-col justify-start pt-12">
-                <div className="max-w-md px-4">
-                  <h2 className="text-4xl font-bold mb-1">Hello,</h2>
-                  <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
-                  <p className="text-gray-600 text-3xl leading-tight">
-                    Comment<br />
-                    puis-je t'aider<br />
-                    aujourd'hui ?
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <>
-                {messages.map(renderMessage)}
-                
-                {/* Indicateur de réflexion */}
-                {isThinking && (
-                  <div className="px-4 py-2 mb-4">
-                    <div className="max-w-3xl mx-auto">
-                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                        <div className="flex space-x-1">
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                          <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                <div ref={messagesEndRef} />
-              </>
-            )}
-          </div>
-          
-          {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
-            <div className="max-w-4xl mx-auto">
-              {/* Zone d'aperçu d'image */}
-              {imagePreview && (
-                <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-                  <div className="flex items-start">
-                    <div className="flex-1 flex space-x-2 items-center">
-                      <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
-                        <img 
-                          src={imagePreview} 
-                          alt="Preview" 
-                          className="w-full h-full object-cover" 
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-medium">Image sélectionnée</div>
-                        <div className="text-xs text-gray-500">{selectedImage?.name}</div>
-                      </div>
-                    </div>
-                    
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-7 w-7 rounded-full p-0"
-                      onClick={() => {
-                        setImagePreview(null);
-                        setSelectedImage(null);
-                      }}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              {/* Composeur de message style iOS */}
-              <div 
-                className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
-                ref={composerRef}
-                onFocus={() => {
-                  // Déclenche la classe keyboard-open pour adapter l'UI
-                  document.body.classList.add('keyboard-open');
-                  
-                  // Scroll vers la fin des messages après un court délai
-                  setTimeout(() => {
-                    if (messagesEndRef.current) {
-                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }, 300);
-                }}
-              >
-                {/* Hidden file input pour les images */}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  onClick={(e) => {
-                    (e.target as HTMLInputElement).value = '';
-                  }}
-                />
-                
-                <div className="flex items-center justify-between gap-2">
-                  {/* Boutons d'action à gauche */}
-                  <div className="flex gap-2">
-                    {/* Bouton galerie */}
-                    <button
-                      type="button"
-                      disabled={isThinking || isUploadingImage}
-                      onClick={handleOpenFileBrowser}
-                      title="Choisir une image"
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                    >
-                      <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                    </button>
-                    
-                    {/* Bouton appareil photo (mobile uniquement) */}
-                    {isMobileDevice && (
-                      <button
-                        type="button"
-                        disabled={isThinking || isUploadingImage}
-                        onClick={() => {
-                          const tempInput = document.createElement('input');
-                          tempInput.type = 'file';
-                          tempInput.accept = 'image/*';
-                          tempInput.capture = 'environment';
-                          
-                          tempInput.onchange = (e) => {
-                            handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                          };
-                          
-                          tempInput.click();
-                        }}
-                        title="Prendre une photo"
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                      >
-                        <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  {/* Champ de saisie au centre */}
-                  <div className="flex items-center flex-1 px-2">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Pose ta question"
-                      className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
-                      disabled={isThinking || isUploadingImage}
-                      onFocus={() => {
-                        // Marquer que le clavier est ouvert
-                        document.body.classList.add('keyboard-open');
-                        
-                        // S'assurer que le header fixe est visible
-                        const headerContainer = document.getElementById('kora-header-container');
-                        if (headerContainer) {
-                          headerContainer.style.position = 'absolute';
-                          headerContainer.style.top = '0';
-                          headerContainer.style.zIndex = '9999';
-                        }
-                        
-                        // Scroll vers le bas après l'ouverture du clavier
-                        setTimeout(() => {
-                          if (messagesEndRef.current) {
-                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }, 100);
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Conteneur à droite pour les boutons micro et envoi */}
-                  <div className="flex items-center gap-2">
-                    {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
-                    {selectedImage ? (
-                      <button
-                        type="button"
-                        onClick={handleSubmitImage}
-                        disabled={isThinking || isUploadingImage}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-5 w-5"
-                        >
-                          <path
-                            d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                          />
-                        </svg>
-                      </button>
-                    ) : inputValue.trim() ? (
-                      /* Bouton d'envoi de texte - visible seulement si du texte est présent */
-                      <button
-                        type="button"
-                        onClick={handleSendMessage}
-                        disabled={isThinking || isUploadingImage}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-5 w-5"
-                        >
-                          <path
-                            d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                          />
-                        </svg>
-                      </button>
-                    ) : (
-                      /* Bouton microphone */
-                      <div className="w-10 h-10 flex items-center justify-center">
-                        <VoiceRecorder 
-                          onTranscriptionComplete={async (text) => {
-                            setInputValue('');
-                            
-                            if (text.trim().length > 0) {
-                              // Créer et ajouter le message de l'utilisateur
-                              const userMessage: Message = {
-                                id: Date.now().toString(),
-                                content: text,
-                                sender: 'user',
-                              };
-                              
-                              setMessages(prev => [...prev, userMessage]);
-                              setIsThinking(true);
-                              
-                              try {
-                                // Préparer les messages précédents pour le contexte
-                                const messageHistory = messages.map(msg => ({
-                                  content: msg.content,
-                                  sender: msg.sender
-                                }));
-                                
-                                // Appel API à OpenAI via notre serveur
-                                const response = await fetch('/api/tutoring/ask', {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                  },
-                                  body: JSON.stringify({
-                                    question: text,
-                                    messages: messageHistory
-                                  }),
-                                });
-                                
-                                if (!response.ok) {
-                                  throw new Error('Erreur lors de la requête API');
-                                }
-                                
-                                const data = await response.json();
-                                
-                                // Ajouter la réponse de l'IA aux messages
-                                setMessages(prev => [...prev, {
-                                  id: Date.now().toString(),
-                                  content: data.content,
-                                  sender: 'kora',
-                                }]);
-                              } catch (error) {
-                                console.error('Erreur lors de la communication avec le serveur:', error);
-                                
-                                // Message d'erreur à l'utilisateur
-                                setMessages(prev => [...prev, {
-                                  id: Date.now().toString(),
-                                  content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
-                                  sender: 'kora',
-                                }]);
-                              } finally {
-                                setIsThinking(false);
-                                
-                                // Faire défiler vers le bas 
-                                setTimeout(() => {
-                                  if (messagesEndRef.current) {
-                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                                  }
-                                }, 100);
-                              }
-                            }
-                          }}
-                          disabled={isThinking || isUploadingImage}
-                          maxRecordingTimeMs={30000}
-                          language="fr"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-2 text-xs text-gray-500 text-center">
-                KORA, ton assistant IA pour réviser et faire tes exercices.
+      <div className="app-container h-full flex flex-col bg-gray-50 dark:bg-gray-900">
+        {/* En-tête */}
+        <header id="kora-header" className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div id="kora-header-container" className="px-4 h-14 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-8 w-8 bg-blue-500">
+                <span className="font-bold text-white text-sm">K</span>
+              </Avatar>
+              <div>
+                <h1 className="text-base font-medium text-gray-900 dark:text-gray-100">Kora</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Assistant d'aide aux devoirs</p>
               </div>
             </div>
+          </div>
+        </header>
+        
+        {/* Contenu principal - Messages */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="chat-messages-container pb-32">
+            {messages.map(msg => <React.Fragment key={msg.id}>{renderMessage({message: msg})}</React.Fragment>)}
+            <div ref={messagesEndRef} />
+            
+            {/* Indicateur de chargement pendant la "réflexion" */}
+            {isThinking && (
+              <div className="px-4 py-2 mb-4">
+                <div className="max-w-3xl mx-auto">
+                  <div className="inline-block rounded-2xl bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full p-4">
+                    <div className="flex items-center space-x-2">
+                      <Loader2 className="animate-spin h-5 w-5 text-gray-500" />
+                      <span className="text-gray-500 text-sm">Kora réfléchit...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </main>
+        
+        {/* Zone de saisie en bas */}
+        <div ref={inputContainerRef} className="composer-container border-t border-gray-200 dark:border-gray-700 p-4 bg-white dark:bg-gray-800">
+          {/* Prévisualisation de l'image si sélectionnée */}
+          {imagePreview && (
+            <div className="mb-3 rounded-lg overflow-hidden relative bg-gray-100 dark:bg-gray-700 p-2">
+              <div className="relative">
+                <img src={imagePreview} alt="Preview" className="max-h-32 rounded max-w-full mx-auto object-contain" />
+                <button 
+                  onClick={() => {
+                    setSelectedImage(null);
+                    setImagePreview(null);
+                  }}
+                  className="absolute top-1 right-1 rounded-full bg-gray-800 bg-opacity-60 text-white p-1 hover:bg-opacity-80"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="flex justify-between mt-2">
+                <div className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[70%]">
+                  {selectedImage?.name}
+                </div>
+                <button 
+                  onClick={handleSubmitImage}
+                  disabled={isUploadingImage}
+                  className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                >
+                  {isUploadingImage ? 'Envoi en cours...' : 'Analyser'}
+                </button>
+              </div>
+            </div>
+          )}
+          
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Posez votre question..."
+              className="flex-1 min-h-[44px] rounded-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 px-4 py-2"
+              disabled={isThinking || isRecording}
+            />
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              accept="image/*" 
+              onChange={handleImageSelect} 
+              className="hidden" 
+            />
+            <button 
+              onClick={handleOpenFileBrowser}
+              disabled={isThinking || isRecording}
+              className="rounded-full w-10 h-10 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <ImageIcon size={20} />
+            </button>
+            
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || isThinking || isRecording}
+              className={`rounded-full w-10 h-10 flex items-center justify-center ${
+                inputValue.trim() && !isThinking && !isRecording
+                  ? 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              <Send size={18} />
+            </button>
           </div>
         </div>
       </div>
     </MathJaxContext>
   );
-};
-
-export default ChatAssistant;
+}
