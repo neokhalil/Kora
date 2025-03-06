@@ -533,33 +533,140 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
-      // Ajouter le défi avec contenu vide au début
+      // Ajouter le défi avec l'ID unique
       setMessages(prev => [...prev, {
         id: challengeId,
-        content: '',
+        content: data.content,
         sender: 'kora',
         isChallenge: true,
-        allowActions: true,
-        challengeId: challengeId,
+        challengeData: {
+          questionId: challengeId,
+          challengeType: data.challengeType || 'practice',
+          expectedAnswer: data.expectedAnswer,
+          solution: data.solution
+        }
       }]);
-      
-      // Simuler l'écriture progressive
-      simulateProgressiveTyping(challengeId, data.content);
     } catch (error) {
       console.error('Erreur lors de la requête de défi:', error);
       
       // Message d'erreur
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        content: "Désolé, je ne peux pas créer un défi pour le moment.",
+        content: "Désolé, je ne peux pas générer un exercice pour le moment.",
         sender: 'kora',
       }]);
     } finally {
       setIsThinking(false);
     }
   };
-
-  const renderMessage = (message: Message) => {
+  
+  // Fonction pour demander un indice sur un défi
+  const handleRequestHint = async (challengeId: string, challengeContent: string) => {
+    if (isThinking) return;
+    
+    setIsThinking(true);
+    
+    try {
+      // Générer les IDs à l'avance
+      const userMessageId = Date.now().toString();
+      const hintId = (Date.now() + 1).toString();
+      
+      // Ajouter la demande d'indice
+      setMessages(prev => [...prev, {
+        id: userMessageId,
+        content: "Peux-tu me donner un indice?",
+        sender: 'user',
+      }]);
+      
+      // Pour le prototype, générer un indice simple
+      // Dans une version réelle, il faudrait appeler l'API
+      const hint = "Pour résoudre ce problème, essaie de décomposer les étapes. Commence par identifier les variables et les contraintes données.";
+      
+      // Ajouter l'indice
+      setMessages(prev => [...prev, {
+        id: hintId,
+        content: hint,
+        sender: 'kora',
+        isHint: true,
+        challengeId: challengeId
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la demande d\'indice:', error);
+      
+      // Message d'erreur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, je ne peux pas te donner un indice pour le moment.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+  
+  // Fonction pour gérer la soumission d'une réponse à un défi
+  const handleSubmitChallengeAnswer = (challengeId: string, expectedAnswer: string) => {
+    const userAnswer = challengeAnswers[challengeId] || '';
+    
+    // Comparer la réponse de l'utilisateur avec la réponse attendue
+    // Cette logique devrait être plus sophistiquée dans une vraie application
+    const isCorrect = userAnswer.trim().toLowerCase() === expectedAnswer.trim().toLowerCase();
+    
+    // Mettre à jour le défi
+    setMessages(prev => prev.map(msg => {
+      if (msg.id === challengeId && msg.challengeData) {
+        return {
+          ...msg,
+          challengeData: {
+            ...msg.challengeData,
+            userAnswer,
+            isAnswered: true,
+            isCorrect
+          }
+        };
+      }
+      return msg;
+    }));
+    
+    // Vider la réponse du défi
+    setChallengeAnswers(prev => {
+      const updated = { ...prev };
+      delete updated[challengeId];
+      return updated;
+    });
+    
+    // Ajouter un message de feedback
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      content: isCorrect 
+        ? "Bravo ! C'est la bonne réponse. 🎉" 
+        : "Ce n'est pas tout à fait ça. Voulez-vous un indice ou voir la solution ?",
+      sender: 'kora',
+      allowActions: !isCorrect,
+      challengeId: isCorrect ? undefined : challengeId,
+    }]);
+  };
+  
+  // Fonction pour montrer la solution à un défi
+  const handleShowSolution = (challengeId: string, solution: string) => {
+    setMessages(prev => [...prev, {
+      id: Date.now().toString(),
+      content: `Voici la solution : ${solution}`,
+      sender: 'kora',
+    }]);
+  };
+  
+  // Gérer le changement de la réponse à un défi
+  const handleChallengeAnswerChange = (challengeId: string, answer: string) => {
+    setChallengeAnswers(prev => ({
+      ...prev,
+      [challengeId]: answer
+    }));
+  };
+  
+  // Utiliser notre composant MathJaxRenderer pour afficher le contenu avec les formules mathématiques
+  // et appliquer un rendu progressif du texte pour les messages de Kora
+  const MessageItem = (message: Message) => {
     const isKora = message.sender === 'kora';
     
     return (
@@ -568,147 +675,123 @@ const ChatAssistant: React.FC = () => {
           <div 
             className={`inline-block rounded-2xl ${
               isKora 
-                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full px-4 py-3" 
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-3 flex items-center min-h-[48px]"
+                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" 
+                : "bg-blue-500 text-white"
+            } ${
+              message.isChallenge ? "w-full" : ""
             }`}
           >
-            {/* Image de l'utilisateur si présente */}
+            {/* Afficher l'image si elle existe */}
             {message.imageUrl && (
               <div className="mb-3">
                 <div className="relative rounded-lg overflow-hidden">
                   <img 
                     src={message.imageUrl} 
-                    alt="Uploaded content" 
-                    className="w-full max-h-60 object-contain"
+                    alt="Image envoyée" 
+                    className="w-full h-auto max-h-[300px] object-contain bg-gray-100"
                   />
                 </div>
               </div>
             )}
             
-            {/* Contenu du message avec formatage amélioré pour les maths via MathJax */}
+            {/* Contenu du message avec support pour les formules mathématiques */}
             <div className="prose dark:prose-invert text-base leading-relaxed px-1">
               <MathJaxRenderer content={message.content} />
             </div>
             
-            {/* Actions supplémentaires (réexpliquer, défi, indice) */}
-            {isKora && (
+            {/* Actions spécifiques selon le type de message (réexplication, défi, etc.) */}
+            {isKora && message.allowActions && !message.isChallenge && (
               <div className="mt-4 flex flex-wrap gap-3 justify-start">
-                {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
-                {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
-                  <button 
-                    className="kora-action-button"
-                    onClick={() => {
-                      // Trouver le message d'utilisateur précédent
-                      const messagesArray = [...messages];
-                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
-                      let userMessageIndex = -1;
-                      
-                      // Chercher le message utilisateur le plus récent avant cette réponse
-                      for (let i = currentIndex - 1; i >= 0; i--) {
-                        if (messagesArray[i].sender === 'user') {
-                          userMessageIndex = i;
-                          break;
-                        }
-                      }
-                      
-                      if (userMessageIndex !== -1) {
-                        handleRequestReExplanation(
-                          messagesArray[userMessageIndex].content,
-                          message.content
-                        );
-                      }
-                    }}
-                  >
-                    Ré-explique
-                  </button>
-                )}
+                {/* Bouton de réexplication */}
+                <Button
+                  onClick={() => handleRequestReExplanation(
+                    // Trouver le message utilisateur précédent pour le contexte
+                    messages.find(m => m.sender === 'user' && m.id < message.id)?.content || "",
+                    message.content
+                  )}
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium"
+                  variant="ghost"
+                >
+                  Ré-explique
+                </Button>
                 
-                {/* Bouton Indice - uniquement visible pour les défis */}
-                {message.isChallenge && (
-                  <button 
-                    className="kora-action-button"
-                    onClick={async () => {
-                      if (isThinking) return;
-                      
-                      setIsThinking(true);
-                      
-                      try {
-                        // Pour la simplicité, nous utilisons la même fonction de réexplication avec un message spécial
-                        const response = await fetch('/api/tutoring/reexplain', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                            originalQuestion: "Indice pour le défi: " + message.content,
-                            originalExplanation: "Génère des indices sans donner la solution complète."
-                          }),
-                        });
-                        
-                        if (!response.ok) {
-                          throw new Error('Erreur lors de la requête d\'indice');
+                {/* Bouton de défi */}
+                <Button
+                  onClick={() => handleRequestChallenge(
+                    messages.find(m => m.sender === 'user' && m.id < message.id)?.content || "",
+                    message.content
+                  )}
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium"
+                  variant="ghost"
+                >
+                  Faire un exercice
+                </Button>
+              </div>
+            )}
+            
+            {/* Interface pour les défis */}
+            {isKora && message.isChallenge && message.challengeData && (
+              <div className="mt-4 border-t pt-3 dark:border-gray-700">
+                {!message.challengeData.isAnswered ? (
+                  <div className="space-y-3">
+                    <Input
+                      type="text"
+                      placeholder="Entrez votre réponse ici..."
+                      value={challengeAnswers[message.id] || ''}
+                      onChange={(e) => handleChallengeAnswerChange(message.id, e.target.value)}
+                      className="w-full border dark:border-gray-700"
+                    />
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => message.challengeData?.expectedAnswer && 
+                          handleSubmitChallengeAnswer(message.id, message.challengeData.expectedAnswer)
                         }
-                        
-                        const data = await response.json();
-                        
-                        // Générer un ID unique pour ce message d'indice
-                        const hintId = Date.now().toString();
-                        
-                        // Ajouter l'indice directement (sans message utilisateur)
-                        setMessages(prev => [...prev, {
-                          id: hintId,
-                          content: '',
-                          sender: 'kora',
-                          isHint: true,
-                          challengeId: message.id,
-                        }]);
-                        
-                        // Simuler l'écriture progressive
-                        simulateProgressiveTyping(hintId, data.content);
-                      } catch (error) {
-                        console.error('Erreur lors de la requête d\'indice:', error);
-                        setMessages(prev => [...prev, {
-                          id: Date.now().toString(),
-                          content: "Désolé, je ne peux pas fournir d'indice pour le moment.",
-                          sender: 'kora',
-                        }]);
-                      } finally {
-                        setIsThinking(false);
-                      }
-                    }}
-                  >
-                    Indice
-                  </button>
-                )}
-                
-                {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
-                {(!message.isChallenge || message.isHint) && (
-                  <button 
-                    className="kora-action-button"
-                    onClick={() => {
-                      // Trouver le message d'utilisateur précédent
-                      const messagesArray = [...messages];
-                      const currentIndex = messagesArray.findIndex(msg => msg.id === message.id);
-                      let userMessageIndex = -1;
-                      
-                      // Chercher le message utilisateur le plus récent avant cette réponse
-                      for (let i = currentIndex - 1; i >= 0; i--) {
-                        if (messagesArray[i].sender === 'user') {
-                          userMessageIndex = i;
-                          break;
-                        }
-                      }
-                      
-                      if (userMessageIndex !== -1) {
-                        handleRequestChallenge(
-                          messagesArray[userMessageIndex].content,
-                          message.content
-                        );
-                      }
-                    }}
-                  >
-                    Faire un exercice
-                  </button>
+                        className="px-3 py-1 text-sm"
+                        variant="default"
+                      >
+                        Soumettre
+                      </Button>
+                      <Button
+                        onClick={() => handleRequestHint(message.id, message.content)}
+                        className="px-3 py-1 text-sm"
+                        variant="outline"
+                      >
+                        Indice
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className={`p-2 rounded-md ${
+                      message.challengeData.isCorrect 
+                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300" 
+                        : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300"
+                    }`}>
+                      {message.challengeData.isCorrect 
+                        ? "Votre réponse est correcte !" 
+                        : "Ce n'est pas la bonne réponse."}
+                    </div>
+                    {!message.challengeData.isCorrect && (
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => handleRequestHint(message.id, message.content)}
+                          className="px-3 py-1 text-sm"
+                          variant="outline"
+                        >
+                          Indice
+                        </Button>
+                        {message.challengeData.solution && (
+                          <Button
+                            onClick={() => handleShowSolution(message.id, message.challengeData?.solution || "")}
+                            className="px-3 py-1 text-sm"
+                            variant="outline"
+                          >
+                            Voir la solution
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
@@ -729,43 +812,45 @@ const ChatAssistant: React.FC = () => {
           {messages.length === 0 ? (
             <div className="h-full flex flex-col justify-start pt-12">
               <div className="max-w-md px-4">
-                <h2 className="text-4xl font-bold mb-1">Hello,</h2>
-                <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
-                <p className="text-gray-600 text-3xl leading-tight">
-                  Comment<br />
-                  puis-je t'aider<br />
-                  aujourd'hui ?
+                <h3 className="text-xl font-semibold mb-4 text-center">
+                  💡 Bonjour, je suis Kora, votre assistant d'aide aux devoirs.
+                </h3>
+                <p className="text-center mb-6 text-gray-600 dark:text-gray-300">
+                  Je peux vous aider à comprendre les concepts difficiles et répondre à vos questions.
                 </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {messages.map(renderMessage)}
-              
-              {/* Indicateur de réflexion */}
-              {isThinking && (
-                <div className="px-4 py-2 mb-4">
+                <div className="space-y-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Exemples de questions:</p>
+                  <div className="px-4 py-2 mb-4">
                   <div className="max-w-3xl mx-auto">
                     <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                       <div className="flex space-x-1">
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                        <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                        <span className="cursor-pointer" onClick={() => {
+                          setInputValue("Comment résoudre une équation du second degré ?");
+                        }}>Comment résoudre une équation du second degré ?</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-              
-              <div ref={messagesEndRef} />
-            </>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Afficher les messages de la conversation
+            messages.map(message => (
+              <React.Fragment key={message.id}>
+                {MessageItem(message)}
+              </React.Fragment>
+            ))
           )}
+          
+          {/* Référence pour faire défiler vers le bas */}
+          <div ref={messagesEndRef} />
         </div>
         
-        {/* Zone de saisie fixe en bas */}
+        {/* Zone de saisie fixée en bas */}
         <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
           <div className="max-w-4xl mx-auto">
-            {/* Zone d'aperçu d'image */}
+            {/* Aperçu de l'image sélectionnée */}
             {imagePreview && (
               <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
                 <div className="flex items-start">
@@ -773,8 +858,8 @@ const ChatAssistant: React.FC = () => {
                     <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
                       <img 
                         src={imagePreview} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover" 
+                        alt="Aperçu" 
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="flex-1">
@@ -782,244 +867,101 @@ const ChatAssistant: React.FC = () => {
                       <div className="text-xs text-gray-500">{selectedImage?.name}</div>
                     </div>
                   </div>
-                  
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-7 w-7 rounded-full p-0"
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
                     onClick={() => {
-                      setImagePreview(null);
                       setSelectedImage(null);
+                      setImagePreview(null);
                     }}
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
+                <Button
+                  onClick={handleSubmitImage}
+                  disabled={isUploadingImage}
+                  className="mt-2 w-full"
+                >
+                  {isUploadingImage ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Envoi en cours...
+                    </>
+                  ) : (
+                    "Envoyer l'image"
+                  )}
+                </Button>
               </div>
             )}
             
-            {/* Composeur de message style iOS */}
             <div 
-              className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
               ref={composerRef}
-              onFocus={() => {
-                // Déclenche la classe keyboard-open pour adapter l'UI
-                document.body.classList.add('keyboard-open');
-                
-                // Scroll vers la fin des messages après un court délai
-                setTimeout(() => {
-                  if (messagesEndRef.current) {
-                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }, 300);
-              }}
+              className="flex flex-col space-y-2 rounded-xl p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
             >
-              {/* Hidden file input pour les images */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageSelect}
-                onClick={(e) => {
-                  (e.target as HTMLInputElement).value = '';
-                }}
+              <Input
+                type="text"
+                placeholder="Posez votre question ici..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyPress}
+                className="flex-1 focus:outline-none focus:ring-0 focus:border-transparent bg-transparent border-none rounded-xl placeholder-gray-500"
+                disabled={isThinking || isUploadingImage}
               />
               
               <div className="flex items-center justify-between gap-2">
-                {/* Boutons d'action à gauche */}
+                {/* Boutons d'action (image, son) */}
                 <div className="flex gap-2">
-                  {/* Bouton galerie */}
-                  <button
-                    type="button"
-                    disabled={isThinking || isUploadingImage}
-                    onClick={handleOpenFileBrowser}
-                    title="Choisir une image"
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                  >
-                    <ImageIcon className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                  </button>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-full"
+                        onClick={handleOpenFileBrowser}
+                        disabled={isThinking || isUploadingImage}
+                      >
+                        <Camera className="h-5 w-5 text-gray-500" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Envoyer une image</p>
+                    </TooltipContent>
+                  </Tooltip>
                   
-                  {/* Bouton appareil photo (mobile uniquement) */}
-                  {isMobileDevice && (
-                    <button
-                      type="button"
-                      disabled={isThinking || isUploadingImage}
-                      onClick={() => {
-                        const tempInput = document.createElement('input');
-                        tempInput.type = 'file';
-                        tempInput.accept = 'image/*';
-                        tempInput.capture = 'environment';
-                        
-                        tempInput.onchange = (e) => {
-                          handleImageSelect(e as unknown as ChangeEvent<HTMLInputElement>);
-                        };
-                        
-                        tempInput.click();
-                      }}
-                      title="Prendre une photo"
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
-                    >
-                      <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
-                    </button>
-                  )}
-                </div>
-                
-                {/* Champ de saisie au centre */}
-                <div className="flex items-center flex-1 px-2">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Pose ta question"
-                    className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
-                    disabled={isThinking || isUploadingImage}
-                    onFocus={() => {
-                      // Marquer que le clavier est ouvert
-                      document.body.classList.add('keyboard-open');
-                      
-                      // S'assurer que le header fixe est visible
-                      const headerContainer = document.getElementById('kora-header-container');
-                      if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
-                        headerContainer.style.top = '0';
-                        headerContainer.style.zIndex = '9999';
-                      }
-                      
-                      // Scroll vers le bas après l'ouverture du clavier
-                      setTimeout(() => {
-                        if (messagesEndRef.current) {
-                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
                   />
                 </div>
                 
-                {/* Conteneur à droite pour les boutons micro et envoi */}
+                {/* Bouton d'envoi */}
                 <div className="flex items-center gap-2">
-                  {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
-                  {selectedImage ? (
-                    <button
-                      type="button"
-                      onClick={handleSubmitImage}
-                      disabled={isThinking || isUploadingImage}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                        />
-                      </svg>
-                    </button>
-                  ) : inputValue.trim() ? (
-                    /* Bouton d'envoi de texte - visible seulement si du texte est présent */
-                    <button
-                      type="button"
-                      onClick={handleSendMessage}
-                      disabled={isThinking || isUploadingImage}
-                      className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                        className="h-5 w-5"
-                      >
-                        <path
-                          d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z"
-                        />
-                      </svg>
-                    </button>
-                  ) : (
-                    /* Bouton microphone */
-                    <div className="w-10 h-10 flex items-center justify-center">
-                      <VoiceRecorder 
-                        onTranscriptionComplete={async (text) => {
-                          setInputValue('');
-                          
-                          if (text.trim().length > 0) {
-                            // Créer et ajouter le message de l'utilisateur
-                            const userMessage: Message = {
-                              id: Date.now().toString(),
-                              content: text,
-                              sender: 'user',
-                            };
-                            
-                            setMessages(prev => [...prev, userMessage]);
-                            setIsThinking(true);
-                            
-                            try {
-                              // Préparer les messages précédents pour le contexte
-                              const messageHistory = messages.map(msg => ({
-                                content: msg.content,
-                                sender: msg.sender
-                              }));
-                              
-                              // Appel API à OpenAI via notre serveur
-                              const response = await fetch('/api/tutoring/ask', {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                  question: text,
-                                  messages: messageHistory
-                                }),
-                              });
-                              
-                              if (!response.ok) {
-                                throw new Error('Erreur lors de la requête API');
-                              }
-                              
-                              const data = await response.json();
-                              
-                              // Ajouter la réponse de l'IA aux messages
-                              setMessages(prev => [...prev, {
-                                id: Date.now().toString(),
-                                content: data.content,
-                                sender: 'kora',
-                              }]);
-                            } catch (error) {
-                              console.error('Erreur lors de la communication avec le serveur:', error);
-                              
-                              // Message d'erreur à l'utilisateur
-                              setMessages(prev => [...prev, {
-                                id: Date.now().toString(),
-                                content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
-                                sender: 'kora',
-                              }]);
-                            } finally {
-                              setIsThinking(false);
-                              
-                              // Faire défiler vers le bas 
-                              setTimeout(() => {
-                                if (messagesEndRef.current) {
-                                  messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                                }
-                              }, 100);
-                            }
-                          }
-                        }}
-                        disabled={isThinking || isUploadingImage}
-                        maxRecordingTimeMs={30000}
-                        language="fr"
-                      />
-                    </div>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+                    onClick={handleSendMessage}
+                    disabled={isThinking || isUploadingImage || !inputValue.trim()}
+                  >
+                    {isThinking ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </Button>
                 </div>
               </div>
             </div>
-            
             <div className="mt-2 text-xs text-gray-500 text-center">
-              KORA, ton assistant IA pour réviser et faire tes exercices.
+              Je t'aide à comprendre, mais n'écris pas tes devoirs à ta place.
             </div>
           </div>
+        </div>
         </div>
       </div>
     </MathJaxContext>
