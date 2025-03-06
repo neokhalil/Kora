@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MathJax } from 'better-react-mathjax';
 import hljs from 'highlight.js';
-import 'highlight.js/styles/github.min.css';
+import 'highlight.js/styles/atom-one-dark.css';
 
 interface MathContentProps {
   content: string;

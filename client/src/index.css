@@ -31,8 +31,8 @@
   /* Styles pour les blocs de code */
   .code-block {
     display: block;
-    background-color: #fafafa;
-    border: 1px solid #e0e0e0;
+    background-color: #282c34;
+    border: 1px solid #3e4451;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     margin: 1rem 0;
@@ -44,7 +44,8 @@
     width: 100%;
     box-sizing: border-box;
     position: relative;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #abb2bf;
   }
   
   /* Contenu du code - amélioration du formatage */
@@ -53,7 +54,7 @@
     overflow-x: auto;
     padding-top: 0.25rem;
     font-size: 0.9rem;
-    color: #333;
+    color: #abb2bf;
     background: transparent;
     white-space: inherit;
   }
@@ -63,8 +64,8 @@
     position: absolute;
     top: 0;
     right: 0;
-    background-color: #e9ecef;
-    color: #495057;
+    background-color: #3b4252;
+    color: #e5e9f0;
     padding: 0.15rem 0.5rem;
     font-size: 0.75rem;
     border-bottom-left-radius: 6px;
@@ -141,14 +142,14 @@
   
   /* Style pour les codes en ligne */
   .inline-code {
-    background-color: rgba(175, 184, 193, 0.2);
+    background-color: rgba(40, 44, 52, 0.75);
     border-radius: 3px;
     padding: 0.2rem 0.4rem;
     font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
     font-size: 0.9em;
     white-space: normal;
     word-break: break-all;
-    color: #24292f;
+    color: #e6e6e6;
   }
   
   /* Texte accentué (à la place du code inline non détecté) */
