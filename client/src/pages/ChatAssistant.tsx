@@ -851,120 +851,120 @@ const ChatAssistant: React.FC = () => {
             {/* Zone de saisie fixée en bas */}
             <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
               <div className="max-w-4xl mx-auto">
-            {/* Aperçu de l'image sélectionnée */}
-            {imagePreview && (
-              <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-                <div className="flex items-start">
-                  <div className="flex-1 flex space-x-2 items-center">
-                    <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
-                      <img 
-                        src={imagePreview} 
-                        alt="Aperçu" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-medium">Image sélectionnée</div>
-                      <div className="text-xs text-gray-500">{selectedImage?.name}</div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => {
-                      setSelectedImage(null);
-                      setImagePreview(null);
-                    }}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <Button
-                  onClick={handleSubmitImage}
-                  disabled={isUploadingImage}
-                  className="mt-2 w-full"
-                >
-                  {isUploadingImage ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Envoi en cours...
-                    </>
-                  ) : (
-                    "Envoyer l'image"
-                  )}
-                </Button>
-              </div>
-            )}
-            
-            <div 
-              ref={composerRef}
-              className="flex flex-col space-y-2 rounded-xl p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-            >
-              <Input
-                type="text"
-                placeholder="Posez votre question ici..."
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyPress}
-                className="flex-1 focus:outline-none focus:ring-0 focus:border-transparent bg-transparent border-none rounded-xl placeholder-gray-500"
-                disabled={isThinking || isUploadingImage}
-              />
-              
-              <div className="flex items-center justify-between gap-2">
-                {/* Boutons d'action (image, son) */}
-                <div className="flex gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
+                {/* Aperçu de l'image sélectionnée */}
+                {imagePreview && (
+                  <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
+                    <div className="flex items-start">
+                      <div className="flex-1 flex space-x-2 items-center">
+                        <div className="w-16 h-16 relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-700">
+                          <img 
+                            src={imagePreview} 
+                            alt="Aperçu" 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium">Image sélectionnée</div>
+                          <div className="text-xs text-gray-500">{selectedImage?.name}</div>
+                        </div>
+                      </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-9 w-9 rounded-full"
-                        onClick={handleOpenFileBrowser}
-                        disabled={isThinking || isUploadingImage}
+                        className="h-8 w-8"
+                        onClick={() => {
+                          setSelectedImage(null);
+                          setImagePreview(null);
+                        }}
                       >
-                        <Camera className="h-5 w-5 text-gray-500" />
+                        <X className="h-4 w-4" />
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Envoyer une image</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    accept="image/*"
-                    onChange={handleImageSelect}
-                    className="hidden"
+                    </div>
+                    <Button
+                      onClick={handleSubmitImage}
+                      disabled={isUploadingImage}
+                      className="mt-2 w-full"
+                    >
+                      {isUploadingImage ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Envoi en cours...
+                        </>
+                      ) : (
+                        "Envoyer l'image"
+                      )}
+                    </Button>
+                  </div>
+                )}
+            
+                <div 
+                  ref={composerRef}
+                  className="flex flex-col space-y-2 rounded-xl p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                >
+                  <Input
+                    type="text"
+                    placeholder="Posez votre question ici..."
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    className="flex-1 focus:outline-none focus:ring-0 focus:border-transparent bg-transparent border-none rounded-xl placeholder-gray-500"
+                    disabled={isThinking || isUploadingImage}
                   />
+                  
+                  <div className="flex items-center justify-between gap-2">
+                    {/* Boutons d'action (image, son) */}
+                    <div className="flex gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 rounded-full"
+                            onClick={handleOpenFileBrowser}
+                            disabled={isThinking || isUploadingImage}
+                          >
+                            <Camera className="h-5 w-5 text-gray-500" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Envoyer une image</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </div>
+                    
+                    {/* Bouton d'envoi */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600"
+                        onClick={handleSendMessage}
+                        disabled={isThinking || isUploadingImage || !inputValue.trim()}
+                      >
+                        {isThinking ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Send className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                
-                {/* Bouton d'envoi */}
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-9 w-9 rounded-full bg-blue-500 text-white hover:bg-blue-600"
-                    onClick={handleSendMessage}
-                    disabled={isThinking || isUploadingImage || !inputValue.trim()}
-                  >
-                    {isThinking ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Send className="h-5 w-5" />
-                    )}
-                  </Button>
+                <div className="mt-2 text-xs text-gray-500 text-center">
+                  Je t'aide à comprendre, mais n'écris pas tes devoirs à ta place.
                 </div>
               </div>
             </div>
-            <div className="mt-2 text-xs text-gray-500 text-center">
-              Je t'aide à comprendre, mais n'écris pas tes devoirs à ta place.
-            </div>
           </div>
         </div>
-        </div>
-      </div>
       </TooltipProvider>
     </MathJaxContext>
   );
