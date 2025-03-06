@@ -695,18 +695,20 @@ header:not(#kora-header) {
 .chat-message {
   position: relative;
   max-width: 80%;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
   padding: 0.5rem 0.75rem;
-  border-radius: 1rem;
+  border-radius: 1.25rem;
 }
 
 .user-message {
   align-self: flex-end;
-  background-color: #1e88e5;
-  color: white;
+  background-color: #f0f0f0;
+  color: #2d2d2d;
   margin-left: auto;
   border-bottom-right-radius: 0.25rem;
-  padding: 0.4rem 0.8rem;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .kora-message {
