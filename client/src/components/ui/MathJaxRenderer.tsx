@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MathJax } from 'better-react-mathjax';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/atom-one-light.css';
 
 interface MathContentProps {
   content: string;
@@ -68,8 +70,22 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
       
+      // Déterminer la classe CSS basée sur le langage
+      const langClass = language ? 'language-' + language.toLowerCase() : '';
+      
+      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
+      let highlightedCode = escapedCode;
+      if (language) {
+        try {
+          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
+        } catch (e) {
+          // Si le langage n'est pas supporté, utiliser le code sans coloration
+          console.warn(`Language '${language}' not supported by highlight.js`);
+        }
+      }
+      
       // Formatter avec la classe appropriée pour le langage
-      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
     }
   );
   
@@ -85,7 +101,21 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
       
-      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+      // Déterminer la classe CSS basée sur le langage
+      const langClass = language ? 'language-' + language.toLowerCase() : '';
+      
+      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
+      let highlightedCode = escapedCode;
+      if (language) {
+        try {
+          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
+        } catch (e) {
+          console.warn(`Language '${language}' not supported by highlight.js`);
+        }
+      }
+      
+      // Formatter avec la classe appropriée pour le langage
+      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
     }
   );
   
@@ -101,7 +131,21 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
       
-      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+      // Déterminer la classe CSS basée sur le langage
+      const langClass = language ? 'language-' + language.toLowerCase() : '';
+      
+      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
+      let highlightedCode = escapedCode;
+      if (language) {
+        try {
+          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
+        } catch (e) {
+          console.warn(`Language '${language}' not supported by highlight.js`);
+        }
+      }
+      
+      // Formatter avec la classe appropriée pour le langage
+      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
     }
   );
   
@@ -160,6 +204,25 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     return () => clearTimeout(initialRenderTimer);
   }, [content]);
+  
+  // Effet pour appliquer la coloration syntaxique après le rendu
+  useEffect(() => {
+    // Timer pour appliquer highlight.js après que le rendu initial est fait
+    const timer = setTimeout(() => {
+      if (containerRef.current) {
+        const codeBlocks = containerRef.current.querySelectorAll('pre code');
+        codeBlocks.forEach((block) => {
+          try {
+            hljs.highlightElement(block as HTMLElement);
+          } catch (e) {
+            console.warn('Failed to highlight code block', e);
+          }
+        });
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [enhancedContent]);
 
   return (
     <div 
