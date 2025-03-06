@@ -671,12 +671,12 @@ const ChatAssistant: React.FC = () => {
     
     return (
       <div key={message.id} className="px-4 py-2 mb-4">
-        <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
+        <div className={`flex ${isKora ? "justify-start" : "justify-end"}`}>
           <div 
-            className={`inline-block rounded-2xl ${
+            className={`chat-message ${
               isKora 
-                ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" 
-                : "bg-blue-500 text-white"
+                ? "kora-message" 
+                : "user-message"
             } ${
               message.isChallenge ? "w-full" : ""
             }`}
@@ -695,7 +695,7 @@ const ChatAssistant: React.FC = () => {
             )}
             
             {/* Contenu du message avec support pour les formules mathématiques */}
-            <div className="prose dark:prose-invert text-base leading-relaxed px-1">
+            <div className={`math-content ${isKora ? "text-gray-800 dark:text-gray-200" : "text-white"}`}>
               <MathJaxRenderer content={message.content} />
             </div>
             
@@ -703,29 +703,27 @@ const ChatAssistant: React.FC = () => {
             {isKora && message.allowActions && !message.isChallenge && (
               <div className="mt-4 flex flex-wrap gap-3 justify-start">
                 {/* Bouton de réexplication */}
-                <Button
+                <button
                   onClick={() => handleRequestReExplanation(
                     // Trouver le message utilisateur précédent pour le contexte
                     messages.find(m => m.sender === 'user' && m.id < message.id)?.content || "",
                     message.content
                   )}
-                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium"
-                  variant="ghost"
+                  className="kora-action-button"
                 >
                   Ré-explique
-                </Button>
+                </button>
                 
                 {/* Bouton de défi */}
-                <Button
+                <button
                   onClick={() => handleRequestChallenge(
                     messages.find(m => m.sender === 'user' && m.id < message.id)?.content || "",
                     message.content
                   )}
-                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium"
-                  variant="ghost"
+                  className="kora-action-button"
                 >
                   Faire un exercice
-                </Button>
+                </button>
               </div>
             )}
             
@@ -742,22 +740,20 @@ const ChatAssistant: React.FC = () => {
                       className="w-full border dark:border-gray-700"
                     />
                     <div className="flex space-x-2">
-                      <Button
+                      <button
                         onClick={() => message.challengeData?.expectedAnswer && 
                           handleSubmitChallengeAnswer(message.id, message.challengeData.expectedAnswer)
                         }
-                        className="px-3 py-1 text-sm"
-                        variant="default"
+                        className="kora-action-button"
                       >
                         Soumettre
-                      </Button>
-                      <Button
+                      </button>
+                      <button
                         onClick={() => handleRequestHint(message.id, message.content)}
-                        className="px-3 py-1 text-sm"
-                        variant="outline"
+                        className="kora-action-button"
                       >
                         Indice
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 ) : (
