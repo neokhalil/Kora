@@ -27,6 +27,46 @@
     line-height: 1.5;
     contain: style;
   }
+  
+  /* Styles pour les blocs de code */
+  .code-block {
+    display: block;
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    white-space: pre;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  /* Style pour les codes en ligne */
+  .inline-code {
+    background-color: #f5f5f5;
+    border-radius: 3px;
+    padding: 0.2rem 0.4rem;
+    font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9em;
+    white-space: nowrap;
+  }
+  
+  /* Style spécifique pour Python */
+  .language-python {
+    border-left: 3px solid #3572A5;
+  }
+  
+  /* Style spécifique pour JavaScript */
+  .language-javascript {
+    border-left: 3px solid #f7df1e;
+  }
+  
+  /* Style spécifique pour Java */
+  .language-java {
+    border-left: 3px solid #b07219;
+  }
 
   .math-content .katex-display {
     margin: 1.2em 0;

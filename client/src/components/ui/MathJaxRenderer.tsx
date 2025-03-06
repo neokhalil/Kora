@@ -52,8 +52,34 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     '$1<h3 class="section-heading">$2</h3>'
   );
   
+  // Prétraiter les blocs de code avec triple backtick
+  let codeBlocksProcessed = headingsPreprocessed;
+  
+  // Remplacer les blocs de code encadrés par des triples backticks
+  codeBlocksProcessed = codeBlocksProcessed.replace(
+    /```([\w]*)\n([\s\S]*?)```/g, 
+    (match, language, code) => {
+      // Échapper les caractères HTML spéciaux dans le code
+      const escapedCode = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      
+      // Formatter avec la classe appropriée pour le langage
+      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+    }
+  );
+  
+  // Remplacer les morceaux de code inline avec backtick simple
+  codeBlocksProcessed = codeBlocksProcessed.replace(
+    /`([^`]+)`/g,
+    '<code class="inline-code">$1</code>'
+  );
+
   // Traiter le formatage Markdown basique
-  const markdownFormatted = headingsPreprocessed
+  const markdownFormatted = codeBlocksProcessed
     // Gras - Gérer le cas avec ** (format Markdown)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     // Italique - Gérer le cas avec * (format Markdown)
