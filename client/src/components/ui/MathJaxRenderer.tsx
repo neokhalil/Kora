@@ -150,9 +150,18 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   );
   
   // Remplacer les morceaux de code inline avec backtick simple
+  // Modification pour ne remplacer que quand c'est vraiment du code
   codeBlocksProcessed = codeBlocksProcessed.replace(
     /`([^`\n]+)`/g,
-    '<code class="inline-code">$1</code>'
+    (match, content) => {
+      // Si le contenu contient des symboles de programmation ou mots-clés, c'est probablement du code
+      if (content.match(/[\$\{\}\(\)\[\]<>;:=\+\-\*\/&|!%^~#@]/) || 
+          content.match(/\b(function|class|var|let|const|if|else|for|while|return|import|export)\b/)) {
+        return `<code class="inline-code">${content}</code>`;
+      }
+      // Sinon, c'est peut-être juste du texte accentué
+      return `<span class="emphasized">${content}</span>`;
+    }
   );
 
   // Traiter le formatage Markdown basique

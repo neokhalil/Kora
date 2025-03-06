@@ -150,6 +150,13 @@
     color: #24292f;
   }
   
+  /* Texte accentué (à la place du code inline non détecté) */
+  .emphasized {
+    font-weight: 500;
+    font-style: italic;
+    color: #333;
+  }
+  
   /* Pour les codes en ligne sur mobile */
   @media (max-width: 640px) {
     .inline-code {
