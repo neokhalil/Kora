@@ -696,7 +696,7 @@ header:not(#kora-header) {
   position: relative;
   max-width: 80%;
   margin-bottom: 1rem;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   border-radius: 1rem;
 }
 
@@ -706,7 +706,7 @@ header:not(#kora-header) {
   color: white;
   margin-left: auto;
   border-bottom-right-radius: 0.25rem;
-  padding: 0.75rem 1rem;
+  padding: 0.4rem 0.8rem;
 }
 
 .kora-message {
@@ -715,6 +715,7 @@ header:not(#kora-header) {
   color: #333;
   margin-right: auto;
   border-bottom-left-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
 }
 
 /* Gestion des conteneurs principaux */
