@@ -743,7 +743,24 @@ main {
   transform: translateZ(0);
 }
 
+/* Style pour le textarea adaptatif dans le chat */
+.chat-textarea {
+  line-height: 1.4;
+  width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+  transition: height 0.15s ease;
+  resize: none;
+  min-height: 40px;
+  max-height: 120px;
+}
 
+/* Style pour assurer que les longs messages utilisateur s'affichent correctement */
+.user-message {
+  word-break: break-word;
+  white-space: pre-wrap;
+  max-width: 85%;
+}
 
 /* Support du Visual Viewport */
 .visual-viewport-active #kora-header-container {

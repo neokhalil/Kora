@@ -16,6 +16,7 @@ import {
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -412,6 +413,8 @@ const ChatAssistant: React.FC = () => {
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      const textareaElement = e.target as HTMLTextAreaElement;
+      textareaElement.style.height = '40px'; // Réinitialiser la hauteur
       handleSendMessage();
     }
   };
@@ -945,12 +948,19 @@ const ChatAssistant: React.FC = () => {
                 
                 {/* Champ de saisie en haut */}
                 <div className="w-full">
-                  <Input
+                  <Textarea
                     value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                      
+                      // Auto-ajustement de la hauteur du textarea
+                      e.target.style.height = '40px'; // Hauteur de base
+                      const newHeight = Math.min(120, e.target.scrollHeight); // Maximum de 120px
+                      e.target.style.height = `${newHeight}px`;
+                    }}
+                    onKeyDown={handleKeyPress}
                     placeholder="Pose ta question"
-                    className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10 w-full"
+                    className="chat-textarea border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-0 overflow-y-auto"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
                       // Marquer que le clavier est ouvert
@@ -1039,7 +1049,15 @@ const ChatAssistant: React.FC = () => {
                       /* Bouton d'envoi de texte - visible seulement si du texte est présent */
                       <button
                         type="button"
-                        onClick={handleSendMessage}
+                        onClick={() => {
+                          // Réinitialiser la hauteur du textarea
+                          const textareas = document.querySelectorAll('.chat-textarea');
+                          textareas.forEach((textarea) => {
+                            const el = textarea as HTMLTextAreaElement;
+                            el.style.height = '40px';
+                          });
+                          handleSendMessage();
+                        }}
                         disabled={isThinking || isUploadingImage}
                         className="w-10 h-10 flex items-center justify-center rounded-full bg-black text-white hover:bg-gray-800 disabled:opacity-50"
                       >
