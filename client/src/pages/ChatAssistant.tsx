@@ -812,7 +812,7 @@ export default function ChatAssistant() {
         </div>
       </div>
     );
-  };
+  }
   
   // Fonction pour rendre chaque message avec ses actions
   const MessageItem = (message: Message) => {
@@ -998,7 +998,7 @@ export default function ChatAssistant() {
         {/* Contenu principal - Messages */}
         <main className="flex-1 overflow-y-auto">
           <div className="chat-messages-container pb-32">
-            {messages.map(msg => <React.Fragment key={msg.id}>{renderMessage({message: msg})}</React.Fragment>)}
+            {messages.map(msg => <React.Fragment key={msg.id}>{MessageItem(msg)}</React.Fragment>)}
             <div ref={messagesEndRef} />
             
             {/* Indicateur de chargement pendant la "réflexion" */}
