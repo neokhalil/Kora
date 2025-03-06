@@ -16,6 +16,7 @@ import {
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Avatar } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -984,12 +985,17 @@ const ChatAssistant: React.FC = () => {
                   
                   {/* Champ de saisie au centre */}
                   <div className="flex items-center flex-1 px-2">
-                    <Input
+                    <Textarea
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={(e) => {
+                        setInputValue(e.target.value);
+                        // Ajuster la hauteur automatiquement
+                        e.target.style.height = 'auto';
+                        e.target.style.height = `${Math.min(120, e.target.scrollHeight)}px`;
+                      }}
                       onKeyPress={handleKeyPress}
                       placeholder="Pose ta question"
-                      className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
+                      className="resize-none border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 min-h-[40px] max-h-[120px] p-0 py-2 overflow-y-auto chat-textarea"
                       disabled={isThinking || isUploadingImage}
                       onFocus={() => {
                         // Marquer que le clavier est ouvert
