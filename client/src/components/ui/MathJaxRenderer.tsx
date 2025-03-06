@@ -55,6 +55,11 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   );
   
   // Prétraiter les blocs de code avec triple backtick
+  // Nous allons d'abord extraire et stocker tous les blocs de code pour éviter 
+  // que le traitement des backticks simples n'interfère avec eux
+  const codeBlocks: {placeholder: string, content: string}[] = [];
+  let codeBlockId = 0;
+  
   let codeBlocksProcessed = headingsPreprocessed;
   
   // Remplacer les blocs de code encadrés par des triples backticks avec ou sans spécification du langage
@@ -72,20 +77,16 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       
       // Déterminer la classe CSS basée sur le langage
       const langClass = language ? 'language-' + language.toLowerCase() : '';
+      const blockId = `code-block-${codeBlockId++}`;
       
-      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
-      let highlightedCode = escapedCode;
-      if (language) {
-        try {
-          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
-        } catch (e) {
-          // Si le langage n'est pas supporté, utiliser le code sans coloration
-          console.warn(`Language '${language}' not supported by highlight.js`);
-        }
-      }
+      // Stocker le bloc de code pour traitement ultérieur
+      codeBlocks.push({
+        placeholder: blockId,
+        content: `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${language || ''}">${escapedCode}</code></pre>`
+      });
       
-      // Formatter avec la classe appropriée pour le langage
-      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
+      // Retourner un placeholder unique pour ce bloc de code
+      return blockId;
     }
   );
   
@@ -103,19 +104,16 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       
       // Déterminer la classe CSS basée sur le langage
       const langClass = language ? 'language-' + language.toLowerCase() : '';
+      const blockId = `code-block-${codeBlockId++}`;
       
-      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
-      let highlightedCode = escapedCode;
-      if (language) {
-        try {
-          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
-        } catch (e) {
-          console.warn(`Language '${language}' not supported by highlight.js`);
-        }
-      }
+      // Stocker le bloc de code pour traitement ultérieur
+      codeBlocks.push({
+        placeholder: blockId,
+        content: `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${language || ''}">${escapedCode}</code></pre>`
+      });
       
-      // Formatter avec la classe appropriée pour le langage
-      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
+      // Retourner un placeholder unique pour ce bloc de code
+      return blockId;
     }
   );
   
@@ -133,19 +131,16 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       
       // Déterminer la classe CSS basée sur le langage
       const langClass = language ? 'language-' + language.toLowerCase() : '';
+      const blockId = `code-block-${codeBlockId++}`;
       
-      // Utiliser highlight.js pour la coloration syntaxique si un langage est spécifié
-      let highlightedCode = escapedCode;
-      if (language) {
-        try {
-          highlightedCode = hljs.highlight(code, { language: language.toLowerCase() }).value;
-        } catch (e) {
-          console.warn(`Language '${language}' not supported by highlight.js`);
-        }
-      }
+      // Stocker le bloc de code pour traitement ultérieur
+      codeBlocks.push({
+        placeholder: blockId,
+        content: `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${language || ''}">${escapedCode}</code></pre>`
+      });
       
-      // Formatter avec la classe appropriée pour le langage
-      return `<pre class="code-block ${langClass}"><code class="${langClass}">${language ? highlightedCode : escapedCode}</code></pre>`;
+      // Retourner un placeholder unique pour ce bloc de code
+      return blockId;
     }
   );
   
@@ -178,7 +173,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     .replace(/\~\~(.*?)\~\~/g, '<s>$1</s>');
   
   // Améliorer les titres et les étapes numérotées pour une meilleure mise en page
-  const enhancedContent = markdownFormatted
+  let enhancedContent = markdownFormatted
     // Améliorer les titres
     .replace(/^(Pour résoudre|Résolution|Résoudre)\s+(.*):$/gm, '<h3>$1 $2 :</h3>')
     // Améliorer la numérotation des étapes
@@ -192,6 +187,11 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Mise en forme de la conclusion
     .replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, 
       '<div class="conclusion">$1, $2 est </div>');
+      
+  // Réinsérer les blocs de code avec coloration syntaxique
+  codeBlocks.forEach(block => {
+    enhancedContent = enhancedContent.replace(block.placeholder, block.content);
+  });
 
   // Observer les changements de hauteur et stabiliser
   useEffect(() => {
@@ -214,7 +214,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     return () => clearTimeout(initialRenderTimer);
   }, [content]);
   
-  // Effet pour appliquer la coloration syntaxique après le rendu
+  // Effet pour appliquer la coloration syntaxique et ajouter les étiquettes de langage après le rendu
   useEffect(() => {
     // Timer pour appliquer highlight.js après que le rendu initial est fait
     const timer = setTimeout(() => {
@@ -222,7 +222,20 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         const codeBlocks = containerRef.current.querySelectorAll('pre code');
         codeBlocks.forEach((block) => {
           try {
+            // Appliquer highlight.js
             hljs.highlightElement(block as HTMLElement);
+            
+            // Ajouter l'étiquette de langage si elle existe
+            const lang = block.getAttribute('data-lang');
+            if (lang) {
+              const pre = block.parentElement;
+              if (pre && !pre.querySelector('.language-label')) {
+                const label = document.createElement('div');
+                label.className = 'language-label';
+                label.textContent = getLangDisplayName(lang);
+                pre.appendChild(label);
+              }
+            }
           } catch (e) {
             console.warn('Failed to highlight code block', e);
           }
@@ -232,6 +245,42 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     return () => clearTimeout(timer);
   }, [enhancedContent]);
+  
+  // Fonction pour obtenir le nom d'affichage du langage
+  const getLangDisplayName = (lang: string): string => {
+    const langMap: Record<string, string> = {
+      'python': 'Python',
+      'py': 'Python',
+      'javascript': 'JavaScript',
+      'js': 'JavaScript',
+      'typescript': 'TypeScript',
+      'ts': 'TypeScript',
+      'java': 'Java',
+      'cpp': 'C++',
+      'c': 'C',
+      'csharp': 'C#',
+      'cs': 'C#',
+      'php': 'PHP',
+      'ruby': 'Ruby',
+      'go': 'Go',
+      'rust': 'Rust',
+      'swift': 'Swift',
+      'kotlin': 'Kotlin',
+      'scala': 'Scala',
+      'html': 'HTML',
+      'css': 'CSS',
+      'sql': 'SQL',
+      'bash': 'Bash',
+      'sh': 'Shell',
+      'xml': 'XML',
+      'json': 'JSON',
+      'yaml': 'YAML',
+      'markdown': 'Markdown',
+      'md': 'Markdown',
+    };
+    
+    return langMap[lang.toLowerCase()] || lang.charAt(0).toUpperCase() + lang.slice(1);
+  };
 
   return (
     <div 
