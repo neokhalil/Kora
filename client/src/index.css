@@ -751,6 +751,7 @@ main {
   word-wrap: break-word;
   transition: height 0.15s ease;
   resize: none;
+  height: 40px !important; /* Forcer la hauteur initiale */
   min-height: 40px;
   max-height: 120px;
 }
@@ -758,8 +759,10 @@ main {
 /* Style pour assurer que les longs messages utilisateur s'affichent correctement */
 .user-message {
   word-break: break-word;
-  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  white-space: normal;
   max-width: 85%;
+  padding: 0.15rem 0.5rem !important;
 }
 
 /* Support du Visual Viewport */

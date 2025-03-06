@@ -103,10 +103,19 @@ const ChatAssistant: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
   
-  // Initialisation du fix pour mobile
+  // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setupMobileViewportFix();
+      
+      // S'assurer que la hauteur initiale du textarea est correcte au chargement
+      setTimeout(() => {
+        const textareas = document.querySelectorAll('.chat-textarea');
+        textareas.forEach((textarea) => {
+          const el = textarea as HTMLTextAreaElement;
+          el.style.height = '40px';
+        });
+      }, 100);
     }
   }, []);
 
@@ -123,6 +132,13 @@ const ChatAssistant: React.FC = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 300);
     }
+    
+    // S'assurer que la hauteur initiale du textarea est correcte
+    const textareas = document.querySelectorAll('.chat-textarea');
+    textareas.forEach((textarea) => {
+      const el = textarea as HTMLTextAreaElement;
+      el.style.height = '40px';
+    });
   }, [messages, isThinking]);
   
   // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
@@ -683,7 +699,7 @@ const ChatAssistant: React.FC = () => {
             className={`inline-block rounded-2xl ${
               isKora 
                 ? "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 w-full px-4 py-3" 
-                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none max-w-[80%] px-4 py-3 flex items-center min-h-[48px]"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-tr-none user-message flex items-center min-h-[48px]"
             }`}
           >
             {/* Image de l'utilisateur si présente */}
