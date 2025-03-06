@@ -142,14 +142,17 @@
   
   /* Style pour les codes en ligne */
   .inline-code {
-    background-color: rgba(40, 44, 52, 0.75);
+    background-color: rgba(88, 116, 211, 0.2);
     border-radius: 3px;
     padding: 0.2rem 0.4rem;
     font-family: 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
     font-size: 0.9em;
     white-space: normal;
     word-break: break-all;
-    color: #e6e6e6;
+    color: #e0e0e0;
+    border: 1px solid rgba(88, 116, 211, 0.3);
+    font-weight: 500;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
   }
   
   /* Texte accentué (à la place du code inline non détecté) */
