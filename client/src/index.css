@@ -40,7 +40,17 @@
     white-space: pre;
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
     font-size: 0.9rem;
-    line-height: 1.4;
+    line-height: 1.5;
+    width: 100%;
+    box-sizing: border-box;
+    word-break: keep-all;
+    word-wrap: normal;
+  }
+  
+  /* Assurer que les conteneurs pre ne sont pas trop étroits */
+  pre.code-block {
+    max-width: 100%;
+    min-width: 200px;
   }
   
   /* Style pour les codes en ligne */
@@ -66,6 +76,11 @@
   /* Style spécifique pour Java */
   .language-java {
     border-left: 3px solid #b07219;
+  }
+  
+  /* Style spécifique pour C++ */
+  .language-cpp, .language-c {
+    border-left: 3px solid #578697;
   }
 
   .math-content .katex-display {

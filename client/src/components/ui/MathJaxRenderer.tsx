@@ -55,9 +55,10 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Prétraiter les blocs de code avec triple backtick
   let codeBlocksProcessed = headingsPreprocessed;
   
-  // Remplacer les blocs de code encadrés par des triples backticks
+  // Remplacer les blocs de code encadrés par des triples backticks avec ou sans spécification du langage
+  // Gestion de la syntaxe ```langage (format standard)
   codeBlocksProcessed = codeBlocksProcessed.replace(
-    /```([\w]*)\n([\s\S]*?)```/g, 
+    /```([\w]*)\s*\n([\s\S]*?)```/g, 
     (match, language, code) => {
       // Échapper les caractères HTML spéciaux dans le code
       const escapedCode = code
@@ -72,9 +73,41 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     }
   );
   
+  // Gestion spéciale pour OpenAI qui parfois utilise des quotes pour le code
+  codeBlocksProcessed = codeBlocksProcessed.replace(
+    /'''([\w]*)\s*\n([\s\S]*?)'''/g, 
+    (match, language, code) => {
+      // Échapper les caractères HTML spéciaux dans le code
+      const escapedCode = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      
+      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+    }
+  );
+  
+  // Supporte également la syntaxe parfois générée par OpenAI: `python
+  codeBlocksProcessed = codeBlocksProcessed.replace(
+    /``([\w]*)\s*\n([\s\S]*?)``/g, 
+    (match, language, code) => {
+      // Échapper les caractères HTML spéciaux dans le code
+      const escapedCode = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+      
+      return `<pre class="code-block ${language ? 'language-' + language : ''}"><code>${escapedCode}</code></pre>`;
+    }
+  );
+  
   // Remplacer les morceaux de code inline avec backtick simple
   codeBlocksProcessed = codeBlocksProcessed.replace(
-    /`([^`]+)`/g,
+    /`([^`\n]+)`/g,
     '<code class="inline-code">$1</code>'
   );
 
