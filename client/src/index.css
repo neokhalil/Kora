@@ -669,16 +669,17 @@ aside {
   justify-content: center;
   background-color: #F0F3F8;
   color: #2d3648;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   border-radius: 999px;
-  padding: 0.5rem 1.25rem;
+  padding: 0.4rem 0.75rem;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: center;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  height: 36px;
+  height: 30px;
+  white-space: nowrap;
 }
 
 .kora-action-button:hover {
