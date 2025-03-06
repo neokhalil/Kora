@@ -803,53 +803,54 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <MathJaxContext config={mathJaxConfig}>
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
-        <div className="flex-1 overflow-hidden flex flex-col">
-        {/* Zone des messages */}
-        <div 
-          className="flex-1 overflow-y-auto p-4 chat-messages-container" 
-        >
-          {messages.length === 0 ? (
-            <div className="h-full flex flex-col justify-start pt-12">
-              <div className="max-w-md px-4">
-                <h3 className="text-xl font-semibold mb-4 text-center">
-                  💡 Bonjour, je suis Kora, votre assistant d'aide aux devoirs.
-                </h3>
-                <p className="text-center mb-6 text-gray-600 dark:text-gray-300">
-                  Je peux vous aider à comprendre les concepts difficiles et répondre à vos questions.
-                </p>
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Exemples de questions:</p>
-                  <div className="px-4 py-2 mb-4">
-                  <div className="max-w-3xl mx-auto">
-                    <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-                      <div className="flex space-x-1">
-                        <span className="cursor-pointer" onClick={() => {
-                          setInputValue("Comment résoudre une équation du second degré ?");
-                        }}>Comment résoudre une équation du second degré ?</span>
+      <TooltipProvider>
+        <div className="flex flex-col h-full max-w-4xl mx-auto">
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {/* Zone des messages */}
+            <div 
+              className="flex-1 overflow-y-auto p-4 chat-messages-container" 
+            >
+              {messages.length === 0 ? (
+                <div className="h-full flex flex-col justify-start pt-12">
+                  <div className="max-w-md px-4">
+                    <h3 className="text-xl font-semibold mb-4 text-center">
+                      💡 Bonjour, je suis Kora, votre assistant d'aide aux devoirs.
+                    </h3>
+                    <p className="text-center mb-6 text-gray-600 dark:text-gray-300">
+                      Je peux vous aider à comprendre les concepts difficiles et répondre à vos questions.
+                    </p>
+                    <div className="space-y-4">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Exemples de questions:</p>
+                      <div className="px-4 py-2 mb-4">
+                        <div className="max-w-3xl mx-auto">
+                          <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                            <div className="flex space-x-1">
+                              <span className="cursor-pointer" onClick={() => {
+                                setInputValue("Comment résoudre une équation du second degré ?");
+                              }}>Comment résoudre une équation du second degré ?</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                </div>
-              </div>
+              ) : (
+                // Afficher les messages de la conversation
+                messages.map(message => (
+                  <React.Fragment key={message.id}>
+                    {MessageItem(message)}
+                  </React.Fragment>
+                ))
+              )}
+              
+              {/* Référence pour faire défiler vers le bas */}
+              <div ref={messagesEndRef} />
             </div>
-          ) : (
-            // Afficher les messages de la conversation
-            messages.map(message => (
-              <React.Fragment key={message.id}>
-                {MessageItem(message)}
-              </React.Fragment>
-            ))
-          )}
-          
-          {/* Référence pour faire défiler vers le bas */}
-          <div ref={messagesEndRef} />
-        </div>
         
-        {/* Zone de saisie fixée en bas */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
-          <div className="max-w-4xl mx-auto">
+            {/* Zone de saisie fixée en bas */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 z-50 composer-container">
+              <div className="max-w-4xl mx-auto">
             {/* Aperçu de l'image sélectionnée */}
             {imagePreview && (
               <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
@@ -964,6 +965,7 @@ const ChatAssistant: React.FC = () => {
         </div>
         </div>
       </div>
+      </TooltipProvider>
     </MathJaxContext>
   );
 };
