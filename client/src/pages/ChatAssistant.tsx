@@ -915,9 +915,9 @@ const ChatAssistant: React.FC = () => {
                 </div>
               )}
               
-              {/* Composeur de message style iOS */}
+              {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
-                className="bg-white dark:bg-gray-800 p-2 rounded-full border border-gray-200 shadow-sm"
+                className="bg-white dark:bg-gray-800 p-3 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-3"
                 ref={composerRef}
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
@@ -943,7 +943,39 @@ const ChatAssistant: React.FC = () => {
                   }}
                 />
                 
-                <div className="flex items-center justify-between gap-2">
+                {/* Champ de saisie en haut */}
+                <div className="w-full">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Pose ta question"
+                    className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10 w-full"
+                    disabled={isThinking || isUploadingImage}
+                    onFocus={() => {
+                      // Marquer que le clavier est ouvert
+                      document.body.classList.add('keyboard-open');
+                      
+                      // S'assurer que le header fixe est visible
+                      const headerContainer = document.getElementById('kora-header-container');
+                      if (headerContainer) {
+                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.top = '0';
+                        headerContainer.style.zIndex = '9999';
+                      }
+                      
+                      // Scroll vers le bas après l'ouverture du clavier
+                      setTimeout(() => {
+                        if (messagesEndRef.current) {
+                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
+                    }}
+                  />
+                </div>
+                
+                {/* Boutons d'action en bas */}
+                <div className="flex justify-between items-center">
                   {/* Boutons d'action à gauche */}
                   <div className="flex gap-2">
                     {/* Bouton galerie */}
@@ -980,37 +1012,6 @@ const ChatAssistant: React.FC = () => {
                         <Camera className="h-5 w-5 text-gray-500 dark:text-gray-300" />
                       </button>
                     )}
-                  </div>
-                  
-                  {/* Champ de saisie au centre */}
-                  <div className="flex items-center flex-1 px-2">
-                    <Input
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Pose ta question"
-                      className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 h-10"
-                      disabled={isThinking || isUploadingImage}
-                      onFocus={() => {
-                        // Marquer que le clavier est ouvert
-                        document.body.classList.add('keyboard-open');
-                        
-                        // S'assurer que le header fixe est visible
-                        const headerContainer = document.getElementById('kora-header-container');
-                        if (headerContainer) {
-                          headerContainer.style.position = 'absolute';
-                          headerContainer.style.top = '0';
-                          headerContainer.style.zIndex = '9999';
-                        }
-                        
-                        // Scroll vers le bas après l'ouverture du clavier
-                        setTimeout(() => {
-                          if (messagesEndRef.current) {
-                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }, 100);
-                      }}
-                    />
                   </div>
                   
                   {/* Conteneur à droite pour les boutons micro et envoi */}
