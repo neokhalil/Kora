@@ -18,20 +18,36 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
   
-  // Prétraiter les titres avec ### avant toute autre transformation
+  // Prétraiter les titres avec ### ou #### avant toute autre transformation
   let headingsPreprocessed = formattedContent;
   
-  // Première passe pour identifier et remplacer les sections avec ###
-  const headingRegex = /(^|<br \/>)###\s+(.*?)(?=<br|$)/g;
+  // Remplacer d'abord les #### (quatre dièses)
   headingsPreprocessed = headingsPreprocessed.replace(
-    headingRegex, 
+    /(^|<br \/>)####\s+(.*?)(?=<br|$)/g, 
+    '$1<h4 class="section-heading">$2</h4>'
+  );
+  
+  // Remplacer ensuite les titres avec ### (trois dièses)
+  headingsPreprocessed = headingsPreprocessed.replace(
+    /(^|<br \/>)###\s+(.*?)(?=<br|$)/g, 
     '$1<h3 class="section-heading">$2</h3>'
   );
   
-  // Deuxième passe pour les cas où ### est au milieu
+  // Deuxième passe pour les cas où les titres sont au milieu du texte
+  headingsPreprocessed = headingsPreprocessed.replace(
+    /(?<=\s)####\s+(.*?)(?=<br|$)/g,
+    '<h4 class="section-heading">$1</h4>'
+  );
+  
   headingsPreprocessed = headingsPreprocessed.replace(
     /(?<=\s)###\s+(.*?)(?=<br|$)/g,
     '<h3 class="section-heading">$1</h3>'
+  );
+  
+  // Rechercher et remplacer les titres de type "Résolution Générale" ou "Méthode"
+  headingsPreprocessed = headingsPreprocessed.replace(
+    /(^|<br \/>)(Résolution Générale|Méthode|Solution|Approche|Démarche)\s*:?/g,
+    '$1<h3 class="section-heading">$2</h3>'
   );
   
   // Traiter le formatage Markdown basique
@@ -72,7 +88,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         transform: 'translateZ(0)',
         position: 'relative', 
         // Utiliser une hauteur d'une ligne minimum pour stabiliser le contenu
-        minHeight: '20px'
+        minHeight: '24px'
       }}
     >
       <MathJax>
