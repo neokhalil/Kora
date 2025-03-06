@@ -173,7 +173,7 @@ const ChatAssistant: React.FC = () => {
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
   
-  // Fonction pour simuler l'écriture progressive du texte avec affichage ultra-fluide
+  // Fonction pour simuler l'écriture progressive du texte
   const simulateProgressiveTyping = (messageId: string, fullText: string) => {
     // Nettoyer tout intervalle précédent si existant
     if (progressiveText.intervalId) {
@@ -195,9 +195,9 @@ const ChatAssistant: React.FC = () => {
     const regexLatexInline = /\\\\?\(([^)]+?)\\\\?\)/g;
     const regexLatexBlock = /\\\\?\[([\s\S]+?)\\\\?\]/g;
     
-    // Détecter le markdown et les titres (incluant #### aussi)
+    // Détecter le markdown et les titres
     const regexBold = /\*\*(.*?)\*\*/g;
-    const regexHeading3 = /^###\s*(.*?)$/gm; 
+    const regexHeading3 = /^###\s*(.*?)$/gm;
     const regexHeading4 = /^####\s*(.*?)$/gm;
     const regexHeadingSpecial = /^(Résolution Générale|Méthode|Solution|Approche|Démarche)\s*:?/gm;
     
@@ -222,7 +222,7 @@ const ChatAssistant: React.FC = () => {
       specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'markdown' });
     }
     
-    // Trouver tous les titres 
+    // Trouver tous les titres avec ###, #### et titres spéciaux
     while ((match = regexHeading3.exec(fullText)) !== null) {
       specialRanges.push({ start: match.index, end: match.index + match[0].length, type: 'heading' });
     }
@@ -237,21 +237,21 @@ const ChatAssistant: React.FC = () => {
     specialRanges.sort((a, b) => a.start - b.start);
     
     let currentCharIndex = 0;
-    let fragmentSize = 5; // Réduit pour plus de fluidité
-    const typingSpeed = 20; // Plus rapide pour une animation plus fluide
+    let fragmentSize = 5; // Nombre de caractères à ajouter à chaque fois
+    const typingSpeed = 30; // Temps en ms entre les mises à jour
     
     // Déterminer la taille du texte complet pour adapter la vitesse
     const totalLength = fullText.length;
     
     // Ajuster le nombre de caractères à ajouter proportionnellement au contenu total
     if (totalLength > 500) {
-      fragmentSize = 8; 
+      fragmentSize = 8; // Texte long = ajout plus rapide
     } else if (totalLength > 1000) {
-      fragmentSize = 12;
+      fragmentSize = 12; // Texte très long = ajout encore plus rapide
     }
     
     // Initialiser avec les premiers caractères pour une transition douce
-    const initialText = fullText.length > 5 ? fullText.substring(0, 5) : fullText;
+    const initialText = fullText.length > 10 ? fullText.substring(0, 10) : fullText;
     currentCharIndex = initialText.length;
     
     setProgressiveText({
@@ -269,71 +269,55 @@ const ChatAssistant: React.FC = () => {
       )
     );
     
-    // Créer un intervalle avec RAF pour une meilleure synchronisation avec le rendu du navigateur
-    let lastTime = 0;
-    const targetFrameTime = typingSpeed; // ms entre chaque mise à jour
-    
-    const animate = (timestamp: number) => {
-      if (!lastTime) lastTime = timestamp;
-      const elapsed = timestamp - lastTime;
-      
-      if (elapsed > targetFrameTime) {
-        lastTime = timestamp;
+    // Créer un intervalle pour ajouter progressivement des caractères
+    const intervalId = setInterval(() => {
+      if (currentCharIndex < fullText.length) {
+        // Déterminer si nous sommes dans une section spéciale (math, markdown, etc.)
+        const specialRange = specialRanges.find(r => 
+          currentCharIndex >= r.start && currentCharIndex < r.end
+        );
         
-        if (currentCharIndex < fullText.length) {
-          // Déterminer si nous sommes dans une section spéciale (math, markdown, etc.)
-          const specialRange = specialRanges.find(r => 
-            currentCharIndex >= r.start && currentCharIndex < r.end
-          );
-          
-          if (specialRange) {
-            // Pour les formules mathématiques et sections spéciales, les ajouter d'un coup
-            currentCharIndex = specialRange.end;
-          } else {
-            // Sinon, ajouter un fragment de texte normal avec légère randomisation pour un effet naturel
-            const increment = fragmentSize + Math.floor(Math.random() * (fragmentSize / 2));
-            currentCharIndex = Math.min(currentCharIndex + increment, fullText.length);
-          }
-          
-          const newCurrentText = fullText.substring(0, currentCharIndex);
-          
-          // Mettre à jour l'état interne sans déclencher de re-rendu global
-          setProgressiveText(prev => ({
-            ...prev,
-            currentText: newCurrentText
-          }));
-          
-          // Mettre à jour le message dans la liste
-          setMessages(prevMessages => 
-            prevMessages.map(msg => 
-              msg.id === messageId 
-                ? { ...msg, content: newCurrentText } 
-                : msg
-            )
-          );
-          
-          // Continuer l'animation
-          requestAnimationFrame(animate);
+        if (specialRange) {
+          // Pour les formules mathématiques et sections spéciales, les ajouter d'un coup
+          currentCharIndex = specialRange.end;
         } else {
-          // Le texte est complet, nettoyer l'animation
-          setProgressiveText(prev => ({
-            ...prev,
-            intervalId: undefined
-          }));
+          // Sinon, ajouter un fragment de texte normal avec légère randomisation
+          currentCharIndex = Math.min(
+            currentCharIndex + fragmentSize + Math.floor(Math.random() * 2), 
+            fullText.length
+          );
         }
+        
+        const newCurrentText = fullText.substring(0, currentCharIndex);
+        
+        // Mettre à jour l'état interne
+        setProgressiveText(prev => ({
+          ...prev,
+          currentText: newCurrentText
+        }));
+        
+        // Mettre à jour le message dans la liste
+        setMessages(prevMessages => 
+          prevMessages.map(msg => 
+            msg.id === messageId 
+              ? { ...msg, content: newCurrentText } 
+              : msg
+          )
+        );
       } else {
-        // Pas encore temps pour la prochaine mise à jour
-        requestAnimationFrame(animate);
+        // Arrêter l'intervalle une fois le texte complet
+        clearInterval(intervalId);
+        setProgressiveText(prev => ({
+          ...prev,
+          intervalId: undefined
+        }));
       }
-    };
+    }, typingSpeed);
     
-    // Démarrer l'animation avec requestAnimationFrame pour une meilleure synchronisation avec le navigateur
-    const rafId = window.requestAnimationFrame(animate);
-    
-    // Stocker l'ID d'animation pour pouvoir le nettoyer plus tard
+    // Stocker l'ID d'intervalle pour pouvoir le nettoyer plus tard
     setProgressiveText(prev => ({
       ...prev,
-      intervalId: rafId
+      intervalId
     }));
   };
   

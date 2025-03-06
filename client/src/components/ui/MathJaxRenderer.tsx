@@ -14,6 +14,8 @@ interface MathContentProps {
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
   // Référence pour obtenir les dimensions du conteneur
   const containerRef = useRef<HTMLDivElement>(null);
+  // État pour stocker les dimensions stables
+  const [stableHeight, setStableHeight] = useState<number | null>(null);
   
   // Formater le contenu pour remplacer les retours à la ligne par des balises <br />
   const formattedContent = content.replace(/\n/g, '<br />');
@@ -44,9 +46,9 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     '<h3 class="section-heading">$1</h3>'
   );
   
-  // Rechercher et remplacer les titres de type "Résolution Générale" ou "Méthode"
+  // Rechercher et remplacer les titres spéciaux comme "Résolution Générale"
   headingsPreprocessed = headingsPreprocessed.replace(
-    /(^|<br \/>)(Résolution Générale|Méthode|Solution|Approche|Démarche)\s*:?/g,
+    /(^|<br \/>)(Résolution Générale|Méthode|Solution|Approche|Démarche)\s*:?(?=<br|$)/g,
     '$1<h3 class="section-heading">$2</h3>'
   );
   
@@ -79,6 +81,27 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     .replace(/(Donc|En conclusion|Ainsi|Par conséquent),\s*(la solution|le résultat|la réponse)\s*est\s*/g, 
       '<div class="conclusion">$1, $2 est </div>');
 
+  // Observer les changements de hauteur et stabiliser
+  useEffect(() => {
+    // Si le contenu est vide, ne pas définir de hauteur minimale
+    if (!content || content.length < 10) {
+      setStableHeight(null);
+      return;
+    }
+
+    // Timer pour laisser MathJax terminer le rendu initial
+    const initialRenderTimer = setTimeout(() => {
+      if (containerRef.current) {
+        const currentHeight = containerRef.current.offsetHeight;
+        if (currentHeight > 0) {
+          setStableHeight(currentHeight);
+        }
+      }
+    }, 50); // Petit délai pour le rendu initial
+    
+    return () => clearTimeout(initialRenderTimer);
+  }, [content]);
+
   return (
     <div 
       ref={containerRef}
@@ -87,14 +110,12 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         willChange: 'transform',
         transform: 'translateZ(0)',
         position: 'relative', 
-        // Utiliser une hauteur d'une ligne minimum pour stabiliser le contenu
-        minHeight: '24px'
+        minHeight: stableHeight ? `${stableHeight}px` : '20px'
       }}
     >
       <MathJax>
         <div 
           dangerouslySetInnerHTML={{ __html: enhancedContent }}
-          style={{ transform: 'translateZ(0)' }}
           className="math-content-inner"
         />
       </MathJax>
