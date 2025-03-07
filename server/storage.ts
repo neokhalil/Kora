@@ -9,6 +9,8 @@ import {
   interactionTags, type InteractionTag, type InsertInteractionTag
 } from "@shared/schema";
 import { RecentQuestion } from "@/lib/types";
+import { db } from "./db";
+import { and, count, desc, eq, gte, inArray, like, lte, max, or, sql } from "drizzle-orm";
 
 export interface HistoryFilterOptions {
   type?: 'text' | 'image' | 'voice' | 'all';
@@ -119,7 +121,529 @@ export interface IStorage {
   searchInteractions(userId: number, query: string): Promise<InteractionWithDetails[]>;
 }
 
-// In-memory storage implementation
+// Database storage implementation
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  // Question operations
+  async getQuestion(id: number): Promise<Question | undefined> {
+    const [question] = await db.select().from(questions).where(eq(questions.id, id));
+    return question || undefined;
+  }
+
+  async getRecentQuestions(): Promise<RecentQuestion[]> {
+    const recentQuestions = await db
+      .select()
+      .from(questions)
+      .orderBy(desc(questions.createdAt))
+      .limit(5);
+
+    return recentQuestions.map(q => ({
+      id: q.id.toString(),
+      title: q.title,
+      timeAgo: this.getTimeAgo(q.createdAt)
+    }));
+  }
+
+  async createQuestion(insertQuestion: InsertQuestion): Promise<Question> {
+    const [question] = await db
+      .insert(questions)
+      .values(insertQuestion)
+      .returning();
+    return question;
+  }
+
+  // Field operations
+  async getField(id: number): Promise<Field | undefined> {
+    const [field] = await db.select().from(fields).where(eq(fields.id, id));
+    return field || undefined;
+  }
+
+  async getAllFields(): Promise<Field[]> {
+    return await db.select().from(fields);
+  }
+
+  async createField(insertField: InsertField): Promise<Field> {
+    const [field] = await db
+      .insert(fields)
+      .values(insertField)
+      .returning();
+    return field;
+  }
+
+  async getFieldsWithInteractionCounts(): Promise<FieldWithCount[]> {
+    const allFields = await this.getAllFields();
+    const result: FieldWithCount[] = [];
+    
+    for (const field of allFields) {
+      // Count interactions for topics in this field
+      const fieldInteractions = await db
+        .select({ count: count() })
+        .from(interactions)
+        .innerJoin(topics, eq(interactions.topicId, topics.id))
+        .where(eq(topics.fieldId, field.id));
+
+      result.push({
+        ...field,
+        interactionCount: fieldInteractions[0]?.count || 0
+      });
+    }
+    
+    return result;
+  }
+
+  // Topic operations
+  async getTopic(id: number): Promise<Topic | undefined> {
+    const [topic] = await db.select().from(topics).where(eq(topics.id, id));
+    return topic || undefined;
+  }
+
+  async getAllTopics(): Promise<Topic[]> {
+    return await db.select().from(topics);
+  }
+
+  async getTopicsByField(fieldId: number): Promise<Topic[]> {
+    return await db
+      .select()
+      .from(topics)
+      .where(eq(topics.fieldId, fieldId));
+  }
+
+  async getTopicsWithCount(): Promise<TopicWithCount[]> {
+    const allTopics = await this.getAllTopics();
+    const result: TopicWithCount[] = [];
+    
+    for (const topic of allTopics) {
+      const topicInteractions = await db
+        .select({ count: count() })
+        .from(interactions)
+        .where(eq(interactions.topicId, topic.id));
+
+      result.push({
+        ...topic,
+        interactionCount: topicInteractions[0]?.count || 0
+      });
+    }
+    
+    return result;
+  }
+
+  async createTopic(insertTopic: InsertTopic): Promise<Topic> {
+    const [topic] = await db
+      .insert(topics)
+      .values(insertTopic)
+      .returning();
+    return topic;
+  }
+
+  // Lesson operations
+  async getLesson(id: number): Promise<Lesson | undefined> {
+    const [lesson] = await db.select().from(lessons).where(eq(lessons.id, id));
+    return lesson || undefined;
+  }
+
+  async getLessonsByTopic(topicId: number): Promise<Lesson[]> {
+    return await db
+      .select()
+      .from(lessons)
+      .where(eq(lessons.topicId, topicId));
+  }
+
+  async createLesson(insertLesson: InsertLesson): Promise<Lesson> {
+    const [lesson] = await db
+      .insert(lessons)
+      .values(insertLesson)
+      .returning();
+    return lesson;
+  }
+
+  // Interaction operations
+  async getInteraction(id: number): Promise<Interaction | undefined> {
+    const [interaction] = await db.select().from(interactions).where(eq(interactions.id, id));
+    return interaction || undefined;
+  }
+
+  async getInteractionWithDetails(id: number): Promise<InteractionWithDetails | undefined> {
+    const interaction = await this.getInteraction(id);
+    if (!interaction) return undefined;
+    
+    // Get the topic
+    const topic = interaction.topicId 
+      ? await this.getTopic(interaction.topicId) || { 
+        id: 0, 
+        title: 'Sans catégorie', 
+        description: null, 
+        fieldId: 0 
+      }
+      : { 
+        id: 0, 
+        title: 'Sans catégorie', 
+        description: null, 
+        fieldId: 0 
+      };
+    
+    // Get the field
+    const field = topic.fieldId 
+      ? await this.getField(topic.fieldId) || {
+        id: 0,
+        name: 'Sans domaine',
+        description: null,
+        iconName: null
+      } 
+      : {
+        id: 0,
+        name: 'Sans domaine',
+        description: null,
+        iconName: null
+      };
+    
+    // Get tags
+    const tags = await this.getTagsByInteraction(interaction.id);
+    
+    return {
+      ...interaction,
+      topic,
+      field,
+      tags
+    };
+  }
+
+  async getInteractionsByUser(userId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    let query = db
+      .select()
+      .from(interactions)
+      .where(eq(interactions.userId, userId));
+    
+    // Apply filters
+    query = this.applyFiltersToQuery(query, options);
+    
+    return await query;
+  }
+
+  async getInteractionsByTopic(topicId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    let query = db
+      .select()
+      .from(interactions)
+      .where(eq(interactions.topicId, topicId));
+    
+    // If userId is specified, apply that filter
+    if (options.userId) {
+      query = query.where(eq(interactions.userId, options.userId));
+    }
+    
+    // Apply other filters
+    query = this.applyFiltersToQuery(query, options);
+    
+    return await query;
+  }
+
+  async getInteractionsByField(fieldId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    // Get topics in this field
+    const fieldTopics = await this.getTopicsByField(fieldId);
+    const topicIds = fieldTopics.map(t => t.id);
+    
+    if (topicIds.length === 0) {
+      return [];
+    }
+    
+    let query = db
+      .select()
+      .from(interactions)
+      .where(inArray(interactions.topicId, topicIds));
+    
+    // If userId is specified, apply that filter
+    if (options.userId) {
+      query = query.where(eq(interactions.userId, options.userId));
+    }
+    
+    // Apply other filters
+    query = this.applyFiltersToQuery(query, options);
+    
+    return await query;
+  }
+
+  private applyFiltersToQuery(query: any, options: HistoryFilterOptions): any {
+    // Type filter
+    if (options.type && options.type !== 'all') {
+      query = query.where(eq(interactions.type, options.type));
+    }
+    
+    // Date range filters
+    if (options.startDate) {
+      query = query.where(gte(interactions.createdAt, options.startDate));
+    }
+    
+    if (options.endDate) {
+      query = query.where(lte(interactions.createdAt, options.endDate));
+    }
+    
+    // Starred filter
+    if (options.starred !== undefined) {
+      query = query.where(eq(interactions.starred, options.starred));
+    }
+    
+    // Search filter
+    if (options.searchTerm) {
+      const term = `%${options.searchTerm}%`;
+      query = query.where(
+        or(
+          like(interactions.question, term),
+          like(interactions.answer, term)
+        )
+      );
+    }
+    
+    // Pagination
+    if (options.limit !== undefined) {
+      query = query.limit(options.limit);
+      
+      if (options.offset !== undefined) {
+        query = query.offset(options.offset);
+      }
+    }
+    
+    // Sorting (newest first)
+    query = query.orderBy(desc(interactions.createdAt));
+    
+    return query;
+  }
+
+  async createInteraction(insertInteraction: InsertInteraction): Promise<Interaction> {
+    const [interaction] = await db
+      .insert(interactions)
+      .values(insertInteraction)
+      .returning();
+    return interaction;
+  }
+
+  async updateInteraction(id: number, updates: Partial<Interaction>): Promise<Interaction | undefined> {
+    const [updated] = await db
+      .update(interactions)
+      .set({
+        ...updates,
+        updatedAt: new Date()
+      })
+      .where(eq(interactions.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteInteraction(id: number): Promise<boolean> {
+    // First delete related interaction tags
+    await db
+      .delete(interactionTags)
+      .where(eq(interactionTags.interactionId, id));
+    
+    // Then delete the interaction
+    const result = await db
+      .delete(interactions)
+      .where(eq(interactions.id, id));
+    
+    return result.rowCount > 0;
+  }
+
+  // Tag operations
+  async getTag(id: number): Promise<Tag | undefined> {
+    const [tag] = await db.select().from(tags).where(eq(tags.id, id));
+    return tag || undefined;
+  }
+
+  async getAllTags(): Promise<Tag[]> {
+    return await db.select().from(tags);
+  }
+
+  async createTag(insertTag: InsertTag): Promise<Tag> {
+    const [tag] = await db
+      .insert(tags)
+      .values(insertTag)
+      .returning();
+    return tag;
+  }
+
+  async getTagsByInteraction(interactionId: number): Promise<Tag[]> {
+    return await db
+      .select({
+        id: tags.id,
+        name: tags.name,
+        type: tags.type,
+        createdAt: tags.createdAt
+      })
+      .from(tags)
+      .innerJoin(
+        interactionTags,
+        and(
+          eq(tags.id, interactionTags.tagId),
+          eq(interactionTags.interactionId, interactionId)
+        )
+      );
+  }
+
+  async getTagsWithCount(): Promise<TagWithCount[]> {
+    const tagsWithCounts = await db
+      .select({
+        id: tags.id,
+        name: tags.name,
+        type: tags.type,
+        createdAt: tags.createdAt,
+        interactionCount: count(interactionTags.id)
+      })
+      .from(tags)
+      .leftJoin(interactionTags, eq(tags.id, interactionTags.tagId))
+      .groupBy(tags.id);
+    
+    return tagsWithCounts;
+  }
+
+  // InteractionTag operations
+  async addTagToInteraction(interactionId: number, tagId: number): Promise<InteractionTag> {
+    const [interactionTag] = await db
+      .insert(interactionTags)
+      .values({
+        interactionId,
+        tagId
+      })
+      .returning();
+    return interactionTag;
+  }
+
+  async removeTagFromInteraction(interactionId: number, tagId: number): Promise<boolean> {
+    const result = await db
+      .delete(interactionTags)
+      .where(
+        and(
+          eq(interactionTags.interactionId, interactionId),
+          eq(interactionTags.tagId, tagId)
+        )
+      );
+    
+    return result.rowCount > 0;
+  }
+
+  // Learning History insights
+  async getFrequentTopics(userId: number, limit: number = 5): Promise<InteractionInsight[]> {
+    const topicInsights = await db
+      .select({
+        topicId: topics.id,
+        topicTitle: topics.title,
+        fieldId: fields.id,
+        fieldName: fields.name,
+        count: count(interactions.id),
+        lastInteractionDate: max(interactions.createdAt)
+      })
+      .from(interactions)
+      .innerJoin(topics, eq(interactions.topicId, topics.id))
+      .innerJoin(fields, eq(topics.fieldId, fields.id))
+      .where(eq(interactions.userId, userId))
+      .groupBy(topics.id, fields.id, fields.name)
+      .orderBy(desc(sql`count`))
+      .limit(limit);
+    
+    return topicInsights;
+  }
+
+  async getRecentInteractions(userId: number, limit: number = 10): Promise<InteractionWithDetails[]> {
+    const recentInteractions = await db
+      .select()
+      .from(interactions)
+      .where(eq(interactions.userId, userId))
+      .orderBy(desc(interactions.createdAt))
+      .limit(limit);
+    
+    const result: InteractionWithDetails[] = [];
+    
+    for (const interaction of recentInteractions) {
+      const details = await this.getInteractionWithDetails(interaction.id);
+      if (details) {
+        result.push(details);
+      }
+    }
+    
+    return result;
+  }
+
+  async searchInteractions(userId: number, query: string): Promise<InteractionWithDetails[]> {
+    const term = `%${query}%`;
+    
+    const searchResults = await db
+      .select()
+      .from(interactions)
+      .where(
+        and(
+          eq(interactions.userId, userId),
+          or(
+            like(interactions.question, term),
+            like(interactions.answer, term)
+          )
+        )
+      )
+      .orderBy(desc(interactions.createdAt));
+    
+    const result: InteractionWithDetails[] = [];
+    
+    for (const interaction of searchResults) {
+      const details = await this.getInteractionWithDetails(interaction.id);
+      if (details) {
+        result.push(details);
+      }
+    }
+    
+    return result;
+  }
+  
+  // Helper function to format relative time
+  private getTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    const minute = 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+    const week = day * 7;
+    const month = day * 30;
+    const year = day * 365;
+    
+    if (diffInSeconds < minute) {
+      return 'à l\'instant';
+    } else if (diffInSeconds < hour) {
+      const minutes = Math.floor(diffInSeconds / minute);
+      return `il y a ${minutes} minute${minutes > 1 ? 's' : ''}`;
+    } else if (diffInSeconds < day) {
+      const hours = Math.floor(diffInSeconds / hour);
+      return `il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+    } else if (diffInSeconds < week) {
+      const days = Math.floor(diffInSeconds / day);
+      return `il y a ${days} jour${days > 1 ? 's' : ''}`;
+    } else if (diffInSeconds < month) {
+      const weeks = Math.floor(diffInSeconds / week);
+      return `il y a ${weeks} semaine${weeks > 1 ? 's' : ''}`;
+    } else if (diffInSeconds < year) {
+      const months = Math.floor(diffInSeconds / month);
+      return `il y a ${months} mois`;
+    } else {
+      const years = Math.floor(diffInSeconds / year);
+      return `il y a ${years} an${years > 1 ? 's' : ''}`;
+    }
+  }
+}
+
+// In-memory storage implementation (used as fallback)
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private questions: Map<number, Question>;
@@ -931,4 +1455,14 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Exportons la base de données PostgreSQL pour l'environnement de production
+// et un stockage en mémoire pour le développement et les tests en l'absence de base
+import { isTest, isDevelopment } from './config/environments';
+
+// Vérifie si une base de données est disponible
+const isDatabaseAvailable = !!process.env.DATABASE_URL;
+
+// Utilisez la base de données si elle est disponible, sinon utilisez le stockage en mémoire
+export const storage: IStorage = isDatabaseAvailable 
+  ? new DatabaseStorage() 
+  : new MemStorage();
