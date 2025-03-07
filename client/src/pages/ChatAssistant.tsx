@@ -108,6 +108,16 @@ const ChatAssistant: React.FC = () => {
     if (typeof window !== 'undefined') {
       setupMobileViewportFix();
       
+      // Forcer le repositionnement dès le chargement pour éviter l'espace blanc initial
+      document.body.classList.add('keyboard-open');
+      
+      // Simuler un clic pour déclencher le repositionnement
+      setTimeout(() => {
+        // Forcer le rendu de la page complète
+        window.scrollTo(0, 1);
+        window.scrollTo(0, 0);
+      }, 100);
+      
       // S'assurer que la hauteur initiale du textarea est correcte au chargement
       setTimeout(() => {
         const textareas = document.querySelectorAll('.chat-textarea');
@@ -899,7 +909,7 @@ const ChatAssistant: React.FC = () => {
           </div>
           
           {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-0 pt-1 z-50 composer-container input-area">
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-0 pt-1 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (

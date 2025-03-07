@@ -81,6 +81,31 @@
     padding-bottom: 0 !important;
     position: relative !important;
     min-height: 100% !important;
+    overscroll-behavior-y: none !important;
+  }
+  
+  /* Forcer le positionnement correct au chargement */
+  body.keyboard-open .fixed.bottom-0.composer-container,
+  .initial-load {
+    position: fixed !important;
+    bottom: 0 !important;
+    height: auto !important;
+    transform: translateY(0) !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Réduire la taille en hauteur pour éviter l'espace blanc */
+  .initial-load {
+    padding-bottom: 0 !important;
+  }
+  
+  /* Pour les appareils mobiles */
+  @media (max-width: 768px) {
+    .initial-load {
+      max-height: 150px !important; /* Hauteur maximale plus petite sur mobile */
+      padding: 0 !important;
+      margin: 0 !important;
+    }
   }
   
   html {
