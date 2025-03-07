@@ -909,7 +909,7 @@ const ChatAssistant: React.FC = () => {
           </div>
           
           {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-0 pt-1 z-50 composer-container input-area initial-load">
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
@@ -946,7 +946,7 @@ const ChatAssistant: React.FC = () => {
               
               {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-1 rounded-2xl border border-gray-200 shadow-sm flex flex-col gap-1"
+                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-xl border-2 border-gray-200 shadow-md flex flex-col gap-1 mb-2"
                 ref={composerRef}
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
@@ -1178,8 +1178,8 @@ const ChatAssistant: React.FC = () => {
                 </div>
               </div>
               
-{/* Message d'information en bas de page */}
-              <div className="text-xs text-gray-500 text-center absolute -bottom-5 left-0 right-0 h-5">
+{/* Message d'information visible sous la zone de saisie */}
+              <div className="text-xs text-gray-500 text-center mt-1 w-full footer-message">
                 KORA, ton assistant IA pour réviser et faire tes exercices.
               </div>
             </div>
