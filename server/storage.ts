@@ -453,17 +453,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteInteraction(id: number): Promise<boolean> {
-    // First delete related interaction tags
-    await db
-      .delete(interactionTags)
-      .where(eq(interactionTags.interactionId, id));
-    
-    // Then delete the interaction
-    const result = await db
-      .delete(interactions)
-      .where(eq(interactions.id, id));
-    
-    return result.rowCount ? result.rowCount > 0 : false;
+    try {
+      // First delete related interaction tags
+      await db
+        .delete(interactionTags)
+        .where(eq(interactionTags.interactionId, id));
+      
+      // Then delete the interaction
+      const result = await db
+        .delete(interactions)
+        .where(eq(interactions.id, id));
+      
+      // Vérifier si l'opération a affecté des lignes en inspectant le rowCount
+      return result && typeof result.rowCount === 'number' && result.rowCount > 0;
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'interaction:', error);
+      return false;
+    }
   }
 
   // Tag operations
@@ -531,16 +537,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async removeTagFromInteraction(interactionId: number, tagId: number): Promise<boolean> {
-    const result = await db
-      .delete(interactionTags)
-      .where(
-        and(
-          eq(interactionTags.interactionId, interactionId),
-          eq(interactionTags.tagId, tagId)
-        )
-      );
-    
-    return result.rowCount ? result.rowCount > 0 : false;
+    try {
+      const result = await db
+        .delete(interactionTags)
+        .where(
+          and(
+            eq(interactionTags.interactionId, interactionId),
+            eq(interactionTags.tagId, tagId)
+          )
+        );
+      
+      // Vérifier si l'opération a affecté des lignes en inspectant le rowCount
+      // Si rowCount n'existe pas ou est null, considérer que l'opération a échoué
+      return result && typeof result.rowCount === 'number' && result.rowCount > 0;
+    } catch (error) {
+      console.error('Erreur lors de la suppression du tag:', error);
+      return false;
+    }
   }
 
   // Learning History insights
