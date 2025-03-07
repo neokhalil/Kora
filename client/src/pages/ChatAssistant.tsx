@@ -1178,11 +1178,10 @@ const ChatAssistant: React.FC = () => {
                 </div>
               </div>
               
-{/* Suppression temporaire du message d'information 
+{/* Message d'information en bas de page */}
               <div className="text-xs text-gray-500 text-center absolute -bottom-5 left-0 right-0 h-5">
                 KORA, ton assistant IA pour réviser et faire tes exercices.
               </div>
-*/}
             </div>
           </div>
         </div>
