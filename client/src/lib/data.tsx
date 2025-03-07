@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Brain } from 'lucide-react';
+import { Brain, Image } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
@@ -7,6 +7,11 @@ export const navItems: NavItem[] = [
     label: 'Aide aux Devoirs',
     path: '/',
     icon: <Brain className="text-primary mr-3 h-5 w-5" />
+  },
+  {
+    label: 'Analyse d\'Image',
+    path: '/image-analysis',
+    icon: <Image className="text-primary mr-3 h-5 w-5" />
   }
 ];
 
