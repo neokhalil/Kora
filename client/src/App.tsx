@@ -6,13 +6,11 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import SideNavigation from "@/components/layout/SideNavigation";
 import ChatAssistant from "@/pages/ChatAssistant";
-import ImageAnalysisTest from "@/pages/ImageAnalysisTest";
 import { MenuProvider, useMenu } from "@/hooks/use-menu";
 
 // Configuration des routes
 const routes = [
-  { path: "/", Component: ChatAssistant },
-  { path: "/image-analysis", Component: ImageAnalysisTest }
+  { path: "/", Component: ChatAssistant }
 ];
 
 // App avec menu latéral

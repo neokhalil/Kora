@@ -1,0 +1,14 @@
+# Configuration environnement de test
+# Copier ce fichier vers .env dans votre Repl de test
+
+# Configuration générale
+PORT=5000
+
+# Base de données
+# Remplacer par l'URL de votre base de données de test
+# La base de données peut être créée avec create_postgresql_database_tool
+DATABASE_URL=postgres://username:password@hostname:port/dbname
+
+# API Keys
+# Remplacer par votre clé API OpenAI
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx

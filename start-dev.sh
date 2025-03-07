@@ -1,9 +1,6 @@
 #!/bin/bash
-# Script pour démarrer l'application en environnement de développement
-
-# Définir l'environnement
-export NODE_ENV=development
+# Script pour démarrer l'application 
 
 # Démarrer l'application
-echo "Démarrage de Kora en environnement de développement..."
+echo "Démarrage de Kora..."
 npm run dev

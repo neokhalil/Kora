@@ -1,7 +1,6 @@
 /**
  * Environment configuration management for Kora application
- * Handles database connections and configuration settings across
- * development, test, and production environments
+ * Simplified for single environment per Repl approach
  */
 
 import dotenv from 'dotenv';
@@ -10,27 +9,9 @@ import path from 'path';
 // Load environment variables from .env file
 dotenv.config();
 
-// Define the environment type
-type Environment = 'development' | 'test' | 'production';
-
-// Get the current environment from NODE_ENV, defaulting to 'development'
-const getEnvironment = (): Environment => {
-  const env = process.env.NODE_ENV?.toLowerCase() as Environment;
-  
-  // Validate that the environment is one of the allowed values
-  if (!env || !['development', 'test', 'production'].includes(env)) {
-    console.log(`Invalid environment "${env}", defaulting to "development"`);
-    return 'development';
-  }
-  
-  return env;
-};
-
-// Current environment
-const environment = getEnvironment();
-
-// Base configuration for all environments
-const baseConfig = {
+// Base configuration
+const config = {
+  environment: 'development', // This will be different in each Repl
   server: {
     port: process.env.PORT || 5000,
   },
@@ -43,54 +24,21 @@ const baseConfig = {
       apiKey: process.env.OPENAI_API_KEY,
     },
   },
+  database: {
+    url: process.env.DATABASE_URL,
+    ssl: false,
+    logging: true,
+  },
+  debug: true,
 };
 
-// Environment-specific configurations
-const environmentConfigs = {
-  development: {
-    ...baseConfig,
-    database: {
-      url: process.env.DEV_DATABASE_URL || process.env.DATABASE_URL,
-      ssl: false,
-      logging: true,
-    },
-    debug: true,
-  },
-  test: {
-    ...baseConfig,
-    database: {
-      url: process.env.TEST_DATABASE_URL,
-      ssl: false,
-      logging: false,
-    },
-    debug: true,
-  },
-  production: {
-    ...baseConfig,
-    database: {
-      url: process.env.PROD_DATABASE_URL || process.env.DATABASE_URL,
-      ssl: true, // Usually required for production database connections
-      logging: false,
-    },
-    debug: false,
-  },
-};
+// Utility functions for environment checks - simplified for single environment approach
+export const isDevelopment = (): boolean => config.environment === 'development';
+export const isTest = (): boolean => config.environment === 'test';
+export const isProduction = (): boolean => config.environment === 'production';
 
-// Export the current environment configuration
-const config = {
-  ...environmentConfigs[environment],
-  environment // Include the environment name in the config
-};
+// Log the current environment
+console.log(`Running in ${config.environment} environment`);
 
-// Utility functions for environment checks
-export const isDevelopment = (): boolean => environment === 'development';
-export const isTest = (): boolean => environment === 'test';
-export const isProduction = (): boolean => environment === 'production';
-
-// Log the current environment (not in production)
-if (!isProduction()) {
-  console.log(`Running in ${environment} environment`);
-}
-
-export { config, environment };
+export { config };
 export default config;
