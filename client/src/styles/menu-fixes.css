@@ -1,0 +1,37 @@
+/* Fix pour le menu mobile */
+
+/* Assurons-nous que la zone de saisie reste au-dessus du menu sur mobile */
+.input-container {
+  position: relative;
+  z-index: 60 !important;
+}
+
+/* Cadre de saisie du texte */
+.message-input {
+  position: relative;
+  z-index: 60 !important;
+}
+
+/* Zone des boutons (micro, caméra, etc.) */
+.message-actions {
+  position: relative;
+  z-index: 60 !important;
+}
+
+/* Zone de messages */
+.messages-container {
+  position: relative;
+  z-index: 30 !important;
+}
+
+/* Menu flottant qui couvre le contenu principal quand il est ouvert sur mobile */
+@media (max-width: 768px) {
+  .side-navigation-mobile-open {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 50;
+  }
+}

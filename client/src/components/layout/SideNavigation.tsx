@@ -54,15 +54,16 @@ const SideNavigation = () => {
       {/* Mobile Navigation Overlay */}
       {isMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={closeMenu}
+          aria-hidden="true"
         ></div>
       )}
       
       {/* Side Navigation - ChatGPT style */}
       <aside 
         className={cn(
-          "w-full max-w-[280px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed inset-y-0 left-0 z-40 md:z-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative flex flex-col",
+          "w-full max-w-[280px] bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
