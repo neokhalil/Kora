@@ -2,7 +2,7 @@ import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
 import * as schema from "@shared/schema";
-import { config } from './config/environments';
+import { config, environment } from './config/environments';
 
 neonConfig.webSocketConstructor = ws;
 
@@ -27,7 +27,7 @@ export const pool = new Pool(poolConfig);
 // Log connection status for non-production environments
 pool.on('connect', () => {
   if (config.debug) {
-    console.log(`Connected to PostgreSQL database (${config.environment} environment)`);
+    console.log(`Connected to PostgreSQL database (${environment} environment)`);
   }
 });
 
