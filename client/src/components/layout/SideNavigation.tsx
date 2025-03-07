@@ -3,10 +3,22 @@ import { useLocation } from 'wouter';
 import { useMenu } from '@/hooks/use-menu';
 import { navItems } from '@/lib/data';
 import { cn } from '@/lib/utils';
+import { Search, PenSquare, Plus, ChevronDown, User } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+
+// Sample recent conversations data
+const recentConversations = [
+  { id: '1', title: 'Équation différentielle expliquée', date: '2025-03-07' },
+  { id: '2', title: 'Verbe dans la phrase', date: '2025-03-06' },
+  { id: '3', title: 'Texte aléatoire et aide', date: '2025-03-05' },
+  { id: '4', title: 'English-speaking Sub-Saharan Africa', date: '2025-03-04' },
+];
 
 const SideNavigation = () => {
   const { isMenuOpen, closeMenu } = useMenu();
   const [location, setLocation] = useLocation();
+  const [searchValue, setSearchValue] = React.useState('');
   
   // Track current location for highlighting active link
   React.useEffect(() => {
@@ -30,6 +42,12 @@ const SideNavigation = () => {
       closeMenu();
     }, 10);
   };
+
+  // Function to start a new conversation
+  const handleNewConversation = () => {
+    console.log("Starting new conversation");
+    handleNavigation('/');
+  };
   
   return (
     <>
@@ -41,51 +59,94 @@ const SideNavigation = () => {
         ></div>
       )}
       
-      {/* Side Navigation */}
+      {/* Side Navigation - ChatGPT style */}
       <aside 
         className={cn(
-          "w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed inset-y-0 left-0 z-40 md:z-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative flex flex-col",
+          "w-80 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 fixed inset-y-0 left-0 z-40 md:z-0 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative flex flex-col",
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        {/* Logo section at the top of sidebar */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-200 dark:border-gray-800">
-          <div 
-            className="flex items-center space-x-2 cursor-pointer" 
-            onClick={() => handleNavigation("/")}
-          >
-            <div className="w-8 h-8 bg-indigo-600 rounded-md flex items-center justify-center">
-              <span className="text-white font-bold text-lg">K</span>
+        {/* Top search bar and new chat button */}
+        <div className="px-3 py-3 flex flex-col gap-3">
+          {/* Search area */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-gray-500" />
             </div>
-            <span className="text-xl font-bold">Kora</span>
+            <Input
+              type="text"
+              placeholder="Rechercher"
+              className="pl-10 pr-4 py-2 w-full bg-gray-100 dark:bg-gray-800 border-none text-sm"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
+          
+          {/* New chat button */}
+          <Button
+            onClick={handleNewConversation}
+            className="w-full bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-black dark:text-white border border-gray-200 dark:border-gray-700 flex items-center justify-between"
+          >
+            <span className="flex items-center">
+              <PenSquare className="h-4 w-4 mr-2" />
+              Nouvelle conversation
+            </span>
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        {/* Main navigation section */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Main menu navigation section */}
+          <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-800">
+            {navItems.map((item) => (
+              <div
+                key={item.path}
+                className={cn(
+                  "flex items-center px-3 py-2 my-1 text-sm font-medium rounded-md transition-colors cursor-pointer",
+                  location === item.path 
+                    ? "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white" 
+                    : "text-gray-700 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+                )}
+                onClick={() => handleNavigation(item.path)}
+              >
+                {item.icon}
+                {item.label}
+              </div>
+            ))}
+          </div>
+          
+          {/* Recent conversations section */}
+          <div className="px-3 py-2">
+            <h3 className="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              Conversations récentes
+            </h3>
+            
+            <div className="space-y-1">
+              {recentConversations.map((convo) => (
+                <div
+                  key={convo.id}
+                  className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md cursor-pointer truncate"
+                  onClick={() => handleNavigation(`/conversation/${convo.id}`)}
+                >
+                  {convo.title}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         
-        {/* Navigation Links */}
-        <nav className="flex-1 py-4 px-3 overflow-y-auto">
-          <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.path}>
-                <div 
-                  className={cn(
-                    "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors cursor-pointer",
-                    location === item.path 
-                      ? "bg-indigo-50 text-indigo-600 dark:bg-gray-800 dark:text-indigo-400" 
-                      : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                  )}
-                  onClick={() => handleNavigation(item.path)}
-                >
-                  <span className="mr-3">{item.icon}</span>
-                  {item.label}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        
-        {/* Version info simple */}
-        <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50 dark:bg-gray-800">
-          <p>Kora - Aide aux devoirs</p>
+        {/* User account section */}
+        <div className="border-t border-gray-200 dark:border-gray-800 p-3">
+          <div className="flex items-center p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md cursor-pointer">
+            <div className="w-8 h-8 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center mr-3">
+              <User className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Mon Compte</p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-gray-500" />
+          </div>
         </div>
       </aside>
     </>
