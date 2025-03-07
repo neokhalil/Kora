@@ -54,7 +54,7 @@ const SideNavigation = () => {
       {/* Mobile Navigation Overlay */}
       {isMenuOpen && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden menu-overlay"
           onClick={closeMenu}
           aria-hidden="true"
         ></div>
