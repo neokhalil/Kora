@@ -64,6 +64,34 @@
   /* Supprimer le trait gris en bas */
   .composer-container {
     border-bottom: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Supprimer tout espace blanc en bas de la page */
+  .fixed.bottom-0 {
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: max-content !important;
+  }
+  
+  /* Fixer position sur mobile */
+  body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    position: relative !important;
+    min-height: 100% !important;
+  }
+  
+  html {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  /* Style de la zone de message pour éviter les espaces */
+  .message-actions {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   /* Corrections pour Safari iOS */
