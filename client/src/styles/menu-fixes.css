@@ -44,15 +44,26 @@
   /* Ajustements pour les petits écrans */
   .input-area {
     background-color: white !important;
-    border-top: 1px solid #e5e7eb;
-    margin-bottom: env(safe-area-inset-bottom, 0);
+    border-top: none;
+    margin-bottom: 0;
     position: relative;
     z-index: 35;
+    padding-bottom: 0 !important;
   }
   
   .dark .input-area {
     background-color: #1f2937 !important;
-    border-top: 1px solid #374151;
+    border-top: none;
+  }
+  
+  /* Eliminer les marges et traits inférieurs */
+  .input-area > div:last-child {
+    margin-bottom: 0 !important;
+  }
+  
+  /* Supprimer le trait gris en bas */
+  .composer-container {
+    border-bottom: none !important;
   }
   
   /* Corrections pour Safari iOS */
