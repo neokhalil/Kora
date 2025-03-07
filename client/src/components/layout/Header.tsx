@@ -8,6 +8,7 @@ const Header: React.FC = () => {
   
   return (
     <header 
+      id="kora-header-container"
       className="app-header bg-white dark:bg-gray-900 w-full border-b border-gray-200 dark:border-gray-800 relative z-40"
       style={{
         height: 'var(--header-height)',

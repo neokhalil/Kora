@@ -963,7 +963,7 @@ const ChatAssistant: React.FC = () => {
                 />
                 
                 {/* Champ de saisie en haut */}
-                <div className="w-full">
+                <div className="w-full input-container">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => {
@@ -976,7 +976,7 @@ const ChatAssistant: React.FC = () => {
                     }}
                     onKeyDown={handleKeyPress}
                     placeholder="Pose ta question"
-                    className="chat-textarea border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-0 overflow-y-auto"
+                    className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-0 overflow-y-auto"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
                       // Marquer que le clavier est ouvert
@@ -1001,7 +1001,7 @@ const ChatAssistant: React.FC = () => {
                 </div>
                 
                 {/* Boutons d'action en bas */}
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center message-actions">
                   {/* Boutons d'action à gauche */}
                   <div className="flex gap-2">
                     {/* Bouton galerie */}
