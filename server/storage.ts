@@ -61,7 +61,7 @@ export interface InteractionInsight {
   fieldId: number;
   fieldName: string;
   count: number;
-  lastInteractionDate: Date;
+  lastInteractionDate: Date | null;
 }
 
 // Interface for all storage operations
@@ -338,15 +338,19 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getInteractionsByTopic(topicId: number, options: HistoryFilterOptions = {}): Promise<Interaction[]> {
+    // Create base query
+    let conditions = [eq(interactions.topicId, topicId)];
+    
+    // Si userId est spécifié, ajouter cette condition
+    if (options.userId) {
+      conditions.push(eq(interactions.userId, options.userId));
+    }
+    
+    // Create query with all conditions
     let query = db
       .select()
       .from(interactions)
-      .where(eq(interactions.topicId, topicId));
-    
-    // If userId is specified, apply that filter
-    if (options.userId) {
-      query = query.where(eq(interactions.userId, options.userId));
-    }
+      .where(and(...conditions));
     
     // Apply other filters
     query = this.applyFiltersToQuery(query, options);
@@ -363,15 +367,18 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
     
+    // Créer la requête de base avec la condition de topicIds
+    let conditions = [inArray(interactions.topicId, topicIds)];
+    
+    // Si userId est spécifié, ajouter cette condition
+    if (options.userId) {
+      conditions.push(eq(interactions.userId, options.userId));
+    }
+    
     let query = db
       .select()
       .from(interactions)
-      .where(inArray(interactions.topicId, topicIds));
-    
-    // If userId is specified, apply that filter
-    if (options.userId) {
-      query = query.where(eq(interactions.userId, options.userId));
-    }
+      .where(and(...conditions));
     
     // Apply other filters
     query = this.applyFiltersToQuery(query, options);
@@ -456,7 +463,7 @@ export class DatabaseStorage implements IStorage {
       .delete(interactions)
       .where(eq(interactions.id, id));
     
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Tag operations
@@ -533,7 +540,7 @@ export class DatabaseStorage implements IStorage {
         )
       );
     
-    return result.rowCount > 0;
+    return result.rowCount ? result.rowCount > 0 : false;
   }
 
   // Learning History insights
