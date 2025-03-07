@@ -1,157 +1,94 @@
-# Guide de Configuration Multi-Repls pour Kora
+# Guide de configuration multi-environnements pour Kora
 
-Ce guide explique comment configurer et maintenir Kora à travers plusieurs Repls pour les environnements de développement, test et production.
+Ce dossier contient tous les scripts et guides nécessaires pour configurer et maintenir vos différents environnements de Kora (développement, test et production).
 
-## Table des matières
+## Architecture des environnements
 
-1. [Création du dépôt Git](#1-création-du-dépôt-git)
-2. [Configuration des Repls](#2-configuration-des-repls)
-3. [Synchronisation entre environnements](#3-synchronisation-entre-environnements)
-4. [Déploiement](#4-déploiement)
-5. [Base de données](#5-base-de-données)
+Nous utilisons une approche basée sur 3 Repls distincts:
 
-## 1. Création du dépôt Git
+1. **Environnement de développement** (`kora-dev`)
+   - Où vous développez et testez initialement vos fonctionnalités
+   - Base de données de développement
+   - URL: `https://kora-dev.VOTRE_USERNAME.repl.co`
 
-### 1.1 Création d'un nouveau dépôt sur GitHub
+2. **Environnement de test** (`kora-test`)
+   - Pour les tests plus approfondis avant mise en production
+   - Base de données de test séparée
+   - URL: `https://kora-test.VOTRE_USERNAME.repl.co`
 
-1. Connectez-vous à votre compte GitHub
-2. Cliquez sur le bouton "+" en haut à droite, puis "New repository"
-3. Nommez le dépôt "kora-app" (ou le nom de votre choix)
-4. Laissez-le en public ou privé selon vos préférences
-5. Initialisez avec un README si vous le souhaitez
-6. Cliquez sur "Create repository"
+3. **Environnement de production** (`kora-prod`)
+   - Version stable et publique de l'application
+   - Base de données de production
+   - URL: `https://kora-prod.VOTRE_USERNAME.repl.co` (ou domaine personnalisé)
 
-### 1.2 Connecter le Repl de développement au dépôt Git
+## Guides détaillés
 
-```bash
-# Dans le Repl de développement
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/VOTRE_USERNAME/kora-app.git
-git push -u origin main
-```
+- [Guide de configuration Git](./git-setup.md) - Comment configurer Git pour la synchronisation entre environnements
+- [Guide de configuration des Repls](./repl-setup.md) - Comment configurer chaque Repl pour les différents environnements
 
-## 2. Configuration des Repls
+## Scripts disponibles
 
-### 2.1 Création du Repl de test
+### Configuration
 
-1. Rendez-vous sur [Replit.com](https://replit.com)
-2. Cliquez sur "Create Repl"
-3. Sélectionnez l'option "Import from GitHub"
-4. Entrez l'URL du dépôt: `https://github.com/VOTRE_USERNAME/kora-app.git`
-5. Nommez le Repl "kora-test"
-6. Configurez comme suit:
-   - Activez "Enable Git Version Control" dans les paramètres
-   - Configurez les secrets (OPENAI_API_KEY, etc.)
-   - Créez un fichier `.env` avec la configuration de test
+- `configure-git-auth.sh` - Configure l'authentification Git pour accéder à GitHub
 
-### 2.2 Création du Repl de production
+### Synchronisation Dev → Test
 
-1. Rendez-vous sur [Replit.com](https://replit.com)
-2. Cliquez sur "Create Repl"
-3. Sélectionnez l'option "Import from GitHub"
-4. Entrez l'URL du dépôt: `https://github.com/VOTRE_USERNAME/kora-app.git`
-5. Nommez le Repl "kora-prod"
-6. Configurez comme suit:
-   - Activez "Enable Git Version Control" dans les paramètres
-   - Configurez les secrets (OPENAI_API_KEY, etc.)
-   - Créez un fichier `.env` avec la configuration de production
+- `sync-to-test.sh` - À exécuter dans l'environnement de développement pour préparer la synchronisation
+- `pull-from-dev.sh` - À exécuter dans l'environnement de test pour récupérer les changements
 
-### 2.3 Configuration spécifique par environnement
+### Synchronisation Test → Production
 
-#### Pour le Repl de développement (existant)
-- Modifiez `server/config/environments.ts` avec:
-  ```typescript
-  environment: 'development'
-  ```
+- `sync-to-prod.sh` - À exécuter dans l'environnement de test pour créer une version à déployer
+- `pull-from-test.sh` - À exécuter dans l'environnement de production pour déployer une version
 
-#### Pour le Repl de test
-- Modifiez `server/config/environments.ts` avec:
-  ```typescript
-  environment: 'test'
-  ```
+### Gestion des données
 
-#### Pour le Repl de production
-- Modifiez `server/config/environments.ts` avec:
-  ```typescript
-  environment: 'production',
-  debug: false,
-  database: {
-    url: process.env.DATABASE_URL,
-    ssl: true,
-    logging: false,
-  }
-  ```
+- `export-data.sh` - Exporte les données d'une table spécifique
+- `import-data.sh` - Importe des données dans un environnement
 
-## 3. Synchronisation entre environnements
+## Flux de travail typique
 
-### 3.1 Flux de développement vers test
-
-Utilisez les scripts fournis dans ce dossier:
-
-1. Dans le Repl de développement:
-   ```bash
+1. **Développement**
+   ```
+   # Dans l'environnement de développement
+   # Développez, testez, et committez vos changements
+   # Quand vous êtes prêt à tester plus en profondeur:
    ./scripts/multi-repls-setup/sync-to-test.sh
    ```
 
-2. Dans le Repl de test:
-   ```bash
-   ./scripts/multi-repls-setup/pull-from-dev.sh
+2. **Test**
    ```
-
-### 3.2 Flux de test vers production
-
-1. Dans le Repl de test:
-   ```bash
+   # Dans l'environnement de test
+   ./scripts/multi-repls-setup/pull-from-dev.sh
+   # Testez l'application
+   # Si tout est OK, préparez pour production:
    ./scripts/multi-repls-setup/sync-to-prod.sh
    ```
 
-2. Dans le Repl de production:
-   ```bash
-   ./scripts/multi-repls-setup/pull-from-test.sh
+3. **Production**
+   ```
+   # Dans l'environnement de production
+   ./scripts/multi-repls-setup/pull-from-test.sh v1.0.0
+   # Vérifiez l'application
+   # Cliquez sur "Deploy" dans Replit
    ```
 
-## 4. Déploiement
+## Mise en place initiale
 
-### 4.1 Déploiement en test
+Si vous n'avez pas encore configuré vos environnements, suivez ces étapes:
 
-1. Après avoir exécuté `pull-from-dev.sh` dans le Repl de test
-2. Cliquez sur le bouton "Deploy" dans l'interface Replit
-
-### 4.2 Déploiement en production
-
-1. Après avoir exécuté `pull-from-test.sh` dans le Repl de production
-2. Cliquez sur le bouton "Deploy" dans l'interface Replit
-
-## 5. Base de données
-
-### 5.1 Configuration de la base de données par environnement
-
-1. Créez une base de données PostgreSQL séparée pour chaque environnement
-2. Dans chaque Repl, exécutez:
+1. Configurez Git dans votre Repl de développement actuel en suivant le [guide Git](./git-setup.md)
+2. Créez vos Repls de test et production en suivant le [guide de configuration des Repls](./repl-setup.md)
+3. Rendez tous les scripts exécutables dans chaque Repl:
    ```bash
-   npm run db:push
+   chmod +x scripts/multi-repls-setup/*.sh
    ```
 
-### 5.2 Migration de données importantes
+## Conseils pour la gestion des environnements
 
-Pour migrer des données spécifiques d'un environnement à un autre:
-
-1. Exportation:
-   ```bash
-   ./scripts/multi-repls-setup/export-data.sh table_name
-   ```
-
-2. Importation:
-   ```bash
-   ./scripts/multi-repls-setup/import-data.sh table_name
-   ```
-
-## Bonnes pratiques
-
-1. **Versionnage**: Utilisez des tags Git pour marquer les versions stables
-2. **Tests**: Testez rigoureusement en environnement de test avant de passer en production
-3. **Rollbacks**: Conservez des tags de versions pour pouvoir revenir en arrière si nécessaire
-4. **Secrets**: Ne stockez jamais les secrets dans Git, utilisez les variables d'environnement Replit
+- **Variables d'environnement**: Utilisez différentes valeurs pour chaque environnement
+- **Debugging**: Activez les logs détaillés en dev/test, désactivez-les en production
+- **Base de données**: Ne partagez jamais les bases de données entre environnements
+- **API Keys**: Utilisez des clés API différentes pour chaque environnement si possible
+- **Branches Git**: Envisagez d'utiliser des branches différentes pour isoler les fonctionnalités en développement

@@ -2,14 +2,20 @@
 
 Ce guide détaille la procédure pour configurer vos Repls d'environnement de test et de production.
 
-## Configuration du versionnement Git
+## Vérification du versionnement Git
 
-Pour chaque Repl (développement, test, production), vous devez activer le versionnement Git:
+Pour chaque Repl (développement, test, production), vous devez vous assurer que Git est initialisé:
 
-1. Ouvrez les paramètres du Repl (icône ⚙️)
-2. Naviguez à la section "Version Control"
-3. Activez l'option "Enable Git Version Control"
-4. Cliquez sur "Apply"
+1. Ouvrez un terminal dans votre Repl
+2. Vérifiez que Git est déjà initialisé:
+   ```bash
+   git status
+   ```
+3. Si vous obtenez une erreur indiquant que ce n'est pas un dépôt Git, initialisez-le:
+   ```bash
+   git init
+   git branch -M main
+   ```
 
 Cette étape est **essentielle** pour permettre la synchronisation entre les environnements.
 
