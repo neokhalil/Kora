@@ -78,11 +78,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a shared conversation history map for all types of interactions
   const userConversations = new Map<string, { role: 'user' | 'assistant', content: string }[]>();
   
-  // Add image processing endpoint
+  // Add enhanced image processing endpoint
   app.post('/api/image-analysis', upload.single('image'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: 'No image file uploaded' });
+      }
+
+      // Verify OpenAI API key availability
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(500).json({ 
+          message: 'OpenAI API key not configured. Please set OPENAI_API_KEY in environment variables.'
+        });
       }
 
       // Read the uploaded file
@@ -90,13 +97,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const imageBuffer = fs.readFileSync(imagePath);
       const imageBase64 = imageBuffer.toString('base64');
       
-      // Get optional parameters
-      const { subject = 'general', query = '', sessionId = 'default' } = req.body;
+      // Get optional parameters with validation
+      const { 
+        subject = 'general', 
+        query = '', 
+        sessionId = uuidv4(),  // Generate new UUID if not provided
+        mode = 'standard',     // Analysis mode: standard, detailed, step-by-step
+        userId = null          // Optional user ID for storing in database
+      } = req.body;
       
-      // Process the image with OpenAI
-      const response = await processImageQuery(imageBase64, query, subject);
+      // Convert mode to valid enum value
+      const analysisMode = ['standard', 'detailed', 'step-by-step'].includes(mode) 
+        ? mode as "standard" | "detailed" | "step-by-step"
+        : "standard";
       
-      // Store conversation history in the shared map for use with WebSocket
+      console.log(`Processing image analysis: mode=${analysisMode}, subject=${subject}`);
+      
+      // Process the image with enhanced OpenAI Vision API
+      const response = await processImageQuery(imageBase64, query, subject, analysisMode);
+      
+      // Store conversation history in the shared map for context memory
       if (!userConversations.has(sessionId)) {
         userConversations.set(sessionId, []);
       }
@@ -107,7 +127,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Add the current interaction to history
       conversationHistory.push({ 
         role: 'user', 
-        content: query || "Analyse cette image s'il te plaît" 
+        content: query 
+          ? `[Image] ${query}` 
+          : "[Image] Analyse cette image s'il te plaît" 
       });
       
       conversationHistory.push({ 
@@ -115,27 +137,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         content: response 
       });
       
-      // Limit conversation history to last 10 messages
+      // Limit conversation history to last 10 messages (5 exchanges)
       if (conversationHistory.length > 10) {
         conversationHistory.splice(0, 2); // Remove oldest Q&A pair
       }
       
-      // Update the map
+      // Update the conversation map
       userConversations.set(sessionId, conversationHistory);
       
-      // Return the response with conversation ID
+      // Save interaction to database if userId is provided
+      let interactionId = null;
+      if (userId) {
+        try {
+          // Generate a public URL for the image
+          // For simplicity we're using the filename, but in production
+          // this should be a proper URL based on your hosting setup
+          const imageUrl = `/uploads/${path.basename(imagePath)}`;
+          
+          // Save to database
+          const interaction = await dbStorage.createInteraction({
+            userId: parseInt(userId as string, 10),
+            topicId: null, // Could be set based on subject detection
+            question: query || "Analyse d'image",
+            answer: response,
+            type: "image",
+            imageUrl: imageUrl,
+            starred: false,
+            metadata: {
+              subject: subject,
+              analysisMode: analysisMode,
+              timestamp: new Date().toISOString()
+            }
+          });
+          
+          interactionId = interaction.id;
+        } catch (dbError) {
+          console.error('Error saving interaction to database:', dbError);
+          // Continue processing even if DB save fails
+        }
+      }
+      
+      // Return the response with additional metadata
       res.json({
         content: response,
         timestamp: new Date().toISOString(),
-        sessionId
+        sessionId,
+        mode: analysisMode,
+        subject: subject,
+        interactionId
       });
       
-      // Clean up - remove the temporary file
-      fs.unlinkSync(imagePath);
+      // We don't delete the image if it's been saved to the database
+      if (!userId) {
+        // Clean up - remove the temporary file if not saved to database
+        fs.unlinkSync(imagePath);
+      }
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing image:', error);
-      res.status(500).json({ message: 'Failed to process image' });
+      
+      // Provide more specific error messages based on error type
+      if (error.message && error.message.includes('API key')) {
+        return res.status(500).json({ message: 'API configuration error. Please contact support.' });
+      } else if (error.message && error.message.includes('content policy')) {
+        return res.status(400).json({ message: 'The image content could not be processed due to content policy restrictions.' });
+      }
+      
+      res.status(500).json({ 
+        message: 'Failed to process image. Please try again with a clearer image.' 
+      });
     }
   });
   

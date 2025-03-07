@@ -254,13 +254,35 @@ export async function generateChallengeProblem(
 
 /**
  * Process an uploaded image and generate an educational response
+ * 
+ * @param imageBase64 - Base64 encoded image data
+ * @param textQuery - Optional text query accompanying the image
+ * @param subject - Optional subject area (math, science, language, history, etc.)
+ * @param analysisMode - Optional mode to customize the analysis approach
+ * @returns Promise with the generated educational response
  */
 export async function processImageQuery(
   imageBase64: string,
   textQuery: string = "",
-  subject: string = "general"
+  subject: string = "general",
+  analysisMode: "standard" | "detailed" | "step-by-step" = "standard"
 ): Promise<string> {
   try {
+    // Check for valid API key
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("API key not configured. Please set OPENAI_API_KEY in environment variables.");
+    }
+
+    // First, perform image analysis to intelligently determine the subject matter
+    // This helps tailor the response even when the user doesn't specify a subject
+    const analysisResponse = await analyzeImageContent(imageBase64);
+    
+    // If subject wasn't explicitly provided, use the detected subject
+    if (subject === "general" && analysisResponse.detectedSubject) {
+      subject = analysisResponse.detectedSubject;
+      console.log(`Auto-detected subject: ${subject}`);
+    }
+
     // Vision-specific system prompt enhancements for educational context
     const visionSystemPrompt = `${SYSTEM_PROMPT}
     
@@ -271,51 +293,83 @@ You are analyzing an educational image uploaded by a student. This may be:
 - Text in a textbook or worksheet they need explained
 
 Important when analyzing images:
-1. First describe what you see in the image clearly but briefly
-2. Identify the subject matter and specific topic
+1. First briefly identify what you see in the image (use 1-2 sentences only)
+2. Identify the subject matter and specific topic (math, science, language, etc.)
 3. For math problems, DO NOT solve the specific problem in the image - follow the same tutoring guidelines:
    - Identify the type of problem
    - Explain the underlying concepts using generalized examples 
    - Use a different example with different numbers
    - Provide guiding questions to help the student solve their problem
-4. For diagrams/charts, provide a comprehensive explanation of the concept, not just the specific content
+4. For diagrams/charts, explain the concept represented, not just the specific content
 5. Provide educational context around the concept, never giving direct answers
-6. Use your educational guidelines for proper mathematical notation
-7. If the image is unclear or unreadable, mention specific parts that are difficult to see
-8. If the question requires more context, ask clarifying questions
+6. Use proper mathematical notation with LaTeX for any formulas or equations
+7. If the image is unclear, mention which parts are difficult to see
+8. End with 1-2 questions to help the student think about how to approach their problem
 
 Respond in ${process.env.LANGUAGE || "French"}.`;
 
-    // Set up appropriate subject-specific guidance
+    // Set up appropriate subject-specific guidance based on detected or specified subject
     let subjectGuidance = "";
 
     switch (subject.toLowerCase()) {
       case "math":
-        subjectGuidance = "IMPORTANT: Never solve the specific problem for the student. Instead, identify the mathematical concepts involved, explain general approaches, and provide a similar but different example. Guide the student with questions that help them apply the concepts to their own problem.";
+      case "mathematics":
+      case "mathématiques":
+      case "algebra":
+      case "calculus":
+      case "geometry":
+        subjectGuidance = "IMPORTANT: Never solve the specific problem for the student. Instead, identify the mathematical concepts involved, explain general approaches, and provide a similar but different example. Guide the student with questions that help them apply the concepts to their own problem. Use LaTeX for all mathematical expressions.";
         break;
       case "science":
+      case "physics":
+      case "chemistry":
+      case "biology":
         subjectGuidance = "Explain scientific concepts, principles, and methodologies without directly answering the specific question. Relate to fundamental principles and provide real-world examples. Guide the student to understand the reasoning process required to solve similar problems.";
         break;
       case "language":
+      case "grammar":
+      case "literature":
+      case "français":
+      case "english":
         subjectGuidance = "Provide guidance on language concepts, grammar rules, or literary techniques, but don't directly translate text or complete assignments. Offer examples that illustrate the concepts but are different from what's in the image.";
         break;
       case "history":
+      case "geography":
+      case "economics":
+      case "social studies":
         subjectGuidance = "Provide historical context and explain methodologies for analyzing historical events or documents, without directly answering specific questions that might be homework. Guide students in how to think about historical analysis.";
         break;
       default:
         subjectGuidance = "Identify the subject matter in the image and provide educational guidance on the concepts involved without directly solving problems or answering specific homework questions. Focus on understanding rather than answers.";
     }
 
+    // Add analysis mode specific instructions
+    let modeGuidance = "";
+    switch (analysisMode) {
+      case "detailed":
+        modeGuidance = "Provide a more detailed explanation of the concepts, with more thorough background information and examples. Still maintain the guideline of not solving the specific problem.";
+        break;
+      case "step-by-step":
+        modeGuidance = "Break down the approach to understanding this type of problem into clear, numbered steps. For each step, explain the concept and provide a general example of how to apply it. Remember not to solve the specific problem in the image.";
+        break;
+      default: // standard
+        modeGuidance = "Provide a balanced explanation that focuses on core concepts and a clear example different from what's in the image.";
+    }
+
+    // Customize the prompt based on whether the user provided additional text
     const userPrompt = textQuery 
       ? `J'ai besoin d'aide avec cette image. ${textQuery}`
       : "Peux-tu m'aider à comprendre ce qui est montré dans cette image?";
 
+    // The system message now includes detected content info and customized guidance
+    const systemMessage = `${visionSystemPrompt}\n\n${subjectGuidance}\n\n${modeGuidance}\n\nDetected content: This appears to be ${analysisResponse.contentDescription}`;
+
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
       messages: [
         { 
           role: "system", 
-          content: `${visionSystemPrompt}\n\n${subjectGuidance}` 
+          content: systemMessage 
         },
         { 
           role: "user", 
@@ -341,5 +395,65 @@ Respond in ${process.env.LANGUAGE || "French"}.`;
   } catch (error) {
     console.error("Error processing image query:", error);
     return "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Veuillez vérifier que l'image est claire et réessayer.";
+  }
+}
+
+/**
+ * Performs preliminary analysis on image content to detect subject and content type
+ * This helps customize the response even when the user doesn't specify subject
+ */
+async function analyzeImageContent(imageBase64: string): Promise<{
+  detectedSubject: string;
+  contentDescription: string;
+  contentType: "problem" | "diagram" | "text" | "chart" | "unknown";
+}> {
+  try {
+    // Send a quick analysis request to determine subject and content type
+    const analysisResponse = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are an educational image analyzer. Examine the image and provide a JSON response with the following fields:
+          1. detectedSubject: The most likely subject (math, science, language, history, geography, etc.)
+          2. contentDescription: A brief (10-15 words) description of what the image contains
+          3. contentType: One of ["problem", "diagram", "text", "chart", "unknown"]
+          
+          Return ONLY valid JSON without additional text or explanations.`
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`
+              }
+            }
+          ]
+        }
+      ],
+      temperature: 0.3,
+      max_tokens: 250,
+      response_format: { type: "json_object" }
+    });
+
+    // Parse the JSON response (ensure content is not null)
+    const content = analysisResponse.choices[0].message.content || '{}';
+    const analysisResult = JSON.parse(content);
+    
+    return {
+      detectedSubject: analysisResult.detectedSubject || "general",
+      contentDescription: analysisResult.contentDescription || "an educational content",
+      contentType: analysisResult.contentType || "unknown"
+    };
+  } catch (error) {
+    console.error("Error analyzing image content:", error);
+    // Return default values if analysis fails
+    return {
+      detectedSubject: "general",
+      contentDescription: "educational content that needs assistance",
+      contentType: "unknown"
+    };
   }
 }
