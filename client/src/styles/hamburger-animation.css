@@ -1,21 +1,6 @@
 /* Animation du menu hamburger */
 .menu-toggle-button {
-  transition: all 0.3s ease-in-out;
   position: relative;
-  z-index: 2100;
-}
-
-/* S'assurer que l'icône X est toujours bien visible */
-.menu-toggle-button.menu-open {
-  background-color: #000 !important;
-}
-
-.menu-toggle-button.menu-open svg {
-  color: white !important;
-}
-
-/* Style pour s'assurer que le toggle apparaît correctement sur tous les appareils */
-.menu-toggle-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -27,10 +12,28 @@
   background: transparent;
   border: none;
   outline: none;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease-in-out;
+  z-index: 2100;
 }
 
-/* Styles spécifiques pour hamburger */
+/* Styles pour l'état ouvert du bouton */
+.menu-toggle-button.menu-open {
+  background-color: #000 !important;
+}
+
+/* Styles initiaux pour l'icône X - cachée par défaut */
+.menu-toggle-button svg {
+  display: none;
+  color: white;
+}
+
+/* Afficher l'icône X quand le menu est ouvert */
+.menu-toggle-button.menu-open svg {
+  display: block !important;
+  color: white !important;
+}
+
+/* Styles pour les lignes du hamburger */
 .hamburger-lines {
   display: flex;
   flex-direction: column;
@@ -53,4 +56,9 @@
 
 .hamburger-lines div:last-child {
   width: 16px;
+}
+
+/* Cacher les lignes du hamburger quand le menu est ouvert */
+.menu-toggle-button.menu-open .hamburger-lines {
+  display: none !important;
 }
