@@ -84,16 +84,17 @@ const SideNavigation = () => {
       >
         {/* Le bouton de fermeture et le logo ont été déplacés vers le header */}
         
-        {/* Zone de recherche globale (comme dans la capture d'écran) */}
+        {/* Zone de recherche globale (ajustée selon la référence) */}
         <div className="px-3 py-2">
           <div className="bg-gray-100 rounded-full px-4 flex items-center h-12">
             <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
             <input
               type="text"
               placeholder="Search"
-              className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500"
+              className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500 text-center"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              style={{ textAlign: 'left', paddingLeft: '0' }}
             />
           </div>
         </div>

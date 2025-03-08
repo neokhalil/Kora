@@ -645,13 +645,17 @@ export default function LearningHistory() {
           
           <TabsContent value="interactions" className="mt-4">
             <div className="mb-4 flex">
-              <Input
-                placeholder="Rechercher dans l'historique..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mr-2"
-              />
-              <Button variant="outline" onClick={() => refetchInteractions()}>
+              <div className="flex items-center w-full bg-gray-100 rounded-full px-4 h-12 mr-2">
+                <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Rechercher dans l'historique..."
+                  className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button variant="outline" onClick={() => refetchInteractions()} className="rounded-full h-12 w-12 flex items-center justify-center">
                 <Search className="h-4 w-4" />
               </Button>
             </div>
@@ -994,13 +998,17 @@ export default function LearningHistory() {
         {/* Main content */}
         <div className="col-span-6">
           <div className="mb-6 flex">
-            <Input
-              placeholder="Rechercher dans l'historique..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="mr-2"
-            />
-            <Button variant="outline" onClick={() => refetchInteractions()}>
+            <div className="flex items-center w-full bg-gray-100 rounded-full px-4 h-12 mr-2">
+              <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Rechercher dans l'historique..."
+                className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" onClick={() => refetchInteractions()} className="rounded-full h-12 w-12 flex items-center justify-center">
               <Search className="h-4 w-4" />
             </Button>
           </div>
