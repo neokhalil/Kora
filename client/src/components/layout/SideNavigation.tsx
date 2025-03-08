@@ -83,19 +83,10 @@ const SideNavigation = () => {
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
         style={{
-          paddingTop: 'var(--safe-area-top, 0px)'
+          paddingTop: 'calc(var(--header-height) + var(--safe-area-top, 0px))'
         }}
       >
-        {/* Le bouton de fermeture a été déplacé vers le header */}
-        {/* Logo et titre */}
-        <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
-              <span className="text-gray-700 text-lg font-bold">K</span>
-            </div>
-            <h1 className="text-lg font-bold text-gray-800">Kora</h1>
-          </div>
-        </div>
+        {/* Le bouton de fermeture et le logo ont été déplacés vers le header */}
         
         {/* Zone de recherche globale (comme dans la capture d'écran) */}
         <div className="px-3 py-2">

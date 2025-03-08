@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const Header: React.FC = () => {
-  const { toggleMenu, isMenuOpen } = useMenu();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const { toggleMenu } = useMenu();
   
   // Ajouter une classe au body quand le menu est ouvert
   useEffect(() => {
-    if (isMenuOpen) {
+    if (menuOpen) {
       document.body.classList.add('menu-open');
     } else {
       document.body.classList.remove('menu-open');
@@ -18,12 +19,18 @@ const Header: React.FC = () => {
     return () => {
       document.body.classList.remove('menu-open');
     };
-  }, [isMenuOpen]);
+  }, [menuOpen]);
+  
+  const handleToggleMenu = () => {
+    const newState = !menuOpen;
+    setMenuOpen(newState);
+    toggleMenu(); // Appelle aussi la fonction du hook useMenu
+  };
   
   return (
     <header 
       id="kora-header-container"
-      className="app-header bg-white w-full border-b border-gray-200 relative z-40"
+      className="app-header bg-white w-full border-b border-gray-200 fixed top-0 left-0 right-0 z-[2000]"
       style={{
         height: 'var(--header-height)',
         paddingTop: 'var(--safe-area-top, 0px)',
@@ -35,13 +42,13 @@ const Header: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            onClick={handleToggleMenu}
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             className="text-gray-800 p-0 hover:bg-transparent"
           >
-            {isMenuOpen ? (
+            {menuOpen ? (
               /* X icon when menu is open */
-              <div className="bg-black text-white p-1 rounded-full">
+              <div className="bg-black text-white p-1.5 rounded-full flex items-center justify-center">
                 <X className="h-5 w-5" strokeWidth={2.5} />
               </div>
             ) : (
