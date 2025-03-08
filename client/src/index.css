@@ -746,8 +746,28 @@ main {
   padding: 0.15rem 0.5rem !important;
 }
 
-/* Support du Visual Viewport */
-.visual-viewport-active #kora-header-container {
-  position: absolute;
-  top: 0;
+/* Support du Visual Viewport - Maintenir le header visible avec le clavier ouvert */
+.visual-viewport-active #kora-header-container,
+#kora-header-container {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2000 !important;
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  transition: none !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+}
+
+/* Classe pour le corps quand le clavier virtuel est ouvert */
+body.keyboard-open {
+  padding-top: var(--header-height) !important;
+}
+
+/* S'assurer que le header reste toujours visible, même en scrollant */
+@supports (position: sticky) {
+  #kora-header-container {
+    position: sticky !important;
+  }
 }

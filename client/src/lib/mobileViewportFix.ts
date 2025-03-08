@@ -26,24 +26,35 @@ export function setupMobileViewportFix() {
       // Si le viewport est plus petit que la fenêtre, cela signifie probablement que le clavier est ouvert
       if (currentHeight < windowHeight * 0.75) {
         document.body.classList.add('keyboard-open');
+        document.body.classList.add('visual-viewport-active');
         
         // Calculer la hauteur approximative du clavier
         const keyboardHeight = windowHeight - currentHeight;
         
         // Stocker la hauteur du clavier comme variable CSS pour pouvoir l'utiliser dans les styles
         document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+        
+        // Assurer que le corps a suffisamment d'espace pour le contenu
+        document.body.style.paddingBottom = `${keyboardHeight + 20}px`;
       } else {
         document.body.classList.remove('keyboard-open');
+        document.body.classList.remove('visual-viewport-active');
         document.documentElement.style.setProperty('--keyboard-height', '0px');
+        document.body.style.paddingBottom = '';
       }
       
-      // Forcer la visibilité du header à chaque changement de viewport
-      const header = document.querySelector('header.app-header');
+      // Forcer la visibilité du header spécifique à chaque changement de viewport
+      const header = document.getElementById('kora-header-container');
       if (header) {
-        header.classList.remove('transform', '-translate-y-full');
-        // Force hardware acceleration pour éviter les problèmes de rendu sur iOS
-        (header as HTMLElement).style.transform = 'translateZ(0)';
-        (header as HTMLElement).style.opacity = '1';
+        // Force le header à rester en haut et visible
+        header.style.position = 'sticky';
+        header.style.top = '0';
+        header.style.zIndex = '2000';
+        header.style.transform = 'translateZ(0)';
+        header.style.willChange = 'transform';
+        header.style.transition = 'none';
+        header.style.opacity = '1';
+        header.style.visibility = 'visible';
       }
       
       // Faire défiler jusqu'à l'élément actif si c'est un champ de texte
@@ -54,7 +65,16 @@ export function setupMobileViewportFix() {
       ) {
         // Ajouter un délai pour permettre au clavier de s'ouvrir complètement
         setTimeout(() => {
-          activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Faire défiler jusqu'au champ actif, mais s'assurer de garder le header visible
+          try {
+            const headerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height') || '56px');
+            const elementRect = (activeElement as HTMLElement).getBoundingClientRect();
+            const scrollPosition = window.scrollY + elementRect.top - headerHeight - 10;
+            window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+          } catch (e) {
+            // Fallback en cas d'erreur
+            activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
         }, 100);
       }
     };
@@ -160,10 +180,20 @@ export function setupMobileViewportFix() {
       }
       
       /* Quand le clavier est ouvert */
+      body.keyboard-open #kora-header-container,
       body.keyboard-open .app-header {
+        position: sticky !important;
+        top: 0 !important;
         opacity: 1 !important;
-        transform: none !important;
+        transform: translateZ(0) !important;
         visibility: visible !important;
+        z-index: 2000 !important;
+      }
+      
+      /* Style pour le corps avec clavier ouvert pour empêcher le scroll inattendu */
+      body.keyboard-open {
+        position: relative;
+        overflow-x: hidden;
       }
       
       /* Styles spécifiques iOS */
@@ -173,17 +203,35 @@ export function setupMobileViewportFix() {
       }
       
       /* Lorsqu'un champ de saisie a le focus */
+      body.input-focused #kora-header-container,
       body.input-focused .app-header {
+        position: sticky !important;
+        top: 0 !important;
         opacity: 1 !important;
-        transform: none !important;
+        transform: translateZ(0) !important;
+        visibility: visible !important;
       }
       
-      /* Fix pour s'assurer que le header reste visible */
+      /* Fix pour s'assurer que le header reste visible sur tous les appareils */
+      #kora-header-container,
       header.app-header {
-        -webkit-transform: translateZ(0);
-        transform: translateZ(0);
-        will-change: transform;
-        transition: transform 0.3s, opacity 0.3s;
+        -webkit-transform: translateZ(0) !important;
+        transform: translateZ(0) !important;
+        will-change: transform !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 2000 !important;
+        transition: none !important;
+        contain: layout paint style !important;
+      }
+      
+      /* Support supplémentaire pour la position sticky */
+      @supports (position: sticky) {
+        #kora-header-container {
+          position: -webkit-sticky !important;
+          position: sticky !important;
+          top: 0 !important;
+        }
       }
     `;
     document.head.appendChild(styleEl);
