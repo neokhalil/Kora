@@ -86,7 +86,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             <h1 className="text-2xl font-bold ml-2">KORA</h1>
           </div>
           
-          {/* Champ de recherche */}
+          {/* Champ de recherche amélioré */}
           <div className="px-4 py-3">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -96,17 +96,32 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 ref={searchInputRef}
                 type="text"
                 placeholder="Rechercher"
-                className="block w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 focus:outline-none"
+                className="block w-full pl-10 pr-10 py-3 rounded-full bg-gray-100 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-300 transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
+                    console.log('Recherche lancée pour:', searchQuery);
                     onClose();
                     setLocation(`/search?q=${encodeURIComponent(searchQuery)}`);
                   }
                 }}
                 aria-label="Rechercher"
               />
+              
+              {/* Bouton pour effacer la recherche si du texte est présent */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-700"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Effacer la recherche"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
           
@@ -141,8 +156,8 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             ))}
           </div>
           
-          {/* Pied de menu avec informations utilisateur */}
-          <div className="mt-auto border-t p-4">
+          {/* Pied de menu avec informations utilisateur - sans bordure supérieure */}
+          <div className="mt-auto p-4">
             <div className="flex items-center">
               <div className="w-6 h-6 text-center font-medium mr-3">
                 I
