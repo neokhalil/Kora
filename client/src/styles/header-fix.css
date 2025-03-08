@@ -1,22 +1,26 @@
 /**
- * Solution minimaliste pour le header
+ * Solution pour le header avec position sticky
  */
 
-/* Header toujours visible */
+/* Header toujours visible avec sticky - sans ligne de démarcation */
 #kora-header-container {
-  position: fixed;
+  position: -webkit-sticky; /* Pour Safari */
+  position: sticky;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
   z-index: 100;
   background-color: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  /* S'assurer qu'il n'y a pas de bordure ni d'ombre */
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
-/* Espacement pour que le contenu ne soit pas caché sous le header */
-body {
-  padding-top: 56px;
+/* S'assurer que le header reste bien en place */
+html, body, #root {
+  height: 100%;
+  overflow-x: hidden;
 }
 
 /* Rendre les champs plus accessibles sur mobile */
@@ -24,9 +28,16 @@ input, textarea, select, button {
   font-size: 16px !important;
 }
 
-/* Éviter les problèmes de rebond */
+/* Optimisations pour les appareils mobiles */
 @media screen and (max-width: 767px) {
   body {
     overscroll-behavior: none;
+  }
+  
+  /* Forcer la position sticky sur mobile */
+  #kora-header-container {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
   }
 }

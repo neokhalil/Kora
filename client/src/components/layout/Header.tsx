@@ -98,7 +98,8 @@ const Header: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 1rem'
+            padding: '0 1rem',
+            borderBottom: 'none'
           }}
         >
           {/* Menu button avec indicateur d'état */}
