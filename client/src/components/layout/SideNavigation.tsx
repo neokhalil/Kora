@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { useMenu } from '@/hooks/use-menu';
 import { navItems } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Search, PenSquare, Plus, ChevronDown, User } from 'lucide-react';
+import { Search, PenSquare, Plus, ChevronDown, User, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -79,15 +79,46 @@ const SideNavigation = () => {
       {/* Side Navigation - White background for better readability */}
       <aside 
         className={cn(
-          "side-navigation w-full max-w-[260px] bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
+          "side-navigation w-full max-w-[300px] bg-white border-r border-gray-200 fixed inset-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{
+          paddingTop: 'var(--safe-area-top, 0px)'
+        }}
       >
+        {/* Zone de recherche globale (comme dans la capture d'écran) */}
+        <div className="p-3 border-b border-gray-200 flex items-center">
+          <div className="relative bg-gray-100 rounded-full flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-500" />
+            </div>
+            <Input
+              type="text"
+              placeholder="Search"
+              className="pl-10 pr-4 py-2 w-full bg-gray-100 border-none text-sm rounded-full h-10"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </div>
+          
+          {/* Bouton de fermeture du menu - visible uniquement sur mobile */}
+          <div className="md:hidden ml-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={closeMenu}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+        
         {/* Logo et titre */}
-        <div className="px-4 py-3 border-b border-gray-200">
+        <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-              <span className="text-white text-lg font-bold">K</span>
+            <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
+              <span className="text-gray-700 text-lg font-bold">K</span>
             </div>
             <h1 className="text-lg font-bold text-gray-800">Kora</h1>
           </div>
@@ -119,22 +150,6 @@ const SideNavigation = () => {
             <h3 className="px-2 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
               Conversations récentes
             </h3>
-            
-            {/* Recherche déplacée ici */}
-            <div className="px-2 pb-2">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-4 w-4 text-gray-500" />
-                </div>
-                <Input
-                  type="text"
-                  placeholder="Rechercher"
-                  className="pl-10 pr-4 py-2 w-full bg-[#f5f5f5] border-none text-sm rounded-md"
-                  value={searchValue}
-                  onChange={(e) => setSearchValue(e.target.value)}
-                />
-              </div>
-            </div>
             
             <div className="space-y-1">
               {filteredConversations.length > 0 ? (
