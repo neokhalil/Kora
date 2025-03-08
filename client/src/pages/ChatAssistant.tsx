@@ -866,7 +866,7 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <MathJaxContext config={mathJaxConfig}>
-      <div className="flex flex-col h-full max-w-4xl mx-auto chat-container">
+      <div className="flex flex-col h-full max-w-4xl mx-auto">
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
@@ -909,7 +909,7 @@ const ChatAssistant: React.FC = () => {
           </div>
           
           {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area chat-input-container initial-load">
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
@@ -951,7 +951,6 @@ const ChatAssistant: React.FC = () => {
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
                   document.body.classList.add('keyboard-open');
-                  document.documentElement.classList.add('visual-viewport-active');
                   
                   // Scroll vers la fin des messages après un court délai
                   setTimeout(() => {
@@ -959,13 +958,6 @@ const ChatAssistant: React.FC = () => {
                       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                     }
                   }, 300);
-                }}
-                onBlur={(e) => {
-                  // Ne pas enlever les classes si on fait un simple changement de focus à l'intérieur du composeur
-                  if (!e.currentTarget.contains(e.relatedTarget as Node) && !document.activeElement?.classList.contains('chat-textarea')) {
-                    document.body.classList.remove('keyboard-open');
-                    document.documentElement.classList.remove('visual-viewport-active');
-                  }
                 }}
               >
                 {/* Hidden file input pour les images */}
@@ -999,7 +991,6 @@ const ChatAssistant: React.FC = () => {
                     onFocus={() => {
                       // Marquer que le clavier est ouvert
                       document.body.classList.add('keyboard-open');
-                      document.documentElement.classList.add('visual-viewport-active');
                       
                       // S'assurer que le header fixe est visible
                       const headerContainer = document.getElementById('kora-header-container');
@@ -1015,17 +1006,6 @@ const ChatAssistant: React.FC = () => {
                           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                         }
                       }, 100);
-                    }}
-                    onBlur={() => {
-                      // Enlever la classe lorsque le clavier est fermé
-                      document.body.classList.remove('keyboard-open');
-                      document.documentElement.classList.remove('visual-viewport-active');
-                      
-                      // Restaurer la position normale du header
-                      const headerContainer = document.getElementById('kora-header-container');
-                      if (headerContainer) {
-                        headerContainer.style.position = 'fixed';
-                      }
                     }}
                   />
                 </div>
