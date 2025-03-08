@@ -175,30 +175,86 @@ export function setupMobileViewportFix() {
   
   // Écouteurs d'événements standard
   window.addEventListener('resize', setAppHeight);
-  window.addEventListener('scroll', ensureHeaderPosition);
+  
+  // Gestionnaire de défilement amélioré
+  let isScrolling = false;
+  let scrollTimeout: number | null = null;
+  
+  window.addEventListener('scroll', () => {
+    // Exécuter la fonction de positionnement du header
+    ensureHeaderPosition();
+    
+    // Détecter l'état de défilement et ajouter une classe temporaire
+    if (!isScrolling && isKeyboardOpen) {
+      isScrolling = true;
+      document.body.classList.add('scrolling');
+    }
+    
+    // Réinitialiser le délai à chaque événement de défilement
+    if (scrollTimeout !== null) {
+      window.clearTimeout(scrollTimeout);
+    }
+    
+    // Définir un délai après lequel on considère que le défilement est terminé
+    scrollTimeout = window.setTimeout(() => {
+      isScrolling = false;
+      document.body.classList.remove('scrolling');
+    }, 150) as unknown as number;
+  });
   
   // Gestion améliorée de l'orientation
   window.addEventListener('orientationchange', () => {
     // Réinitialiser l'état du clavier lors d'un changement d'orientation
     handleKeyboardVisibilityChange(false);
     
+    // Fermer le clavier si possible lors d'un changement d'orientation
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    
+    // Nettoyer les classes spéciales
+    document.body.classList.remove('keyboard-open', 'scrolling');
+    
     // Sur Android, attendre un court instant après le changement d'orientation
     setAppHeight();
     
-    if (isAndroid) {
-      // Attendre un court délai pour que les dimensions soient stables
-      setTimeout(() => {
-        setAppHeight();
-        ensureHeaderPosition();
-        
-        // Forcer un petit défilement pour déclencher les recalculs du navigateur
-        window.scrollTo(0, 1);
-        window.scrollTo(0, 0);
-      }, 150);
+    // Séquence de recalcul et repositionnement pour tous les appareils
+    setTimeout(() => {
+      // Recalculer les hauteurs
+      setAppHeight();
+      ensureHeaderPosition();
       
-      // Second délai plus long pour certains appareils/navigateurs Android plus lents
-      setTimeout(setAppHeight, 500);
-    }
+      // Forcer un petit défilement pour déclencher les recalculs du navigateur
+      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
+      
+      // S'assurer que le header et la zone de composition sont correctement positionnés
+      const header = document.getElementById('kora-header-container');
+      const composer = document.querySelector('.composer-container');
+      
+      if (header) {
+        header.style.position = 'fixed';
+        header.style.top = '0';
+        header.style.zIndex = '9999';
+      }
+      
+      if (composer && composer instanceof HTMLElement) {
+        composer.style.position = 'fixed';
+        composer.style.bottom = '0';
+      }
+    }, 150);
+    
+    // Second délai plus long pour finaliser les ajustements
+    setTimeout(() => {
+      setAppHeight();
+      ensureHeaderPosition();
+      
+      // S'assurer que tout l'affichage est correct après l'orientation
+      const messagesEnd = document.querySelector('[data-scroll-anchor]');
+      if (messagesEnd && messagesEnd instanceof HTMLElement) {
+        messagesEnd.scrollIntoView({ behavior: 'auto' });
+      }
+    }, 500);
   });
   
   // Utilisation de l'API Visual Viewport pour une meilleure détection du clavier

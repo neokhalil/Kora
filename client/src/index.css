@@ -856,6 +856,25 @@ body {
     left: 0 !important;
     right: 0 !important;
     z-index: 2000 !important;
+    transition: transform 0.2s ease-out;
+  }
+  
+  /* Conserver le header toujours visible, même en défilement */
+  body.keyboard-open.scrolling #kora-header-container {
+    position: fixed !important;
+    top: 0 !important;
+    transform: translateY(0) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Styles spécifiques pour la zone de contenu quand le clavier est ouvert */
+  body.keyboard-open .chat-messages-container {
+    padding-bottom: calc(80px + var(--keyboard-height, 0px));
+  }
+  
+  /* Assurer que le bouton d'envoi reste visible */
+  body.keyboard-open .send-button {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
   }
 }
 
