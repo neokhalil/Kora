@@ -770,3 +770,38 @@ body {
     z-index: 2000 !important;
   }
 }
+
+/* Styles pour le menu latéral */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+/* Animation pour le bouton hamburger/X */
+@keyframes menu-icon-to-x {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(90deg); }
+}
+
+@keyframes x-to-menu-icon {
+  0% { transform: rotate(90deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animate-to-x {
+  animation: menu-icon-to-x 0.3s forwards;
+}
+
+.animate-to-menu {
+  animation: x-to-menu-icon 0.3s forwards;
+}
+
+/* Empêcher le scroll du body quand le menu est ouvert */
+body.menu-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
