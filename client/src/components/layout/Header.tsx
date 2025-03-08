@@ -1,23 +1,24 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import SideMenu from './SideMenu';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   
   // Fonction pour déboguer le click en mode dev
   useEffect(() => {
-    console.log("Header monté, menu état initial:", isMenuOpen);
+    console.log("[Debug Header] Component mounted, initial menu state:", isMenuOpen);
   }, []);
   
   // Effet pour ajouter/supprimer la classe menu-open au body
   useEffect(() => {
     if (isMenuOpen) {
       document.body.classList.add('menu-open');
-      console.log("Menu ouvert");
+      console.log("[Debug Header] Menu opened, body class added");
     } else {
       document.body.classList.remove('menu-open');
-      console.log("Menu fermé");
+      console.log("[Debug Header] Menu closed, body class removed");
     }
     
     // Nettoyage
@@ -46,10 +47,32 @@ const Header: React.FC = () => {
     }
   }, []);
   
+  // Handler pour les clics sur le document
+  useEffect(() => {
+    // Handler pour s'assurer que les clicks sur le bouton du menu sont bien capturés
+    const handleDocumentClick = (e: MouseEvent) => {
+      const menuButton = menuButtonRef.current;
+      if (menuButton && menuButton.contains(e.target as Node)) {
+        console.log("[Debug Header] Menu button clicked via document handler");
+      }
+    };
+    
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
+  
   // Mémoriser la fonction de toggle du menu pour éviter de la recréer
-  const toggleMenu = useCallback(() => {
-    console.log("Toggle menu appelé, état actuel:", isMenuOpen);
-    setIsMenuOpen(prevState => !prevState);
+  const toggleMenu = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("[Debug Header] Toggle menu called, current state:", isMenuOpen);
+    setIsMenuOpen(prevState => {
+      const newState = !prevState;
+      console.log("[Debug Header] Setting menu state to:", newState);
+      return newState;
+    });
   }, [isMenuOpen]);
   
   return (
@@ -66,10 +89,20 @@ const Header: React.FC = () => {
           {/* Menu button avec indicateur d'état */}
           <div className="flex items-center">
             <button 
+              ref={menuButtonRef}
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               className={`flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 ${isMenuOpen ? 'bg-gray-100' : ''}`}
               onClick={toggleMenu}
-              style={{ cursor: 'pointer' }}
+              onTouchStart={(e) => {
+                // Sur mobile, ajouter un événement tactile explicite pour éviter les délais
+                console.log("[Debug Header] TouchStart on menu button");
+              }}
+              onTouchEnd={(e) => {
+                console.log("[Debug Header] TouchEnd on menu button");
+                e.preventDefault(); // Empêcher le comportement par défaut qui pourrait interférer
+                // Le clic sera géré par l'événement onClick
+              }}
+              style={{ cursor: 'pointer', touchAction: 'manipulation' }}
               data-state={isMenuOpen ? 'open' : 'closed'}
             >
               <div className="menu-icon-container">
