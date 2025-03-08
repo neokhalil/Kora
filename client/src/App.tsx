@@ -9,7 +9,8 @@ import ChatAssistant from "@/pages/ChatAssistant";
 
 // Configuration des routes
 const routes = [
-  { path: "/", Component: ChatAssistant }
+  { path: "/", Component: ChatAssistant },
+  { path: "/chat-assistant", Component: ChatAssistant }
 ];
 
 // App simplifié sans menu latéral
