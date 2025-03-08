@@ -40,14 +40,6 @@ const AppContainer = () => {
         {/* Menu latéral */}
         <SideNavigation />
         
-        {/* Overlay pour fermer le menu sur mobile */}
-        {isMenuOpen && (
-          <div 
-            className="menu-overlay"
-            onClick={toggleMenu}
-          />
-        )}
-        
         {/* Contenu principal */}
         <main className="flex-1 overflow-y-auto w-full">
           <Switch>

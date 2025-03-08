@@ -3,9 +3,7 @@ import { useLocation } from 'wouter';
 import { useMenu } from '@/hooks/use-menu';
 import { navItems } from '@/lib/data';
 import { cn } from '@/lib/utils';
-import { Search, PenSquare, Plus, ChevronDown, User, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Search, ChevronDown } from 'lucide-react';
 
 // Sample recent conversations data
 const recentConversations = [
@@ -59,11 +57,7 @@ const SideNavigation = () => {
     }, 10);
   };
 
-  // Function to start a new conversation
-  const handleNewConversation = () => {
-    console.log("Starting new conversation");
-    handleNavigation('/');
-  };
+  // Removed unused function handleNewConversation
   
   return (
     <>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useMenu } from '@/hooks/use-menu';
 
 const Header: React.FC = () => {
