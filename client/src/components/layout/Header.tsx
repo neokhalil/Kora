@@ -6,16 +6,10 @@ const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   
-  // Fonction pour déboguer le click en mode dev
-  useEffect(() => {
-    console.log("[Debug Header] Component mounted, initial menu state:", isMenuOpen);
-  }, []);
-  
   // Effet pour ajouter/supprimer la classe menu-open au body
   useEffect(() => {
     if (isMenuOpen) {
       document.body.classList.add('menu-open');
-      console.log("[Debug Header] Menu opened, body class added");
       
       // Quand le menu s'ouvre, on masque le focus de tous les éléments actifs
       // pour éviter que le clavier ne s'ouvre automatiquement
@@ -25,7 +19,6 @@ const Header: React.FC = () => {
       }
     } else {
       document.body.classList.remove('menu-open');
-      console.log("[Debug Header] Menu closed, body class removed");
     }
     
     // Nettoyage
@@ -54,16 +47,12 @@ const Header: React.FC = () => {
   
   // Mémoriser la fonction de toggle du menu pour éviter de la recréer
   const toggleMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("[Debug Header] Button clicked:", e.currentTarget);
-    console.log("[Debug Header] Toggle menu called, current state:", isMenuOpen);
-    
     // Important: empêcher la propagation et le comportement par défaut
     e.preventDefault();
     e.stopPropagation();
     
     // Changer l'état du menu directement
     const newState = !isMenuOpen;
-    console.log("[Debug Header] Setting menu state to:", newState);
     setIsMenuOpen(newState);
     
     // Déclencher un événement personnalisé pour informer d'autres parties de l'application
@@ -72,9 +61,8 @@ const Header: React.FC = () => {
         document.dispatchEvent(new CustomEvent('kora-menu-toggle', { 
           detail: { isOpen: newState } 
         }));
-        console.log("[Debug Header] Custom event dispatched");
       } catch (err) {
-        console.error("[Debug Header] Error dispatching custom event:", err);
+        console.error("Error dispatching custom event:", err);
       }
     }
   }, [isMenuOpen]);
@@ -95,15 +83,11 @@ const Header: React.FC = () => {
               id="kora-menu-button"
               ref={menuButtonRef}
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-              onClick={(e) => {
-                console.log("[Debug Header] Click triggered on menu button");
-                toggleMenu(e);
-              }}
+              onClick={toggleMenu}
               onTouchStart={(e) => {
-                console.log("[Debug Header] TouchStart on menu button");
+                // Vide intentionnellement - capture le toucher initial
               }}
               onTouchEnd={(e) => {
-                console.log("[Debug Header] TouchEnd on menu button");
                 e.preventDefault();
                 // Sur mobile, déclencher le toggle au touchEnd
                 const syntheticEvent = e as unknown as React.MouseEvent<HTMLButtonElement>;
