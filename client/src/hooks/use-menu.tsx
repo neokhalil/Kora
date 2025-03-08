@@ -1,53 +1,25 @@
+// Ce fichier est conservé pour éviter les erreurs d'importation, mais son contenu a été supprimé
+// car nous avons retiré la fonctionnalité de menu latéral
+
 import * as React from 'react';
 
+// Interface gardée pour la compatibilité
 interface MenuContextType {
   isMenuOpen: boolean;
   toggleMenu: () => void;
   closeMenu: () => void;
 }
 
-const MenuContext = React.createContext<MenuContextType | undefined>(undefined);
-
-interface MenuProviderProps {
-  children: React.ReactNode;
-}
-
-export const MenuProvider = ({ children }: MenuProviderProps) => {
-  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-  const toggleMenu = React.useCallback(() => {
-    setIsMenuOpen((prev) => {
-      if (!prev) {
-        document.body.classList.add('overflow-hidden');
-      } else {
-        document.body.classList.remove('overflow-hidden');
-      }
-      return !prev;
-    });
-  }, []);
-
-  const closeMenu = React.useCallback(() => {
-    setIsMenuOpen(false);
-    document.body.classList.remove('overflow-hidden');
-  }, []);
-
-  const value = React.useMemo(() => ({
-    isMenuOpen,
-    toggleMenu,
-    closeMenu
-  }), [isMenuOpen, toggleMenu, closeMenu]);
-
-  return (
-    <MenuContext.Provider value={value}>
-      {children}
-    </MenuContext.Provider>
-  );
-};
-
+// Hook factice qui ne fait rien
 export function useMenu(): MenuContextType {
-  const context = React.useContext(MenuContext);
-  if (context === undefined) {
-    throw new Error('useMenu must be used within a MenuProvider');
-  }
-  return context;
+  return {
+    isMenuOpen: false,
+    toggleMenu: () => {},
+    closeMenu: () => {}
+  };
 }
+
+// Component factice pour compatibilité
+export const MenuProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+  return <>{children}</>;
+};

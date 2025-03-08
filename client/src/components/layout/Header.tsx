@@ -1,23 +1,7 @@
-import React, { useEffect } from 'react';
-import { useMenu } from '@/hooks/use-menu';
-import { Menu, X } from 'lucide-react';
+import React from 'react';
+import { Menu } from 'lucide-react';
 
 const Header: React.FC = () => {
-  const { toggleMenu, isMenuOpen } = useMenu();
-  
-  // Ajouter une classe au body quand le menu est ouvert
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.classList.add('menu-open');
-    } else {
-      document.body.classList.remove('menu-open');
-    }
-    
-    return () => {
-      document.body.classList.remove('menu-open');
-    };
-  }, [isMenuOpen]);
-  
   return (
     <header 
       id="kora-header-container"
@@ -29,22 +13,13 @@ const Header: React.FC = () => {
       }}
     >
       <div className="flex items-center justify-between px-4 h-full">
-        {/* Menu button - Left aligned */}
+        {/* Menu button - Left aligned (statique) */}
         <div className="flex items-center">
           <button 
-            onClick={toggleMenu}
-            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            className="menu-toggle-button flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300"
-            style={{
-              backgroundColor: isMenuOpen ? '#000' : 'transparent',
-            }}
+            aria-label="Menu"
+            className="flex items-center justify-center w-10 h-10 rounded-full"
           >
-            {/* Utilise directement les icônes Lucide pour s'assurer que cela fonctionne */}
-            {isMenuOpen ? (
-              <X size={24} className="text-white transition-transform duration-300" />
-            ) : (
-              <Menu size={24} className="text-gray-800 transition-transform duration-300" />
-            )}
+            <Menu size={24} className="text-gray-800" />
           </button>
         </div>
         
