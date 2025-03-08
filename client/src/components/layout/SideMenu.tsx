@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Search, Book } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
@@ -7,6 +7,14 @@ interface RecentConversation {
   id: string;
   title: string;
   date: Date;
+}
+
+// Type pour les éléments du menu
+interface MenuItem {
+  id: string;
+  title: string;
+  icon?: React.ReactNode;
+  href: string;
 }
 
 // Props du composant SideMenu
@@ -20,6 +28,16 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const [location, setLocation] = useLocation();
   const searchInputRef = useRef<HTMLInputElement>(null);
   
+  // Éléments fixes du menu (aide aux devoirs, etc.)
+  const menuItems: MenuItem[] = [
+    { 
+      id: 'homework-help', 
+      title: 'Aide aux devoirs', 
+      icon: <Book className="h-5 w-5 mr-3" />, 
+      href: '/chat-assistant' 
+    }
+  ];
+  
   // Exemple de conversations récentes (dans un cas réel, vous les récupéreriez d'une API)
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([
     { id: '1', title: 'Texte aléatoire et aide', date: new Date(2025, 2, 8) },
@@ -29,14 +47,31 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
     { id: '5', title: 'ICT Growth in Kenya 2024', date: new Date(2025, 2, 4) }
   ]);
   
+  // Filtrer les éléments du menu en fonction de la recherche
+  const filteredMenuItems = useMemo(() => {
+    if (!searchQuery.trim()) return menuItems;
+    
+    const query = searchQuery.toLowerCase();
+    return menuItems.filter(item => 
+      item.title.toLowerCase().includes(query)
+    );
+  }, [menuItems, searchQuery]);
+  
+  // Filtrer les conversations récentes en fonction de la recherche
+  const filteredConversations = useMemo(() => {
+    if (!searchQuery.trim()) return recentConversations;
+    
+    const query = searchQuery.toLowerCase();
+    return recentConversations.filter(convo => 
+      convo.title.toLowerCase().includes(query)
+    );
+  }, [recentConversations, searchQuery]);
+  
   // Ajuster le corps pour éviter le scroll quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // Mettre le focus sur le champ de recherche quand le menu s'ouvre
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 300);
+      // Ne pas mettre le focus automatiquement sur le champ de recherche
     } else {
       document.body.style.overflow = '';
     }
@@ -96,7 +131,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 ref={searchInputRef}
                 type="text"
                 placeholder="Rechercher"
-                className="block w-full pl-10 pr-10 py-3 rounded-full bg-gray-100 focus:outline-none focus:bg-white focus:ring-2 focus:ring-blue-300 transition-all"
+                className="block w-full pl-10 pr-10 py-3 rounded-full bg-gray-100 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
@@ -125,25 +160,39 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           
-          {/* Section Aide aux devoirs */}
+          {/* Section Aide aux devoirs - filtrée par recherche */}
           <div className="mt-2 px-4">
-            <Link
-              href="/chat-assistant"
-              onClick={() => onClose()}
-              className="flex items-center py-3 hover:bg-gray-100 transition-colors"
-              role="button"
-            >
-              <Book className="h-5 w-5 mr-3" />
-              <span className="font-medium">Aide aux devoirs</span>
-            </Link>
+            {filteredMenuItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => onClose()}
+                className="flex items-center py-3 hover:bg-gray-100 transition-colors"
+                role="button"
+              >
+                {item.icon}
+                <span className="font-medium">{item.title}</span>
+              </Link>
+            ))}
+            
+            {/* Message si aucun élément ne correspond à la recherche */}
+            {searchQuery && filteredMenuItems.length === 0 && (
+              <div className="py-3 text-gray-500 text-sm">
+                Aucun élément ne correspond à votre recherche
+              </div>
+            )}
           </div>
           
-          {/* Section Conversations récentes */}
+          {/* Section Conversations récentes - filtrée par recherche */}
           <div className="mt-6 px-4">
-            <div className="uppercase text-sm font-semibold text-gray-600 mb-3">
-              CONVERSATIONS RÉCENTES
-            </div>
-            {recentConversations.map((convo) => (
+            {/* N'afficher l'en-tête que s'il y a des résultats ou pas de recherche */}
+            {(filteredConversations.length > 0 || !searchQuery) && (
+              <div className="uppercase text-sm font-semibold text-gray-600 mb-3">
+                CONVERSATIONS RÉCENTES
+              </div>
+            )}
+            
+            {filteredConversations.map((convo) => (
               <Link
                 key={convo.id}
                 href={`/chat/${convo.id}`}
@@ -154,6 +203,13 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 <span className="text-sm">{convo.title}</span>
               </Link>
             ))}
+            
+            {/* Message si aucune conversation ne correspond à la recherche */}
+            {searchQuery && filteredConversations.length === 0 && (
+              <div className="py-3 text-gray-500 text-sm">
+                Aucune conversation ne correspond à votre recherche
+              </div>
+            )}
           </div>
           
           {/* Pied de menu avec informations utilisateur - sans bordure supérieure */}
