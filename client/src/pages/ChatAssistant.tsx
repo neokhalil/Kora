@@ -866,7 +866,7 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <MathJaxContext config={mathJaxConfig}>
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
+      <div className="flex flex-col h-full max-w-4xl mx-auto chat-container">
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
