@@ -671,9 +671,6 @@ header:not(#kora-header) {
   display: none !important;
 }
 
-/* Toujours afficher le header, même quand le menu est ouvert */
-/* Retrait de tous les styles liés au menu hamburger et au menu latéral */
-
 /* Tous les styles liés au menu ont été supprimés */
 
 /* Améliorer l'affichage des messages */

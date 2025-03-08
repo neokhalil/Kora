@@ -4,8 +4,6 @@ import "./index.css";
 import "./styles/math.css";
 import "./styles/animations.css"; // Animations pour l'interface utilisateur
 import "./math-mobile.css"; // Styles spécifiques pour les formules mathématiques sur mobile
-import "./styles/menu-fixes.css"; // Correctifs pour le menu mobile
-import "./styles/hamburger-animation.css"; // Animation spécifique pour le menu hamburger
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
