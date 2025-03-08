@@ -133,3 +133,39 @@ input, textarea, select, button {
   /* Certains appareils Android ont besoin d'un ajustement en bas */
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
+
+/* Styles pour les appareils Android 9 et inférieur */
+.android-9 #kora-header-container,
+.android-8 #kora-header-container,
+.android-7 #kora-header-container {
+  /* Certains appareils Android plus anciens ont des barres système */
+  height: 56px !important;
+  padding-top: 0 !important;
+}
+
+/* Styles spécifiques aux navigateurs sur Android */
+.android-device.chrome-browser #kora-header-container {
+  /* Le navigateur Chrome peut nécessiter des ajustements spécifiques */
+  position: fixed !important;
+  top: 0 !important;
+}
+
+.android-device.samsung-browser #kora-header-container {
+  /* Le navigateur Samsung a parfois des comportements spécifiques */
+  position: fixed !important;
+  top: 0 !important;
+}
+
+/* Styles pour gérer l'apparition et la disparition du clavier Android */
+.android-device .kora-side-menu {
+  height: 100vh !important;
+  height: calc(var(--app-height, 100vh)) !important;
+}
+
+/* Ajustements pour le clavier virtuel sur Android */
+@media screen and (max-height: 450px) and (orientation: landscape) {
+  .android-device #kora-header-container {
+    /* En mode paysage avec clavier ouvert, assurer la visibilité */
+    position: absolute;
+  }
+}

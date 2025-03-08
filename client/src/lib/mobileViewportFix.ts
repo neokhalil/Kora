@@ -53,18 +53,42 @@ export function setupMobileViewportFix() {
    */
   function ensureHeaderPosition() {
     const header = document.getElementById('kora-header-container');
-    if (header) {
-      // On vérifie que le header est bien visible et au-dessus des autres éléments
-      // mais sans redéfinir les positions, qui peuvent maintenant utiliser safe-area-inset
+    if (!header) return;
+    
+    // Détection du support des safe-area-inset
+    const supportsSafeArea = typeof CSS !== 'undefined' && CSS.supports('top: env(safe-area-inset-top)');
+    const safeAreaTop = supportsSafeArea ? 'env(safe-area-inset-top, 0)' : '0';
+    
+    // S'assurer que le z-index est toujours élevé
+    header.style.zIndex = '9999';
+    header.style.borderBottom = 'none';
+    
+    // Ajustements spécifiques selon la plateforme
+    if (isAndroid) {
+      // Vérifier si le clavier est ouvert (hauteur réduite significativement)
+      const isKeyboardOpen = window.innerHeight < window.outerHeight * 0.75;
       
-      // S'assurer que la hauteur est prise en compte pour les appareils avec "notch"
-      const safeAreaTop = typeof CSS !== 'undefined' && CSS.supports('top: env(safe-area-inset-top)') 
-        ? 'env(safe-area-inset-top, 0)' 
-        : '0';
-
-      // On s'assure uniquement que le z-index est élevé et que rien ne vient perturber
-      header.style.zIndex = '9999';
-      header.style.borderBottom = 'none';
+      if (isKeyboardOpen) {
+        // Si le clavier est ouvert sur Android, s'assurer que le header reste visible
+        header.style.position = 'absolute';
+      } else {
+        // Sinon, revenir à l'état normal
+        header.style.position = 'fixed';
+        header.style.top = '0';
+      }
+      
+      // Ajustements spécifiques selon la version Android
+      if (androidVersion < 10) {
+        // Android versions antérieures peuvent nécessiter des ajustements supplémentaires
+        header.style.height = '56px';
+        header.style.paddingTop = '0';
+      }
+    } else if (isIOS) {
+      // Sur iOS, utiliser les valeurs safe-area quand disponibles
+      if (supportsSafeArea) {
+        header.style.paddingTop = safeAreaTop;
+        header.style.height = `calc(56px + ${safeAreaTop})`;
+      }
     }
   }
   
@@ -80,18 +104,55 @@ export function setupMobileViewportFix() {
   // Initialisation
   setAppHeight();
   
-  // Écouteurs d'événements
+  // Écouteurs d'événements standard
   window.addEventListener('resize', setAppHeight);
   window.addEventListener('scroll', ensureHeaderPosition);
-  window.addEventListener('orientationchange', setAppHeight);
   
-  // Gestion spécifique du clavier mobile
+  // Gestion améliorée de l'orientation
+  window.addEventListener('orientationchange', () => {
+    // Sur Android, attendre un court instant après le changement d'orientation
+    // pour permettre au navigateur de recalculer correctement les dimensions
+    setAppHeight();
+    
+    if (isAndroid) {
+      // Attendre un court délai pour que les dimensions soient stables
+      setTimeout(() => {
+        setAppHeight();
+        ensureHeaderPosition();
+        
+        // Forcer un petit défilement pour déclencher les recalculs du navigateur
+        window.scrollTo(0, 1);
+        window.scrollTo(0, 0);
+      }, 150);
+      
+      // Second délai plus long pour certains appareils/navigateurs Android plus lents
+      setTimeout(setAppHeight, 500);
+    }
+  });
+  
+  // Gestion spécifique du clavier mobile via Visual Viewport API
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', setAppHeight);
     window.visualViewport.addEventListener('scroll', ensureHeaderPosition);
+    
+    // Event supplémentaire pour détecter les changements de taille plus précisément
+    window.visualViewport.addEventListener('resize', () => {
+      // Mettre à jour le --app-height immédiatement
+      document.documentElement.style.setProperty('--app-height', `${window.visualViewport.height}px`);
+      ensureHeaderPosition();
+    });
   }
   
   // Détection de focus sur les champs de saisie (pour le clavier)
-  document.addEventListener('focusin', ensureHeaderPosition);
+  document.addEventListener('focusin', (e) => {
+    ensureHeaderPosition();
+    
+    // Sur Android, ajouter un délai pour s'assurer que le header reste visible
+    // après que le clavier est complètement ouvert
+    if (isAndroid) {
+      setTimeout(ensureHeaderPosition, 300);
+    }
+  });
+  
   document.addEventListener('focusout', ensureHeaderPosition);
 }
