@@ -35,14 +35,11 @@ const Header: React.FC = () => {
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             className={`menu-toggle-button flex items-center justify-center h-10 w-10 p-0 rounded-full transition-colors ${isMenuOpen ? 'bg-black' : 'bg-transparent'}`}
           >
-            {isMenuOpen ? (
-              <X className="h-5 w-5 text-white" strokeWidth={2.5} />
-            ) : (
-              <div className="flex flex-col space-y-1.5">
-                <div className="w-6 h-0.5 bg-gray-800 rounded-full"></div>
-                <div className="w-4 h-0.5 bg-gray-800 rounded-full"></div>
-              </div>
-            )}
+            <X className={`h-5 w-5 ${isMenuOpen ? 'block text-white' : 'hidden'}`} strokeWidth={2.5} />
+            <div className={`hamburger-lines flex flex-col space-y-1.5 ${isMenuOpen ? 'hidden' : 'block'}`}>
+              <div className="w-6 h-0.5 bg-gray-800 rounded-full"></div>
+              <div className="w-4 h-0.5 bg-gray-800 rounded-full"></div>
+            </div>
           </button>
         </div>
         
