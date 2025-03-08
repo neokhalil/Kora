@@ -86,12 +86,12 @@ const SideNavigation = () => {
         
         {/* Zone de recherche globale (comme dans la capture d'écran) */}
         <div className="px-3 py-2">
-          <div className="bg-gray-100 rounded-full px-3 flex items-center">
+          <div className="bg-gray-100 rounded-full px-4 flex items-center h-12">
             <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
             <input
               type="text"
-              placeholder="Rechercher"
-              className="h-10 w-full bg-transparent border-0 focus:outline-none text-gray-800 ml-2"
+              placeholder="Search"
+              className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
