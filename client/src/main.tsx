@@ -1,11 +1,15 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { setupMobileViewportFix } from "./lib/mobileViewportFix";
+
+// Import des CSS dans un ordre précis pour éviter les conflits
 import "./index.css";
 import "./styles/math.css";
 import "./styles/animations.css"; // Animations pour l'interface utilisateur
 import "./math-mobile.css"; // Styles spécifiques pour les formules mathématiques sur mobile
-import "./styles/mobile-header-fix.css"; // Fix simple pour le header mobile
+
+// Solution définitive pour le header fixe - doit être chargé en dernier pour avoir priorité
+import "./styles/header-fix.css";
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {

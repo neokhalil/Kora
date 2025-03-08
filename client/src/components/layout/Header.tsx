@@ -90,15 +90,15 @@ const Header: React.FC = () => {
       <div 
         id="kora-header-container"
         style={{
-          position: 'absolute',
+          position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          height: 'calc(56px + env(safe-area-inset-top, 0px))',
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          zIndex: 1000,
-          pointerEvents: 'none',
+          height: '56px',
+          zIndex: 9999,
           backgroundColor: 'white',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
         }}
       >
         {/* Header content */}

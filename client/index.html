@@ -39,6 +39,7 @@
     /* Variables globales */
     :root {
       --header-height: 56px;
+      --app-height: 100%;
     }
     
     /* Styles de base */
@@ -57,54 +58,20 @@
     body {
       font-family: 'Inter', sans-serif;
       background-color: #fff;
-      position: relative;
     }
     
     /* Conteneur principal */
     #root {
-      position: relative;
       min-height: 100%;
-      padding-top: var(--header-height); /* Espace pour le header fixe */
     }
     
-    /* Le header */
-    #kora-header-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: var(--header-height);
-      z-index: 100;
-    }
-    
-    #kora-header {
-      background-color: white;
-      height: var(--header-height);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 1rem;
-    }
-    
+    /* Styles simples pour le header - les détails sont dans header-fix.css */
     #kora-header-title {
       font-family: 'Elza', sans-serif;
       font-size: 1.5rem;
       font-weight: 900;
       letter-spacing: -0.025em;
       text-transform: uppercase;
-      margin-left: 8px;
-    }
-    
-    /* Container pour le menu et le titre */
-    .header-left-group {
-      display: flex;
-      align-items: center;
-      flex: 1;
-    }
-    
-    /* S'assurer que les inputs ont la bonne taille de police */
-    input, textarea, select, button {
-      font-size: 16px !important;
     }
   </style>
   

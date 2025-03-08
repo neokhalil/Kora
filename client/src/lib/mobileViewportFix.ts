@@ -1,5 +1,6 @@
 /**
  * Script d'aide pour corriger les problèmes de viewport sur les appareils mobiles
+ * Version simplifiée pour éviter les conflits avec le header-fix.css
  */
 
 export function setupMobileViewportFix() {
@@ -8,32 +9,32 @@ export function setupMobileViewportFix() {
   // Configurer le viewport pour éviter les problèmes de zoom et de déplacement
   const metaViewport = document.querySelector('meta[name="viewport"]');
   if (metaViewport) {
-    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
   }
 
-  // Ajout direct d'un CSS pour les optimisations mobiles
-  const styleEl = document.createElement('style');
-  styleEl.innerHTML = `
-    /* Assurer que les champs de texte ont une taille correcte */
-    input, textarea, select {
-      font-size: 16px !important; /* Évite le zoom automatique sur iOS */
-    }
+  // Sur iOS, ajouter une classe pour aider à identifier l'appareil
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  if (isIOS) {
+    document.body.classList.add('ios-device');
+  }
 
-    /* Fix pour le header sur mobile */
-    @media screen and (max-width: 767px) {
-      #root {
-        padding-top: 56px; /* Hauteur du header */
-      }
-      
-      #kora-header-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        height: 56px;
-      }
-    }
-  `;
-  document.head.appendChild(styleEl);
+  // Sur Android, ajouter une classe pour aider à identifier l'appareil
+  const isAndroid = /Android/.test(navigator.userAgent);
+  if (isAndroid) {
+    document.body.classList.add('android-device');
+  }
+  
+  // Gérer les problèmes de hauteur sur mobile avec JavaScript
+  // Cette partie est cruciale pour la stabilité du viewport sur mobile
+  function setAppHeight() {
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+  }
+  
+  window.addEventListener('resize', setAppHeight);
+  setAppHeight();
+
+  // Sur iOS, utiliser visualViewport pour détecter les changements de clavier
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', setAppHeight);
+  }
 }

@@ -1,0 +1,61 @@
+/**
+ * Solution définitive pour maintenir le header visible sur tous les appareils mobiles
+ * y compris lorsque le clavier virtuel est actif
+ */
+
+/* Ajustement du padding pour le contenu sous le header */
+body {
+  padding-top: 56px !important;
+}
+
+/* S'assurer que le header reste fixé au-dessus */
+#kora-header-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  z-index: 9999 !important;
+  background-color: white !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  
+  /* Optimisations de performance pour éviter les saccades */
+  transform: translateZ(0) !important;
+  will-change: transform !important;
+  backface-visibility: hidden !important;
+}
+
+/* S'assurer que les champs de texte ont la bonne taille (évite le zoom sur iOS) */
+input, textarea, select, button {
+  font-size: 16px !important;
+}
+
+/* Optimisations pour les appareils mobiles */
+@media screen and (max-width: 767px) {
+  /* Éviter le défilement indésirable du body */
+  html {
+    overflow-x: hidden;
+    height: 100%;
+  }
+  
+  body {
+    /* Éviter les problèmes de rebond sur les navigateurs mobiles */
+    overscroll-behavior: none;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Garantir que le root n'interfère pas avec le header */
+  #root {
+    padding-top: 56px; /* Même valeur que la hauteur du header */
+    position: relative;
+    min-height: calc(100% - 56px);
+  }
+  
+  /* Hack ultime pour maintenir le header visible */
+  #kora-header-container {
+    position: sticky !important;
+    top: 0 !important;
+    position: -webkit-sticky !important;
+  }
+}
