@@ -27,13 +27,16 @@ export function setupMobileViewportFix() {
   function ensureHeaderPosition() {
     const header = document.getElementById('kora-header-container');
     if (header) {
-      header.style.position = 'fixed';
-      header.style.top = '0';
-      header.style.left = '0';
-      header.style.right = '0';
-      header.style.zIndex = '1000';
+      // On vérifie que le header est bien visible et au-dessus des autres éléments
+      // mais sans redéfinir les positions, qui peuvent maintenant utiliser safe-area-inset
       
-      // Garantir qu'aucun style inline ne vient contredire nos règles
+      // S'assurer que la hauteur est prise en compte pour les appareils avec "notch"
+      const safeAreaTop = typeof CSS !== 'undefined' && CSS.supports('top: env(safe-area-inset-top)') 
+        ? 'env(safe-area-inset-top, 0)' 
+        : '0';
+
+      // On s'assure uniquement que le z-index est élevé et que rien ne vient perturber
+      header.style.zIndex = '9999';
       header.style.borderBottom = 'none';
     }
   }

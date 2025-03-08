@@ -7,11 +7,12 @@
 #kora-header-container {
   position: fixed;
   top: 0;
+  top: env(safe-area-inset-top, 0);
   left: 0;
   right: 0;
   width: 100%;
   height: 56px;
-  z-index: 1000;
+  z-index: 9999; /* Valeur très élevée pour garantir visibilité */
   background-color: white;
   /* Garantir l'absence de bordures et d'ombres */
   border: none !important;
@@ -19,6 +20,7 @@
   box-shadow: none !important;
   margin: 0 !important;
   padding: 0 !important;
+  padding-top: env(safe-area-inset-top, 0) !important;
 }
 
 /* Styles du contenu du header pour cohérence, plutôt qu'inline */
@@ -70,7 +72,8 @@
 
 /* Ajouter un espace pour compenser le header fixed */
 body {
-  padding-top: 56px !important;
+  padding-top: calc(56px + env(safe-area-inset-top, 0)) !important;
+  /* Assure que le contenu reste visible même avec notch ou barre de status */
 }
 
 /* Optimisations générales pour le layout */
@@ -88,5 +91,29 @@ input, textarea, select, button {
 @media screen and (max-width: 767px) {
   body {
     overscroll-behavior: none;
+  }
+}
+
+/* Ajustements spécifiques pour les appareils iOS */
+.ios-device #kora-header-container {
+  /* Spécifique à iOS pour gérer le "notch" et la barre de status */
+  padding-top: env(safe-area-inset-top, 0);
+  height: calc(56px + env(safe-area-inset-top, 0));
+}
+
+/* Pour les iPhones avec "notch" */
+@supports (padding-top: env(safe-area-inset-top)) {
+  #kora-header-container {
+    padding-top: env(safe-area-inset-top);
+    height: calc(56px + env(safe-area-inset-top));
+  }
+  
+  body {
+    padding-top: calc(56px + env(safe-area-inset-top)) !important;
+  }
+  
+  /* S'assurer que le menu reste au bon endroit */
+  .kora-side-menu {
+    top: calc(56px + env(safe-area-inset-top));
   }
 }
