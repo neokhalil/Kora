@@ -1,12 +1,32 @@
 import * as React from 'react';
-import { Brain, Sparkles } from 'lucide-react';
+import { Brain, Sparkles, Grid, Folder, User } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
   {
-    label: 'Aide aux Devoirs',
+    label: 'ChatGPT',
+    path: '/chatgpt',
+    icon: <Brain className="h-5 w-5" />
+  },
+  {
+    label: 'Olivia',
+    path: '/olivia',
+    icon: <User className="h-5 w-5" />
+  },
+  {
+    label: '11 more',
+    path: '/more',
+    icon: <User className="h-5 w-5" />
+  },
+  {
+    label: 'Explore GPTs',
+    path: '/explore',
+    icon: <Grid className="h-5 w-5" />
+  },
+  {
+    label: 'Kora',
     path: '/',
-    icon: <Brain className="h-5 w-5 mr-2" />
+    icon: <Folder className="h-5 w-5" />
   }
 ];
 
@@ -15,7 +35,7 @@ export const additionalModels = [
   {
     label: 'Kora Avancé',
     path: '/advanced',
-    icon: <Sparkles className="h-5 w-5 mr-2" />
+    icon: <Sparkles className="h-5 w-5" />
   }
 ];
 
