@@ -1,175 +1,79 @@
-/**
- * Correctifs spécifiques pour le menu mobile et la disposition des éléments d'interface
- */
+/* Styles CSS pour corriger le problème de fond gris sur le menu latéral */
 
-/* Hiérarchie z-index pour l'interface */
+/* Reset complet des styles pour forcer le mode clair */
+:root {
+  color-scheme: light !important;
+}
+
+/* Forcer le fond blanc sur le menu latéral et tous les éléments internes */
+aside.side-navigation {
+  background-color: white !important;
+  background: white !important;
+  color: #000 !important;
+  border-color: #e5e7eb !important;
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
+  --tw-border-opacity: 1 !important;
+}
+
+/* S'assurer que tous les éléments du menu ont une couleur de texte sombre */
+aside.side-navigation * {
+  color: #000 !important;
+  border-color: #e5e7eb !important;
+  --tw-text-opacity: 1 !important;
+  --tw-border-opacity: 1 !important;
+}
+
+/* Forcer le fond blanc pour tous les conteneurs dans le menu latéral */
+aside.side-navigation > div,
+aside.side-navigation > div > div,
+aside.side-navigation > div > div > div {
+  background-color: white !important;
+  --tw-bg-opacity: 1 !important;
+}
+
+/* Styles spécifiques pour les éléments interactifs */
+aside.side-navigation div,
+aside.side-navigation span,
+aside.side-navigation p,
+aside.side-navigation h1,
+aside.side-navigation h2,
+aside.side-navigation h3 {
+  color: #000 !important;
+  --tw-text-opacity: 1 !important;
+}
+
+/* Style pour les éléments survolés */
+aside.side-navigation [class*="hover:bg"] {
+  --tw-bg-opacity: 1 !important;
+}
+
+aside.side-navigation [class*="hover:bg"]:hover {
+  background-color: #f0f0f0 !important;
+  --tw-bg-opacity: 1 !important;
+}
+
+/* Correction pour les entrées de recherche */
+aside.side-navigation input {
+  background-color: #f5f5f5 !important;
+  color: #000 !important;
+  border-color: #e5e7eb !important;
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
+  --tw-border-opacity: 1 !important;
+}
+
+/* Assurer que le menu a un z-index supérieur à l'overlay */
+.side-navigation {
+  z-index: 1000 !important;
+}
+
+/* Style spécifique pour l'overlay du menu */
 .menu-overlay {
-  z-index: 50 !important; /* Overlay du menu au plus haut pour mobile */
+  z-index: 999 !important;
 }
 
-#kora-header-container {
-  z-index: 40 !important; /* Header sous le menu mais au-dessus du contenu */
-}
-
-/* Correctifs pour la zone de messages */
-.messages-container {
-  padding-bottom: 120px !important; /* Espace supplémentaire pour la zone de saisie */
-}
-
-/* Styles pour la zone de saisie et les boutons */
-.input-container {
-  position: relative;
-  z-index: 30;
-}
-
-.message-input {
-  min-height: 40px;
-  max-height: 120px;
-  overflow-y: auto !important;
-  resize: none !important;
-}
-
-.message-actions {
-  z-index: 30;
-  position: relative;
-}
-
-/* Correctifs pour le clavier virtuel sur mobile */
-@media (max-width: 767px) {
-  /* Quand le clavier est ouvert */
-  body.keyboard-open .messages-container {
-    padding-bottom: 180px !important; /* Espace supplémentaire quand le clavier est ouvert */
-  }
-  
-  /* Ajustements pour les petits écrans */
-  .input-area {
-    background-color: white !important;
-    border-top: none;
-    margin-bottom: 0;
-    position: relative;
-    z-index: 35;
-    padding-bottom: 0 !important;
-  }
-  
-  .dark .input-area {
-    background-color: #1f2937 !important;
-    border-top: none;
-  }
-  
-  /* Eliminer les marges et traits inférieurs */
-  .input-area > div:last-child {
-    margin-bottom: 0 !important;
-  }
-  
-  /* Supprimer le trait gris en bas */
-  .composer-container {
-    border-bottom: none !important;
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Supprimer tout espace blanc en bas de la page */
-  .fixed.bottom-0 {
-    bottom: 0 !important;
-    height: auto !important;
-    max-height: max-content !important;
-  }
-  
-  /* Fixer position sur mobile */
-  body {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-    position: relative !important;
-    min-height: 100% !important;
-    overscroll-behavior-y: none !important;
-  }
-  
-  /* Forcer le positionnement correct au chargement */
-  body.keyboard-open .fixed.bottom-0.composer-container,
-  .initial-load {
-    position: fixed !important;
-    bottom: 0 !important;
-    height: auto !important;
-    transform: translateY(0) !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Réduire la taille en hauteur pour éviter l'espace blanc */
-  .initial-load {
-    padding-bottom: 0 !important;
-  }
-  
-  /* Pour les appareils mobiles */
-  @media (max-width: 768px) {
-    .initial-load {
-      max-height: 150px !important; /* Hauteur maximale plus petite sur mobile */
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-  }
-  
-  /* Style du message en pied de page */
-  .footer-message {
-    margin-top: 8px !important;
-    margin-bottom: 15px !important;
-    padding: 2px 0 !important;
-    font-size: 11px !important;
-    color: #6b7280 !important;
-    font-weight: 400 !important;
-    letter-spacing: 0.1px !important;
-    opacity: 0.8 !important;
-  }
-  
-  html {
-    height: 100% !important;
-    overflow: hidden !important;
-  }
-  
-  /* Style de la zone de message pour éviter les espaces */
-  .message-actions {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  
-  /* Corrections pour Safari iOS */
-  @supports (-webkit-touch-callout: none) {
-    .messages-container {
-      padding-bottom: calc(120px + env(safe-area-inset-bottom)) !important;
-    }
-    
-    .input-area {
-      padding-bottom: env(safe-area-inset-bottom, 0);
-    }
-  }
-}
-
-/* Styles pour les animations lors des transitions */
-.menu-slide-in {
-  animation: slideInFromLeft 0.3s ease-out forwards;
-}
-
-.menu-slide-out {
-  animation: slideOutToLeft 0.3s ease-out forwards;
-}
-
-@keyframes slideInFromLeft {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOutToLeft {
-  0% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
+/* Force le mode lumineux globalement */
+body {
+  color-scheme: light !important;
 }
