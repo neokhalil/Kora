@@ -37,7 +37,7 @@ const SideNavigation = () => {
   }, [searchValue]);
   
   // Track current location for highlighting active link
-  React.useEffect(() => {
+  useEffect(() => {
     // Only log in development
     if (process.env.NODE_ENV !== 'production') {
       console.log("Current location in SideNavigation:", location);
@@ -137,15 +137,25 @@ const SideNavigation = () => {
             </h3>
             
             <div className="space-y-1">
-              {recentConversations.map((convo) => (
-                <div
-                  key={convo.id}
-                  className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#f0f0f0] dark:hover:bg-gray-700 rounded-md cursor-pointer truncate"
-                  onClick={() => handleNavigation(`/conversation/${convo.id}`)}
-                >
-                  {convo.title}
+              {filteredConversations.length > 0 ? (
+                filteredConversations.map((convo) => (
+                  <div
+                    key={convo.id}
+                    className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#f0f0f0] dark:hover:bg-gray-700 rounded-md cursor-pointer truncate"
+                    onClick={() => handleNavigation(`/conversation/${convo.id}`)}
+                  >
+                    {convo.title}
+                  </div>
+                ))
+              ) : searchValue.trim() !== '' ? (
+                <div className="px-3 py-2 text-sm text-gray-500 italic">
+                  Aucun résultat trouvé
                 </div>
-              ))}
+              ) : (
+                <div className="px-3 py-2 text-sm text-gray-500 italic">
+                  Aucune conversation récente
+                </div>
+              )}
             </div>
           </div>
         </div>
