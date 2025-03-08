@@ -1,84 +1,34 @@
 /**
- * Script d'aide pour corriger les problèmes de viewport sur les appareils mobiles
- * Solution améliorée pour maintenir le header visible même avec le clavier
+ * Script simple pour la gestion du viewport mobile
  */
 
 export function setupMobileViewportFix() {
   if (typeof window === 'undefined') return;
 
-  // Configuration agressive du viewport pour les appareils mobiles
+  // Configuration du viewport pour les appareils mobiles
   const metaViewport = document.querySelector('meta[name="viewport"]');
   if (metaViewport) {
-    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+    metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
   }
 
-  // Détection des plateformes
+  // Détection des plateformes pour ajouter des classes utiles au CSS
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   const isAndroid = /Android/.test(navigator.userAgent);
   
-  // Ajouter des classes pour cibler CSS spécifique par plateforme
   if (isIOS) document.body.classList.add('ios-device');
   if (isAndroid) document.body.classList.add('android-device');
   
-  /**
-   * Fonction critique qui maintient la hauteur de l'application
-   * et s'assure que le header reste visible en tout temps
-   */
+  // Hauteur de l'application pour les mobiles
   function setAppHeight() {
-    // Définir la hauteur de l'application
-    const viewportHeight = window.innerHeight;
-    document.documentElement.style.setProperty('--app-height', `${viewportHeight}px`);
-    
-    // S'assurer que le header reste visible
-    const header = document.getElementById('kora-header-container');
-    if (header) {
-      header.style.display = 'block';
-      header.style.visibility = 'visible';
-      header.style.opacity = '1';
-    }
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
   }
   
-  // Appliquer immédiatement
+  // Appliquer la hauteur et écouter les événements de redimensionnement
   setAppHeight();
-  
-  // Écouter les changements de taille d'écran
   window.addEventListener('resize', setAppHeight);
-
-  // Solution spécifique à Android - force le header à rester visible
-  if (isAndroid) {
-    // Ajouter un gestionnaire plus agressif pour Android
-    window.addEventListener('scroll', () => {
-      const header = document.getElementById('kora-header-container');
-      if (header) {
-        header.style.top = '0';
-        header.style.position = 'sticky';
-      }
-    });
-  }
   
-  // Solution spécifique à iOS - utilise visualViewport
+  // Utiliser visualViewport sur les appareils qui le supportent
   if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', () => {
-      setAppHeight();
-      
-      // Sur iOS, on force la position du header quand le clavier s'ouvre
-      if (isIOS) {
-        const header = document.getElementById('kora-header-container');
-        if (header) {
-          header.style.top = '0';
-          header.style.position = 'fixed';
-        }
-      }
-    });
-    
-    // Gérer le scroll sur iOS
-    window.visualViewport.addEventListener('scroll', () => {
-      if (isIOS) {
-        const header = document.getElementById('kora-header-container');
-        if (header) {
-          header.style.top = '0';
-        }
-      }
-    });
+    window.visualViewport.addEventListener('resize', setAppHeight);
   }
 }
