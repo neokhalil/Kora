@@ -67,30 +67,60 @@
   </style>
   
   <script type="text/javascript">
-    // Script minimaliste pour capturer uniquement les événements de menu
-    // La gestion complète du viewport et des classes mobiles est désormais dans mobileViewportFix.ts
+    // Fonction d'initialisation simplifiée - suppression de la création du header
     (function() {
-      // Écouter uniquement les événements de toggle du menu depuis le composant React
-      document.addEventListener('kora-menu-toggle', function(event) {
-        // Ajouter une classe au body quand le menu est ouvert
-        if (event.detail && event.detail.isOpen) {
-          document.body.classList.add('kora-menu-open');
-        } else {
-          document.body.classList.remove('kora-menu-open');
+      // Détecter le système d'exploitation
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const isAndroid = /Android/.test(navigator.userAgent);
+      
+      // Correction pour la hauteur de l'application mobile
+      function resetAppHeight() {
+        const doc = document.documentElement;
+        doc.style.setProperty('--app-height', `${window.innerHeight}px`);
+      }
+      
+      // Initialiser les événements
+      function setupEvents() {
+        // Recalculer la hauteur à chaque changement d'orientation ou redimensionnement
+        window.addEventListener('resize', resetAppHeight);
+        
+        // Recalculer aussi quand le clavier apparaît/disparaît
+        if (isIOS) {
+          window.visualViewport.addEventListener('resize', function() {
+            resetAppHeight();
+          });
         }
-      });
-
-      // Exposer la fonction de toggle pour les tests ou les cas particuliers
-      if (!window.toggleKoraMenu) {
-        window.toggleKoraMenu = function() {
-          const isMenuOpen = document.body.classList.contains('kora-menu-open');
-          if (isMenuOpen) {
-            document.body.classList.remove('kora-menu-open');
-          } else {
+        
+        // Écouter les événements de toggle du menu depuis le composant React
+        document.addEventListener('kora-menu-toggle', function(event) {
+          console.log("Menu toggle event received from React:", event.detail);
+          // Ajouter une classe au body quand le menu est ouvert
+          if (event.detail && event.detail.isOpen) {
             document.body.classList.add('kora-menu-open');
+          } else {
+            document.body.classList.remove('kora-menu-open');
           }
-          return !isMenuOpen;
-        };
+        });
+      }
+      
+      // Initialisation complète quand la page est chargée
+      function initApp() {
+        // Ajouter les classes pour détecter le système d'exploitation
+        if (isIOS) document.body.classList.add('ios-device');
+        if (isAndroid) document.body.classList.add('android-device');
+        
+        // Configurer les événements
+        setupEvents();
+        
+        // Initialiser la hauteur
+        resetAppHeight();
+      }
+      
+      // Démarrer l'initialisation au chargement de la page
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initApp);
+      } else {
+        initApp();
       }
     })();
   </script>
