@@ -68,9 +68,21 @@ const Header: React.FC = () => {
     e.preventDefault();
     e.stopPropagation();
     console.log("[Debug Header] Toggle menu called, current state:", isMenuOpen);
+    
+    // Changer l'état du menu
     setIsMenuOpen(prevState => {
       const newState = !prevState;
       console.log("[Debug Header] Setting menu state to:", newState);
+      
+      // Si window.toggleKoraMenu existe (défini dans index.html), on l'appelle pour maintenir la cohérence
+      if (typeof window !== 'undefined' && window.toggleKoraMenu) {
+        try {
+          window.toggleKoraMenu();
+        } catch (err) {
+          console.error("[Debug Header] Error calling window.toggleKoraMenu:", err);
+        }
+      }
+      
       return newState;
     });
   }, [isMenuOpen]);

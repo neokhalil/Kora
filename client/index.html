@@ -128,10 +128,7 @@
       flex: 1;
     }
     
-    /* Masquer tous les autres headers */
-    .app-header, header:not(#kora-header) {
-      display: none !important;
-    }
+    /* Permettre à tous les headers de s'afficher par défaut */
     
     /* S'assurer que les inputs ont la bonne taille de police */
     input, textarea, select, button {
@@ -140,7 +137,7 @@
   </style>
   
   <script type="text/javascript">
-    // Fonction d'initialisation
+    // Fonction d'initialisation simplifiée - suppression de la création du header
     (function() {
       // Détecter le système d'exploitation
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -152,51 +149,8 @@
         doc.style.setProperty('--app-height', `${window.innerHeight}px`);
       }
       
-      // Créer le header fixe
-      function createFixedHeader() {
-        // Créer le conteneur externe qui ne sera jamais touché par le scroll
-        const headerContainer = document.createElement('div');
-        headerContainer.id = 'kora-header-container';
-        
-        // Créer le header lui-même
-        const header = document.createElement('div');
-        header.id = 'kora-header';
-        
-        // Contenu du header
-        header.innerHTML = `
-          <div class="header-left-group">
-            <button id="kora-menu-button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </svg>
-            </button>
-            <h1 id="kora-header-title">Kora</h1>
-          </div>
-          <div style="width: 40px;"></div>
-        `;
-        
-        // Ajouter le header au conteneur
-        headerContainer.appendChild(header);
-        
-        // Ajouter le conteneur au body
-        document.body.appendChild(headerContainer);
-        
-        return header;
-      }
-      
       // Initialiser les événements
       function setupEvents() {
-        // Événement pour le bouton de menu
-        const menuButton = document.getElementById('kora-menu-button');
-        if (menuButton) {
-          menuButton.addEventListener('click', function() {
-            document.dispatchEvent(new CustomEvent('toggle-menu'));
-          });
-        }
-        
         // Recalculer la hauteur à chaque changement d'orientation ou redimensionnement
         window.addEventListener('resize', resetAppHeight);
         
@@ -204,15 +158,14 @@
         if (isIOS) {
           window.visualViewport.addEventListener('resize', function() {
             resetAppHeight();
-            
-            // Forcer le header à rester au sommet
-            const headerContainer = document.getElementById('kora-header-container');
-            if (headerContainer) {
-              headerContainer.style.top = '0';
-              headerContainer.style.position = 'absolute';
-            }
           });
         }
+        
+        // Exposer une fonction globale pour permettre au Header React de savoir quand le toggle-menu est activé
+        window.toggleKoraMenu = function() {
+          // Cette fonction sera appelée par le Header React
+          document.dispatchEvent(new CustomEvent('toggle-menu'));
+        };
       }
       
       // Initialisation complète quand la page est chargée
@@ -220,9 +173,6 @@
         // Ajouter les classes pour détecter le système d'exploitation
         if (isIOS) document.body.classList.add('ios-device');
         if (isAndroid) document.body.classList.add('android-device');
-        
-        // Créer un header fixe absolu
-        createFixedHeader();
         
         // Configurer les événements
         setupEvents();

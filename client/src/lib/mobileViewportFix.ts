@@ -17,38 +17,23 @@ export function setupMobileViewportFix() {
     metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
   }
 
-  // Ajout direct d'un CSS pour le header fixe et le padding du body
+  // Ajout direct d'un CSS pour les optimisations mobiles
   const styleEl = document.createElement('style');
   styleEl.innerHTML = `
     :root {
       --header-height: 56px;
     }
     
-    body {
-      padding-top: var(--header-height);
-    }
-    
-    #kora-header-container {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-      height: var(--header-height) !important;
-      z-index: 2000 !important;
-      background-color: white !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    
-    /* Pour éviter les problèmes de contenu masqué */
-    .main-content {
-      padding-top: 10px;
-    }
-    
     /* Styles pour les entrées sur mobile */
     input, textarea, select {
       font-size: 16px !important; /* Évite le zoom automatique sur iOS */
+    }
+    
+    /* Optimisation du débordement sur mobile */
+    @media screen and (max-width: 767px) {
+      body {
+        overflow-x: hidden;
+      }
     }
   `;
   document.head.appendChild(styleEl);
