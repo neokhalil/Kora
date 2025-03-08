@@ -104,7 +104,6 @@ const Header: React.FC = () => {
             justifyContent: 'space-between',
             padding: '0 1rem',
             pointerEvents: 'auto',
-            borderBottom: '1px solid #eaeaea',
           }}
         >
           {/* Menu button avec indicateur d'état */}
