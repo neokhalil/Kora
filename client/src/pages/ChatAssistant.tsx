@@ -908,8 +908,8 @@ const ChatAssistant: React.FC = () => {
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas - ajout de la classe message-composer pour fixation mobile */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load message-composer">
+          {/* Zone de saisie fixe en bas */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
@@ -992,20 +992,18 @@ const ChatAssistant: React.FC = () => {
                       // Marquer que le clavier est ouvert
                       document.body.classList.add('keyboard-open');
                       
+                      // S'assurer que le header fixe est visible
+                      const headerContainer = document.getElementById('kora-header-container');
+                      if (headerContainer) {
+                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.top = '0';
+                        headerContainer.style.zIndex = '9999';
+                      }
+                      
                       // Scroll vers le bas après l'ouverture du clavier
                       setTimeout(() => {
                         if (messagesEndRef.current) {
                           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 100);
-                    }}
-                    onBlur={() => {
-                      // On attend un court délai avant de retirer la classe
-                      // pour éviter des problèmes si le focus passe à un autre champ
-                      setTimeout(() => {
-                        const activeElement = document.activeElement as HTMLElement;
-                        if (!(activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA'))) {
-                          document.body.classList.remove('keyboard-open');
                         }
                       }, 100);
                     }}
