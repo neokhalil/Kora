@@ -6,26 +6,21 @@
 /* Header toujours visible - complètement en haut de l'écran */
 #kora-header-container {
   position: fixed;
-  top: 0; 
-  top: constant(safe-area-inset-top, 0); /* Pour iOS 11.0 */
-  top: env(safe-area-inset-top, 0); /* Pour iOS 11.2+ */
+  top: 0;
+  top: env(safe-area-inset-top, 0);
   left: 0;
   right: 0;
   width: 100%;
   height: 56px;
-  z-index: 99999; /* Valeur extrêmement élevée pour garantir visibilité */
+  z-index: 9999; /* Valeur très élevée pour garantir visibilité */
   background-color: white;
   /* Garantir l'absence de bordures et d'ombres */
   border: none !important;
   border-bottom: none !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important; /* Légère ombre pour mieux distinguer */
+  box-shadow: none !important;
   margin: 0 !important;
   padding: 0 !important;
   padding-top: env(safe-area-inset-top, 0) !important;
-  /* Empêcher le déplacement pendant le défilement */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  will-change: transform;
 }
 
 /* Styles du contenu du header pour cohérence, plutôt qu'inline */
@@ -173,81 +168,4 @@ input, textarea, select, button {
     /* En mode paysage avec clavier ouvert, assurer la visibilité */
     position: absolute;
   }
-}
-
-/* Style pour la zone de saisie qui doit rester visible au-dessus du clavier */
-.bg-white.dark\:bg-gray-800.p-3.pb-2.rounded-3xl.border.border-gray-200 {
-  position: relative;
-  z-index: 1000;
-}
-
-/* Optimisations spécifiques pour le clavier mobile */
-.keyboard-open {
-  /* Empêcher le scroll de la page quand le clavier est ouvert */
-  overflow: hidden;
-}
-
-/* Styles spécifiques appliqués lorsque le clavier est ouvert */
-.keyboard-open #kora-header-container {
-  position: fixed !important;
-  top: 0 !important;
-  z-index: 999999 !important; /* Valeur encore plus élevée pour priorité maximale */
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-  background-color: white !important;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
-  /* Garantir la visualisation sur tous les navigateurs mobiles */
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-/* S'assurer que le contenu de saisie reste visible quand le clavier est ouvert */
-.keyboard-open .message-composer {
-  position: sticky !important;
-  bottom: 0 !important;
-  z-index: 1000 !important;
-  padding-bottom: env(safe-area-inset-bottom, 8px) !important;
-  margin-bottom: 0 !important;
-  background-color: white !important;
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-}
-
-/* Ajustement pour le conteneur principal quand le clavier est ouvert */
-.keyboard-open .chat-messages-container {
-  padding-bottom: 100px !important; /* Espace pour le composeur de message */
-}
-
-/* Styles pour garantir que le header reste visible */
-.android-device.chrome-browser body.keyboard-open #kora-header-container {
-  position: fixed !important;
-  top: 0 !important;
-  z-index: 99999 !important;
-  transform: translateZ(0) !important;
-  -webkit-transform: translateZ(0) !important;
-  backface-visibility: hidden !important;
-  -webkit-backface-visibility: hidden !important;
-  will-change: transform !important;
-}
-
-/* Styles pour la zone de composition qui reste par-dessus le clavier */
-.chat-messages-container {
-  /* Assurez-vous que le conteneur de message défile correctement */
-  overflow-y: auto;
-  /* Laissez de l'espace pour le header en haut */
-  padding-top: calc(56px + env(safe-area-inset-top, 0px));
-  /* Utilisez un z-index inférieur à celui du header */
-  position: relative;
-  z-index: 1;
-}
-
-/* Styles pour le conteneur du composeur de message */
-div[ref="composerRef"] {
-  position: sticky;
-  bottom: 0;
-  z-index: 1000;
-  /* Assurez-vous qu'il reste visible au-dessus du clavier */
-  background-color: white;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
