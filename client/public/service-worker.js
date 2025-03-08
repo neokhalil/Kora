@@ -22,44 +22,19 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Cache and return requests
+// No caching, fetch directly from network
 self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        
-        return fetch(event.request).then(
-          response => {
-            // Check if we received a valid response
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clone the response
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Don't cache API requests
-                if (!event.request.url.includes('/api/')) {
-                  cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
-          }
-        ).catch(() => {
-          // If the network is unavailable, show the offline page for navigate requests
-          if (event.request.mode === 'navigate') {
-            return caches.match('/offline.html');
-          }
-        });
-      })
-  );
+  // Pour les requêtes de navigation uniquement, si hors ligne, servir la page hors ligne
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match('/offline.html'))
+    );
+    return;
+  }
+  
+  // Pour toutes les autres requêtes, ne pas utiliser de cache
+  event.respondWith(fetch(event.request));
 });
 
 // Update the service worker
