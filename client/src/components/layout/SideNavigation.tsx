@@ -76,35 +76,35 @@ const SideNavigation = () => {
         ></div>
       )}
       
-      {/* Side Navigation - ChatGPT style */}
+      {/* Side Navigation - White background for better readability */}
       <aside 
         className={cn(
-          "w-full max-w-[260px] bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
+          "w-full max-w-[260px] bg-white border-r border-gray-200 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Logo et titre */}
-        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="px-4 py-3 border-b border-gray-200">
           <div className="flex items-center">
             <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
               <span className="text-white text-lg font-bold">K</span>
             </div>
-            <h1 className="text-lg font-bold text-gray-800 dark:text-gray-200">Kora</h1>
+            <h1 className="text-lg font-bold text-gray-800">Kora</h1>
           </div>
         </div>
         
         {/* Main navigation section */}
         <div className="flex-1 overflow-y-auto">
           {/* Main menu navigation section */}
-          <div className="px-2 py-2 border-b border-gray-200 dark:border-gray-800">
+          <div className="px-2 py-2 border-b border-gray-200">
             {navItems.map((item) => (
               <div
                 key={item.path}
                 className={cn(
                   "flex items-center px-3 py-2.5 my-1 text-sm font-medium rounded-md transition-colors cursor-pointer",
                   location === item.path 
-                    ? "bg-[#f0f0f0] text-gray-800 dark:bg-gray-700 dark:text-white" 
-                    : "text-gray-700 hover:bg-[#f0f0f0] dark:text-gray-300 dark:hover:bg-gray-700"
+                    ? "bg-[#f0f0f0] text-gray-800" 
+                    : "text-gray-700 hover:bg-[#f0f0f0]"
                 )}
                 onClick={() => handleNavigation(item.path)}
               >
@@ -123,7 +123,7 @@ const SideNavigation = () => {
               <Input
                 type="text"
                 placeholder="Rechercher les conversations"
-                className="pl-10 pr-4 py-2 w-full bg-[#f5f5f5] dark:bg-gray-800 border-none text-sm rounded-md"
+                className="pl-10 pr-4 py-2 w-full bg-[#f5f5f5] border-none text-sm rounded-md"
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
@@ -141,7 +141,7 @@ const SideNavigation = () => {
                 filteredConversations.map((convo) => (
                   <div
                     key={convo.id}
-                    className="px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-[#f0f0f0] dark:hover:bg-gray-700 rounded-md cursor-pointer truncate"
+                    className="px-3 py-2 text-sm text-gray-700 hover:bg-[#f0f0f0] rounded-md cursor-pointer truncate"
                     onClick={() => handleNavigation(`/conversation/${convo.id}`)}
                   >
                     {convo.title}
@@ -161,13 +161,13 @@ const SideNavigation = () => {
         </div>
         
         {/* User account section */}
-        <div className="border-t border-gray-200 dark:border-gray-800 p-2">
-          <div className="flex items-center p-2 hover:bg-[#f0f0f0] dark:hover:bg-gray-700 cursor-pointer">
+        <div className="border-t border-gray-200 p-2">
+          <div className="flex items-center p-2 hover:bg-[#f0f0f0] cursor-pointer rounded-md">
             <div className="w-7 h-7 bg-amber-600 rounded-full flex items-center justify-center mr-3">
               <span className="text-white text-sm font-medium">I</span>
             </div>
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-800 dark:text-gray-200">Ibrahima Ndiaye</p>
+              <p className="text-sm font-medium text-gray-800">Ibrahima Ndiaye</p>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-500" />
           </div>
