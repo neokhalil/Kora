@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Menu, X } from 'lucide-react';
 import SideMenu from './SideMenu';
 
@@ -20,15 +20,37 @@ const Header: React.FC = () => {
       console.log("Menu fermé");
     }
     
+    // Nettoyage
     return () => {
       document.body.classList.remove('menu-open');
     };
   }, [isMenuOpen]);
   
-  const toggleMenu = () => {
+  // Fermer le menu avec la touche Escape
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false);
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => window.removeEventListener('keydown', handleEscapeKey);
+  }, [isMenuOpen]);
+  
+  // Récupérer les infos sur l'appareil
+  useEffect(() => {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    if (isIOS) {
+      document.body.classList.add('ios-device');
+    }
+  }, []);
+  
+  // Mémoriser la fonction de toggle du menu pour éviter de la recréer
+  const toggleMenu = useCallback(() => {
     console.log("Toggle menu appelé, état actuel:", isMenuOpen);
     setIsMenuOpen(prevState => !prevState);
-  };
+  }, [isMenuOpen]);
   
   return (
     <>
@@ -41,19 +63,22 @@ const Header: React.FC = () => {
         }}
       >
         <div className="flex items-center justify-between px-4 h-full">
-          {/* Menu button - Left aligned avec animation */}
+          {/* Menu button avec indicateur d'état */}
           <div className="flex items-center">
             <button 
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
+              className={`flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 ${isMenuOpen ? 'bg-gray-100' : ''}`}
               onClick={toggleMenu}
               style={{ cursor: 'pointer' }}
+              data-state={isMenuOpen ? 'open' : 'closed'}
             >
-              {isMenuOpen ? (
-                <X size={24} className="text-gray-800 transition-transform duration-300" />
-              ) : (
-                <Menu size={24} className="text-gray-800 transition-transform duration-300" />
-              )}
+              <div className="menu-icon-container">
+                {isMenuOpen ? (
+                  <X size={24} className="text-gray-800 animate-to-x" />
+                ) : (
+                  <Menu size={24} className="text-gray-800 animate-to-menu" />
+                )}
+              </div>
             </button>
           </div>
           
@@ -67,14 +92,8 @@ const Header: React.FC = () => {
         </div>
       </header>
       
-      {/* Menu latéral, rendu conditionnel pour debugger */}
-      {typeof SideMenu === 'function' ? (
-        <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      ) : (
-        <div style={{position: 'fixed', top: '60px', left: '10px', zIndex: 3000, background: 'red', color: 'white', padding: '5px'}}>
-          Erreur: SideMenu n'est pas un composant valide
-        </div>
-      )}
+      {/* Menu latéral */}
+      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </>
   );
 };
