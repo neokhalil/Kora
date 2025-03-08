@@ -113,28 +113,28 @@ const SideNavigation = () => {
               </div>
             ))}
           </div>
-          
-          {/* Recherche de conversations */}
-          <div className="px-4 pt-4 pb-2">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-500" />
-              </div>
-              <Input
-                type="text"
-                placeholder="Rechercher les conversations"
-                className="pl-10 pr-4 py-2 w-full bg-[#f5f5f5] border-none text-sm rounded-md"
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-              />
-            </div>
-          </div>
 
           {/* Conversations récentes section */}
           <div className="px-2 py-2">
             <h3 className="px-2 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
               Conversations récentes
             </h3>
+            
+            {/* Recherche déplacée ici */}
+            <div className="px-2 pb-2">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-4 w-4 text-gray-500" />
+                </div>
+                <Input
+                  type="text"
+                  placeholder="Rechercher"
+                  className="pl-10 pr-4 py-2 w-full bg-[#f5f5f5] border-none text-sm rounded-md"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                />
+              </div>
+            </div>
             
             <div className="space-y-1">
               {filteredConversations.length > 0 ? (
