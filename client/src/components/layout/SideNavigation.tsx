@@ -79,8 +79,9 @@ const SideNavigation = () => {
       {/* Side Navigation - White background for better readability */}
       <aside 
         className={cn(
-          "side-navigation w-full max-w-[300px] bg-white border-r border-gray-200 fixed inset-0 left-0 z-50 transform transition-transform duration-300 ease-in-out md:translate-x-0 md:relative md:z-0 flex flex-col",
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          "side-navigation bg-white border-r border-gray-200 fixed inset-0 left-0 z-50 transform transition-transform duration-300 ease-in-out flex flex-col",
+          "md:w-[300px] md:translate-x-0 md:relative md:z-0",
+          isMenuOpen ? "translate-x-0 w-full" : "-translate-x-full w-full"
         )}
         style={{
           paddingTop: 'calc(var(--header-height) + var(--safe-area-top, 0px))'

@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useMenu } from '@/hooks/use-menu';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 const Header: React.FC = () => {
-  const [menuOpen, setMenuOpen] = React.useState(false);
-  const { toggleMenu } = useMenu();
+  const { toggleMenu, isMenuOpen } = useMenu();
   
   // Ajouter une classe au body quand le menu est ouvert
   useEffect(() => {
-    if (menuOpen) {
+    if (isMenuOpen) {
       document.body.classList.add('menu-open');
     } else {
       document.body.classList.remove('menu-open');
@@ -19,13 +16,7 @@ const Header: React.FC = () => {
     return () => {
       document.body.classList.remove('menu-open');
     };
-  }, [menuOpen]);
-  
-  const handleToggleMenu = () => {
-    const newState = !menuOpen;
-    setMenuOpen(newState);
-    toggleMenu(); // Appelle aussi la fonction du hook useMenu
-  };
+  }, [isMenuOpen]);
   
   return (
     <header 
@@ -39,26 +30,20 @@ const Header: React.FC = () => {
       <div className="flex items-center justify-between px-4 h-full">
         {/* Menu button - Left aligned */}
         <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={handleToggleMenu}
-            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            className="text-gray-800 p-0 hover:bg-transparent"
+          <button 
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            className={`menu-toggle-button flex items-center justify-center h-10 w-10 p-0 rounded-full transition-colors ${isMenuOpen ? 'bg-black' : 'bg-transparent'}`}
           >
-            {menuOpen ? (
-              /* X icon when menu is open */
-              <div className="bg-black text-white p-1.5 rounded-full flex items-center justify-center">
-                <X className="h-5 w-5" strokeWidth={2.5} />
-              </div>
+            {isMenuOpen ? (
+              <X className="h-5 w-5 text-white" strokeWidth={2.5} />
             ) : (
-              /* ChatGPT style hamburger menu with two lines when closed */
               <div className="flex flex-col space-y-1.5">
                 <div className="w-6 h-0.5 bg-gray-800 rounded-full"></div>
                 <div className="w-4 h-0.5 bg-gray-800 rounded-full"></div>
               </div>
             )}
-          </Button>
+          </button>
         </div>
         
         {/* Logo in center */}
