@@ -29,11 +29,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [readOnly, setReadOnly] = useState(true);
   
-  // Éléments fixes du menu (aide aux devoirs)
+  // Éléments fixes du menu (aide aux études)
   const menuItems: MenuItem[] = [
     { 
-      id: 'homework-help', 
-      title: 'Aide aux devoirs', 
+      id: 'studies-help', 
+      title: 'Aide aux études', 
       icon: <Book className="h-5 w-5 mr-3" />, 
       href: '/chat-assistant' 
     }

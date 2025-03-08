@@ -16,6 +16,13 @@ const Header: React.FC = () => {
     if (isMenuOpen) {
       document.body.classList.add('menu-open');
       console.log("[Debug Header] Menu opened, body class added");
+      
+      // Quand le menu s'ouvre, on masque le focus de tous les éléments actifs
+      // pour éviter que le clavier ne s'ouvre automatiquement
+      const activeElement = document.activeElement as HTMLElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        activeElement.blur();
+      }
     } else {
       document.body.classList.remove('menu-open');
       console.log("[Debug Header] Menu closed, body class removed");
