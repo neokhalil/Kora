@@ -21,43 +21,64 @@
   background-color: #000 !important;
 }
 
-/* Styles pour les lignes du hamburger */
-.hamburger-lines {
-  position: relative;
+/* Conteneur des lignes hamburger */
+.hamburger-icon {
   width: 24px;
-  height: 20px;
+  height: 18px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: 0.5s ease-in-out;
+  cursor: pointer;
 }
 
-.hamburger-lines div {
+/* Chaque barre du hamburger */
+.hamburger-icon span {
+  display: block;
   position: absolute;
   height: 2px;
-  background-color: #333;
-  border-radius: 3px;
-  transition: transform 0.3s ease, background-color 0.3s ease, width 0.2s ease, opacity 0.3s ease;
+  width: 100%;
+  background: #333;
+  border-radius: 9px;
+  opacity: 1;
   left: 0;
+  transform: rotate(0deg);
+  transition: 0.25s ease-in-out;
 }
 
-.hamburger-lines div:first-child {
-  width: 24px;
-  top: 5px;
+/* Positionnement des barres */
+.hamburger-icon span:nth-child(1) {
+  top: 0px;
 }
 
-.hamburger-lines div:last-child {
-  width: 16px;
-  bottom: 5px;
+.hamburger-icon span:nth-child(2) {
+  top: 8px;
+  width: 70%; /* Barre du milieu plus courte */
+  right: 0;
+  left: auto;
 }
 
-/* Animation pour transformer en X */
-.menu-toggle-button.menu-open .hamburger-lines div {
-  background-color: white;
+.hamburger-icon span:nth-child(3) {
+  top: 16px;
 }
 
-.menu-toggle-button.menu-open .hamburger-lines div:first-child {
-  transform: translateY(4px) rotate(45deg);
-  width: 22px; /* Légèrement plus court pour un X équilibré */
+/* Animation pour l'état ouvert */
+.menu-toggle-button.menu-open .hamburger-icon span {
+  background: white;
 }
 
-.menu-toggle-button.menu-open .hamburger-lines div:last-child {
-  transform: translateY(-4px) rotate(-45deg);
-  width: 22px; /* Même taille que la ligne du haut pour un X symétrique */
+.menu-toggle-button.menu-open .hamburger-icon span:nth-child(1) {
+  top: 8px;
+  transform: rotate(135deg);
+  width: 100%;
+}
+
+.menu-toggle-button.menu-open .hamburger-icon span:nth-child(2) {
+  opacity: 0;
+  left: -60px;
+}
+
+.menu-toggle-button.menu-open .hamburger-icon span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-135deg);
+  width: 100%;
 }

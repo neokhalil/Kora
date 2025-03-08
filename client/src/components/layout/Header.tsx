@@ -34,10 +34,11 @@ const Header: React.FC = () => {
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             className={`menu-toggle-button ${isMenuOpen ? 'menu-open' : ''}`}
           >
-            {/* Les lignes du hamburger se transformeront en X */}
-            <div className="hamburger-lines">
-              <div></div>
-              <div></div>
+            {/* Icône hamburger avec animation en X */}
+            <div className="hamburger-icon">
+              <span></span>
+              <span></span>
+              <span></span>
             </div>
           </button>
         </div>
