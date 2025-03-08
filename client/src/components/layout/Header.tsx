@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
 import { useMenu } from '@/hooks/use-menu';
 
 const Header: React.FC = () => {
@@ -35,10 +34,7 @@ const Header: React.FC = () => {
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             className={`menu-toggle-button ${isMenuOpen ? 'menu-open' : ''}`}
           >
-            {/* L'icône X est toujours présente mais sera masquée/affichée selon l'état du menu */}
-            <X className="h-5 w-5 text-white" strokeWidth={2.5} />
-            
-            {/* Les lignes du hamburger sont toujours présentes mais seront masquées quand isMenuOpen est true */}
+            {/* Les lignes du hamburger se transformeront en X */}
             <div className="hamburger-lines">
               <div></div>
               <div></div>

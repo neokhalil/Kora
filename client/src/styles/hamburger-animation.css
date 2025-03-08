@@ -21,44 +21,43 @@
   background-color: #000 !important;
 }
 
-/* Styles initiaux pour l'icône X - cachée par défaut */
-.menu-toggle-button svg {
-  display: none;
-  color: white;
-}
-
-/* Afficher l'icône X quand le menu est ouvert */
-.menu-toggle-button.menu-open svg {
-  display: block !important;
-  color: white !important;
-}
-
 /* Styles pour les lignes du hamburger */
 .hamburger-lines {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 6px;
+  position: relative;
   width: 24px;
+  height: 20px;
 }
 
 .hamburger-lines div {
+  position: absolute;
   height: 2px;
   background-color: #333;
   border-radius: 3px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, background-color 0.3s ease, width 0.2s ease, opacity 0.3s ease;
+  left: 0;
 }
 
 .hamburger-lines div:first-child {
   width: 24px;
+  top: 5px;
 }
 
 .hamburger-lines div:last-child {
   width: 16px;
+  bottom: 5px;
 }
 
-/* Cacher les lignes du hamburger quand le menu est ouvert */
-.menu-toggle-button.menu-open .hamburger-lines {
-  display: none !important;
+/* Animation pour transformer en X */
+.menu-toggle-button.menu-open .hamburger-lines div {
+  background-color: white;
+}
+
+.menu-toggle-button.menu-open .hamburger-lines div:first-child {
+  transform: translateY(4px) rotate(45deg);
+  width: 22px; /* Légèrement plus court pour un X équilibré */
+}
+
+.menu-toggle-button.menu-open .hamburger-lines div:last-child {
+  transform: translateY(-4px) rotate(-45deg);
+  width: 22px; /* Même taille que la ligne du haut pour un X symétrique */
 }
