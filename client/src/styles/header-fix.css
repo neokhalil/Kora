@@ -1,22 +1,7 @@
 /**
  * Solution optimisée pour le header avec position fixed
  * Nettoyée pour éliminer les redondances et garantir la stabilité
- * Version améliorée avec support clavier virtuel mobile
  */
-
-/* Layout principal en mode app conteneur */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: var(--viewport-height, 100vh);
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-}
 
 /* Header toujours visible - complètement en haut de l'écran */
 #kora-header-container {
@@ -183,55 +168,4 @@ input, textarea, select, button {
     /* En mode paysage avec clavier ouvert, assurer la visibilité */
     position: absolute;
   }
-}
-
-/* Style pour la zone de contenu scrollable entre header et composer */
-.scrollable-content {
-  flex-grow: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: var(--composer-height, 60px);
-  height: calc(var(--viewport-height) - var(--header-height) - var(--composer-height, 60px));
-}
-
-/* Zone de saisie en bas de l'écran */
-.composer, 
-.message-input,
-.input-container,
-.message-composer,
-.chat-input-container {
-  position: sticky;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 90;
-  background-color: white;
-  padding: 10px;
-  border-top: 1px solid #eee;
-  width: 100%;
-}
-
-/* Ajustements quand le clavier est ouvert */
-.keyboard-open .composer,
-.keyboard-open .message-input,
-.keyboard-open .input-container,
-.keyboard-open .message-composer,
-.keyboard-open .chat-input-container {
-  position: fixed !important;
-  bottom: var(--keyboard-height, 0) !important;
-}
-
-/* Ajustements quand la zone de saisie est fixée au-dessus du clavier */
-.composer-fixed .scrollable-content {
-  padding-bottom: calc(var(--composer-height, 60px) + 10px);
-}
-
-/* Pour iOS - ajustements spécifiques de la zone saisie */
-.ios-device.keyboard-open .composer,
-.ios-device.keyboard-open .message-input,
-.ios-device.keyboard-open .input-container,
-.ios-device.keyboard-open .message-composer,
-.ios-device.keyboard-open .chat-input-container {
-  bottom: 0 !important;
-  transform: translateY(calc(-1 * var(--keyboard-height, 0)));
 }

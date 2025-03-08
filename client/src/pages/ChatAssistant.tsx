@@ -908,8 +908,8 @@ const ChatAssistant: React.FC = () => {
             )}
           </div>
           
-          {/* Zone de saisie en bas - classe message-composer pour ciblage automatique */}
-          <div className="message-composer fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 input-area initial-load">
+          {/* Zone de saisie fixe en bas */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
@@ -944,11 +944,21 @@ const ChatAssistant: React.FC = () => {
                 </div>
               )}
               
-              {/* Composeur de message style iOS, reformaté pour compatibilité clavier */}
+              {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
                 className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
                 ref={composerRef}
-                style={{ "--composer-height": "60px" } as React.CSSProperties}
+                onFocus={() => {
+                  // Déclenche la classe keyboard-open pour adapter l'UI
+                  document.body.classList.add('keyboard-open');
+                  
+                  // Scroll vers la fin des messages après un court délai
+                  setTimeout(() => {
+                    if (messagesEndRef.current) {
+                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }, 300);
+                }}
               >
                 {/* Hidden file input pour les images */}
                 <input
@@ -979,13 +989,23 @@ const ChatAssistant: React.FC = () => {
                     className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-2 overflow-y-auto"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
-                      // Scroll vers le bas après un court délai
-                      // (Le reste est géré par notre gestionnaire de viewport)
+                      // Marquer que le clavier est ouvert
+                      document.body.classList.add('keyboard-open');
+                      
+                      // S'assurer que le header fixe est visible
+                      const headerContainer = document.getElementById('kora-header-container');
+                      if (headerContainer) {
+                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.top = '0';
+                        headerContainer.style.zIndex = '9999';
+                      }
+                      
+                      // Scroll vers le bas après l'ouverture du clavier
                       setTimeout(() => {
                         if (messagesEndRef.current) {
                           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                         }
-                      }, 300);
+                      }, 100);
                     }}
                   />
                 </div>
