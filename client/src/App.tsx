@@ -16,13 +16,14 @@ const routes = [
 // App simplifié sans menu latéral
 const AppContainer = () => {
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full app-container">
       {/* Header fixe en haut */}
       <Header />
       
-      <div className="flex h-full" style={{ paddingTop: 'var(--header-height, 56px)' }}>
-        {/* Contenu principal */}
-        <main className="flex-1 overflow-y-auto w-full">
+      {/* Div supprimé car le padding-top est déjà sur #root */}
+      <div className="flex h-full">
+        {/* Contenu principal - ajout de la classe main-content pour les styles mobiles */}
+        <main className="flex-1 overflow-y-auto w-full main-content">
           <Switch>
             {routes.map(({ path, Component }) => (
               <Route key={path} path={path}>
