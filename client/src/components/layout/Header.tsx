@@ -17,6 +17,70 @@ const Header: React.FC = () => {
     };
   }, [isMenuOpen]);
   
+  // Styles inline pour le bouton et l'animation
+  const buttonStyle = {
+    position: 'relative' as const,
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    width: '40px',
+    height: '40px',
+    padding: '0',
+    borderRadius: '50%',
+    cursor: 'pointer',
+    background: isMenuOpen ? '#000' : 'transparent',
+    border: 'none',
+    outline: 'none',
+    transition: 'all 0.3s ease-in-out',
+    zIndex: 2100,
+  };
+  
+  // Styles pour l'icône hamburger
+  const hamburgerStyle = {
+    width: '24px',
+    height: '18px',
+    position: 'relative' as const,
+    transform: 'rotate(0deg)',
+    transition: '0.5s ease-in-out',
+    cursor: 'pointer',
+  };
+  
+  // Styles de base pour les barres
+  const barBaseStyle = {
+    display: 'block',
+    position: 'absolute' as const,
+    height: '2px',
+    borderRadius: '9px',
+    opacity: 1,
+    transform: 'rotate(0deg)',
+    transition: '0.25s ease-in-out',
+    backgroundColor: isMenuOpen ? '#fff' : '#333',
+  };
+  
+  // Styles spécifiques pour chaque barre
+  const bar1Style = {
+    ...barBaseStyle,
+    width: '100%',
+    top: isMenuOpen ? '8px' : '0px',
+    transform: isMenuOpen ? 'rotate(135deg)' : 'rotate(0deg)',
+  };
+  
+  const bar2Style = {
+    ...barBaseStyle,
+    width: isMenuOpen ? '100%' : '70%',
+    top: '8px',
+    right: '0',
+    left: isMenuOpen ? '0' : 'auto',
+    opacity: isMenuOpen ? 0 : 1,
+  };
+  
+  const bar3Style = {
+    ...barBaseStyle,
+    width: isMenuOpen ? '100%' : '100%',
+    top: isMenuOpen ? '8px' : '16px',
+    transform: isMenuOpen ? 'rotate(-135deg)' : 'rotate(0deg)',
+  };
+  
   return (
     <header 
       id="kora-header-container"
@@ -32,13 +96,13 @@ const Header: React.FC = () => {
           <button 
             onClick={toggleMenu}
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            className={`menu-toggle-button ${isMenuOpen ? 'menu-open' : ''}`}
+            style={buttonStyle}
           >
             {/* Icône hamburger avec animation en X */}
-            <div className="hamburger-icon">
-              <span></span>
-              <span></span>
-              <span></span>
+            <div style={hamburgerStyle}>
+              <span style={bar1Style}></span>
+              <span style={bar2Style}></span>
+              <span style={bar3Style}></span>
             </div>
           </button>
         </div>
