@@ -1,80 +1,171 @@
 /**
- * Styles optimisés pour maintenir le header visible malgré le clavier virtuel
- * Ces styles se concentrent spécifiquement sur la résolution des problèmes mobiles
- * liés à l'ouverture du clavier virtuel
+ * Solution optimisée pour le header avec position fixed
+ * Nettoyée pour éliminer les redondances et garantir la stabilité
  */
 
-/* Assurer que le header reste fixe en haut */
+/* Header toujours visible - complètement en haut de l'écran */
 #kora-header-container {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 9999 !important;
-  width: 100% !important;
-  transform: translateZ(0);
-  transform: translate3d(0, 0, 0);
-  backface-visibility: hidden;
-  will-change: transform;
-  transition: transform 0.2s ease-out;
+  position: fixed;
+  top: 0;
+  top: env(safe-area-inset-top, 0);
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 56px;
+  z-index: 9999; /* Valeur très élevée pour garantir visibilité */
+  background-color: white;
+  /* Garantir l'absence de bordures et d'ombres */
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-top: env(safe-area-inset-top, 0) !important;
 }
 
-/* Assurer que le header ne disparaît pas lors du focus d'un input */
-body.keyboard-open #kora-header-container {
-  position: fixed !important;
-  top: 0 !important;
-  transform: translateY(0) !important;
-  z-index: 9999 !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+/* Styles du contenu du header pour cohérence, plutôt qu'inline */
+#kora-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border: none !important;
+  border-bottom: none !important;
 }
 
-/* Prévenir le défilement automatique du body sur iOS */
-body.keyboard-open {
+/* Style du logo plus cohérent */
+#kora-header-title {
+  font-family: 'Elza', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* Style optimisé pour le bouton du menu */
+.kora-menu-button-control {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
   position: relative;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  height: var(--app-height);
+  z-index: 10000;
 }
 
-/* Ajustements spécifiques à iOS */
-.ios-device.keyboard-open #kora-header-container {
-  /* Forcer l'application du GPU pour éviter les bugs visuels sur iOS */
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
+/* Groupe gauche du header */
+.header-left-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
-/* Ajustements spécifiques à Android */
-.android-device.keyboard-open #kora-header-container {
-  position: fixed !important;
-  top: 0 !important;
-  will-change: transform;
+/* Élément de balancement pour l'équilibre du layout */
+#kora-header > div:last-child {
+  width: 40px;
 }
 
-/* Styles pour les navigateurs spécifiques sur Android */
-.android-device.chrome-browser.keyboard-open #kora-header-container {
-  /* Fixes pour Chrome sur Android */
-  position: fixed !important;
-  transform: translateY(0) !important;
+/* Ajouter un espace pour compenser le header fixed */
+body {
+  padding-top: calc(56px + env(safe-area-inset-top, 0)) !important;
+  /* Assure que le contenu reste visible même avec notch ou barre de status */
 }
 
-.android-device.samsung-browser.keyboard-open #kora-header-container {
-  /* Fixes pour Samsung Browser */
-  z-index: 9999 !important;
+/* Optimisations générales pour le layout */
+html, body, #root {
+  height: 100%;
+  overflow-x: hidden;
 }
 
-/* Style pour les positions d'écrans iPad en orientation portrait/paysage */
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
-  #kora-header-container {
-    /* Style spécifique pour iPad */
-    position: fixed !important;
-    top: 0 !important;
+/* Rendre les champs plus accessibles sur mobile (16px minimum pour éviter zoom iOS) */
+input, textarea, select, button {
+  font-size: 16px !important;
+}
+
+/* Optimisations pour les appareils mobiles */
+@media screen and (max-width: 767px) {
+  body {
+    overscroll-behavior: none;
   }
 }
 
-/* Prévenir les problèmes avec les transitions CSS sur le header */
-@media screen and (max-width: 767px) {
-  body.scrolling #kora-header-container {
-    transform: translateY(0) !important;
-    transition: none !important;
+/* Ajustements spécifiques pour les appareils iOS */
+.ios-device #kora-header-container {
+  /* Spécifique à iOS pour gérer le "notch" et la barre de status */
+  padding-top: env(safe-area-inset-top, 0);
+  height: calc(56px + env(safe-area-inset-top, 0));
+}
+
+/* Ajustements spécifiques pour Android */
+.android-device #kora-header-container {
+  /* Assurer une hauteur stable pour toutes les versions Android */
+  height: 56px; 
+  /* Certains appareils Android ont besoin d'un padding supplémentaire */
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Pour les appareils avec "notch" ou barre système (iOS et certains Android) */
+@supports (padding-top: env(safe-area-inset-top)) {
+  #kora-header-container {
+    padding-top: env(safe-area-inset-top);
+    height: calc(56px + env(safe-area-inset-top));
+  }
+  
+  body {
+    padding-top: calc(56px + env(safe-area-inset-top)) !important;
+  }
+  
+  /* S'assurer que le menu reste au bon endroit */
+  .kora-side-menu {
+    top: calc(56px + env(safe-area-inset-top));
+  }
+}
+
+/* Spécifique aux modèles Android avec barre de navigation */
+.android-device {
+  /* Empêcher le retaillage excessif sur Android lors de l'ouverture du clavier */
+  overflow-y: auto;
+  /* Certains appareils Android ont besoin d'un ajustement en bas */
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+/* Styles pour les appareils Android 9 et inférieur */
+.android-9 #kora-header-container,
+.android-8 #kora-header-container,
+.android-7 #kora-header-container {
+  /* Certains appareils Android plus anciens ont des barres système */
+  height: 56px !important;
+  padding-top: 0 !important;
+}
+
+/* Styles spécifiques aux navigateurs sur Android */
+.android-device.chrome-browser #kora-header-container {
+  /* Le navigateur Chrome peut nécessiter des ajustements spécifiques */
+  position: fixed !important;
+  top: 0 !important;
+}
+
+.android-device.samsung-browser #kora-header-container {
+  /* Le navigateur Samsung a parfois des comportements spécifiques */
+  position: fixed !important;
+  top: 0 !important;
+}
+
+/* Styles pour gérer l'apparition et la disparition du clavier Android */
+.android-device .kora-side-menu {
+  height: 100vh !important;
+  height: calc(var(--app-height, 100vh)) !important;
+}
+
+/* Ajustements pour le clavier virtuel sur Android */
+@media screen and (max-height: 450px) and (orientation: landscape) {
+  .android-device #kora-header-container {
+    /* En mode paysage avec clavier ouvert, assurer la visibilité */
+    position: absolute;
   }
 }
