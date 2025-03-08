@@ -2,19 +2,25 @@
  * Solution pour le header avec position sticky
  */
 
-/* Header toujours visible avec sticky - sans ligne de démarcation */
+/* Header toujours visible - complètement en haut de l'écran */
 #kora-header-container {
-  position: -webkit-sticky; /* Pour Safari */
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 56px;
-  z-index: 100;
+  z-index: 1000;
   background-color: white;
   /* S'assurer qu'il n'y a pas de bordure ni d'ombre */
   border-bottom: none !important;
   box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ajouter un espace pour compenser le header fixed */
+body {
+  padding-top: 56px !important;
 }
 
 /* S'assurer que le header reste bien en place */
@@ -34,10 +40,11 @@ input, textarea, select, button {
     overscroll-behavior: none;
   }
   
-  /* Forcer la position sticky sur mobile */
+  /* S'assurer que le header est bien fixé en haut sur mobile */
   #kora-header-container {
-    position: -webkit-sticky !important;
-    position: sticky !important;
+    position: fixed !important;
     top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
   }
 }

@@ -1,6 +1,6 @@
 /**
  * Script pour la gestion du viewport mobile
- * Optimisé pour conserver le header sticky visible avec le clavier
+ * Optimisé pour conserver le header fixed visible avec le clavier
  */
 
 export function setupMobileViewportFix() {
@@ -23,12 +23,15 @@ export function setupMobileViewportFix() {
   function setAppHeight() {
     document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     
-    // S'assurer que le header reste sticky
+    // S'assurer que le header reste bien en place
     const header = document.getElementById('kora-header-container');
     if (header) {
-      // Forcer la propriété de style directement
-      header.style.position = isIOS ? 'sticky' : '-webkit-sticky';
+      // Forcer la propriété de style directement pour garantir position fixed
+      header.style.position = 'fixed';
       header.style.top = '0';
+      header.style.left = '0';
+      header.style.right = '0';
+      header.style.zIndex = '1000';
     }
   }
   
@@ -36,26 +39,39 @@ export function setupMobileViewportFix() {
   setAppHeight();
   window.addEventListener('resize', setAppHeight);
   
-  // Traitement spécial pour iOS
-  if (isIOS && window.visualViewport) {
+  // Traitement spécial pour iOS avec visualViewport
+  if (window.visualViewport) {
     // Gérer la taille quand le clavier apparaît/disparaît
     window.visualViewport.addEventListener('resize', () => {
       setAppHeight();
       
-      // Forcer la visibilité du header sur iOS quand le clavier est ouvert
+      // Forcer le positionnement du header quand le clavier est ouvert
       const header = document.getElementById('kora-header-container');
       if (header) {
-        header.style.position = 'sticky';
+        header.style.position = 'fixed';
         header.style.top = '0';
       }
     });
   }
   
-  // S'assurer que le header reste visible même au scroll
+  // Forcer les styles au scroll pour garantir que le header reste visible
   window.addEventListener('scroll', () => {
     const header = document.getElementById('kora-header-container');
     if (header) {
+      header.style.position = 'fixed';
       header.style.top = '0';
     }
   });
+  
+  // Correction spéciale pour iOS quand le clavier s'ouvre
+  if (isIOS) {
+    document.addEventListener('focusin', (e) => {
+      const header = document.getElementById('kora-header-container');
+      if (header) {
+        // S'assurer que le header reste bien en haut même avec le clavier
+        header.style.position = 'fixed';
+        header.style.top = '0';
+      }
+    });
+  }
 }
