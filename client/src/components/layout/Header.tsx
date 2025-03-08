@@ -1,12 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import SideMenu from './SideMenu';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
+  // Fonction pour déboguer le click en mode dev
+  useEffect(() => {
+    console.log("Header monté, menu état initial:", isMenuOpen);
+  }, []);
+  
+  // Effet pour ajouter/supprimer la classe menu-open au body
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('menu-open');
+      console.log("Menu ouvert");
+    } else {
+      document.body.classList.remove('menu-open');
+      console.log("Menu fermé");
+    }
+    
+    return () => {
+      document.body.classList.remove('menu-open');
+    };
+  }, [isMenuOpen]);
+  
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    console.log("Toggle menu appelé, état actuel:", isMenuOpen);
+    setIsMenuOpen(prevState => !prevState);
   };
   
   return (
@@ -26,6 +47,7 @@ const Header: React.FC = () => {
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
               className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors"
               onClick={toggleMenu}
+              style={{ cursor: 'pointer' }}
             >
               {isMenuOpen ? (
                 <X size={24} className="text-gray-800 transition-transform duration-300" />
@@ -45,8 +67,14 @@ const Header: React.FC = () => {
         </div>
       </header>
       
-      {/* Menu latéral */}
-      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      {/* Menu latéral, rendu conditionnel pour debugger */}
+      {typeof SideMenu === 'function' ? (
+        <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+      ) : (
+        <div style={{position: 'fixed', top: '60px', left: '10px', zIndex: 3000, background: 'red', color: 'white', padding: '5px'}}>
+          Erreur: SideMenu n'est pas un composant valide
+        </div>
+      )}
     </>
   );
 };

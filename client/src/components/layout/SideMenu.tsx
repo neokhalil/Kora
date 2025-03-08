@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, Plus, BookOpen, MessageSquare } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 
 // Type pour les conversations récentes
 interface RecentConversation {
@@ -86,6 +86,13 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    console.log('Recherche pour:', searchQuery);
+                    onClose();
+                    window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+                  }
+                }}
               />
             </div>
           </div>
@@ -102,24 +109,30 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
           {/* Contenu du menu */}
           <div className="flex-1 overflow-y-auto p-4">
             {/* Bouton pour nouvelle conversation */}
-            <Link href="/chat">
-              <a className="flex items-center justify-center w-full mb-6 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" 
-                onClick={onClose}>
-                <Plus className="h-5 w-5 mr-2" />
-                <span>Nouvelle conversation</span>
-              </a>
-            </Link>
+            <button
+              className="flex items-center justify-center w-full mb-6 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => {
+                onClose();
+                window.location.href = '/chat';
+              }}
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              <span>Nouvelle conversation</span>
+            </button>
             
             {/* Section d'aide aux études */}
             <div className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Aide aux Études</h2>
-              <Link href="/chat-assistant">
-                <a className="flex items-center p-3 rounded-lg hover:bg-gray-100 transition-colors" 
-                  onClick={onClose}>
-                  <BookOpen className="h-5 w-5 mr-3 text-blue-600" />
-                  <span>Assistant Chat IA</span>
-                </a>
-              </Link>
+              <button
+                className="flex items-center w-full p-3 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => {
+                  onClose();
+                  window.location.href = '/chat-assistant';
+                }}
+              >
+                <BookOpen className="h-5 w-5 mr-3 text-blue-600" />
+                <span>Assistant Chat IA</span>
+              </button>
             </div>
             
             {/* Liste des conversations récentes */}
@@ -127,16 +140,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
               <h2 className="text-lg font-semibold mb-3">Conversations récentes</h2>
               <div className="space-y-1">
                 {recentConversations.map((convo) => (
-                  <Link key={convo.id} href={`/chat/${convo.id}`}>
-                    <a className="flex items-start p-3 rounded-lg hover:bg-gray-100 transition-colors" 
-                      onClick={onClose}>
-                      <MessageSquare className="h-5 w-5 mr-3 text-gray-500 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium line-clamp-1">{convo.title}</p>
-                        <p className="text-xs text-gray-500">{formatDate(convo.date)}</p>
-                      </div>
-                    </a>
-                  </Link>
+                  <button
+                    key={convo.id}
+                    className="flex items-start p-3 rounded-lg hover:bg-gray-100 transition-colors w-full text-left"
+                    onClick={() => {
+                      onClose();
+                      window.location.href = `/chat/${convo.id}`;
+                    }}
+                  >
+                    <MessageSquare className="h-5 w-5 mr-3 text-gray-500 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium line-clamp-1">{convo.title}</p>
+                      <p className="text-xs text-gray-500">{formatDate(convo.date)}</p>
+                    </div>
+                  </button>
                 ))}
               </div>
             </div>
