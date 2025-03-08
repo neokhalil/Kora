@@ -46,13 +46,8 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('keydown', handleEscapeKey);
   }, [isMenuOpen]);
   
-  // Récupérer les infos sur l'appareil
-  useEffect(() => {
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    if (isIOS) {
-      document.body.classList.add('ios-device');
-    }
-  }, []);
+  // Détection du système d'exploitation déplacée dans mobileViewportFix.ts
+  // pour centraliser la logique et éviter les redondances
   
   // Nous n'avons pas besoin d'un gestionnaire de clic sur document pour le débogage
   // Le clic est géré directement par l'événement onClick sur le bouton
@@ -95,7 +90,7 @@ const Header: React.FC = () => {
           id="kora-header"
         >
           {/* Menu button avec indicateur d'état */}
-          <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+          <div className="header-left-group">
             <button 
               id="kora-menu-button"
               ref={menuButtonRef}
@@ -115,18 +110,6 @@ const Header: React.FC = () => {
                 toggleMenu(syntheticEvent);
               }}
               className="kora-menu-button-control"
-              style={{ 
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                touchAction: 'manipulation',
-                position: 'relative',
-                zIndex: 10000 // S'assurer que le bouton est au-dessus de tout
-              }}
               data-state={isMenuOpen ? 'open' : 'closed'}
             >
               <div className="menu-icon-container">
@@ -142,8 +125,8 @@ const Header: React.FC = () => {
             <h1 id="kora-header-title">Kora</h1>
           </div>
           
-          {/* Empty div to balance the layout */}
-          <div style={{ width: '40px' }}></div>
+          {/* Empty div to balance the layout - style déplacé vers le CSS */}
+          <div></div>
         </div>
       </div>
       

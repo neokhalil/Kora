@@ -63,6 +63,11 @@
   flex: 1;
 }
 
+/* Élément de balancement pour l'équilibre du layout */
+#kora-header > div:last-child {
+  width: 40px;
+}
+
 /* Ajouter un espace pour compenser le header fixed */
 body {
   padding-top: 56px !important;
