@@ -705,16 +705,10 @@ header:not(#kora-header) {
   display: none !important;
 }
 
-/* Masquer le header quand le menu est ouvert sur mobile */
+/* Toujours afficher le header, même quand le menu est ouvert */
 body.menu-open #kora-header-container {
-  display: none !important;
-}
-
-/* Sur desktop, toujours afficher le header */
-@media (min-width: 768px) {
-  body.menu-open #kora-header-container {
-    display: block !important;
-  }
+  display: block !important;
+  z-index: 2000 !important;
 }
 
 /* Style pour le bouton de fermeture du menu */

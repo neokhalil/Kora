@@ -86,14 +86,7 @@ const SideNavigation = () => {
           paddingTop: 'var(--safe-area-top, 0px)'
         }}
       >
-        {/* Bouton flottant pour fermer le menu (visible seulement sur mobile) */}
-        <button
-          onClick={closeMenu}
-          className="menu-close-button md:hidden"
-          aria-label="Fermer le menu"
-        >
-          <X className="h-6 w-6" strokeWidth={2.5} />
-        </button>
+        {/* Le bouton de fermeture a été déplacé vers le header */}
         {/* Logo et titre */}
         <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
           <div className="flex items-center">
