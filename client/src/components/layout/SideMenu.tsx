@@ -27,14 +27,15 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [location, setLocation] = useLocation();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [readOnly, setReadOnly] = useState(true);
   
-  // Éléments fixes du menu (aide aux études)
+  // Éléments fixes du menu (aide aux devoirs)
   const menuItems: MenuItem[] = [
     { 
-      id: 'studies-help', 
-      title: 'Aide aux études', 
+      id: 'homework-help', 
+      title: 'Aide aux devoirs', 
       icon: <Book className="h-5 w-5 mr-3" />, 
-      href: '/chat' 
+      href: '/chat-assistant' 
     }
   ];
   
@@ -68,10 +69,13 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   }, [recentConversations, searchQuery]);
   
   // Ajuster le corps pour éviter le scroll quand le menu est ouvert
+  // et gérer l'état readOnly du champ de recherche pour éviter que le clavier
+  // ne s'ouvre automatiquement quand le menu est ouvert
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      // Ne pas mettre le focus automatiquement sur le champ de recherche
+      // Activer readOnly pour empêcher le clavier de s'ouvrir automatiquement
+      setReadOnly(true);
     } else {
       document.body.style.overflow = '';
     }
@@ -133,6 +137,8 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 placeholder="Rechercher"
                 className="block w-full pl-10 pr-10 py-3 rounded-full bg-gray-100 focus:outline-none"
                 value={searchQuery}
+                readOnly={readOnly}
+                onClick={() => setReadOnly(false)}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
