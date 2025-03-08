@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Plus, BookOpen, MessageSquare } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
@@ -17,6 +17,8 @@ interface SideMenuProps {
 
 const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [location, setLocation] = useLocation();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   
   // Exemple de conversations récentes (dans un cas réel, vous les récupéreriez d'une API)
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([
@@ -31,6 +33,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      // Mettre le focus sur le champ de recherche quand le menu s'ouvre
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 300);
     } else {
       document.body.style.overflow = '';
     }
@@ -39,6 +45,20 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+  
+  // Gestion de la touche Escape pour fermer le menu
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
   
   // Formater la date pour l'affichage
   const formatDate = (date: Date): string => {
@@ -82,6 +102,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Rechercher"
                 className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -91,9 +112,10 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
                     console.log('Recherche pour:', searchQuery);
                     onClose();
-                    window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`;
+                    setLocation(`/search?q=${encodeURIComponent(searchQuery)}`);
                   }
                 }}
+                aria-label="Rechercher des conversations ou des sujets"
               />
               
               {/* Bouton de réinitialisation de la recherche (apparaît uniquement quand il y a du texte) */}
@@ -121,30 +143,28 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
           {/* Contenu du menu */}
           <div className="flex-1 overflow-y-auto p-4">
             {/* Bouton pour nouvelle conversation */}
-            <button
+            <Link
+              href="/chat"
+              onClick={() => onClose()}
               className="flex items-center justify-center w-full mb-6 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              onClick={() => {
-                onClose();
-                window.location.href = '/chat';
-              }}
+              role="button"
             >
               <Plus className="h-5 w-5 mr-2" />
               <span>Nouvelle conversation</span>
-            </button>
+            </Link>
             
             {/* Section d'aide aux études */}
             <div className="mb-6">
               <h2 className="text-lg font-semibold mb-3">Aide aux Études</h2>
-              <button
+              <Link
+                href="/chat-assistant"
+                onClick={() => onClose()}
                 className="flex items-center w-full p-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 side-menu-item"
-                onClick={() => {
-                  onClose();
-                  window.location.href = '/chat-assistant';
-                }}
+                role="button"
               >
                 <BookOpen className="h-5 w-5 mr-3 text-blue-600" />
                 <span>Assistant Chat IA</span>
-              </button>
+              </Link>
             </div>
             
             {/* Liste des conversations récentes */}
@@ -152,20 +172,19 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
               <h2 className="text-lg font-semibold mb-3">Conversations récentes</h2>
               <div className="space-y-1">
                 {recentConversations.map((convo) => (
-                  <button
+                  <Link
                     key={convo.id}
+                    href={`/chat/${convo.id}`}
+                    onClick={() => onClose()}
                     className="flex items-start p-3 rounded-lg hover:bg-gray-100 transition-colors w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-300 side-menu-item"
-                    onClick={() => {
-                      onClose();
-                      window.location.href = `/chat/${convo.id}`;
-                    }}
+                    role="button"
                   >
                     <MessageSquare className="h-5 w-5 mr-3 text-gray-500 mt-0.5" />
                     <div className="flex-1">
                       <p className="text-sm font-medium line-clamp-1">{convo.title}</p>
                       <p className="text-xs text-gray-500">{formatDate(convo.date)}</p>
                     </div>
-                  </button>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -180,20 +199,17 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 </div>
                 <span className="font-medium">Ibrahima Ndiaye</span>
               </div>
-              <button 
-                className="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-100 focus:ring-2 focus:ring-blue-300"
+              <Link
+                href="/settings"
+                onClick={() => onClose()}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-100 focus:ring-2 focus:ring-blue-300 flex items-center justify-center"
                 aria-label="Paramètres du compte"
-                onClick={() => {
-                  onClose();
-                  // Rediriger vers les paramètres ou afficher un menu d'options
-                  window.location.href = '/settings';
-                }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
         </div>
