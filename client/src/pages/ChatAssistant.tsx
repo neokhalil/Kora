@@ -946,18 +946,47 @@ const ChatAssistant: React.FC = () => {
               
               {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
+                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 message-composer"
                 ref={composerRef}
+                id="message-composer"
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
                   document.body.classList.add('keyboard-open');
                   
-                  // Scroll vers la fin des messages après un court délai
+                  // S'assurer que le header reste visible
+                  const headerContainer = document.getElementById('kora-header-container');
+                  if (headerContainer) {
+                    headerContainer.style.position = 'fixed';
+                    headerContainer.style.top = '0';
+                    headerContainer.style.zIndex = '99999';
+                  }
+                  
+                  // Scroll vers la fin des messages et ajuster la position de la zone de saisie
                   setTimeout(() => {
                     if (messagesEndRef.current) {
                       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                     }
+                    
+                    // Ajuster la position de la zone de saisie pour qu'elle reste visible
+                    const composerElement = document.getElementById('message-composer');
+                    if (composerElement) {
+                      composerElement.style.position = 'sticky';
+                      composerElement.style.bottom = '0';
+                      composerElement.style.zIndex = '1000';
+                    }
                   }, 300);
+                }}
+                onBlur={() => {
+                  // Retirer la classe lorsque le focus est perdu - mais pas tout de suite
+                  // pour éviter les problèmes lors du passage entre les inputs
+                  setTimeout(() => {
+                    // Vérifier s'il n'y a pas d'autre élément focusé dans le composeur
+                    const activeElement = document.activeElement;
+                    const composerElement = document.getElementById('message-composer');
+                    if (composerElement && !composerElement.contains(activeElement)) {
+                      document.body.classList.remove('keyboard-open');
+                    }
+                  }, 200);
                 }}
               >
                 {/* Hidden file input pour les images */}
@@ -992,12 +1021,22 @@ const ChatAssistant: React.FC = () => {
                       // Marquer que le clavier est ouvert
                       document.body.classList.add('keyboard-open');
                       
-                      // S'assurer que le header fixe est visible
+                      // S'assurer que le header fixe est visible avec priorité maximale
                       const headerContainer = document.getElementById('kora-header-container');
                       if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.position = 'fixed';
                         headerContainer.style.top = '0';
-                        headerContainer.style.zIndex = '9999';
+                        headerContainer.style.zIndex = '99999';
+                        headerContainer.style.transform = 'translateZ(0)';
+                        headerContainer.style.webkitTransform = 'translateZ(0)';
+                      }
+                      
+                      // Ajuster la position de la zone de saisie pour qu'elle reste visible
+                      const composerElement = document.getElementById('message-composer');
+                      if (composerElement) {
+                        composerElement.style.position = 'sticky';
+                        composerElement.style.bottom = '0';
+                        composerElement.style.zIndex = '1000';
                       }
                       
                       // Scroll vers le bas après l'ouverture du clavier
