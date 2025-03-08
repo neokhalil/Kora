@@ -84,7 +84,8 @@ const SideNavigation = () => {
           isMenuOpen ? "translate-x-0 w-full" : "-translate-x-full w-full"
         )}
         style={{
-          paddingTop: 'calc(var(--header-height) + var(--safe-area-top, 0px))'
+          top: 'var(--header-height, 56px)',
+          paddingTop: 'var(--safe-area-top, 0px)'
         }}
       >
         {/* Le bouton de fermeture et le logo ont été déplacés vers le header */}

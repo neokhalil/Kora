@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --header-height: 56px;
+}
+
 /* Base styles appliqués globalement */
 @layer base {
   * {
