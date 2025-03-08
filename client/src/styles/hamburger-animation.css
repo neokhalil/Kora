@@ -37,7 +37,7 @@
   position: absolute;
   height: 2px;
   width: 100%;
-  background: #333;
+  background: #ff0000; /* Rouge pour tester si c'est appliqué */
   border-radius: 9px;
   opacity: 1;
   left: 0;
@@ -81,4 +81,23 @@
   top: 8px;
   transform: rotate(-135deg);
   width: 100%;
+}
+
+/* Styles pour cibler directement le bouton du menu dans le DOM */
+button[aria-label="Ouvrir le menu"],
+button[aria-label="Fermer le menu"] {
+  position: relative;
+  transition: transform 0.3s ease-in-out !important;
+}
+
+/* Styles pour le symbole hamburger */
+button[aria-label="Ouvrir le menu"] svg {
+  stroke: #ff0000 !important; /* Rouge pour tester */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Styles pour le symbole X quand le menu est ouvert */
+body.menu-open button[aria-label="Fermer le menu"] svg {
+  transform: rotate(90deg);
+  stroke: #ffffff !important;
 }
