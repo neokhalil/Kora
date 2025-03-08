@@ -765,6 +765,32 @@ body.menu-open #kora-header-container {
   width: 100%;
 }
 
+/* Styles spécifiques à l'icône hamburger visible dans l'UI */
+button[aria-label="Ouvrir le menu"],
+button[aria-label="Fermer le menu"] {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Styles pour l'icône hamburger simple (3 lignes) */
+button[aria-label="Ouvrir le menu"]::before {
+  content: '☰';
+  font-size: 24px;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Animation pour transformer en X quand le menu est ouvert */
+body.menu-open button[aria-label="Fermer le menu"]::before {
+  content: '✕';
+  font-size: 24px;
+  transform: rotate(180deg);
+}
+
+/* Cache l'icône originale pour la remplacer par notre version animée */
+button[aria-label="Ouvrir le menu"] svg,
+button[aria-label="Fermer le menu"] svg {
+  display: none;
+}
+
 /* Améliorer l'affichage des messages */
 .chat-message {
   position: relative;
