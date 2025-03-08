@@ -98,6 +98,9 @@ const Header: React.FC = () => {
           paddingTop: 'env(safe-area-inset-top, 0px)',
           zIndex: 9999,
           pointerEvents: 'none',
+          transform: 'translateZ(0)',
+          willChange: 'transform',
+          backgroundColor: 'white',
         }}
       >
         {/* Header content */}

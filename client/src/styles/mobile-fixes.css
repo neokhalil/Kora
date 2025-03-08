@@ -1,0 +1,59 @@
+/**
+ * mobile-fixes.css
+ * Contient des corrections CSS spécifiques aux appareils mobiles
+ */
+
+/* Assurer que le header reste visible en tout temps */
+#kora-header-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important;
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  background-color: white;
+}
+
+/* Ajustements spécifiques pour iOS */
+.ios-device #kora-header-container {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+}
+
+/* Assurer que les champs de texte ne déclenchent pas de zoom */
+input, textarea, select {
+  font-size: 16px !important;
+}
+
+/* Optimisations pour le défilement sur mobile */
+@media screen and (max-width: 767px) {
+  body {
+    overflow-x: hidden;
+    touch-action: pan-y;
+  }
+  
+  /* Empêcher le pull-to-refresh sur les appareils tactiles */
+  body, #root {
+    overscroll-behavior-y: none;
+  }
+  
+  /* Assurer que le contenu commence après le header */
+  #root {
+    padding-top: calc(var(--header-height) + var(--safe-area-top, 0px));
+  }
+}
+
+/* Corrections iOS pour le visualViewport */
+@supports (-webkit-touch-callout: none) {
+  #kora-header-container {
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  
+  input[type="text"], textarea {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}

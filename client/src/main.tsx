@@ -5,6 +5,7 @@ import "./index.css";
 import "./styles/math.css";
 import "./styles/animations.css"; // Animations pour l'interface utilisateur
 import "./math-mobile.css"; // Styles spécifiques pour les formules mathématiques sur mobile
+import "./styles/mobile-fixes.css"; // Corrections spécifiques pour les appareils mobiles
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
