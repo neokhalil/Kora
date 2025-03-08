@@ -634,45 +634,7 @@ input, textarea, select, button {
   font-weight: 500;
 }
 
-/* Classes pour le menu latéral */
-.menu-overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 950;
-  transition: opacity 150ms ease-in-out;
-}
-
-@media (min-width: 1024px) {
-  .menu-overlay {
-    display: none;
-  }
-}
-
-/* Assurer que le SideNavigation a un bon z-index */
-aside.side-navigation {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  z-index: 950;
-  background-color: white;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
-  max-width: 100%;
-}
-
-@media (min-width: 768px) {
-  aside.side-navigation {
-    top: calc(var(--header-height) + var(--safe-area-top));
-    width: auto;
-    max-width: 300px;
-  }
-}
+/* Styles du menu latéral maintenant gérés dans le composant SideNavigation */
 
 /* Style du bouton d'envoi */
 .send-button {
@@ -740,8 +702,6 @@ body.menu-open .menu-toggle-button .lucide-x {
 body.menu-open .menu-toggle-button .hamburger-lines {
   display: none !important;
 }
-
-/* Styles pour le menu maintenant gérés dans le header directement */
 
 /* Améliorer l'affichage des messages */
 .chat-message {
