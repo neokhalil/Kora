@@ -87,17 +87,13 @@ const SideNavigation = () => {
         }}
       >
         {/* Bouton flottant pour fermer le menu (visible seulement sur mobile) */}
-        <div className="absolute top-2 right-2 md:hidden z-20">
-          <Button
-            variant="default"
-            size="icon"
-            onClick={closeMenu}
-            className="rounded-full shadow-md bg-gray-800 text-white hover:bg-gray-700 h-10 w-10 border border-gray-700"
-            aria-label="Fermer le menu"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+        <button
+          onClick={closeMenu}
+          className="menu-close-button md:hidden"
+          aria-label="Fermer le menu"
+        >
+          <X className="h-6 w-6" strokeWidth={2.5} />
+        </button>
         {/* Logo et titre */}
         <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
           <div className="flex items-center">
@@ -110,12 +106,12 @@ const SideNavigation = () => {
         
         {/* Zone de recherche globale (comme dans la capture d'écran) */}
         <div className="px-3 py-2">
-          <div className="relative flex items-center bg-gray-100 rounded-full h-10">
-            <Search className="h-5 w-5 text-gray-500 ml-3" />
-            <Input
+          <div className="bg-gray-100 rounded-full px-3 flex items-center">
+            <Search className="h-5 w-5 text-gray-500 flex-shrink-0" />
+            <input
               type="text"
               placeholder="Rechercher"
-              className="h-10 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 pl-2"
+              className="h-10 w-full bg-transparent border-0 focus:outline-none text-gray-800 ml-2"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />

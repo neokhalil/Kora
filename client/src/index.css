@@ -717,6 +717,24 @@ body.menu-open #kora-header-container {
   }
 }
 
+/* Style pour le bouton de fermeture du menu */
+.menu-close-button {
+  position: fixed !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 2000 !important;
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 50% !important;
+  background-color: #000 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+}
+
 /* Améliorer l'affichage des messages */
 .chat-message {
   position: relative;
