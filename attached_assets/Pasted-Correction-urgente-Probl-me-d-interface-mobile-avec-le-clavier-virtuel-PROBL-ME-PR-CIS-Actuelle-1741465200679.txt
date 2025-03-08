@@ -1,0 +1,119 @@
+Correction urgente : Problème d'interface mobile avec le clavier virtuel
+
+PROBLÈME PRÉCIS :
+Actuellement, lorsque le clavier virtuel s'ouvre sur mobile, l'ensemble de l'application est poussé vers le haut et traité comme étant "derrière" le clavier. Je ne peux pas voir simultanément le header et la zone de composition, ce qui rend l'expérience utilisateur frustrante.
+
+COMPORTEMENT SOUHAITÉ :
+- Le header doit rester visible en haut de l'écran même quand le clavier est ouvert
+- La zone de composition (où l'utilisateur tape) doit rester visible juste au-dessus du clavier
+- La zone de contenu au milieu doit être scrollable sans affecter la position du header et de la zone de composition
+
+SOLUTION TECHNIQUE DEMANDÉE :
+
+1. CONFIGURATION DU VIEWPORT :
+   - Mettre à jour la balise meta viewport pour gérer correctement la hauteur : 
+   ```html
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height, viewport-fit=cover, user-scalable=no">
+   ```
+
+2. IMPLÉMENTATION DU GESTIONNAIRE DE CLAVIER :
+   - Intégrer l'API visualViewport pour détecter précisément les changements de dimensions lors de l'ouverture du clavier
+   - Ajouter le hook suivant dans le composant principal :
+
+   ```jsx
+   useEffect(() => {
+     function handleVisualViewportChange() {
+       const viewportHeight = window.visualViewport?.height || window.innerHeight;
+       document.documentElement.style.setProperty('--viewport-height', `${viewportHeight}px`);
+       
+       // Ajuster la position du composer pour qu'il reste visible au-dessus du clavier
+       const composer = document.querySelector('.composer'); // Sélecteur à adapter
+       if (composer) {
+         const viewportBottom = window.visualViewport?.offsetTop + window.visualViewport?.height;
+         composer.style.bottom = `${window.innerHeight - viewportBottom}px`;
+       }
+     }
+     
+     if (window.visualViewport) {
+       window.visualViewport.addEventListener('resize', handleVisualViewportChange);
+       window.visualViewport.addEventListener('scroll', handleVisualViewportChange);
+     } else {
+       window.addEventListener('resize', handleVisualViewportChange);
+     }
+     
+     handleVisualViewportChange(); // Initialisation
+     
+     return () => {
+       if (window.visualViewport) {
+         window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
+         window.visualViewport.removeEventListener('scroll', handleVisualViewportChange);
+       } else {
+         window.removeEventListener('resize', handleVisualViewportChange);
+       }
+     };
+   }, []);
+   ```
+
+3. STRUCTURE CSS À METTRE EN PLACE :
+   ```css
+   :root {
+     --viewport-height: 100vh;
+   }
+   
+   .app-container {
+     display: flex;
+     flex-direction: column;
+     height: var(--viewport-height);
+     overflow: hidden;
+     position: fixed;
+     top: 0;
+     left: 0;
+     right: 0;
+     bottom: 0;
+   }
+   
+   .header {
+     position: sticky;
+     top: 0;
+     z-index: 100;
+     background-color: #fff; /* Adapter selon votre design */
+   }
+   
+   .scrollable-content {
+     flex-grow: 1;
+     overflow-y: auto;
+     -webkit-overflow-scrolling: touch;
+   }
+   
+   .composer {
+     position: sticky;
+     bottom: 0;
+     z-index: 100;
+     background-color: #fff; /* Adapter selon votre design */
+   }
+   ```
+
+4. STRUCTURE JSX RECOMMANDÉE :
+   ```jsx
+   <div className="app-container">
+     <header className="header">
+       {/* Contenu du header */}
+     </header>
+     
+     <main className="scrollable-content">
+       {/* Contenu principal scrollable */}
+     </main>
+     
+     <div className="composer">
+       {/* Zone de composition */}
+     </div>
+   </div>
+   ```
+
+5. TESTS À EFFECTUER :
+   - Vérifier sur iOS et Android (leurs comportements diffèrent)
+   - Tester l'ouverture/fermeture du clavier dans différentes positions de scroll
+   - Vérifier que la saisie de texte fonctionne correctement
+   - S'assurer que le contenu reste accessible par défilement entre le header et la zone de composition
+
+Cette solution utilise les API modernes du navigateur pour résoudre ce problème complexe d'interaction entre le clavier virtuel et l'interface utilisateur.
