@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, X, Plus, BookOpen, MessageSquare } from 'lucide-react';
+import { Search, Book } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 
 // Type pour les conversations récentes
@@ -22,11 +22,11 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   
   // Exemple de conversations récentes (dans un cas réel, vous les récupéreriez d'une API)
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([
-    { id: '1', title: 'Aide aux devoirs de mathématiques', date: new Date(2025, 2, 8) },
-    { id: '2', title: 'Questions de physique', date: new Date(2025, 2, 7) },
-    { id: '3', title: 'Exercice de français', date: new Date(2025, 2, 6) },
-    { id: '4', title: 'Préparation exposé histoire', date: new Date(2025, 2, 5) },
-    { id: '5', title: 'Révisions pour examen final', date: new Date(2025, 2, 4) }
+    { id: '1', title: 'Texte aléatoire et aide', date: new Date(2025, 2, 8) },
+    { id: '2', title: 'English-speaking Sub-Saharan Africa', date: new Date(2025, 2, 7) },
+    { id: '3', title: 'Équation différentielle expliquée', date: new Date(2025, 2, 6) },
+    { id: '4', title: 'Verbe dans la phrase', date: new Date(2025, 2, 5) },
+    { id: '5', title: 'ICT Growth in Kenya 2024', date: new Date(2025, 2, 4) }
   ]);
   
   // Ajuster le corps pour éviter le scroll quand le menu est ouvert
@@ -59,23 +59,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
       window.removeEventListener('keydown', handleEscapeKey);
     };
   }, [isOpen, onClose]);
-  
-  // Formater la date pour l'affichage
-  const formatDate = (date: Date): string => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    if (date.toDateString() === today.toDateString()) {
-      return "Aujourd'hui";
-    }
-    
-    if (date.toDateString() === yesterday.toDateString()) {
-      return "Hier";
-    }
-    
-    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-  };
 
   return (
     <>
@@ -87,16 +70,24 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
         onClick={onClose}
       />
       
-      {/* Menu latéral */}
+      {/* Menu latéral simplifié selon la capture d'écran */}
       <div
         className={`fixed top-0 left-0 h-full w-full bg-white z-[1001] transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        style={{ 
+          paddingTop: 'env(safe-area-inset-top, 0px)', 
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
+        }}
       >
         <div className="flex flex-col h-full">
-          {/* En-tête du menu avec champ de recherche */}
-          <div className="p-4 border-b relative">
+          {/* En-tête du menu */}
+          <div className="px-4 py-5 flex items-center border-b border-gray-200">
+            <h1 className="text-2xl font-bold ml-2">KORA</h1>
+          </div>
+          
+          {/* Champ de recherche */}
+          <div className="px-4 py-3">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
@@ -104,112 +95,62 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Rechercher"
-                className="block w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Search"
+                className="block w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
-                    console.log('Recherche pour:', searchQuery);
                     onClose();
                     setLocation(`/search?q=${encodeURIComponent(searchQuery)}`);
                   }
                 }}
-                aria-label="Rechercher des conversations ou des sujets"
+                aria-label="Rechercher"
               />
-              
-              {/* Bouton de réinitialisation de la recherche (apparaît uniquement quand il y a du texte) */}
-              {searchQuery && (
-                <button 
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                  onClick={() => setSearchQuery('')}
-                  aria-label="Effacer la recherche"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
             </div>
-            
-            {/* Bouton pour fermer le menu (visible seulement sur mobile) */}
-            <button
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              onClick={onClose}
-              aria-label="Fermer le menu"
-            >
-              <X className="h-6 w-6 text-gray-600" />
-            </button>
           </div>
           
-          {/* Contenu du menu */}
-          <div className="flex-1 overflow-y-auto p-4">
-            {/* Bouton pour nouvelle conversation */}
+          {/* Section Aide aux devoirs */}
+          <div className="mt-2 px-4">
             <Link
-              href="/chat"
+              href="/chat-assistant"
               onClick={() => onClose()}
-              className="flex items-center justify-center w-full mb-6 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="flex items-center py-3 hover:bg-gray-100 transition-colors"
               role="button"
             >
-              <Plus className="h-5 w-5 mr-2" />
-              <span>Nouvelle conversation</span>
+              <Book className="h-5 w-5 mr-3" />
+              <span className="font-medium">Aide aux devoirs</span>
             </Link>
-            
-            {/* Section d'aide aux études */}
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold mb-3">Aide aux Études</h2>
-              <Link
-                href="/chat-assistant"
-                onClick={() => onClose()}
-                className="flex items-center w-full p-3 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 side-menu-item"
-                role="button"
-              >
-                <BookOpen className="h-5 w-5 mr-3 text-blue-600" />
-                <span>Assistant Chat IA</span>
-              </Link>
-            </div>
-            
-            {/* Liste des conversations récentes */}
-            <div>
-              <h2 className="text-lg font-semibold mb-3">Conversations récentes</h2>
-              <div className="space-y-1">
-                {recentConversations.map((convo) => (
-                  <Link
-                    key={convo.id}
-                    href={`/chat/${convo.id}`}
-                    onClick={() => onClose()}
-                    className="flex items-start p-3 rounded-lg hover:bg-gray-100 transition-colors w-full text-left focus:outline-none focus:ring-2 focus:ring-blue-300 side-menu-item"
-                    role="button"
-                  >
-                    <MessageSquare className="h-5 w-5 mr-3 text-gray-500 mt-0.5" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium line-clamp-1">{convo.title}</p>
-                      <p className="text-xs text-gray-500">{formatDate(convo.date)}</p>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
           
-          {/* Pied de menu avec informations utilisateur et options */}
-          <div className="border-t p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold mr-3">
-                  I
-                </div>
-                <span className="font-medium">Ibrahima Ndiaye</span>
-              </div>
+          {/* Section Conversations récentes */}
+          <div className="mt-6 px-4">
+            <div className="uppercase text-sm font-semibold text-gray-600 mb-3">
+              CONVERSATIONS RÉCENTES
+            </div>
+            {recentConversations.map((convo) => (
               <Link
-                href="/settings"
+                key={convo.id}
+                href={`/chat/${convo.id}`}
                 onClick={() => onClose()}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none p-1 rounded-full hover:bg-gray-100 focus:ring-2 focus:ring-blue-300 flex items-center justify-center"
-                aria-label="Paramètres du compte"
+                className="block py-3 hover:bg-gray-100 transition-colors"
+                role="button"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+                <span className="text-sm">{convo.title}</span>
               </Link>
+            ))}
+          </div>
+          
+          {/* Pied de menu avec informations utilisateur */}
+          <div className="mt-auto border-t p-4">
+            <div className="flex items-center">
+              <div className="w-6 h-6 text-center font-medium mr-3">
+                I
+              </div>
+              <span className="font-medium">Ibrahima Ndiaye</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-auto" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </div>
           </div>
         </div>
