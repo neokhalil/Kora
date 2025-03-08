@@ -75,6 +75,22 @@
 /* Modification spécifique quand le clavier est ouvert */
 body.keyboard-open .message-composer {
   position: absolute !important;
+  bottom: 0 !important;
+  transform: translateY(0) !important;
+  z-index: 9998 !important;
+  padding-bottom: 8px !important; /* Réduit le padding pour maximiser l'espace */
+}
+
+/* Spécifique à iOS avec clavier ouvert */
+body.keyboard-open.ios-device .message-composer {
+  position: fixed !important; /* iOS a besoin de fixed pour rester visible */
+  padding-bottom: 8px !important; /* Plus d'espace pour iOS */
+}
+
+/* Style pour le Textarea quand le clavier est ouvert */
+body.keyboard-open .message-input {
+  min-height: 36px !important; /* Réduit légèrement la hauteur */
+  max-height: 80px !important; /* Limite la hauteur maximale */
 }
 
 /* Support de différentes orientations */

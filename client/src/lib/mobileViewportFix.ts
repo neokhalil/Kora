@@ -145,26 +145,38 @@ export function setupMobileViewportFix() {
    * Fonction qui garantit que la zone de composition reste bien positionnée
    */
   function ensureComposerPosition() {
+    // Chercher d'abord l'élément avec la classe dédiée message-composer
     const composer = document.querySelector('.message-composer') as HTMLElement;
-    if (!composer) return;
+    // S'il n'existe pas, chercher le conteneur de composer générique
+    if (!composer) {
+      const composerFallback = document.querySelector('.composer-container') as HTMLElement;
+      if (!composerFallback) return;
+    }
     
-    if (isKeyboardVisible) {
-      // Quand le clavier est visible, ajuster la position
-      if (isAndroid) {
-        composer.style.position = 'absolute';
-        composer.style.bottom = '0';
-      } else if (isIOS) {
-        composer.style.position = 'fixed';
-        composer.style.bottom = '0';
-      }
-    } else {
-      // Quand le clavier n'est pas visible, revenir à la position normale
-      if (window.innerWidth < 1024) { // Mobile et tablette
-        composer.style.position = 'fixed';
-        composer.style.bottom = 'env(safe-area-inset-bottom, 0)';
-      } else { // Desktop
-        composer.style.position = 'sticky';
-        composer.style.bottom = '0';
+    // Si l'élément existe, ajuster sa position
+    if (composer) {
+      if (isKeyboardVisible) {
+        // Quand le clavier est visible, ajuster la position
+        if (isAndroid) {
+          composer.style.position = 'absolute';
+          composer.style.bottom = '0';
+          // Sur Android, ajouter un peu d'espace pour éviter que le texte ne soit caché
+          composer.style.paddingBottom = '8px';
+        } else if (isIOS) {
+          composer.style.position = 'fixed';
+          composer.style.bottom = '0';
+          // Sur iOS, ajuster pour éviter la barre du clavier
+          composer.style.paddingBottom = 'env(safe-area-inset-bottom, 8px)';
+        }
+      } else {
+        // Quand le clavier n'est pas visible, revenir à la position normale
+        if (window.innerWidth < 1024) { // Mobile et tablette
+          composer.style.position = 'fixed';
+          composer.style.bottom = 'env(safe-area-inset-bottom, 0)';
+        } else { // Desktop
+          composer.style.position = 'sticky';
+          composer.style.bottom = '0';
+        }
       }
     }
   }
