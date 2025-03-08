@@ -679,7 +679,7 @@ body.menu-open #kora-header-container {
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
-  background: #ffffff !important;
+  background: #0000ff !important; /* Changé pour bleu */
 }
 
 /* Styles du menu hamburger */
@@ -776,6 +776,7 @@ button[aria-label="Ouvrir le menu"]::before {
   content: '☰';
   font-size: 24px;
   transition: transform 0.3s ease-in-out;
+  color: #ff0000 !important; /* Rouge */
 }
 
 /* Animation pour transformer en X quand le menu est ouvert */

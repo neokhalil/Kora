@@ -20,10 +20,11 @@ const Header: React.FC = () => {
   return (
     <header 
       id="kora-header-container"
-      className="app-header bg-white w-full border-b border-gray-200 fixed top-0 left-0 right-0 z-[2000]"
+      className="app-header w-full border-b border-gray-200 fixed top-0 left-0 right-0 z-[2000]"
       style={{
         height: 'var(--header-height)',
         paddingTop: 'var(--safe-area-top, 0px)',
+        backgroundColor: 'lightblue',
       }}
     >
       <div className="flex items-center justify-between px-4 h-full">
