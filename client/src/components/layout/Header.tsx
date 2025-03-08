@@ -89,29 +89,16 @@ const Header: React.FC = () => {
       {/* Header container qui correspond au style dans index.html */}
       <div 
         id="kora-header-container"
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '56px',
-          zIndex: 9999,
-          backgroundColor: 'white',
-          transform: 'translateZ(0)',
-          willChange: 'transform',
-        }}
       >
         {/* Header content */}
         <div 
           id="kora-header"
           style={{
-            backgroundColor: 'white',
             height: '56px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 1rem',
-            pointerEvents: 'auto',
+            padding: '0 1rem'
           }}
         >
           {/* Menu button avec indicateur d'état */}
