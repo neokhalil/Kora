@@ -106,20 +106,19 @@ const ChatAssistant: React.FC = () => {
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Initialiser la solution pour le viewport mobile
       setupMobileViewportFix();
       
-      // Forcer le repositionnement dès le chargement pour éviter l'espace blanc initial
-      document.body.classList.add('keyboard-open');
+      // Nettoyer toute classe incorrecte au chargement
+      document.body.classList.remove('keyboard-open');
       
-      // Simuler un clic pour déclencher le repositionnement
+      // Assurer la hauteur initiale correcte et le viewport stable
       setTimeout(() => {
-        // Forcer le rendu de la page complète
+        // Forcer un petit recalcul du viewport pour iOS et Android
         window.scrollTo(0, 1);
         window.scrollTo(0, 0);
-      }, 100);
-      
-      // S'assurer que la hauteur initiale du textarea est correcte au chargement
-      setTimeout(() => {
+        
+        // Réinitialiser la hauteur des zones de texte
         const textareas = document.querySelectorAll('.chat-textarea');
         textareas.forEach((textarea) => {
           const el = textarea as HTMLTextAreaElement;
@@ -127,6 +126,12 @@ const ChatAssistant: React.FC = () => {
         });
       }, 100);
     }
+    
+    // Nettoyage à la sortie du composant
+    return () => {
+      // Retirer les classes qui pourraient persister
+      document.body.classList.remove('keyboard-open');
+    };
   }, []);
 
   // Détecter l'appareil mobile
@@ -151,49 +156,39 @@ const ChatAssistant: React.FC = () => {
     });
   }, [messages, isThinking]);
   
-  // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
+  // Comportement spécifique pour les champs de texte du chat
   useEffect(() => {
-    // Gestion des événements de focus
-    const handleFocusIn = () => {
-      // Assurer que le clavier s'ouvre correctement
-      document.body.classList.add('keyboard-open');
-    };
-    
-    const handleFocusOut = () => {
-      // Retirer la classe quand un champ perd le focus
-      document.body.classList.remove('keyboard-open');
-    };
-    
-    // Gestion des événements du Visual Viewport API (pour iOS)
-    const handleVisualViewportChange = () => {
-      const vv = window.visualViewport;
-      if (vv && vv.height < window.innerHeight) {
-        document.body.classList.add('keyboard-open');
-        document.body.classList.add('visual-viewport-active');
-      } else {
-        document.body.classList.remove('keyboard-open');
-        document.body.classList.remove('visual-viewport-active');
+    // Fonction pour assurer que le champ de texte est visible
+    const ensureTextareaVisible = (event: FocusEvent) => {
+      const targetElement = event.target as HTMLElement;
+      // Vérifier si c'est un champ de saisie ou textarea
+      if (targetElement && (targetElement.tagName === 'INPUT' || targetElement.tagName === 'TEXTAREA')) {
+        // Attendre que le clavier soit complètement ouvert
+        setTimeout(() => {
+          targetElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, 300);
       }
     };
     
-    // Enregistrement des écouteurs d'événements
-    document.addEventListener('focusin', handleFocusIn);
-    document.addEventListener('focusout', handleFocusOut);
+    // Fonction pour ajuster la hauteur du textarea lors de la saisie
+    const adjustTextareaHeight = (event: FocusEvent) => {
+      const targetElement = event.target as HTMLElement;
+      if (targetElement && targetElement.classList.contains('chat-textarea')) {
+        // Garantir que le textarea commence à la bonne taille
+        const textarea = targetElement as HTMLTextAreaElement;
+        textarea.style.height = '40px';
+        textarea.style.height = `${textarea.scrollHeight}px`;
+      }
+    };
     
-    // Si VisualViewport API est disponible (principalement iOS)
-    if (window.visualViewport) {
-      document.body.classList.add('visual-viewport-supported');
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-    }
+    // Ajouter les écouteurs pour cette fonctionnalité spécifique
+    document.addEventListener('focusin', ensureTextareaVisible);
+    document.addEventListener('focusin', adjustTextareaHeight);
     
     // Fonction de nettoyage
     return () => {
-      document.removeEventListener('focusin', handleFocusIn);
-      document.removeEventListener('focusout', handleFocusOut);
-      
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
-      }
+      document.removeEventListener('focusin', ensureTextareaVisible);
+      document.removeEventListener('focusin', adjustTextareaHeight);
     };
   }, []);
   
