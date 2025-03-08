@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMenu } from '@/hooks/use-menu';
+import { Menu, X } from 'lucide-react';
 
 const Header: React.FC = () => {
   const { toggleMenu, isMenuOpen } = useMenu();
@@ -33,14 +34,17 @@ const Header: React.FC = () => {
           <button 
             onClick={toggleMenu}
             aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-            className={`menu-toggle-button ${isMenuOpen ? 'menu-open' : ''}`}
+            className="menu-toggle-button flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300"
+            style={{
+              backgroundColor: isMenuOpen ? '#000' : 'transparent',
+            }}
           >
-            {/* Icône hamburger avec animation en X */}
-            <div className="hamburger-icon">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
+            {/* Utilise directement les icônes Lucide pour s'assurer que cela fonctionne */}
+            {isMenuOpen ? (
+              <X size={24} className="text-white transition-transform duration-300" />
+            ) : (
+              <Menu size={24} className="text-gray-800 transition-transform duration-300" />
+            )}
           </button>
         </div>
         
