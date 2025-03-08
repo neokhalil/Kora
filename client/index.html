@@ -161,11 +161,10 @@
           });
         }
         
-        // Exposer une fonction globale pour permettre au Header React de savoir quand le toggle-menu est activé
-        window.toggleKoraMenu = function() {
-          // Cette fonction sera appelée par le Header React
-          document.dispatchEvent(new CustomEvent('toggle-menu'));
-        };
+        // Écouter les événements de toggle du menu depuis le composant React
+        document.addEventListener('kora-menu-toggle', function(event) {
+          console.log("Menu toggle event received:", event);
+        });
       }
       
       // Initialisation complète quand la page est chargée

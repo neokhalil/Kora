@@ -74,12 +74,14 @@ const Header: React.FC = () => {
       const newState = !prevState;
       console.log("[Debug Header] Setting menu state to:", newState);
       
-      // Si window.toggleKoraMenu existe (défini dans index.html), on l'appelle pour maintenir la cohérence
-      if (typeof window !== 'undefined' && window.toggleKoraMenu) {
+      // Déclencher un événement personnalisé pour informer d'autres parties de l'application
+      if (typeof window !== 'undefined') {
         try {
-          window.toggleKoraMenu();
+          document.dispatchEvent(new CustomEvent('kora-menu-toggle', { 
+            detail: { isOpen: newState } 
+          }));
         } catch (err) {
-          console.error("[Debug Header] Error calling window.toggleKoraMenu:", err);
+          console.error("[Debug Header] Error dispatching custom event:", err);
         }
       }
       
@@ -89,32 +91,58 @@ const Header: React.FC = () => {
   
   return (
     <>
-      <header 
+      {/* Header container qui correspond au style dans index.html */}
+      <div 
         id="kora-header-container"
-        className="app-header w-full border-b border-gray-200 fixed top-0 left-0 right-0 z-[2000] bg-white"
         style={{
-          height: '56px',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 'calc(56px + env(safe-area-inset-top, 0px))',
           paddingTop: 'env(safe-area-inset-top, 0px)',
+          zIndex: 9999,
+          pointerEvents: 'none',
         }}
       >
-        <div className="flex items-center justify-between px-4 h-full">
+        {/* Header content */}
+        <div 
+          id="kora-header"
+          style={{
+            backgroundColor: 'white',
+            height: '56px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 1rem',
+            pointerEvents: 'auto',
+            borderBottom: '1px solid #eaeaea',
+          }}
+        >
           {/* Menu button avec indicateur d'état */}
-          <div className="flex items-center">
+          <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             <button 
+              id="kora-menu-button"
               ref={menuButtonRef}
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-              className={`flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300 ${isMenuOpen ? 'bg-gray-100' : ''}`}
               onClick={toggleMenu}
               onTouchStart={(e) => {
-                // Sur mobile, ajouter un événement tactile explicite pour éviter les délais
                 console.log("[Debug Header] TouchStart on menu button");
               }}
               onTouchEnd={(e) => {
                 console.log("[Debug Header] TouchEnd on menu button");
-                e.preventDefault(); // Empêcher le comportement par défaut qui pourrait interférer
-                // Le clic sera géré par l'événement onClick
+                e.preventDefault();
               }}
-              style={{ cursor: 'pointer', touchAction: 'manipulation' }}
+              style={{ 
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                touchAction: 'manipulation'
+              }}
               data-state={isMenuOpen ? 'open' : 'closed'}
             >
               <div className="menu-icon-container">
@@ -125,17 +153,22 @@ const Header: React.FC = () => {
                 )}
               </div>
             </button>
-          </div>
-          
-          {/* Logo in center */}
-          <div className="flex items-center justify-center">
-            <h1 className="text-xl font-bold tracking-tight">Kora</h1>
+            
+            {/* Logo */}
+            <h1 id="kora-header-title" style={{
+              fontFamily: "'Elza', sans-serif",
+              fontSize: '1.5rem',
+              fontWeight: 900,
+              letterSpacing: '-0.025em',
+              textTransform: 'uppercase',
+              marginLeft: '8px'
+            }}>Kora</h1>
           </div>
           
           {/* Empty div to balance the layout */}
-          <div className="w-10"></div>
+          <div style={{ width: '40px' }}></div>
         </div>
-      </header>
+      </div>
       
       {/* Menu latéral */}
       <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
