@@ -86,41 +86,43 @@ const SideNavigation = () => {
           paddingTop: 'var(--safe-area-top, 0px)'
         }}
       >
+        {/* Logo et titre */}
+        <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
+                <span className="text-gray-700 text-lg font-bold">K</span>
+              </div>
+              <h1 className="text-lg font-bold text-gray-800">Kora</h1>
+            </div>
+            
+            {/* Bouton de fermeture du menu - visible uniquement sur mobile */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={closeMenu}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+        
         {/* Zone de recherche globale (comme dans la capture d'écran) */}
-        <div className="p-3 border-b border-gray-200 flex items-center">
-          <div className="relative bg-gray-100 rounded-full flex-1">
+        <div className="p-3 border-b border-gray-200">
+          <div className="relative bg-gray-100 rounded-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-500" />
             </div>
             <Input
               type="text"
-              placeholder="Search"
+              placeholder="Rechercher"
               className="pl-10 pr-4 py-2 w-full bg-gray-100 border-none text-sm rounded-full h-10"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
             />
-          </div>
-          
-          {/* Bouton de fermeture du menu - visible uniquement sur mobile */}
-          <div className="md:hidden ml-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={closeMenu}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* Logo et titre */}
-        <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
-              <span className="text-gray-700 text-lg font-bold">K</span>
-            </div>
-            <h1 className="text-lg font-bold text-gray-800">Kora</h1>
           </div>
         </div>
         

@@ -12,7 +12,7 @@ const Header: React.FC = () => {
       id="kora-header-container"
       className={cn(
         "app-header bg-white w-full border-b border-gray-200 relative z-40",
-        isMenuOpen && "md:block hidden" // Cache le header sur mobile quand le menu est ouvert
+        isMenuOpen ? "hidden" : "block" // Cache complètement le header quand le menu est ouvert
       )}
       style={{
         height: 'var(--header-height)',
