@@ -14,6 +14,8 @@
   will-change: transform;
   backface-visibility: hidden;
   background-color: white;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Ajustements spécifiques pour iOS */
@@ -24,7 +26,7 @@
 
 /* Assurer que les champs de texte ne déclenchent pas de zoom */
 input, textarea, select {
-  font-size: 16px !important;
+  font-size: 16px !important; 
 }
 
 /* Optimisations pour le défilement sur mobile */
@@ -45,6 +47,26 @@ input, textarea, select {
   }
 }
 
+/* Styles spécifiques quand le clavier est ouvert */
+body.keyboard-open #kora-header-container,
+body.input-focused #kora-header-container {
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: fixed !important;
+}
+
+/* Assurer que les éléments actifs sont visibles lorsque le clavier est ouvert */
+body.keyboard-open .active-input,
+body.input-focused .active-input {
+  padding-bottom: 200px;
+}
+
+/* Correction pour éviter que le footer cache le champ actif */
+body.keyboard-open footer,
+body.input-focused footer {
+  display: none;
+}
+
 /* Corrections iOS pour le visualViewport */
 @supports (-webkit-touch-callout: none) {
   #kora-header-container {
@@ -56,4 +78,24 @@ input, textarea, select {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
+  
+  /* Empêcher que le site "saute" lorsque le clavier s'ouvre */
+  html, body {
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  #root {
+    overflow-y: auto;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Désactiver les animations pendant que le clavier est ouvert pour de meilleures performances */
+body.keyboard-open * {
+  animation: none !important;
+  transition: none !important;
 }
