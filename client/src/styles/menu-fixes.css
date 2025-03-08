@@ -1,84 +1,9 @@
-/* Styles CSS pour corriger le problème de fond gris sur le menu latéral */
-
-/* Reset complet des styles pour forcer le mode clair */
+/* Fichier vide - tous les styles liés au menu latéral ont été supprimés */
+/* Conserver uniquement la préférence de mode clair pour toute l'application */
 :root {
   color-scheme: light !important;
 }
 
-/* Forcer le fond blanc sur le menu latéral et tous les éléments internes */
-aside.side-navigation {
-  background-color: white !important;
-  background: white !important;
-  color: #000 !important;
-  border-color: #e5e7eb !important;
-  --tw-bg-opacity: 1 !important;
-  --tw-text-opacity: 1 !important;
-  --tw-border-opacity: 1 !important;
-}
-
-/* S'assurer que tous les éléments du menu ont une couleur de texte sombre */
-aside.side-navigation * {
-  color: #000 !important;
-  border-color: #e5e7eb !important;
-  --tw-text-opacity: 1 !important;
-  --tw-border-opacity: 1 !important;
-}
-
-/* Forcer le fond blanc pour tous les conteneurs dans le menu latéral */
-aside.side-navigation > div,
-aside.side-navigation > div > div,
-aside.side-navigation > div > div > div {
-  background-color: white !important;
-  --tw-bg-opacity: 1 !important;
-}
-
-/* Styles spécifiques pour les éléments interactifs */
-aside.side-navigation div,
-aside.side-navigation span,
-aside.side-navigation p,
-aside.side-navigation h1,
-aside.side-navigation h2,
-aside.side-navigation h3 {
-  color: #000 !important;
-  --tw-text-opacity: 1 !important;
-}
-
-/* Style pour les éléments survolés */
-aside.side-navigation [class*="hover:bg"] {
-  --tw-bg-opacity: 1 !important;
-}
-
-aside.side-navigation [class*="hover:bg"]:hover {
-  background-color: #f0f0f0 !important;
-  --tw-bg-opacity: 1 !important;
-}
-
-/* Correction pour les entrées de recherche - style mis à jour */
-aside.side-navigation .bg-gray-100 {
-  background-color: #f0f0f0 !important;
-  border-radius: 9999px !important; /* Pour assurer les coins arrondis */
-}
-
-aside.side-navigation input {
-  background-color: transparent !important;
-  color: #000 !important;
-  border-color: transparent !important;
-  --tw-text-opacity: 1 !important;
-}
-
-/* S'assurer que le conteneur de recherche a les bonnes propriétés */
-aside.side-navigation .px-3.py-2 {
-  padding: 0.5rem 0.75rem !important;
-}
-
-/* Assurer que le menu a un z-index supérieur à l'overlay */
-.side-navigation {
-  z-index: 1000 !important;
-}
-
-/* L'overlay du menu est maintenant géré dans SideNavigation.tsx */
-
-/* Force le mode lumineux globalement */
 body {
   color-scheme: light !important;
 }
