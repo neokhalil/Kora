@@ -169,3 +169,56 @@ input, textarea, select, button {
     position: absolute;
   }
 }
+
+/* Styles spécifiques pour l'écran de chat quand le clavier est ouvert */
+.keyboard-open .chat-container {
+  /* Définir une hauteur minimale pour éviter la compression du contenu */
+  min-height: 100%;
+  /* Utiliser une position fixe pour les conteneurs principaux */
+  position: fixed;
+  top: 56px; /* Hauteur du header */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Assurer que le scroll fonctionne correctement */
+  overflow-y: auto;
+}
+
+/* Empêcher le contenu de remonter quand le clavier est ouvert */
+.keyboard-open .chat-messages-container {
+  /* Fixer une hauteur minimale pour éviter la compression */
+  min-height: calc(100% - 120px); /* Soustraire la hauteur du champ de saisie */
+  /* S'assurer que le contenu reste en place */
+  transform: translateY(0) !important;
+}
+
+/* S'assurer que le champ de saisie reste accessible */
+.keyboard-open .chat-input-container {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 10;
+}
+
+/* Ajustements spécifiques pour les appareils iOS avec Visual Viewport API */
+.visual-viewport-active .chat-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  z-index: 100;
+  transform: translateY(0) !important;
+}
+
+/* Ajuster les marges quand le viewport visuel est actif */
+.visual-viewport-active .chat-messages-container {
+  margin-bottom: 120px; /* Espace pour le champ de saisie */
+}
+
+/* Assurer une hauteur minimale même sur les petits écrans */
+@media screen and (max-height: 500px) {
+  .chat-container {
+    min-height: 500px;
+  }
+}
