@@ -86,27 +86,25 @@ const SideNavigation = () => {
           paddingTop: 'var(--safe-area-top, 0px)'
         }}
       >
+        {/* Bouton flottant pour fermer le menu (visible seulement sur mobile) */}
+        <div className="absolute top-2 right-2 md:hidden z-20">
+          <Button
+            variant="default"
+            size="icon"
+            onClick={closeMenu}
+            className="rounded-full shadow-md bg-gray-800 text-white hover:bg-gray-700 h-10 w-10 border border-gray-700"
+            aria-label="Fermer le menu"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
         {/* Logo et titre */}
         <div className="px-4 py-3 bg-gray-100 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
-                <span className="text-gray-700 text-lg font-bold">K</span>
-              </div>
-              <h1 className="text-lg font-bold text-gray-800">Kora</h1>
+          <div className="flex items-center">
+            <div className="w-8 h-8 bg-white border border-gray-300 rounded-full flex items-center justify-center mr-3">
+              <span className="text-gray-700 text-lg font-bold">K</span>
             </div>
-            
-            {/* Bouton de fermeture du menu - visible uniquement sur mobile */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={closeMenu}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+            <h1 className="text-lg font-bold text-gray-800">Kora</h1>
           </div>
         </div>
         
