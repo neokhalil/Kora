@@ -1,43 +1,32 @@
 import * as React from 'react';
-import { Brain, Sparkles, Grid, Folder, User } from 'lucide-react';
+import { BrainCircuit, BookOpen, FileQuestion, History, Settings, Sparkles } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
   {
-    label: 'ChatGPT',
-    path: '/chatgpt',
-    icon: <Brain className="h-5 w-5" />
-  },
-  {
-    label: 'Olivia',
-    path: '/olivia',
-    icon: <User className="h-5 w-5" />
-  },
-  {
-    label: '11 more',
-    path: '/more',
-    icon: <User className="h-5 w-5" />
-  },
-  {
-    label: 'Explore GPTs',
-    path: '/explore',
-    icon: <Grid className="h-5 w-5" />
-  },
-  {
-    label: 'Kora',
+    label: 'Aide aux études',
     path: '/',
-    icon: <Folder className="h-5 w-5" />
+    icon: <BrainCircuit className="h-5 w-5" />
+  },
+  {
+    label: 'Préparation aux Examens',
+    path: '/exam-prep',
+    icon: <BookOpen className="h-5 w-5" />
+  },
+  {
+    label: 'Leçons Interactives',
+    path: '/lessons',
+    icon: <FileQuestion className="h-5 w-5" />
+  },
+  {
+    label: 'Historique d\'Apprentissage',
+    path: '/history',
+    icon: <History className="h-5 w-5" />
   }
 ];
 
 // Ajouter plus tard si nécessaire
-export const additionalModels = [
-  {
-    label: 'Kora Avancé',
-    path: '/advanced',
-    icon: <Sparkles className="h-5 w-5" />
-  }
-];
+export const additionalModels = [];
 
 export const discussionTopics: DiscussionTopic[] = [
   {
