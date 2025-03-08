@@ -131,14 +131,15 @@ export function setupMobileViewportFix() {
   });
   
   // Gestion spécifique du clavier mobile via Visual Viewport API
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', setAppHeight);
-    window.visualViewport.addEventListener('scroll', ensureHeaderPosition);
+  const visualViewport = window.visualViewport;
+  if (visualViewport) {
+    visualViewport.addEventListener('resize', setAppHeight);
+    visualViewport.addEventListener('scroll', ensureHeaderPosition);
     
     // Event supplémentaire pour détecter les changements de taille plus précisément
-    window.visualViewport.addEventListener('resize', () => {
+    visualViewport.addEventListener('resize', () => {
       // Mettre à jour le --app-height immédiatement
-      document.documentElement.style.setProperty('--app-height', `${window.visualViewport.height}px`);
+      document.documentElement.style.setProperty('--app-height', `${visualViewport.height}px`);
       ensureHeaderPosition();
     });
   }

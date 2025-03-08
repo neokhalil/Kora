@@ -121,9 +121,9 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
         }}
       >
         <div className="flex flex-col h-full">
-          {/* En-tête du menu */}
-          <div className="px-4 py-5 flex items-center">
-            <h1 className="text-2xl font-bold ml-2">KORA</h1>
+          {/* En-tête du menu - supprimé pour éviter la redondance */}
+          <div className="px-4 pt-2 pb-1 flex items-center">
+            {/* Logo supprimé pour éviter d'avoir "KORA" deux fois */}
           </div>
           
           {/* Champ de recherche amélioré */}
