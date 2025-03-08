@@ -3,4 +3,5 @@
 // Declare the toggleKoraMenu function added by index.html
 interface Window {
   toggleKoraMenu?: () => void;
+  resetKeyboardState?: () => void;
 }

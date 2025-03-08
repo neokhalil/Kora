@@ -903,7 +903,7 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} data-scroll-anchor />
               </>
             )}
           </div>
@@ -995,7 +995,7 @@ const ChatAssistant: React.FC = () => {
                       // S'assurer que le header fixe est visible
                       const headerContainer = document.getElementById('kora-header-container');
                       if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
+                        headerContainer.style.position = 'fixed';
                         headerContainer.style.top = '0';
                         headerContainer.style.zIndex = '9999';
                       }
@@ -1005,7 +1005,23 @@ const ChatAssistant: React.FC = () => {
                         if (messagesEndRef.current) {
                           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                         }
-                      }, 100);
+                      }, 300);
+                    }}
+                    onBlur={() => {
+                      // Détection de la fermeture possible du clavier
+                      setTimeout(() => {
+                        // Vérifier si le focus est toujours dans l'application
+                        if (!document.activeElement || 
+                            (document.activeElement.tagName !== 'INPUT' && 
+                             document.activeElement.tagName !== 'TEXTAREA')) {
+                          // Si on a une fonction globale de reset, l'utiliser
+                          if (window.resetKeyboardState) {
+                            window.resetKeyboardState();
+                          }
+                          // Enlever la classe keyboard-open
+                          document.body.classList.remove('keyboard-open');
+                        }
+                      }, 300);
                     }}
                   />
                 </div>

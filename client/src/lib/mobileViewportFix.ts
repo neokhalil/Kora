@@ -1,6 +1,6 @@
 /**
  * Script optimisé pour la gestion du viewport mobile
- * Garantit que le header reste visible même quand le clavier est ouvert
+ * Garantit que le header et la zone de saisie restent visibles même quand le clavier est ouvert
  */
 
 export function setupMobileViewportFix() {
@@ -11,6 +11,10 @@ export function setupMobileViewportFix() {
   if (metaViewport) {
     metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
   }
+
+  // Ajout d'une variable pour suivre l'état du clavier
+  let isKeyboardOpen = false;
+  let lastViewportHeight = window.innerHeight;
 
   // Détection avancée des plateformes
   const ua = navigator.userAgent;
@@ -48,6 +52,50 @@ export function setupMobileViewportFix() {
   }
   
   /**
+   * Fonction qui garantit que les éléments d'interface restent bien positionnés
+   * quand le clavier virtuel est ouvert
+   */
+  function handleKeyboardVisibilityChange(isOpen: boolean) {
+    if (isOpen === isKeyboardOpen) return; // Éviter les traitements redondants
+    
+    isKeyboardOpen = isOpen;
+    
+    if (isOpen) {
+      document.body.classList.add('keyboard-open');
+      
+      // Forcer un repositionnement de la zone de saisie pour qu'elle reste visible
+      const composer = document.querySelector('.composer-container');
+      if (composer && composer instanceof HTMLElement) {
+        composer.style.position = 'fixed';
+        composer.style.bottom = '0';
+      }
+      
+      // Sur Android, s'assurer que le contenu reste visible
+      if (isAndroid) {
+        setTimeout(() => {
+          const messagesEnd = document.querySelector('[data-scroll-anchor]');
+          if (messagesEnd && messagesEnd instanceof HTMLElement) {
+            messagesEnd.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 300);
+      }
+    } else {
+      document.body.classList.remove('keyboard-open');
+      
+      // Restaurer la position normale des éléments
+      if (isAndroid) {
+        // Forcer un petit défilement pour réinitialiser la vue
+        window.scrollTo(0, 1);
+        window.scrollTo(0, 0);
+      }
+    }
+    
+    // Mise à jour du layout
+    ensureHeaderPosition();
+    setAppHeight();
+  }
+  
+  /**
    * Fonction qui garantit que le header reste bien positionné
    * Centralise la logique pour éviter les redondances
    */
@@ -63,29 +111,30 @@ export function setupMobileViewportFix() {
     header.style.zIndex = '9999';
     header.style.borderBottom = 'none';
     
-    // Ajustements spécifiques selon la plateforme
-    if (isAndroid) {
-      // Vérifier si le clavier est ouvert (hauteur réduite significativement)
-      const isKeyboardOpen = window.innerHeight < window.outerHeight * 0.75;
+    // Comportement spécifique quand le clavier est ouvert
+    if (isKeyboardOpen) {
+      // Assurer que le header reste visible même avec le clavier ouvert
+      header.style.position = 'fixed';
+      header.style.top = '0';
+      header.style.width = '100%';
+      header.style.zIndex = '9999';
       
-      if (isKeyboardOpen) {
-        // Si le clavier est ouvert sur Android, s'assurer que le header reste visible
-        header.style.position = 'absolute';
-      } else {
-        // Sinon, revenir à l'état normal
+      // Différences de comportement selon les plateformes
+      if (isAndroid) {
         header.style.position = 'fixed';
-        header.style.top = '0';
       }
+    } else {
+      // Comportement normal sans clavier
+      header.style.position = 'fixed';
+      header.style.top = '0';
       
-      // Ajustements spécifiques selon la version Android
-      if (androidVersion < 10) {
-        // Android versions antérieures peuvent nécessiter des ajustements supplémentaires
-        header.style.height = '56px';
-        header.style.paddingTop = '0';
-      }
-    } else if (isIOS) {
-      // Sur iOS, utiliser les valeurs safe-area quand disponibles
-      if (supportsSafeArea) {
+      // Ajustements spécifiques selon la plateforme
+      if (isAndroid) {
+        if (androidVersion < 10) {
+          header.style.height = '56px';
+          header.style.paddingTop = '0';
+        }
+      } else if (isIOS && supportsSafeArea) {
         header.style.paddingTop = safeAreaTop;
         header.style.height = `calc(56px + ${safeAreaTop})`;
       }
@@ -93,11 +142,31 @@ export function setupMobileViewportFix() {
   }
   
   /**
-   * Mise à jour de la hauteur de l'application
-   * Cette variable CSS est utilisée pour les calculs de hauteur dynamique
+   * Mise à jour de la hauteur de l'application et détection du clavier
+   * Cette fonction est cruciale pour l'expérience mobile
    */
   function setAppHeight() {
-    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    const currentHeight = window.innerHeight;
+    const viewportHeight = currentHeight;
+    
+    // Définir les variables CSS utilisées pour le layout
+    document.documentElement.style.setProperty('--app-height', `${viewportHeight}px`);
+    
+    // Détecter l'ouverture du clavier par changement significatif de hauteur
+    if (lastViewportHeight > 0 && currentHeight < lastViewportHeight * 0.8) {
+      // Le clavier est probablement ouvert
+      document.documentElement.style.setProperty('--keyboard-height', `${lastViewportHeight - currentHeight}px`);
+      handleKeyboardVisibilityChange(true);
+    } else if (lastViewportHeight > 0 && currentHeight > lastViewportHeight * 0.9) {
+      // Le clavier est probablement fermé
+      document.documentElement.style.setProperty('--keyboard-height', '0px');
+      handleKeyboardVisibilityChange(false);
+    }
+    
+    // Mémoriser la hauteur actuelle pour la comparaison suivante
+    lastViewportHeight = currentHeight;
+    
+    // Assurer la position du header
     ensureHeaderPosition();
   }
   
@@ -110,8 +179,10 @@ export function setupMobileViewportFix() {
   
   // Gestion améliorée de l'orientation
   window.addEventListener('orientationchange', () => {
+    // Réinitialiser l'état du clavier lors d'un changement d'orientation
+    handleKeyboardVisibilityChange(false);
+    
     // Sur Android, attendre un court instant après le changement d'orientation
-    // pour permettre au navigateur de recalculer correctement les dimensions
     setAppHeight();
     
     if (isAndroid) {
@@ -130,30 +201,77 @@ export function setupMobileViewportFix() {
     }
   });
   
-  // Gestion spécifique du clavier mobile via Visual Viewport API
+  // Utilisation de l'API Visual Viewport pour une meilleure détection du clavier
   const visualViewport = window.visualViewport;
   if (visualViewport) {
-    visualViewport.addEventListener('resize', setAppHeight);
-    visualViewport.addEventListener('scroll', ensureHeaderPosition);
-    
-    // Event supplémentaire pour détecter les changements de taille plus précisément
     visualViewport.addEventListener('resize', () => {
-      // Mettre à jour le --app-height immédiatement
-      document.documentElement.style.setProperty('--app-height', `${visualViewport.height}px`);
+      if (visualViewport) {
+        // Mise à jour de l'app-height basée sur le viewportHeight
+        document.documentElement.style.setProperty('--app-height', `${visualViewport.height}px`);
+        
+        // Détecter l'ouverture du clavier via Visual Viewport
+        const winHeight = window.innerHeight;
+        if (visualViewport.height < winHeight * 0.8) {
+          // Clavier ouvert
+          document.documentElement.style.setProperty('--keyboard-height', `${winHeight - visualViewport.height}px`);
+          handleKeyboardVisibilityChange(true);
+        } else {
+          // Clavier fermé
+          document.documentElement.style.setProperty('--keyboard-height', '0px');
+          handleKeyboardVisibilityChange(false);
+        }
+      }
+      
+      // Toujours appeler ensureHeaderPosition
       ensureHeaderPosition();
     });
+    
+    visualViewport.addEventListener('scroll', ensureHeaderPosition);
   }
   
-  // Détection de focus sur les champs de saisie (pour le clavier)
+  // Détection de focus sur les champs de saisie (pour détecter le clavier)
   document.addEventListener('focusin', (e) => {
-    ensureHeaderPosition();
+    const target = e.target as HTMLElement;
     
-    // Sur Android, ajouter un délai pour s'assurer que le header reste visible
-    // après que le clavier est complètement ouvert
-    if (isAndroid) {
-      setTimeout(ensureHeaderPosition, 300);
+    // Vérifier si le focus est sur un champ de saisie
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      // Forcer la classe keyboard-open
+      document.body.classList.add('keyboard-open');
+      
+      // Sur Android, ajouter un délai pour éviter les problèmes de timing
+      if (isAndroid) {
+        setTimeout(() => handleKeyboardVisibilityChange(true), 200);
+      } else {
+        handleKeyboardVisibilityChange(true);
+      }
     }
   });
   
-  document.addEventListener('focusout', ensureHeaderPosition);
+  // Détection de perte de focus (fermeture possible du clavier)
+  document.addEventListener('focusout', (e) => {
+    // Sur iOS, le focusout est fiable pour détecter la fermeture du clavier
+    if (isIOS) {
+      handleKeyboardVisibilityChange(false);
+    }
+    
+    // Sur Android, on ne peut pas se fier uniquement au focusout
+    // car le clavier peut rester ouvert même après un focusout
+    if (isAndroid) {
+      // Vérifier si la hauteur a changé significativement
+      setTimeout(() => {
+        const currentHeight = window.innerHeight;
+        if (currentHeight > lastViewportHeight * 0.95) {
+          handleKeyboardVisibilityChange(false);
+        }
+      }, 300);
+    }
+    
+    ensureHeaderPosition();
+  });
+  
+  // Gestionnaire pour permettre au code externe de forcer la réinitialisation
+  window.resetKeyboardState = () => {
+    handleKeyboardVisibilityChange(false);
+    setAppHeight();
+  };
 }

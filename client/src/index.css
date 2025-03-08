@@ -540,6 +540,36 @@
   flex-direction: column;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  height: calc(100vh - var(--header-height) - 80px); /* Prend tout l'espace disponible moins le header et la zone de saisie */
+  position: relative;
+  z-index: 10;
+}
+
+/* Styles spécifiques quand le clavier est ouvert */
+body.keyboard-open .chat-messages-container {
+  height: calc(100vh - var(--header-height) - 80px - var(--keyboard-height, 0px));
+  overflow-y: auto !important;
+}
+
+/* Pour Android, on adapte le layout quand le clavier est ouvert */
+.android-device.keyboard-open .chat-messages-container {
+  height: calc(var(--app-height, 100vh) - var(--header-height) - 80px);
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 80px;
+}
+
+/* Pour iOS, on assure que l'interface reste bien positionnée */
+.ios-device.keyboard-open .chat-messages-container {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  overflow-y: auto !important;
 }
 
 /* Style pour les éléments numérotés */
@@ -620,11 +650,33 @@ h3.section-heading,
   right: 0;
   z-index: 100;
   padding-top: 8px;
+  transition: transform 0.2s ease-out;
+}
+
+/* État lorsque le clavier est ouvert */
+.keyboard-open .composer-container {
+  position: fixed !important;
+  bottom: 0 !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 }
 
 /* Ajustements pour iOS */
 .ios-device .composer-container {
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+/* Ajustements pour Android */
+.android-device .composer-container {
+  position: fixed !important;
+  bottom: 0 !important;
+}
+
+/* Quand le clavier est ouvert sur Android */
+.android-device.keyboard-open .composer-container {
+  position: fixed !important;
+  bottom: 0 !important;
+  z-index: 9900;
 }
 
 /* S'assurer que les inputs ont la bonne taille de police */
