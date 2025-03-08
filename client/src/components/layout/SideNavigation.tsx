@@ -91,10 +91,10 @@ const SideNavigation = () => {
             <input
               type="text"
               placeholder="Search"
-              className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500 text-center"
+              className="h-full w-full bg-transparent border-0 focus:outline-none text-gray-600 ml-3 placeholder-gray-500"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              style={{ textAlign: 'left', paddingLeft: '0' }}
+              style={{ textAlign: 'center' }}
             />
           </div>
         </div>

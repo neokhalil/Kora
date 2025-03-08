@@ -53,14 +53,22 @@ aside.side-navigation [class*="hover:bg"]:hover {
   --tw-bg-opacity: 1 !important;
 }
 
-/* Correction pour les entrées de recherche */
+/* Correction pour les entrées de recherche - style mis à jour */
+aside.side-navigation .bg-gray-100 {
+  background-color: #f0f0f0 !important;
+  border-radius: 9999px !important; /* Pour assurer les coins arrondis */
+}
+
 aside.side-navigation input {
-  background-color: #f5f5f5 !important;
+  background-color: transparent !important;
   color: #000 !important;
-  border-color: #e5e7eb !important;
-  --tw-bg-opacity: 1 !important;
+  border-color: transparent !important;
   --tw-text-opacity: 1 !important;
-  --tw-border-opacity: 1 !important;
+}
+
+/* S'assurer que le conteneur de recherche a les bonnes propriétés */
+aside.side-navigation .px-3.py-2 {
+  padding: 0.5rem 0.75rem !important;
 }
 
 /* Assurer que le menu a un z-index supérieur à l'overlay */
