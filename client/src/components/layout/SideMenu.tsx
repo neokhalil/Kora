@@ -39,14 +39,25 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
     }
   ];
   
-  // Exemple de conversations récentes (dans un cas réel, vous les récupéreriez d'une API)
-  const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([
-    { id: '1', title: 'Texte aléatoire et aide', date: new Date(2025, 2, 8) },
-    { id: '2', title: 'English-speaking Sub-Saharan Africa', date: new Date(2025, 2, 7) },
-    { id: '3', title: 'Équation différentielle expliquée', date: new Date(2025, 2, 6) },
-    { id: '4', title: 'Verbe dans la phrase', date: new Date(2025, 2, 5) },
-    { id: '5', title: 'ICT Growth in Kenya 2024', date: new Date(2025, 2, 4) }
-  ]);
+  // État pour les conversations récentes (à remplir via API)
+  const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
+  
+  // Effet pour charger les conversations récentes (simulé pour le moment)
+  useEffect(() => {
+    // Dans un cas réel, vous utiliseriez une requête API avec react-query
+    // Cette structure permet l'intégration future avec l'API
+    const loadRecentConversations = async () => {
+      try {
+        // Conversations récentes à charger via API plus tard
+        // Pour le moment, utilisons un tableau vide pour avoir une UI propre
+        setRecentConversations([]);
+      } catch (error) {
+        console.error("Erreur lors du chargement des conversations récentes:", error);
+      }
+    };
+    
+    loadRecentConversations();
+  }, []);
   
   // Filtrer les éléments du menu en fonction de la recherche
   const filteredMenuItems = useMemo(() => {
@@ -143,7 +154,6 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && searchQuery.trim()) {
-                    console.log('Recherche lancée pour:', searchQuery);
                     onClose();
                     setLocation(`/search?q=${encodeURIComponent(searchQuery)}`);
                   }
@@ -219,16 +229,27 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             )}
           </div>
           
-          {/* Pied de menu avec informations utilisateur - sans bordure supérieure */}
+          {/* Pied de menu avec bouton de retour ou lien vers les paramètres */}
           <div className="mt-auto p-4">
             <div className="flex items-center">
-              <div className="w-6 h-6 text-center font-medium mr-3">
-                I
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-center font-medium mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
               </div>
-              <span className="font-medium">Ibrahima Ndiaye</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-auto" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <span className="font-medium">Mon profil</span>
+              <button 
+                className="ml-auto p-2 rounded-full hover:bg-gray-100"
+                onClick={() => {
+                  // Future action pour les paramètres ou la déconnexion
+                  onClose();
+                }}
+                aria-label="Options utilisateur"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
