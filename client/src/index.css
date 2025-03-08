@@ -649,12 +649,25 @@ input, textarea, select, button {
 }
 
 /* Assurer que le SideNavigation a un bon z-index */
-aside {
+aside.side-navigation {
   position: fixed;
-  top: calc(var(--header-height) + var(--safe-area-top));
+  top: 0;
   bottom: 0;
   z-index: 950;
   background-color: white;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {
+  aside.side-navigation {
+    top: calc(var(--header-height) + var(--safe-area-top));
+    width: auto;
+    max-width: 300px;
+  }
 }
 
 /* Style du bouton d'envoi */
@@ -690,6 +703,18 @@ aside {
 .app-header, 
 header:not(#kora-header) {
   display: none !important;
+}
+
+/* Masquer le header quand le menu est ouvert sur mobile */
+body.menu-open #kora-header-container {
+  display: none !important;
+}
+
+/* Sur desktop, toujours afficher le header */
+@media (min-width: 768px) {
+  body.menu-open #kora-header-container {
+    display: block !important;
+  }
 }
 
 /* Améliorer l'affichage des messages */

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Menu } from 'lucide-react';
 import { useMenu } from '@/hooks/use-menu';
 import { Button } from '@/components/ui/button';
@@ -7,13 +7,23 @@ import { cn } from '@/lib/utils';
 const Header: React.FC = () => {
   const { toggleMenu, isMenuOpen } = useMenu();
   
+  // Ajouter une classe au body quand le menu est ouvert
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add('menu-open');
+    } else {
+      document.body.classList.remove('menu-open');
+    }
+    
+    return () => {
+      document.body.classList.remove('menu-open');
+    };
+  }, [isMenuOpen]);
+  
   return (
     <header 
       id="kora-header-container"
-      className={cn(
-        "app-header bg-white w-full border-b border-gray-200 relative z-40",
-        isMenuOpen ? "hidden" : "block" // Cache complètement le header quand le menu est ouvert
-      )}
+      className="app-header bg-white w-full border-b border-gray-200 relative z-40"
       style={{
         height: 'var(--header-height)',
         paddingTop: 'var(--safe-area-top, 0px)',
