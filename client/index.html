@@ -111,14 +111,9 @@
       margin-left: 8px;
     }
     
+    /* Style de base pour le bouton de menu - sera enrichi dans le composant React */
     #kora-menu-button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      /* Vide pour laisser le contrôle complet au composant React */
     }
     
     /* Container pour le menu et le titre, pour les mettre ensemble */
@@ -163,7 +158,13 @@
         
         // Écouter les événements de toggle du menu depuis le composant React
         document.addEventListener('kora-menu-toggle', function(event) {
-          console.log("Menu toggle event received:", event);
+          console.log("Menu toggle event received from React:", event.detail);
+          // Ajouter une classe au body quand le menu est ouvert
+          if (event.detail && event.detail.isOpen) {
+            document.body.classList.add('kora-menu-open');
+          } else {
+            document.body.classList.remove('kora-menu-open');
+          }
         });
       }
       

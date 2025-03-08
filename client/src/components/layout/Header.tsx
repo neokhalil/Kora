@@ -47,46 +47,34 @@ const Header: React.FC = () => {
     }
   }, []);
   
-  // Handler pour les clics sur le document
-  useEffect(() => {
-    // Handler pour s'assurer que les clicks sur le bouton du menu sont bien capturés
-    const handleDocumentClick = (e: MouseEvent) => {
-      const menuButton = menuButtonRef.current;
-      if (menuButton && menuButton.contains(e.target as Node)) {
-        console.log("[Debug Header] Menu button clicked via document handler");
-      }
-    };
-    
-    document.addEventListener('click', handleDocumentClick);
-    return () => {
-      document.removeEventListener('click', handleDocumentClick);
-    };
-  }, []);
+  // Nous n'avons pas besoin d'un gestionnaire de clic sur document pour le débogage
+  // Le clic est géré directement par l'événement onClick sur le bouton
   
   // Mémoriser la fonction de toggle du menu pour éviter de la recréer
-  const toggleMenu = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const toggleMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("[Debug Header] Button clicked:", e.currentTarget);
     console.log("[Debug Header] Toggle menu called, current state:", isMenuOpen);
     
-    // Changer l'état du menu
-    setIsMenuOpen(prevState => {
-      const newState = !prevState;
-      console.log("[Debug Header] Setting menu state to:", newState);
-      
-      // Déclencher un événement personnalisé pour informer d'autres parties de l'application
-      if (typeof window !== 'undefined') {
-        try {
-          document.dispatchEvent(new CustomEvent('kora-menu-toggle', { 
-            detail: { isOpen: newState } 
-          }));
-        } catch (err) {
-          console.error("[Debug Header] Error dispatching custom event:", err);
-        }
+    // Important: empêcher la propagation et le comportement par défaut
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Changer l'état du menu directement
+    const newState = !isMenuOpen;
+    console.log("[Debug Header] Setting menu state to:", newState);
+    setIsMenuOpen(newState);
+    
+    // Déclencher un événement personnalisé pour informer d'autres parties de l'application
+    if (typeof window !== 'undefined') {
+      try {
+        document.dispatchEvent(new CustomEvent('kora-menu-toggle', { 
+          detail: { isOpen: newState } 
+        }));
+        console.log("[Debug Header] Custom event dispatched");
+      } catch (err) {
+        console.error("[Debug Header] Error dispatching custom event:", err);
       }
-      
-      return newState;
-    });
+    }
   }, [isMenuOpen]);
   
   return (
@@ -125,14 +113,21 @@ const Header: React.FC = () => {
               id="kora-menu-button"
               ref={menuButtonRef}
               aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-              onClick={toggleMenu}
+              onClick={(e) => {
+                console.log("[Debug Header] Click triggered on menu button");
+                toggleMenu(e);
+              }}
               onTouchStart={(e) => {
                 console.log("[Debug Header] TouchStart on menu button");
               }}
               onTouchEnd={(e) => {
                 console.log("[Debug Header] TouchEnd on menu button");
                 e.preventDefault();
+                // Sur mobile, déclencher le toggle au touchEnd
+                const syntheticEvent = e as unknown as React.MouseEvent<HTMLButtonElement>;
+                toggleMenu(syntheticEvent);
               }}
+              className="kora-menu-button-control"
               style={{ 
                 background: 'none',
                 border: 'none',
@@ -141,7 +136,9 @@ const Header: React.FC = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                touchAction: 'manipulation'
+                touchAction: 'manipulation',
+                position: 'relative',
+                zIndex: 10000 // S'assurer que le bouton est au-dessus de tout
               }}
               data-state={isMenuOpen ? 'open' : 'closed'}
             >
