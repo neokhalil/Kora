@@ -82,7 +82,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
       >
         <div className="flex flex-col h-full">
           {/* En-tête du menu */}
-          <div className="px-4 py-5 flex items-center border-b border-gray-200">
+          <div className="px-4 py-5 flex items-center">
             <h1 className="text-2xl font-bold ml-2">KORA</h1>
           </div>
           
@@ -95,7 +95,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search"
+                placeholder="Rechercher"
                 className="block w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 focus:outline-none"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
