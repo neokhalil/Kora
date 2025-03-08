@@ -109,14 +109,15 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
         onClick={onClose}
       />
       
-      {/* Menu latéral simplifié selon la capture d'écran */}
+      {/* Menu latéral simplifié avec classe kora-side-menu pour ciblage CSS */}
       <div
-        className={`fixed top-0 left-0 h-full w-full bg-white z-[1001] transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-full bg-white z-[1001] transform transition-transform duration-300 ease-in-out kora-side-menu ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ 
-          paddingTop: 'env(safe-area-inset-top, 0px)', 
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)' 
+          paddingTop: 'calc(56px + env(safe-area-inset-top, 0px))', 
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          top: 0
         }}
       >
         <div className="flex flex-col h-full">

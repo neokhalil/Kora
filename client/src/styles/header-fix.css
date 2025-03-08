@@ -101,7 +101,15 @@ input, textarea, select, button {
   height: calc(56px + env(safe-area-inset-top, 0));
 }
 
-/* Pour les iPhones avec "notch" */
+/* Ajustements spécifiques pour Android */
+.android-device #kora-header-container {
+  /* Assurer une hauteur stable pour toutes les versions Android */
+  height: 56px; 
+  /* Certains appareils Android ont besoin d'un padding supplémentaire */
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Pour les appareils avec "notch" ou barre système (iOS et certains Android) */
 @supports (padding-top: env(safe-area-inset-top)) {
   #kora-header-container {
     padding-top: env(safe-area-inset-top);
@@ -116,4 +124,12 @@ input, textarea, select, button {
   .kora-side-menu {
     top: calc(56px + env(safe-area-inset-top));
   }
+}
+
+/* Spécifique aux modèles Android avec barre de navigation */
+.android-device {
+  /* Empêcher le retaillage excessif sur Android lors de l'ouverture du clavier */
+  overflow-y: auto;
+  /* Certains appareils Android ont besoin d'un ajustement en bas */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }

@@ -12,13 +12,40 @@ export function setupMobileViewportFix() {
     metaViewport.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
   }
 
-  // Détection des plateformes
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-  const isAndroid = /Android/.test(navigator.userAgent);
+  // Détection avancée des plateformes
+  const ua = navigator.userAgent;
   
-  // Ajouter les classes pour le CSS conditionnel
-  if (isIOS) document.body.classList.add('ios-device');
-  if (isAndroid) document.body.classList.add('android-device');
+  // Détection iOS plus précise
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+  
+  // Détection Android plus précise avec version
+  const androidMatch = ua.match(/Android\s([0-9.]+)/);
+  const isAndroid = androidMatch !== null;
+  const androidVersion = isAndroid && androidMatch ? parseFloat(androidMatch[1]) : 0;
+  
+  // Détection de navigateurs spécifiques sur mobile
+  const isChrome = /Chrome\/([0-9.]+)/.test(ua);
+  const isSamsung = /SamsungBrowser\/([0-9.]+)/.test(ua);
+  const isFirefox = /Firefox\/([0-9.]+)/.test(ua);
+  
+  // Ajouter des classes CSS pour le ciblage conditionnel
+  if (isIOS) {
+    document.body.classList.add('ios-device');
+    // Détection des modèles récents avec notch
+    if (/iPhone X|iPhone 11|iPhone 12|iPhone 13|iPhone 14|iPhone 15/.test(ua)) {
+      document.body.classList.add('ios-notch');
+    }
+  }
+  
+  if (isAndroid) {
+    document.body.classList.add('android-device');
+    document.body.classList.add(`android-${Math.floor(androidVersion)}`);
+    
+    // Classes spécifiques pour les navigateurs
+    if (isChrome) document.body.classList.add('chrome-browser');
+    if (isSamsung) document.body.classList.add('samsung-browser');
+    if (isFirefox) document.body.classList.add('firefox-browser');
+  }
   
   /**
    * Fonction qui garantit que le header reste bien positionné
