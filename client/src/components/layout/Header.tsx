@@ -93,14 +93,6 @@ const Header: React.FC = () => {
         {/* Header content */}
         <div 
           id="kora-header"
-          style={{
-            height: '56px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 1rem',
-            borderBottom: 'none'
-          }}
         >
           {/* Menu button avec indicateur d'état */}
           <div className="header-left-group" style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
@@ -146,15 +138,8 @@ const Header: React.FC = () => {
               </div>
             </button>
             
-            {/* Logo */}
-            <h1 id="kora-header-title" style={{
-              fontFamily: "'Elza', sans-serif",
-              fontSize: '1.5rem',
-              fontWeight: 900,
-              letterSpacing: '-0.025em',
-              textTransform: 'uppercase',
-              marginLeft: '8px'
-            }}>Kora</h1>
+            {/* Logo - style déplacé vers le CSS */}
+            <h1 id="kora-header-title">Kora</h1>
           </div>
           
           {/* Empty div to balance the layout */}

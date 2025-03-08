@@ -1,5 +1,6 @@
 /**
- * Solution pour le header avec position sticky
+ * Solution optimisée pour le header avec position fixed
+ * Nettoyée pour éliminer les redondances et garantir la stabilité
  */
 
 /* Header toujours visible - complètement en haut de l'écran */
@@ -8,14 +9,58 @@
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
   height: 56px;
   z-index: 1000;
   background-color: white;
-  /* S'assurer qu'il n'y a pas de bordure ni d'ombre */
+  /* Garantir l'absence de bordures et d'ombres */
+  border: none !important;
   border-bottom: none !important;
   box-shadow: none !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+/* Styles du contenu du header pour cohérence, plutôt qu'inline */
+#kora-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+/* Style du logo plus cohérent */
+#kora-header-title {
+  font-family: 'Elza', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* Style optimisé pour le bouton du menu */
+.kora-menu-button-control {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 10000;
+}
+
+/* Groupe gauche du header */
+.header-left-group {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 /* Ajouter un espace pour compenser le header fixed */
@@ -23,13 +68,13 @@ body {
   padding-top: 56px !important;
 }
 
-/* S'assurer que le header reste bien en place */
+/* Optimisations générales pour le layout */
 html, body, #root {
   height: 100%;
   overflow-x: hidden;
 }
 
-/* Rendre les champs plus accessibles sur mobile */
+/* Rendre les champs plus accessibles sur mobile (16px minimum pour éviter zoom iOS) */
 input, textarea, select, button {
   font-size: 16px !important;
 }
@@ -38,13 +83,5 @@ input, textarea, select, button {
 @media screen and (max-width: 767px) {
   body {
     overscroll-behavior: none;
-  }
-  
-  /* S'assurer que le header est bien fixé en haut sur mobile */
-  #kora-header-container {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
   }
 }
