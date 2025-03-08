@@ -682,26 +682,7 @@ body.menu-open #kora-header-container {
   background: #ffffff !important;
 }
 
-/* Style spécial pour le bouton quand le menu est ouvert */
-body.menu-open .menu-toggle-button {
-  background: #000000 !important;
-  z-index: 3000 !important;
-  position: relative !important;
-}
-
-body.menu-open .menu-toggle-button svg {
-  color: white !important;
-}
-
-/* Forcer la visibilité du bouton X */
-body.menu-open .menu-toggle-button .lucide-x {
-  display: block !important;
-  color: white !important;
-}
-
-body.menu-open .menu-toggle-button .hamburger-lines {
-  display: none !important;
-}
+/* Les styles du bouton hamburger sont maintenant dans hamburger-animation.css */
 
 /* Améliorer l'affichage des messages */
 .chat-message {
