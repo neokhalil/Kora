@@ -1,21 +1,32 @@
 /* Styles spécifiques pour la vue web de la page d'accueil */
 
-/* Supprimer la media query pour permettre l'application des styles directement */
-
 /* Assurer que le fond est propre pour la vue web */
 .web-home-container {
   background-color: white;
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem 2rem;
+}
+
+/* Structure de la page web */
+.web-home-container .flex-col {
+  flex-direction: row;
 }
 
 /* Styles pour la section de gauche (liste des sujets récents) */
+.web-topics-list {
+  min-width: 240px;
+  width: 240px;
+  padding-right: 1.5rem;
+  border-right: 1px solid #e5e7eb;
+}
+
 .web-topics-list h2 {
   color: #6b7280;
   font-size: 0.9rem;
   font-weight: 500;
+  margin-bottom: 0.75rem;
 }
 
 .web-topics-list a {
@@ -23,38 +34,47 @@
   text-decoration: none;
   transition: color 0.2s;
   display: block;
-  padding: 0.25rem 0;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
 }
 
 .web-topics-list a:hover {
   color: #4f46e5;
 }
 
+/* Styles pour la partie principale */
+.web-home-container .flex-1 {
+  padding-left: 2.5rem;
+  padding-top: 2rem;
+}
+
 /* Styles pour le titre et le sous-titre de bienvenue */
 .web-welcome-title {
-  font-size: 2.25rem;
+  font-size: 2.5rem;
   font-weight: 700;
   letter-spacing: -0.025em;
   text-align: left;
+  margin-bottom: 1rem;
 }
 
 .web-welcome-subtitle {
   color: #6b7280;
   font-size: 1.25rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 4rem;
   text-align: left;
 }
 
 /* Styles pour la boîte de question */
 .web-question-box {
+  width: 100%;
+  max-width: 600px;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  margin-top: 1.5rem;
 }
 
 .web-question-box input {
@@ -63,6 +83,7 @@
   outline: none;
   font-size: 1rem;
   background: transparent;
+  padding: 0.25rem 0;
 }
 
 .web-question-box button {
@@ -74,10 +95,13 @@
   align-items: center;
   justify-content: center;
   color: #6b7280;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  margin-left: 0.25rem;
 }
 
 .web-question-box button:hover {
+  background-color: #f3f4f6;
   color: #4f46e5;
 }
 
@@ -85,7 +109,8 @@
   background-color: #000000;
   color: white;
   border-radius: 9999px;
-  padding: 0.5rem;
+  padding: 0.6rem;
+  margin-left: 0.5rem;
 }
 
 .web-question-box .send-button:hover {
@@ -95,8 +120,10 @@
 
 /* Footer de la boîte de question */
 .web-question-footer {
+  width: 100%;
+  max-width: 600px;
   text-align: center;
   color: #6b7280;
   font-size: 0.75rem;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
