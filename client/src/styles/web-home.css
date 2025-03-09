@@ -177,7 +177,7 @@ body, html {
 
 .aide-etudes svg {
   margin-top: 0 !important;
-  margin-right: 8px !important; /* Espace réduit entre l'icône et le texte */
+  margin-right: 4px !important; /* Espace encore plus réduit entre l'icône et le texte */
   flex-shrink: 0 !important;
   min-width: 20px !important;
   color: #303030 !important;
@@ -304,7 +304,10 @@ body, html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 120px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -65%);
   padding-bottom: 30px;
 }
 

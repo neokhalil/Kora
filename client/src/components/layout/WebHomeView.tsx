@@ -22,6 +22,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     { id: '3', title: 'Les groupes nominaux' },
     { id: '4', title: 'Les adjectifs' }
   ];
+  
+  // État pour les sujets filtrés
+  const [filteredRecentTopics, setFilteredRecentTopics] = useState(recentTopics);
+  const [filteredOlderTopics, setFilteredOlderTopics] = useState(olderTopics);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +36,46 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   };
 
+  // Filtrer les éléments en fonction de la recherche
+  const filterItems = (query: string) => {
+    if (!query.trim()) {
+      // Si la recherche est vide, réinitialiser aux listes complètes
+      setFilteredRecentTopics(recentTopics);
+      setFilteredOlderTopics(olderTopics);
+      return;
+    }
+    
+    const queryLower = query.toLowerCase();
+    
+    // Filtrer les sujets récents
+    const filteredRecent = recentTopics.filter(topic => 
+      topic.title.toLowerCase().includes(queryLower)
+    );
+    
+    // Filtrer les sujets plus anciens
+    const filteredOlder = olderTopics.filter(topic => 
+      topic.title.toLowerCase().includes(queryLower)
+    );
+    
+    // Mettre à jour les états
+    setFilteredRecentTopics(filteredRecent);
+    setFilteredOlderTopics(filteredOlder);
+    
+    console.log('Résultats récents:', filteredRecent);
+    console.log('Résultats anciens:', filteredOlder);
+  };
+  
+  // Gestion de la recherche lors de la soumission du formulaire
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log('Recherche:', searchQuery);
-      // Implémentation de la recherche
-    }
+    filterItems(searchQuery);
+  };
+  
+  // Mettre à jour la recherche à chaque frappe
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setSearchQuery(newQuery);
+    filterItems(newQuery);
   };
 
   return (
@@ -59,7 +97,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 placeholder="Rechercher" 
                 className="web-search-input"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
               />
             </form>
             <button className="web-new-chat-button" aria-label="Nouvelle conversation">
@@ -67,11 +105,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             </button>
           </div>
 
-          {/* Section Aides aux études */}
+          {/* Section Aide aux études */}
           <div className="web-sidebar-section">
             <a href="/chat-assistant" className="web-sidebar-link aide-etudes">
               <BookIcon className="web-icon-book" />
-              <span>Aides aux études</span>
+              <span>Aide aux études</span>
             </a>
           </div>
 
@@ -81,29 +119,37 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           {/* Section Hier */}
           <div className="web-sidebar-section">
             <h2>Hier</h2>
-            <ul>
-              {recentTopics.map(topic => (
-                <li key={topic.id}>
-                  <Link href={`/topics/${topic.id}`}>
-                    {topic.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {filteredRecentTopics.length === 0 ? (
+              <p className="text-gray-500 text-sm pl-3 pr-3 py-2">Aucun résultat trouvé</p>
+            ) : (
+              <ul>
+                {filteredRecentTopics.map(topic => (
+                  <li key={topic.id}>
+                    <Link href={`/topics/${topic.id}`}>
+                      {topic.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           
           {/* Section Il y a 7 jours */}
           <div className="web-sidebar-section">
             <h2>Il y a 7 jours</h2>
-            <ul>
-              {olderTopics.map(topic => (
-                <li key={topic.id}>
-                  <Link href={`/topics/${topic.id}`}>
-                    {topic.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {filteredOlderTopics.length === 0 ? (
+              <p className="text-gray-500 text-sm pl-3 pr-3 py-2">Aucun résultat trouvé</p>
+            ) : (
+              <ul>
+                {filteredOlderTopics.map(topic => (
+                  <li key={topic.id}>
+                    <Link href={`/topics/${topic.id}`}>
+                      {topic.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Profil utilisateur en bas */}

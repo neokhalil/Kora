@@ -35,7 +35,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
     { 
       id: 'studies-help', 
       title: 'Aide aux études', 
-      icon: <BookIcon className="h-5 w-5 mr-3" />, 
+      icon: <BookIcon className="h-5 w-5 mr-2" />, 
       href: '/chat-assistant' 
     }
   ];
