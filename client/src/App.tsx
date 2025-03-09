@@ -6,10 +6,12 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/Header";
 import ChatAssistant from "@/pages/ChatAssistant";
+import Home from "@/pages/Home";
 
 // Configuration des routes
 const routes = [
-  { path: "/", Component: ChatAssistant },
+  { path: "/", Component: Home },
+  { path: "/home", Component: Home },
   { path: "/chat-assistant", Component: ChatAssistant }
 ];
 
