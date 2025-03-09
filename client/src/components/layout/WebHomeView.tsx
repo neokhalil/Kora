@@ -1,16 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
 import { ArrowRight, Mic, Image, Search, PenLine, User, Settings } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
+import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
+import './WebHomeView.css';
+
+// Interface pour les messages de la conversation
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'kora';
+  allowActions?: boolean;
+  imageUrl?: string | null;
+}
 
 interface WebHomeViewProps {
   recentQuestions: RecentQuestion[];
 }
 
 const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
+  // États pour le formulaire et la recherche
   const [question, setQuestion] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // États pour la conversation
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isThinking, setIsThinking] = useState(false);
+  const [conversationStarted, setConversationStarted] = useState(false);
+  
+  // Référence pour le défilement automatique des messages
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Pour correspondre exactement à la maquette
   const recentTopics = [
@@ -26,13 +46,86 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // État pour les sujets filtrés
   const [filteredRecentTopics, setFilteredRecentTopics] = useState(recentTopics);
   const [filteredOlderTopics, setFilteredOlderTopics] = useState(olderTopics);
+  
+  // Effet pour faire défiler automatiquement vers le dernier message
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fonction pour gérer la soumission du formulaire de question
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (question.trim()) {
-      console.log('Question posée:', question);
-      // Ici, nous pourrions appeler une API ou rediriger vers la page du chat
-      setQuestion('');
+    if (!question.trim()) return;
+    
+    // Démarrage de la conversation si ce n'est pas déjà fait
+    if (!conversationStarted) {
+      setConversationStarted(true);
+    }
+    
+    // Créer un message utilisateur
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: question,
+      sender: 'user',
+    };
+    
+    // Ajouter le message utilisateur à la conversation
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Réinitialiser le champ de question
+    setQuestion('');
+    
+    // Indiquer que KORA réfléchit
+    setIsThinking(true);
+    
+    try {
+      // Préparer les messages précédents pour le contexte
+      const messageHistory = messages.map(msg => ({
+        content: msg.content,
+        sender: msg.sender
+      }));
+      
+      // Appel API à OpenAI via notre serveur
+      const response = await fetch('/api/tutoring/ask', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: userMessage.content,
+          messages: messageHistory
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête API');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de KORA
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        allowActions: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la communication avec le serveur:', error);
+      
+      // Message d'erreur à l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
+        sender: 'kora',
+      }]);
+    } finally {
+      // Arrêter l'animation de réflexion
+      setIsThinking(false);
     }
   };
 
@@ -76,6 +169,22 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const newQuery = e.target.value;
     setSearchQuery(newQuery);
     filterItems(newQuery);
+  };
+  
+  // Fonction pour afficher les messages de la conversation
+  const renderMessage = (message: Message) => {
+    const isUserMessage = message.sender === 'user';
+    
+    return (
+      <div 
+        key={message.id}
+        className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}
+      >
+        <div className="web-message-content">
+          {message.content}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -166,17 +275,37 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           </div>
         </div>
         
-        {/* Contenu principal - partie centrale avec message de bienvenue */}
+        {/* Contenu principal - partie centrale */}
         <div className="web-main-content">
-          <div className="web-welcome-container">
-            <h1 className="web-welcome-title">Hello Ibrahima</h1>
-            <div className="web-welcome-subtitle">
-              <div>Comment puis t'aider</div>
-              <div>aujourd'hui?</div>
+          {!conversationStarted ? (
+            // Affichage du message de bienvenue lorsqu'aucune conversation n'est démarrée
+            <div className="web-welcome-container">
+              <h1 className="web-welcome-title">Hello Ibrahima</h1>
+              <div className="web-welcome-subtitle">
+                <div>Comment puis t'aider</div>
+                <div>aujourd'hui?</div>
+              </div>
             </div>
-          </div>
+          ) : (
+            // Affichage de la conversation en cours
+            <div className="web-conversation-container">
+              <div className="web-messages-list">
+                {messages.map(renderMessage)}
+                {isThinking && (
+                  <div className="web-message web-kora-message">
+                    <div className="web-message-content web-thinking">
+                      <span className="web-dot"></span>
+                      <span className="web-dot"></span>
+                      <span className="web-dot"></span>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </div>
+          )}
           
-          {/* Zone de question avec boutons */}
+          {/* Zone de question avec boutons - toujours visible */}
           <div className="web-question-container">
             <form onSubmit={handleSubmit} className="web-question-form">
               <div className="web-question-box">
@@ -186,6 +315,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     placeholder="Pose ta question"
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
+                    autoFocus
                   />
                 </div>
                 <div className="web-action-buttons">
@@ -206,9 +336,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 </div>
               </div>
             </form>
-            <p className="web-question-footer">
-              <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
-            </p>
+            {!conversationStarted && (
+              <p className="web-question-footer">
+                <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
+              </p>
+            )}
           </div>
         </div>
       </div>

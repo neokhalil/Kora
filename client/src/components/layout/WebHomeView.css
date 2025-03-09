@@ -1,0 +1,111 @@
+/* Styles spécifiques pour la version web de la conversation */
+
+/* Container de la conversation */
+.web-conversation-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  height: calc(100% - 180px); /* Ajuster en fonction de la hauteur du formulaire */
+  margin-bottom: 1rem;
+}
+
+/* Liste des messages */
+.web-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 2rem;
+}
+
+/* Style commun pour tous les messages */
+.web-message {
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  white-space: pre-wrap;
+}
+
+/* Message de l'utilisateur */
+.web-user-message {
+  align-self: flex-end;
+  background-color: #0066ff;
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+/* Message de KORA */
+.web-kora-message {
+  align-self: flex-start;
+  background-color: #f0f0f5;
+  color: #333;
+  border-bottom-left-radius: 2px;
+}
+
+/* Contenu du message */
+.web-message-content {
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Animation "en train de réfléchir" */
+.web-thinking {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  min-width: 60px;
+}
+
+/* Points de l'animation "en train de réfléchir" */
+.web-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.web-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.web-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* Ajustements pour le mode conversation */
+.web-main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Donne plus d'espace à la conversation lorsqu'elle est active */
+.web-conversation-container {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+}
+
+/* Ajustements pour le conteneur de questions en mode conversation */
+.web-question-container {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  padding-top: 0.5rem;
+  z-index: 10;
+}
