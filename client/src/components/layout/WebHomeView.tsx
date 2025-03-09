@@ -1,11 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, User, Settings } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
 import { MathJaxContext } from 'better-react-mathjax';
+import VoiceRecorder from '@/components/VoiceRecorder';
 import './WebHomeView.css';
 
 // Configuration MathJax
@@ -53,8 +54,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [isThinking, setIsThinking] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
   
-  // Référence pour le défilement automatique des messages
+  // États pour les fonctionnalités d'image et de voix
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
+  const [isImageUploadModalOpen, setIsImageUploadModalOpen] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  
+  // Références
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Pour correspondre exactement à la maquette
   const recentTopics = [
@@ -193,6 +201,122 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const newQuery = e.target.value;
     setSearchQuery(newQuery);
     filterItems(newQuery);
+  };
+  
+  // Gestion du téléchargement d'image
+  const handleImageClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+  
+  // Fonction appelée lorsqu'un fichier est sélectionné
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedImage(file);
+      
+      // Créer une URL pour l'aperçu de l'image
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreviewUrl(reader.result as string);
+        setIsImageUploadModalOpen(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Envoyer l'image avec une question (utilisé depuis la modale)
+  const handleImageSubmit = async (imageText: string = '') => {
+    if (!uploadedImage || !imagePreviewUrl) return;
+    
+    // Démarrage de la conversation si ce n'est pas déjà fait
+    if (!conversationStarted) {
+      setConversationStarted(true);
+    }
+    
+    // Fermer la modale et réinitialiser la question
+    setIsImageUploadModalOpen(false);
+    setQuestion('');
+    
+    // Créer un message utilisateur avec l'image
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content: imageText || 'Analyse cette image s\'il te plaît',
+      sender: 'user',
+      imageUrl: imagePreviewUrl,
+    };
+    
+    // Ajouter le message utilisateur à la conversation
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Indiquer que KORA réfléchit
+    setIsThinking(true);
+    
+    try {
+      // Préparer le formulaire pour l'envoi de l'image
+      const formData = new FormData();
+      formData.append('image', uploadedImage);
+      
+      if (imageText) {
+        formData.append('text_query', imageText);
+      }
+      
+      // Appel API pour l'analyse d'image
+      const response = await fetch('/api/image-analysis', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête API');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de KORA
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        allowActions: true,
+        isImageAnalysis: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de l\'analyse de l\'image:', error);
+      
+      // Message d'erreur à l'utilisateur
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Pourriez-vous réessayer ou reformuler votre question?",
+        sender: 'kora',
+      }]);
+    } finally {
+      // Réinitialiser les états
+      setIsThinking(false);
+      setUploadedImage(null);
+      setImagePreviewUrl(null);
+    }
+  };
+  
+  // Annuler le téléchargement d'image
+  const handleCancelImageUpload = () => {
+    setIsImageUploadModalOpen(false);
+    setUploadedImage(null);
+    setImagePreviewUrl(null);
+  };
+  
+  // Gestion de l'enregistrement vocal
+  const handleVoiceButtonClick = () => {
+    setIsRecordingVoice(!isRecordingVoice);
+  };
+  
+  // Fonction appelée lorsque la transcription audio est terminée
+  const handleTranscriptionComplete = (text: string) => {
+    if (text) {
+      setQuestion(text);
+      setIsRecordingVoice(false);
+    }
   };
   
   // Fonction pour afficher les messages de la conversation
@@ -353,6 +477,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       value={question}
                       onChange={(e) => setQuestion(e.target.value)}
                       autoFocus
+                      disabled={isRecordingVoice}
                     />
                   </div>
                   <div className="web-action-buttons">
@@ -360,25 +485,117 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       type="button"
                       className="web-image-button"
                       aria-label="Télécharger une image"
+                      onClick={handleImageClick}
                     >
                       <Image size={24} strokeWidth={2} />
                     </button>
-                    <button 
-                      type="button"
-                      className="web-mic-button"
-                      aria-label="Enregistrer audio"
-                    >
-                      <Mic size={24} strokeWidth={2.5} />
-                    </button>
+                    
+                    {isRecordingVoice ? (
+                      <button 
+                        type="button"
+                        className="web-mic-button recording"
+                        aria-label="Arrêter l'enregistrement"
+                        onClick={handleVoiceButtonClick}
+                      >
+                        <X size={24} strokeWidth={2.5} />
+                      </button>
+                    ) : (
+                      <button 
+                        type="button"
+                        className="web-mic-button"
+                        aria-label="Enregistrer audio"
+                        onClick={handleVoiceButtonClick}
+                      >
+                        <Mic size={24} strokeWidth={2.5} />
+                      </button>
+                    )}
+                    
+                    {/* Input caché pour le téléchargement d'image */}
+                    <input 
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
                   </div>
                 </div>
               </form>
+              
+              {/* Affichage de l'enregistreur vocal quand activé */}
+              {isRecordingVoice && (
+                <div className="web-voice-recorder">
+                  <VoiceRecorder 
+                    onTranscriptionComplete={handleTranscriptionComplete}
+                    maxRecordingTimeMs={30000}
+                    language="fr"
+                  />
+                </div>
+              )}
+              
+              {/* Message d'accueil */}
               {!conversationStarted && (
                 <p className="web-question-footer">
                   <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
                 </p>
               )}
             </div>
+            
+            {/* Modal de téléchargement d'image */}
+            {isImageUploadModalOpen && (
+              <div className="web-modal-overlay">
+                <div className="web-modal">
+                  <div className="web-modal-header">
+                    <h3>Télécharger une image</h3>
+                    <button 
+                      type="button" 
+                      className="web-modal-close"
+                      onClick={handleCancelImageUpload}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  
+                  <div className="web-modal-content">
+                    {imagePreviewUrl && (
+                      <div className="web-image-preview">
+                        <img 
+                          src={imagePreviewUrl} 
+                          alt="Aperçu de l'image" 
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="web-modal-form">
+                      <textarea
+                        placeholder="Ajoute une question ou une description (optionnel)"
+                        className="web-modal-textarea"
+                        onChange={(e) => setQuestion(e.target.value)}
+                        value={question}
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="web-modal-footer">
+                    <button 
+                      type="button"
+                      className="web-modal-button cancel"
+                      onClick={handleCancelImageUpload}
+                    >
+                      Annuler
+                    </button>
+                    <button 
+                      type="button"
+                      className="web-modal-button submit"
+                      onClick={() => handleImageSubmit(question)}
+                    >
+                      Envoyer
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
