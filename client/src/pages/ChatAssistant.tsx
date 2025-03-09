@@ -923,8 +923,8 @@ const ChatAssistant: React.FC = () => {
           </div>
           
           {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
-            <div className={`${isMobile ? 'max-w-4xl' : 'max-w-3xl'} mx-auto px-2`}>
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load flex justify-center">
+            <div className="max-w-3xl w-full mx-auto">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
                 <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
