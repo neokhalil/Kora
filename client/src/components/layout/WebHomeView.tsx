@@ -47,7 +47,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           {/* Barre de recherche */}
           <div className="web-search-container">
             <form onSubmit={handleSearch} className="web-search-form">
-              <Search className="web-search-icon" size={16} />
+              <Search className="web-search-icon" size={15} />
               <input 
                 type="text" 
                 placeholder="Rechercher" 
@@ -57,14 +57,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               />
             </form>
             <button className="web-new-chat-button" aria-label="Nouvelle conversation">
-              <Plus size={20} />
+              <Plus size={16} strokeWidth={2.5} />
             </button>
           </div>
 
           {/* Section Aides aux études */}
           <div className="web-sidebar-section">
             <Link href="/aide-etudes" className="web-sidebar-link aide-etudes">
-              <FileText size={18} />
+              <FileText size={16} strokeWidth={2} />
               <span>Aides aux études</span>
             </Link>
           </div>
@@ -103,7 +103,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           {/* Profil utilisateur en bas */}
           <div className="web-profile-container">
             <Link href="/profile" className="web-profile-link">
-              <User size={18} />
+              <User size={16} strokeWidth={2} />
               <span>Mon profil</span>
             </Link>
           </div>
@@ -131,21 +131,21 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   className="web-input-button"
                   aria-label="Télécharger une image"
                 >
-                  <Image className="h-5 w-5" />
+                  <Image className="h-5 w-5" strokeWidth={1.75} />
                 </button>
                 <button 
                   type="button"
                   className="web-input-button"
                   aria-label="Enregistrer audio"
                 >
-                  <Mic className="h-5 w-5" />
+                  <Mic className="h-5 w-5" strokeWidth={1.75} />
                 </button>
                 <button 
                   type="submit"
                   className="web-send-button"
                   aria-label="Envoyer"
                 >
-                  <ArrowRight className="h-5 w-5" />
+                  <ArrowRight className="h-5 w-5" strokeWidth={2.5} />
                 </button>
               </div>
             </form>
