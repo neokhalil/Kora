@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, Book } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
+import BookIcon from '@/components/ui/BookIcon';
 
 // Type pour les conversations récentes
 interface RecentConversation {
@@ -34,7 +35,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
     { 
       id: 'studies-help', 
       title: 'Aide aux études', 
-      icon: <Book className="h-5 w-5 mr-3" />, 
+      icon: <BookIcon className="h-5 w-5 mr-3" />, 
       href: '/chat-assistant' 
     }
   ];

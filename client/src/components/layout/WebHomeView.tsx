@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, User, FileText, Settings } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, User, Settings } from 'lucide-react';
+import BookIcon from '@/components/ui/BookIcon';
 
 interface WebHomeViewProps {
   recentQuestions: RecentQuestion[];
@@ -69,13 +70,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           {/* Section Aides aux études */}
           <div className="web-sidebar-section">
             <a href="/chat-assistant" className="web-sidebar-link aide-etudes">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="web-icon-book">
-                <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" strokeWidth="2" />
-                <line x1="9" y1="6" x2="15" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="10" x2="15" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="14" x2="15" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <line x1="9" y1="18" x2="13" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <BookIcon className="web-icon-book" />
               <span>Aides aux études</span>
             </a>
           </div>
