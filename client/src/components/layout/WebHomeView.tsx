@@ -145,6 +145,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         content: data.content,
         sender: 'kora',
         allowActions: true,
+        messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
@@ -281,6 +282,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         sender: 'kora',
         allowActions: true,
         isImageAnalysis: true,
+        messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
@@ -670,12 +672,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 </div>
               )}
               
-              {/* Message d'accueil */}
-              {!conversationStarted && (
-                <p className="web-question-footer">
-                  <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
-                </p>
-              )}
+              {/* Message d'accueil - toujours visible */}
+              <p className="web-question-footer">
+                <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
+              </p>
             </div>
             
             {/* Modal de téléchargement d'image */}

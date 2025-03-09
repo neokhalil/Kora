@@ -53,6 +53,7 @@
   border: none;
   max-width: 100%;
   padding: 0.75rem 0.5rem;
+  box-shadow: none;
 }
 
 /* Image dans les messages */
@@ -186,6 +187,7 @@
   flex: 1;
   overflow-y: auto;
   margin-bottom: 1rem;
+  padding-top: 1.5rem; /* Espace en haut de la conversation */
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
@@ -259,7 +261,7 @@
 }
 
 .web-send-button {
-  background-color: #0066ff;
+  background-color: #000000;
   color: white;
   border: none;
 }
