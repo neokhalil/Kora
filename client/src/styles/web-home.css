@@ -108,6 +108,10 @@ body, html {
   font-weight: 500;
 }
 
+.web-sidebar-link svg {
+  flex-shrink: 0;
+}
+
 .web-sidebar-link:hover {
   background-color: #f3f4f6;
 }
@@ -115,6 +119,7 @@ body, html {
 .web-sidebar-link span {
   margin-left: 12px;
   font-size: 0.95rem;
+  display: block;
 }
 
 /* Séparateur */
@@ -360,4 +365,9 @@ body, html {
   font-size: 0.75rem;
   margin-top: 12px;
   margin-bottom: 0;
+}
+
+/* Style pour le nom KORA */
+.web-question-footer {
+  font-family: 'Elza Black', sans-serif;
 }
