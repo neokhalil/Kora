@@ -27,6 +27,9 @@
   letter-spacing: 0.1em;
   margin-left: 4px;
   color: #FF0000; /* Couleur rouge */
+  font-family: 'Arial Black', 'Helvetica Black', 'Impact', sans-serif;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 /* Base styles appliqués globalement */
