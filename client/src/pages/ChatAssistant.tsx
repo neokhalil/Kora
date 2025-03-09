@@ -873,8 +873,8 @@ const ChatAssistant: React.FC = () => {
             className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
           >
             {messages.length === 0 ? (
-              <div className="h-full flex flex-col justify-start pt-12">
-                <div className="max-w-md px-4">
+              <div className="h-full flex flex-col justify-center items-center">
+                <div className="text-center">
                   <h2 className="text-4xl font-bold mb-1">Hello,</h2>
                   <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
                   <p className="text-gray-600 text-3xl leading-tight">
