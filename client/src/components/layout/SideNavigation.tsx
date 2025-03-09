@@ -1,10 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Book, Search } from 'lucide-react';
+import { Book, Search, MessageSquare, ArrowRight, Clock } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+
+// Type pour les conversations récentes
+interface RecentConversation {
+  id: string;
+  title: string;
+  date: string;
+}
 
 // Composant de navigation latérale fixe pour les écrans larges
 const SideNavigation = () => {
   const [location] = useLocation();
+  const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
+  
+  // Simuler le chargement des conversations récentes
+  useEffect(() => {
+    // Dans un cas réel, cela viendrait d'une API
+    const mockConversations = [
+      { 
+        id: '1', 
+        title: 'Résoudre une équation du second degré', 
+        date: 'Il y a 2 heures' 
+      },
+      { 
+        id: '2', 
+        title: 'Comment calculer une dérivée', 
+        date: 'Hier' 
+      },
+      { 
+        id: '3', 
+        title: 'L\'accord du participe passé', 
+        date: 'Il y a 3 jours' 
+      }
+    ];
+    
+    setRecentConversations(mockConversations);
+  }, []);
   
   // Liste des éléments de menu - synchronisés avec SideMenu.tsx
   const menuItems = [
@@ -66,7 +100,7 @@ const SideNavigation = () => {
       </div>
       
       {/* Liste des éléments de menu */}
-      <nav className="flex-1 px-4 mt-2">
+      <nav className="flex-1 px-4 mt-2 overflow-y-auto">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const isActive = location === item.href;
@@ -85,6 +119,49 @@ const SideNavigation = () => {
               </Link>
             );
           })}
+        </div>
+        
+        {/* Section des conversations récentes */}
+        <div className="mt-6">
+          <div className="px-3 mb-2 flex justify-between items-center">
+            <h3 className="text-sm font-medium text-gray-600">
+              <div className="flex items-center">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Conversations récentes
+              </div>
+            </h3>
+            <Link href="/learning-history">
+              <span className="text-xs text-blue-600 hover:underline flex items-center">
+                Tout voir
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </span>
+            </Link>
+          </div>
+          
+          <Separator className="my-2" />
+          
+          <div className="space-y-2 mt-3">
+            {recentConversations.map(convo => (
+              <Link 
+                key={convo.id}
+                href={`/chat-assistant?id=${convo.id}`}
+                className="block px-3 py-2 text-sm rounded-lg text-gray-700 hover:bg-gray-50"
+              >
+                <div className="flex items-start">
+                  <Badge variant="outline" className="mr-2 mt-0.5 flex-shrink-0">
+                    <MessageSquare className="h-3 w-3 mr-1" />
+                  </Badge>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{convo.title}</p>
+                    <p className="text-xs text-gray-500 flex items-center mt-1">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {convo.date}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </nav>
       
