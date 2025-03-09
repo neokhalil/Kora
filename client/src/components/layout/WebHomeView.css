@@ -298,14 +298,14 @@
   color: #000;
 }
 
-/* Overlay complet pour masquer tout le contenu qui pourrait apparaître dessous */
+/* Overlay compact pour ne pas masquer les boutons d'action */
 .web-question-container::after {
   content: "";
   position: absolute;
   bottom: 100%; /* Positionné juste au-dessus du conteneur */
   left: -200px; /* S'étend au-delà des bords */
   right: -200px;
-  height: 80px; /* Plus grand pour couvrir complètement */
+  height: 15px; /* Hauteur réduite pour ne pas cacher les boutons d'action */
   background-color: white; /* Fond complètement opaque */
   z-index: -1; /* Sous le conteneur mais au-dessus du contenu */
 }
@@ -314,10 +314,10 @@
 .web-question-container::before {
   content: "";
   position: absolute;
-  bottom: calc(100% + 80px); /* Au-dessus de l'overlay opaque */
+  bottom: calc(100% + 15px); /* Au-dessus de l'overlay opaque, avec la nouvelle hauteur */
   left: -200px;
   right: -200px;
-  height: 80px; /* Transition plus douce */
+  height: 40px; /* Transition plus douce mais moins haute */
   background: linear-gradient(to top, white, rgba(255, 255, 255, 0));
   pointer-events: none; /* Permet de cliquer à travers */
   z-index: -1;

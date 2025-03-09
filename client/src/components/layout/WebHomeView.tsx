@@ -148,7 +148,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
-        allowActions: true,
+        allowActions: true, // Assurons-nous que cette propriété est correctement définie
         messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
     } catch (error) {
@@ -159,6 +159,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         id: Date.now().toString(),
         content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
         sender: 'kora',
+        allowActions: true, // Assurons-nous que cette propriété est définie
       }]);
     } finally {
       // Arrêter l'animation de réflexion
