@@ -202,7 +202,7 @@
 
 /* Ajoute une marge en bas pour que le dernier message soit visible */
 .web-messages-list {
-  padding-bottom: 80px; /* Espace minimal pour que les messages soient visibles */
+  padding-bottom: 100px; /* Espace ajusté pour correspondre à la référence */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -246,8 +246,8 @@
 
 /* Style spécifique pour les boutons d'indice */
 .web-challenge-actions {
-  padding-bottom: 1rem; /* Moins d'espace sous le bouton d'indice */
-  margin-bottom: 0;
+  padding-bottom: 1.25rem; /* Espacement égal aux autres boutons d'action */
+  margin-bottom: 0.75rem; /* Espacement égal aux autres boutons d'action */
   margin-top: 0.75rem;
   display: flex;
   justify-content: flex-end; /* Aligner le bouton à droite */
@@ -302,10 +302,10 @@
 /* Styles pour les boutons d'action des messages de Kora */
 .web-message-actions {
   display: flex;
-  margin-top: 0.75rem; /* Réduit */
+  margin-top: 0.75rem;
   gap: 0.75rem;
-  padding-bottom: 1rem; /* Réduit de moitié */
-  margin-bottom: 0.5rem; /* Réduit */
+  padding-bottom: 1.25rem; /* Espacement augmenté pour correspondre à la référence */
+  margin-bottom: 0.75rem; /* Espacement augmenté pour correspondre à la référence */
 }
 
 .web-action-button {
