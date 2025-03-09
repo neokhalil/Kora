@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
@@ -319,6 +319,106 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   };
   
+  // Demande une ré-explication
+  const handleReExplain = async (messageId: string) => {
+    if (!messageId) return;
+    
+    // Récupère le message original
+    const originalMessage = messages.find(m => m.id === messageId);
+    if (!originalMessage) return;
+    
+    // Indiquer que KORA réfléchit
+    setIsThinking(true);
+    
+    try {
+      // Appel API pour la ré-explication
+      const response = await fetch('/api/tutoring/reexplain', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: originalMessage.content,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête API');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de KORA
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        allowActions: true,
+        isReExplanation: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la ré-explication:', error);
+      
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant de reformuler ma réponse.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+  
+  // Demande un exercice de challenge
+  const handleChallenge = async (messageId: string) => {
+    if (!messageId) return;
+    
+    // Récupère le message original
+    const originalMessage = messages.find(m => m.id === messageId);
+    if (!originalMessage) return;
+    
+    // Indiquer que KORA réfléchit
+    setIsThinking(true);
+    
+    try {
+      // Appel API pour générer un exercice
+      const response = await fetch('/api/tutoring/challenge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: originalMessage.content,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la requête API');
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter la réponse de KORA
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        allowActions: false,
+        isChallenge: true,
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la génération de l\'exercice:', error);
+      
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Désolé, j'ai rencontré un problème en essayant de générer un exercice.",
+        sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+
   // Fonction pour afficher les messages de la conversation
   const renderMessage = (message: Message) => {
     const isUserMessage = message.sender === 'user';
@@ -343,6 +443,35 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         <div className="web-message-content">
           <MathJaxRenderer content={message.content} />
         </div>
+        
+        {/* Boutons d'action pour les messages de Kora uniquement */}
+        {!isUserMessage && message.allowActions && (
+          <div className="web-message-actions">
+            <button 
+              type="button"
+              className="web-message-action-button"
+              onClick={() => handleReExplain(message.id)}
+            >
+              <RefreshCcw size={15} />
+              Reformuler
+            </button>
+            <button 
+              type="button"
+              className="web-message-action-button"
+              onClick={() => handleChallenge(message.id)}
+            >
+              <Lightbulb size={15} />
+              Exercice
+            </button>
+            <button 
+              type="button"
+              className="web-message-action-button"
+            >
+              <BookOpen size={15} />
+              Cours
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -487,17 +616,25 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       aria-label="Télécharger une image"
                       onClick={handleImageClick}
                     >
-                      <Image size={24} strokeWidth={2} />
+                      <Image size={20} strokeWidth={2} />
                     </button>
                     
-                    {isRecordingVoice ? (
+                    {question.trim() ? (
+                      <button 
+                        type="submit"
+                        className="web-send-button"
+                        aria-label="Envoyer"
+                      >
+                        <Send size={20} strokeWidth={2} />
+                      </button>
+                    ) : isRecordingVoice ? (
                       <button 
                         type="button"
                         className="web-mic-button recording"
                         aria-label="Arrêter l'enregistrement"
                         onClick={handleVoiceButtonClick}
                       >
-                        <X size={24} strokeWidth={2.5} />
+                        <X size={20} strokeWidth={2.5} />
                       </button>
                     ) : (
                       <button 
@@ -506,7 +643,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                         aria-label="Enregistrer audio"
                         onClick={handleVoiceButtonClick}
                       >
-                        <Mic size={24} strokeWidth={2.5} />
+                        <Mic size={20} strokeWidth={2.5} />
                       </button>
                     )}
                     
