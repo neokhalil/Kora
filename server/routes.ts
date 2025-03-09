@@ -348,6 +348,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: 'Failed to generate challenge problem' });
     }
   });
+  
+  app.post('/api/tutoring/hint', async (req: Request, res: Response) => {
+    try {
+      const { exerciseContent } = req.body;
+      
+      if (!exerciseContent) {
+        return res.status(400).json({ message: 'Exercise content is required' });
+      }
+      
+      // En attendant d'avoir une fonction spécifique pour les indices dans openai.ts,
+      // nous pouvons utiliser le modèle existant avec un prompt spécifique
+      // Note: Cette implémentation est temporaire et devrait être remplacée par
+      // une fonction dédiée dans openai.ts
+      
+      const prompt = `Tu es Kora, un assistant pédagogique expert. Voici un exercice que tu as donné à un étudiant :
+      
+${exerciseContent}
+
+Fournis un indice utile qui guidera l'étudiant vers la solution sans lui donner la réponse complète. 
+L'indice doit être subtil, instructif et faire réfléchir l'étudiant.`;
+      
+      // Utiliser la fonction existante comme solution temporaire
+      const messages = [{ role: 'user' as const, content: prompt }];
+      const response = await generateTutoringResponse(prompt, messages);
+      
+      res.json({ 
+        content: response,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Error in hint request:', error);
+      res.status(500).json({ message: 'Failed to generate hint' });
+    }
+  });
 
   // Endpoint for audio transcription with Whisper API
   app.post('/api/transcribe', audioUpload.single('audio'), async (req: Request, res: Response) => {

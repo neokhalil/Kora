@@ -207,18 +207,65 @@
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
 .web-thinking {
-  padding-bottom: 1rem; /* Moins d'espace pour les points de réflexion */
+  padding: 1rem 1.5rem; /* Moins d'espace pour les points de réflexion */
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px; /* Hauteur fixe pour éviter les sauts */
+}
+
+/* Animation des points de réflexion */
+.web-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #888;
+  border-radius: 50%;
+  display: inline-block;
+  animation: dot-pulse 1.5s infinite ease-in-out;
+}
+
+.web-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.web-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
 }
 
 /* Style spécifique pour les boutons d'indice */
 .web-challenge-actions {
   padding-bottom: 1rem; /* Moins d'espace sous le bouton d'indice */
   margin-bottom: 0;
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-end; /* Aligner le bouton à droite */
 }
 
 .web-challenge-actions .web-action-button {
-  background-color: #f7f3e3; /* Couleur légèrement différente pour le distinguer */
-  color: #6b5b35;
+  background-color: #e9f7ff; /* Couleur bleue claire pour la distinguer */
+  color: #0066cc;
+  border: 1px solid #c2e4ff;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.web-challenge-actions .web-action-button:hover {
+  background-color: #d8efff;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
@@ -238,16 +285,29 @@
   position: relative;
 }
 
-/* Pseudo-élément pour bloquer complètement le contenu sous la zone de saisie */
+/* Overlay complet pour masquer tout le contenu qui pourrait apparaître dessous */
+.web-question-container::after {
+  content: "";
+  position: absolute;
+  bottom: 100%; /* Positionné juste au-dessus du conteneur */
+  left: -200px; /* S'étend au-delà des bords */
+  right: -200px;
+  height: 80px; /* Plus grand pour couvrir complètement */
+  background-color: white; /* Fond complètement opaque */
+  z-index: -1; /* Sous le conteneur mais au-dessus du contenu */
+}
+
+/* Pseudo-élément pour créer une transition douce vers le haut */
 .web-question-container::before {
   content: "";
   position: absolute;
-  top: -50px; /* Déborde vers le haut */
-  left: 0;
-  right: 0;
-  height: 50px; /* Hauteur de l'élément de blocage */
-  background: linear-gradient(to top, white, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 0));
+  bottom: calc(100% + 80px); /* Au-dessus de l'overlay opaque */
+  left: -200px;
+  right: -200px;
+  height: 80px; /* Transition plus douce */
+  background: linear-gradient(to top, white, rgba(255, 255, 255, 0));
   pointer-events: none; /* Permet de cliquer à travers */
+  z-index: -1;
 }
 
 /* Styles pour les boutons d'action des messages de Kora */

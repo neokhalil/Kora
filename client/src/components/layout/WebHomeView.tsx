@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
@@ -577,7 +577,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               className="web-action-button"
               onClick={() => handleHint(message.challengeId!)}
             >
-              <Lightbulb size={15} />
+              <HelpCircle size={15} />
               <span>Indice</span>
             </button>
           </div>
