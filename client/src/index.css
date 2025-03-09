@@ -21,6 +21,13 @@
   letter-spacing: 0.05em;
 }
 
+/* Style spécifique pour KORA dans le header */
+#kora-header-title.kora-name {
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  margin-left: 4px;
+}
+
 /* Base styles appliqués globalement */
 @layer base {
   * {

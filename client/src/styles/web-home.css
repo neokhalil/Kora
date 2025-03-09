@@ -143,17 +143,22 @@ body, html {
 .aide-etudes {
   align-items: center !important;
   display: flex !important;
+  width: 100% !important;
 }
 
 .aide-etudes svg {
   margin-top: 0 !important;
   margin-right: 12px !important;
   flex-shrink: 0 !important;
+  min-width: 16px !important;
 }
 
 .aide-etudes span {
   display: inline-block !important;
   vertical-align: middle !important;
+  white-space: normal !important;
+  width: calc(100% - 30px) !important;
+  overflow: visible !important;
 }
 
 /* Séparateur */
