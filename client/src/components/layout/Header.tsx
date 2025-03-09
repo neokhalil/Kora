@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Menu, X } from 'lucide-react';
 import SideMenu from './SideMenu';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const isMobile = useIsMobile(); // Vérification si on est sur mobile
   
   // Effet pour ajouter/supprimer la classe menu-open au body
   useEffect(() => {
@@ -39,12 +41,6 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('keydown', handleEscapeKey);
   }, [isMenuOpen]);
   
-  // Détection du système d'exploitation déplacée dans mobileViewportFix.ts
-  // pour centraliser la logique et éviter les redondances
-  
-  // Nous n'avons pas besoin d'un gestionnaire de clic sur document pour le débogage
-  // Le clic est géré directement par l'événement onClick sur le bouton
-  
   // Mémoriser la fonction de toggle du menu pour éviter de la recréer
   const toggleMenu = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     // Important: empêcher la propagation et le comportement par défaut
@@ -67,16 +63,17 @@ const Header: React.FC = () => {
     }
   }, [isMenuOpen]);
   
+  // Si on n'est pas sur mobile, ne pas afficher le header
+  if (!isMobile) {
+    return null;
+  }
+  
   return (
     <>
-      {/* Header container qui correspond au style dans index.html */}
-      <div 
-        id="kora-header-container"
-      >
+      {/* Header container - uniquement affiché en version mobile */}
+      <div id="kora-header-container">
         {/* Header content */}
-        <div 
-          id="kora-header"
-        >
+        <div id="kora-header">
           {/* Menu button avec indicateur d'état */}
           <div className="header-left-group">
             <button 
