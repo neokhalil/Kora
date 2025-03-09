@@ -134,14 +134,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     className="web-image-button"
                     aria-label="Télécharger une image"
                   >
-                    <Image size={22} strokeWidth={1.5} />
+                    <Image size={24} strokeWidth={2} />
                   </button>
                   <button 
                     type="button"
                     className="web-mic-button"
                     aria-label="Enregistrer audio"
                   >
-                    <Mic size={22} strokeWidth={1.5} />
+                    <Mic size={24} strokeWidth={2.5} />
                   </button>
                 </div>
               </div>
