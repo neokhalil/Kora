@@ -33,7 +33,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const menuItems: MenuItem[] = [
     { 
       id: 'studies-help', 
-      title: 'Aides aux études', 
+      title: 'Aide aux études', 
       icon: <Book className="h-5 w-5 mr-3" />, 
       href: '/chat-assistant' 
     }
@@ -42,22 +42,15 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   // État pour les conversations récentes (à remplir via API)
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
   
-  // Conversations récentes basées sur l'image
+  // Effet pour charger les conversations récentes (simulé pour le moment)
   useEffect(() => {
+    // Dans un cas réel, vous utiliseriez une requête API avec react-query
+    // Cette structure permet l'intégration future avec l'API
     const loadRecentConversations = async () => {
       try {
-        // Groupes de conversations par date
-        const hierConversations = [
-          { id: '1', title: 'Soustraction posée', date: new Date() },
-          { id: '2', title: 'Conjugaison au présent', date: new Date() }
-        ];
-        
-        const semaineDerniereConversations = [
-          { id: '3', title: 'Les groupes nominaux', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
-          { id: '4', title: 'Les adjectifs', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
-        ];
-        
-        setRecentConversations([...hierConversations, ...semaineDerniereConversations]);
+        // Conversations récentes à charger via API plus tard
+        // Pour le moment, utilisons un tableau vide pour avoir une UI propre
+        setRecentConversations([]);
       } catch (error) {
         console.error("Erreur lors du chargement des conversations récentes:", error);
       }
@@ -144,17 +137,17 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             {/* Logo supprimé pour éviter d'avoir "KORA" deux fois */}
           </div>
           
-          {/* Champ de recherche basé sur l'image */}
-          <div className="px-4 py-2">
+          {/* Champ de recherche amélioré */}
+          <div className="px-4 py-3">
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-gray-400" />
+                <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 ref={searchInputRef}
                 type="text"
                 placeholder="Rechercher"
-                className="block w-full pl-8 pr-3 py-2 rounded-lg bg-gray-100 text-sm border-0 focus:outline-none focus:ring-0"
+                className="block w-full pl-10 pr-10 py-3 rounded-full bg-gray-100 focus:outline-none"
                 value={searchQuery}
                 readOnly={readOnly}
                 onClick={() => setReadOnly(false)}
@@ -168,16 +161,19 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 aria-label="Rechercher"
               />
               
-              {/* Bouton pour créer une nouvelle discussion */}
-              <Link 
-                href="/new-chat"
-                className="absolute inset-y-0 right-2 flex items-center text-gray-600 hover:text-gray-900"
-                onClick={() => onClose()}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
-              </Link>
+              {/* Bouton pour effacer la recherche si du texte est présent */}
+              {searchQuery && (
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-700"
+                  onClick={() => setSearchQuery('')}
+                  aria-label="Effacer la recherche"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
           
@@ -233,14 +229,28 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             )}
           </div>
           
-          {/* Pied de menu avec le profil exactement comme dans l'image */}
-          <div className="mt-auto p-4 border-t border-gray-200">
-            <Link href="/profile" className="flex items-center">
-              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-center mr-2">
-                <span className="text-gray-600 text-xs">M</span>
+          {/* Pied de menu avec bouton de retour ou lien vers les paramètres */}
+          <div className="mt-auto p-4">
+            <div className="flex items-center">
+              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-center font-medium mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
               </div>
-              <span className="text-sm">Mon profil</span>
-            </Link>
+              <span className="font-medium">Mon profil</span>
+              <button 
+                className="ml-auto p-2 rounded-full hover:bg-gray-100"
+                onClick={() => {
+                  // Future action pour les paramètres ou la déconnexion
+                  onClose();
+                }}
+                aria-label="Options utilisateur"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>

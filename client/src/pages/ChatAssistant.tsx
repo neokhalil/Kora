@@ -874,11 +874,13 @@ const ChatAssistant: React.FC = () => {
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">
-                <div className="max-w-md px-4 text-center">
-                  <h1 className="text-4xl font-bold mb-4">Hello Ibrahima</h1>
-                  <p className="text-gray-500 text-2xl leading-tight">
-                    Comment puis t'aider<br />
-                    aujourd'hui?
+                <div className="max-w-md px-4">
+                  <h2 className="text-4xl font-bold mb-1">Hello,</h2>
+                  <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
+                  <p className="text-gray-600 text-3xl leading-tight">
+                    Comment<br />
+                    puis-je t'aider<br />
+                    aujourd'hui ?
                   </p>
                 </div>
               </div>

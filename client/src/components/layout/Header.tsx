@@ -106,7 +106,7 @@ const Header: React.FC = () => {
             </button>
             
             {/* Logo - style déplacé vers le CSS */}
-            <h1 id="kora-header-title">KORA</h1>
+            <h1 id="kora-header-title">Kora</h1>
           </div>
           
           {/* Empty div to balance the layout - style déplacé vers le CSS */}
