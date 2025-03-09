@@ -101,21 +101,19 @@ body, html {
   align-items: center;
   text-decoration: none;
   color: #1f2937;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 6px;
   transition: background-color 0.2s;
+  margin-bottom: 4px;
+  font-weight: 500;
 }
 
 .web-sidebar-link:hover {
   background-color: #f3f4f6;
 }
 
-.web-sidebar-link.aide-etudes {
-  margin-bottom: 4px;
-}
-
 .web-sidebar-link span {
-  margin-left: 10px;
+  margin-left: 12px;
   font-size: 0.95rem;
 }
 
@@ -163,7 +161,6 @@ body, html {
 .web-profile-container {
   margin-top: auto;
   padding: 16px;
-  border-top: 1px solid #e5e7eb;
 }
 
 .web-profile-link {
@@ -171,9 +168,10 @@ body, html {
   align-items: center;
   text-decoration: none;
   color: #1f2937;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 6px;
   transition: background-color 0.2s;
+  font-weight: 500;
 }
 
 .web-profile-link:hover {
@@ -181,7 +179,7 @@ body, html {
 }
 
 .web-profile-link span {
-  margin-left: 10px;
+  margin-left: 12px;
   font-size: 0.95rem;
 }
 
