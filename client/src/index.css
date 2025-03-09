@@ -6,6 +6,21 @@
   --header-height: 56px;
 }
 
+@font-face {
+  font-family: 'Elza Black';
+  src: url('/fonts/Elza-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Style pour le nom KORA */
+.kora-name {
+  font-family: 'Elza Black', 'Arial Black', 'Helvetica Black', sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
 /* Base styles appliqués globalement */
 @layer base {
   * {
