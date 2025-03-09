@@ -118,7 +118,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           
           {/* Zone de question avec boutons */}
           <div className="web-question-container">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="web-question-form">
               <div className="web-question-box">
                 <input 
                   type="text" 
@@ -126,27 +126,29 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                 />
-                <button 
-                  type="button"
-                  className="web-input-button"
-                  aria-label="Télécharger une image"
-                >
-                  <Image className="h-5 w-5" strokeWidth={1.75} />
-                </button>
-                <button 
-                  type="button"
-                  className="web-input-button"
-                  aria-label="Enregistrer audio"
-                >
-                  <Mic className="h-5 w-5" strokeWidth={1.75} />
-                </button>
-                <button 
-                  type="submit"
-                  className="web-send-button"
-                  aria-label="Envoyer"
-                >
-                  <ArrowRight className="h-5 w-5" strokeWidth={2.5} />
-                </button>
+                <div className="web-input-actions">
+                  <button 
+                    type="button"
+                    className="web-input-button"
+                    aria-label="Télécharger une image"
+                  >
+                    <Image size={24} strokeWidth={1.5} />
+                  </button>
+                  <button 
+                    type="button"
+                    className="web-input-button"
+                    aria-label="Enregistrer audio"
+                  >
+                    <Mic size={24} strokeWidth={1.5} />
+                  </button>
+                  <button 
+                    type="submit"
+                    className="web-send-button"
+                    aria-label="Envoyer"
+                  >
+                    <ArrowRight size={24} strokeWidth={2.5} />
+                  </button>
+                </div>
               </div>
             </form>
             <p className="web-question-footer">
