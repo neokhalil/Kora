@@ -7,7 +7,6 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/Header";
 import ChatAssistant from "@/pages/ChatAssistant";
 import Home from "@/pages/Home";
-import { MathJaxContext } from "better-react-mathjax";
 
 // Configuration des routes
 const routes = [
@@ -42,30 +41,12 @@ const AppContainer = () => {
   );
 };
 
-// Configuration de MathJax
-const mathJaxConfig = {
-  tex: {
-    inlineMath: [["$", "$"]],
-    displayMath: [["$$", "$$"]],
-    processEscapes: true,
-    packages: ['base', 'ams', 'noerrors', 'noundefined']
-  },
-  svg: {
-    fontCache: 'global'
-  },
-  startup: {
-    typeset: true
-  }
-};
-
 // Application principale
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <MathJaxContext config={mathJaxConfig}>
-        <AppContainer />
-        <Toaster />
-      </MathJaxContext>
+      <AppContainer />
+      <Toaster />
     </QueryClientProvider>
   );
 };
