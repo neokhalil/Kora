@@ -44,6 +44,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       <div className="web-layout">
         {/* Sidebar - menu latéral gauche */}
         <div className="web-sidebar">
+          {/* Logo KORA */}
+          <div className="web-logo-container">
+            <h1 className="web-kora-logo">KORA</h1>
+          </div>
+          
           {/* Barre de recherche */}
           <div className="web-search-container">
             <form onSubmit={handleSearch} className="web-search-form">
@@ -64,7 +69,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           {/* Section Aides aux études */}
           <div className="web-sidebar-section">
             <a href="/chat-assistant" className="web-sidebar-link aide-etudes">
-              <FileText size={16} strokeWidth={2} />
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="web-icon-book">
+                <rect x="4" y="2" width="16" height="20" rx="2" stroke="currentColor" strokeWidth="2" />
+                <line x1="9" y1="6" x2="15" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="10" x2="15" y2="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="14" x2="15" y2="14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <line x1="9" y1="18" x2="13" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
               <span>Aides aux études</span>
             </a>
           </div>
