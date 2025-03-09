@@ -120,33 +120,28 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           <div className="web-question-container">
             <form onSubmit={handleSubmit} className="web-question-form">
               <div className="web-question-box">
-                <input 
-                  type="text" 
-                  placeholder="Pose ta question"
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                />
-                <div className="web-input-actions">
+                <div className="web-input-wrapper">
+                  <input 
+                    type="text" 
+                    placeholder="Pose ta question"
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                  />
+                </div>
+                <div className="web-action-buttons">
                   <button 
                     type="button"
-                    className="web-input-button"
+                    className="web-image-button"
                     aria-label="Télécharger une image"
                   >
-                    <Image size={24} strokeWidth={1.5} />
+                    <Image size={22} strokeWidth={1.5} />
                   </button>
                   <button 
                     type="button"
-                    className="web-input-button"
+                    className="web-mic-button"
                     aria-label="Enregistrer audio"
                   >
-                    <Mic size={24} strokeWidth={1.5} />
-                  </button>
-                  <button 
-                    type="submit"
-                    className="web-send-button"
-                    aria-label="Envoyer"
-                  >
-                    <ArrowRight size={24} strokeWidth={2.5} />
+                    <Mic size={22} strokeWidth={1.5} />
                   </button>
                 </div>
               </div>
