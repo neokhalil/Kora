@@ -5,6 +5,7 @@ import { ArrowRight, Mic, Image, Search, PenLine, User, Settings } from 'lucide-
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import './WebHomeView.css';
+import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
 
 // Interface pour les messages de la conversation
 interface Message {
@@ -180,9 +181,36 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         key={message.id}
         className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}
       >
-        <div className="web-message-content">
-          {message.content}
+        {/* Afficher le nom "You" ou "KORA" comme sur ChatGPT */}
+        <div className="web-message-header">
+          <span className="web-message-sender">
+            {isUserMessage ? 'Vous' : 'KORA'}
+          </span>
         </div>
+        
+        {/* Contenu du message avec support des maths */}
+        <div className="web-message-content">
+          {message.imageUrl && (
+            <div className="web-message-image">
+              <img src={message.imageUrl} alt="Uploaded content" />
+            </div>
+          )}
+          <div className="web-message-text">
+            <MathJaxRenderer content={message.content} />
+          </div>
+        </div>
+        
+        {/* Actions (si disponibles et si c'est un message de KORA) */}
+        {!isUserMessage && message.allowActions && (
+          <div className="web-message-actions">
+            <button className="web-action-button">
+              Explique différemment
+            </button>
+            <button className="web-action-button">
+              Donne-moi un exercice
+            </button>
+          </div>
+        )}
       </div>
     );
   };
@@ -293,10 +321,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 {messages.map(renderMessage)}
                 {isThinking && (
                   <div className="web-message web-kora-message">
-                    <div className="web-message-content web-thinking">
-                      <span className="web-dot"></span>
-                      <span className="web-dot"></span>
-                      <span className="web-dot"></span>
+                    <div className="web-message-header">
+                      <span className="web-message-sender">KORA</span>
+                    </div>
+                    <div className="web-message-content">
+                      <div className="web-thinking">
+                        <span className="web-dot"></span>
+                        <span className="web-dot"></span>
+                        <span className="web-dot"></span>
+                      </div>
                     </div>
                   </div>
                 )}

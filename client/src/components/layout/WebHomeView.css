@@ -1,59 +1,119 @@
-/* Styles spécifiques pour la version web de la conversation */
+/* Styles spécifiques pour la version web de la conversation style ChatGPT */
 
 /* Container de la conversation */
 .web-conversation-container {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  padding: 1rem;
   overflow-y: auto;
-  height: calc(100% - 180px); /* Ajuster en fonction de la hauteur du formulaire */
+  height: calc(100% - 140px); /* Ajuster en fonction de la hauteur du formulaire */
   margin-bottom: 1rem;
+  width: 100%;
 }
 
 /* Liste des messages */
 .web-messages-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  width: 100%;
+  max-width: 768px; /* Largeur maximum comme ChatGPT */
+  margin: 0 auto; /* Centre les messages */
   padding-bottom: 2rem;
 }
 
 /* Style commun pour tous les messages */
 .web-message {
-  max-width: 80%;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
+  width: 100%;
+  padding: 1rem 0;
   margin-bottom: 0.5rem;
   white-space: pre-wrap;
+  position: relative;
 }
 
 /* Message de l'utilisateur */
 .web-user-message {
-  align-self: flex-end;
-  background-color: #0066ff;
-  color: white;
-  border-bottom-right-radius: 2px;
+  background-color: rgba(247, 247, 248, 0.9); /* Fond gris clair comme ChatGPT */
 }
 
 /* Message de KORA */
 .web-kora-message {
-  align-self: flex-start;
-  background-color: #f0f0f5;
+  background-color: white;
   color: #333;
-  border-bottom-left-radius: 2px;
 }
 
-/* Contenu du message */
+/* En-tête du message (nom de l'expéditeur) */
+.web-message-header {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  padding: 0 1.5rem;
+}
+
+.web-message-sender {
+  color: #555;
+}
+
+.web-user-message .web-message-sender {
+  color: #444;
+}
+
+/* Contenu du message - style ChatGPT */
 .web-message-content {
-  font-size: 15px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.5;
+  width: 100%;
+  max-width: 90%;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Zone de texte du message */
+.web-message-text {
+  width: 100%;
+}
+
+/* Image dans le message */
+.web-message-image {
+  margin-bottom: 0.75rem;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.web-message-image img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+/* Actions de message (boutons explique différemment, etc.) */
+.web-message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0 1.5rem;
+}
+
+.web-action-button {
+  background-color: #f0f0f5;
+  border: 1px solid #e0e0e5;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.web-action-button:hover {
+  background-color: #e5e5ea;
 }
 
 /* Animation "en train de réfléchir" */
 .web-thinking {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.3rem;
   padding: 0.5rem 1rem;
@@ -62,8 +122,8 @@
 
 /* Points de l'animation "en train de réfléchir" */
 .web-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   background-color: #666;
   border-radius: 50%;
   animation: pulse 1.5s infinite ease-in-out;
@@ -92,13 +152,14 @@
 .web-main-content {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 /* Donne plus d'espace à la conversation lorsqu'elle est active */
 .web-conversation-container {
   flex: 1;
   overflow-y: auto;
-  margin-bottom: 1rem;
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
@@ -106,6 +167,160 @@
   position: sticky;
   bottom: 0;
   background-color: white;
-  padding-top: 0.5rem;
+  padding: 0.75rem 1rem;
   z-index: 10;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Formulaire de question centré */
+.web-question-form {
+  width: 100%;
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+/* Zone de saisie de texte */
+.web-question-box {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 0.5rem;
+  background-color: white;
+}
+
+.web-input-wrapper {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+}
+
+.web-input-wrapper input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  background: transparent;
+}
+
+.web-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.web-image-button, .web-mic-button {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  margin: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.web-image-button:hover, .web-mic-button:hover {
+  background-color: #f5f5f5;
+}
+
+.web-question-footer {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-top: 1rem;
+}
+
+.kora-name {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Style pour les blocs de code */
+.web-code-block {
+  background-color: #f7f7f8;
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Style pour les formules mathématiques */
+.web-math-formula {
+  display: block;
+  margin: 0.75rem 0;
+  text-align: center;
+}
+
+/* Style pour les listes numérotées */
+.web-numbered-list {
+  counter-reset: item;
+  list-style-type: none;
+  padding-left: 1.5rem;
+}
+
+.web-numbered-list li {
+  counter-increment: item;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.web-numbered-list li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: -1.5rem;
+  width: 1.2rem;
+  text-align: right;
+  font-weight: bold;
+}
+
+/* Titres dans les messages */
+.web-message-content h1, 
+.web-message-content h2, 
+.web-message-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.web-message-content h1 {
+  font-size: 1.5rem;
+}
+
+.web-message-content h2 {
+  font-size: 1.25rem;
+}
+
+.web-message-content h3 {
+  font-size: 1.125rem;
+}
+
+/* Styles pour les paragraphes */
+.web-message-content p {
+  margin-bottom: 1rem;
+}
+
+/* Style pour les cas particuliers */
+.web-case-item {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.web-case-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
 }
