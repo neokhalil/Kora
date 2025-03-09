@@ -202,7 +202,7 @@
 
 /* Ajoute une marge en bas pour que le dernier message soit visible */
 .web-messages-list {
-  padding-bottom: 200px; /* Espace fortement augmenté pour que les messages et actions soient complètement visibles */
+  padding-bottom: 160px; /* Espace réduit mais suffisant pour voir les messages et actions */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -273,16 +273,29 @@
   position: sticky;
   bottom: 0;
   background-color: white;
-  padding-top: 0.75rem;
   z-index: 100; /* Z-index élevé pour être toujours au-dessus des messages */
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  padding: 1.25rem 1rem; /* Padding vertical augmenté */
+  padding: 1rem 1rem 0.5rem 1rem; /* Padding réduit en bas pour moins d'espace */
   box-shadow: 0 -30px 40px 20px white; /* Ombre blanche étendue pour masquer complètement le contenu */
   border-top: 1px solid rgba(0, 0, 0, 0.08); /* Bordure légèrement plus visible */
   /* Rendre le fond complètement opaque */
   position: relative;
+}
+
+/* Style pour le texte d'information en bas */
+.web-question-footer {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+}
+
+/* Style pour le nom KORA dans le footer */
+.kora-name {
+  font-weight: 600;
+  color: #000;
 }
 
 /* Overlay complet pour masquer tout le contenu qui pourrait apparaître dessous */
