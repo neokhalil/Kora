@@ -38,6 +38,10 @@ interface Message {
   sender: 'user' | 'kora';
   allowActions?: boolean;
   imageUrl?: string | null;
+  isReExplanation?: boolean;
+  isChallenge?: boolean;
+  isHint?: boolean;
+  challengeId?: string; // Pour associer un indice à un exercice spécifique
 }
 
 interface WebHomeViewProps {
@@ -420,6 +424,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
+      // Générer un ID unique pour l'exercice afin de pouvoir lier des indices
+      const challengeId = `challenge-${Date.now()}`;
+      
       // Ajouter la réponse de KORA
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
@@ -427,6 +434,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         sender: 'kora',
         allowActions: false,
         isChallenge: true,
+        challengeId: challengeId
       }]);
     } catch (error) {
       console.error('Erreur lors de la génération de l\'exercice:', error);
@@ -435,6 +443,72 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         id: Date.now().toString(),
         content: "Désolé, j'ai rencontré un problème en essayant de générer un exercice.",
         sender: 'kora',
+      }]);
+    } finally {
+      setIsThinking(false);
+    }
+  };
+  
+  // Demande un indice pour un exercice
+  const handleHint = async (challengeId: string) => {
+    if (!challengeId) return;
+    
+    // Récupère l'exercice original
+    const challengeMessage = messages.find(m => m.challengeId === challengeId);
+    if (!challengeMessage) return;
+    
+    // Indiquer que KORA réfléchit
+    setIsThinking(true);
+    
+    try {
+      // Appel API pour générer un indice
+      const response = await fetch('/api/tutoring/hint', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          exerciseContent: challengeMessage.content,
+        }),
+      });
+      
+      if (!response.ok) {
+        // Si l'API n'est pas disponible, on génère un indice générique
+        // Cela permet d'avoir la fonctionnalité sans avoir besoin d'implémenter l'API tout de suite
+        const hintContent = "Voici un indice pour t'aider : essaie de repenser au concept que nous avons discuté précédemment et applique-le étape par étape à ce problème.";
+        
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          content: hintContent,
+          sender: 'kora',
+          isHint: true,
+          challengeId: challengeId
+        }]);
+        
+        setIsThinking(false);
+        return;
+      }
+      
+      const data = await response.json();
+      
+      // Ajouter l'indice de KORA
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: data.content,
+        sender: 'kora',
+        isHint: true,
+        challengeId: challengeId
+      }]);
+    } catch (error) {
+      console.error('Erreur lors de la génération de l\'indice:', error);
+      
+      // Même en cas d'erreur, fournir un indice générique
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        content: "Voici un indice : essaie de décomposer le problème en étapes plus simples et résoudre chaque partie séparément.",
+        sender: 'kora',
+        isHint: true,
+        challengeId: challengeId
       }]);
     } finally {
       setIsThinking(false);
@@ -466,7 +540,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           <MathJaxRenderer content={message.content} />
         </div>
         
-        {/* Boutons d'action pour les messages de Kora uniquement */}
+        {/* Boutons d'action standards pour les messages de Kora */}
         {!isUserMessage && message.allowActions && (
           <div className="web-message-actions">
             <button 
@@ -491,6 +565,20 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             >
               <BookOpen size={15} />
               <span>Cours</span>
+            </button>
+          </div>
+        )}
+        
+        {/* Bouton d'indice pour les exercices */}
+        {!isUserMessage && message.isChallenge && message.challengeId && (
+          <div className="web-message-actions web-challenge-actions">
+            <button 
+              type="button"
+              className="web-action-button"
+              onClick={() => handleHint(message.challengeId!)}
+            >
+              <Lightbulb size={15} />
+              <span>Indice</span>
             </button>
           </div>
         )}

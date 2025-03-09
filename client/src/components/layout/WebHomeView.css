@@ -205,6 +205,22 @@
   padding-bottom: 200px; /* Espace fortement augmenté pour que les messages et actions soient complètement visibles */
 }
 
+/* Réduire l'espace quand Kora est en train de réfléchir */
+.web-thinking {
+  padding-bottom: 1rem; /* Moins d'espace pour les points de réflexion */
+}
+
+/* Style spécifique pour les boutons d'indice */
+.web-challenge-actions {
+  padding-bottom: 1rem; /* Moins d'espace sous le bouton d'indice */
+  margin-bottom: 0;
+}
+
+.web-challenge-actions .web-action-button {
+  background-color: #f7f3e3; /* Couleur légèrement différente pour le distinguer */
+  color: #6b5b35;
+}
+
 /* Ajustements pour le conteneur de questions en mode conversation */
 .web-question-container {
   position: sticky;
@@ -216,8 +232,22 @@
   margin: 0 auto;
   width: 100%;
   padding: 1.25rem 1rem; /* Padding vertical augmenté */
-  box-shadow: 0 -20px 30px rgba(255, 255, 255, 1); /* Effet d'ombre plus prononcé */
+  box-shadow: 0 -30px 40px 20px white; /* Ombre blanche étendue pour masquer complètement le contenu */
   border-top: 1px solid rgba(0, 0, 0, 0.08); /* Bordure légèrement plus visible */
+  /* Rendre le fond complètement opaque */
+  position: relative;
+}
+
+/* Pseudo-élément pour bloquer complètement le contenu sous la zone de saisie */
+.web-question-container::before {
+  content: "";
+  position: absolute;
+  top: -50px; /* Déborde vers le haut */
+  left: 0;
+  right: 0;
+  height: 50px; /* Hauteur de l'élément de blocage */
+  background: linear-gradient(to top, white, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 0));
+  pointer-events: none; /* Permet de cliquer à travers */
 }
 
 /* Styles pour les boutons d'action des messages de Kora */
