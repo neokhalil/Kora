@@ -961,8 +961,8 @@ const ChatAssistant: React.FC = () => {
               {/* Composeur de message adapté selon la plateforme */}
               <div 
                 className={isMobile 
-                  ? "bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 mx-auto max-w-3xl w-full" 
-                  : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl flex flex-col gap-0 mb-2 mx-auto max-w-3xl w-full"
+                  ? "bg-white dark:bg-gray-800 p-2 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 mx-auto max-w-3xl w-full" 
+                  : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-2xl flex flex-col gap-0 mb-2 mx-auto max-w-3xl w-full"
                 }
                 ref={composerRef}
                 onFocus={() => {
@@ -990,7 +990,7 @@ const ChatAssistant: React.FC = () => {
                 />
                 
                 {/* Champ de saisie en haut */}
-                <div className="w-full input-container">
+                <div className="w-full input-container p-1">
                   <Textarea
                     value={inputValue}
                     onChange={(e) => {
@@ -1003,7 +1003,7 @@ const ChatAssistant: React.FC = () => {
                     }}
                     onKeyDown={handleKeyPress}
                     placeholder="Pose ta question"
-                    className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-2 overflow-y-auto"
+                    className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-3 px-4 overflow-y-auto"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
                       // Marquer que le clavier est ouvert
@@ -1028,9 +1028,9 @@ const ChatAssistant: React.FC = () => {
                 </div>
                 
                 {/* Boutons d'action en bas */}
-                <div className="flex justify-between items-center message-actions">
+                <div className="flex justify-between items-center message-actions px-3 py-1">
                   {/* Boutons d'action à gauche */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 pl-1">
                     {/* Bouton galerie */}
                     <button
                       type="button"
@@ -1068,7 +1068,7 @@ const ChatAssistant: React.FC = () => {
                   </div>
                   
                   {/* Conteneur à droite pour les boutons micro et envoi */}
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 pr-1">
                     {/* Bouton d'envoi d'image - visible seulement si une image est sélectionnée */}
                     {selectedImage ? (
                       <button
