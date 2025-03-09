@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import MainContent from '@/components/layout/MainContent';
+import WebHomeView from '@/components/layout/WebHomeView';
 import { RecentQuestion } from '@/lib/types';
 import { apiRequest } from '@/lib/queryClient';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Home = () => {
   const [recentQuestions, setRecentQuestions] = useState<RecentQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const isMobile = useIsMobile();
+  
   useEffect(() => {
     const fetchRecentQuestions = async () => {
       try {
-        const response = await apiRequest('GET', '/api/questions/recent');
-        const data = await response.json();
-        setRecentQuestions(data);
+        const response = await apiRequest<RecentQuestion[]>('/api/questions/recent');
+        setRecentQuestions(response);
       } catch (error) {
         console.error('Failed to fetch recent questions:', error);
         // Use fallback data if offline
@@ -41,8 +43,11 @@ const Home = () => {
     fetchRecentQuestions();
   }, []);
 
-  return (
+  // Utilisez la version mobile ou desktop en fonction de la taille de l'écran
+  return isMobile ? (
     <MainContent recentQuestions={recentQuestions} />
+  ) : (
+    <WebHomeView recentQuestions={recentQuestions} />
   );
 };
 
