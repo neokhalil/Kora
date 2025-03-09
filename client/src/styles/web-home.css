@@ -1,5 +1,14 @@
 /* Styles spécifiques pour la vue web de la page d'accueil */
 
+/* Importation de la police Elza Black pour KORA */
+@font-face {
+  font-family: 'Elza Black';
+  src: local('Elza Black');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Style global pour occuper tout l'espace disponible */
 body, html {
   height: 100%;
@@ -368,6 +377,7 @@ body, html {
 }
 
 /* Style pour le nom KORA */
-.web-question-footer {
+.kora-name {
   font-family: 'Elza Black', sans-serif;
+  font-weight: 900;
 }

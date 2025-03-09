@@ -155,7 +155,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               </div>
             </form>
             <p className="web-question-footer">
-              KORA, ton assistant IA pour réviser et faire tes exercices.
+              <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
             </p>
           </div>
         </div>
