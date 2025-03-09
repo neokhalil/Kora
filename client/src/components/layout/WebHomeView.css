@@ -189,7 +189,12 @@
   flex: 1;
   overflow-y: auto;
   margin-bottom: 1rem;
-  padding-top: 1.5rem; /* Espace en haut de la conversation */
+  padding-top: 3rem; /* Espace en haut de la conversation - augmenté */
+}
+
+/* Ajoute une marge en bas pour que le dernier message soit visible */
+.web-messages-list {
+  padding-bottom: 120px; /* Espace suffisant pour que les messages n'aillent pas sous la zone de saisie */
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
@@ -203,6 +208,7 @@
   margin: 0 auto;
   width: 100%;
   padding: 1rem;
+  box-shadow: 0 -10px 20px rgba(255, 255, 255, 0.9); /* Effet d'ombre pour masquer le contenu qui passerait en dessous */
 }
 
 /* Style pour le formulaire de question */
