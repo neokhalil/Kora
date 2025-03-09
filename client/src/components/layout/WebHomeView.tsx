@@ -471,26 +471,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           <div className="web-message-actions">
             <button 
               type="button"
-              className="web-message-action-button"
+              className="web-action-button"
               onClick={() => handleReExplain(message.id)}
             >
               <RefreshCcw size={15} />
-              Reformuler
+              <span>Reformuler</span>
             </button>
             <button 
               type="button"
-              className="web-message-action-button"
+              className="web-action-button"
               onClick={() => handleChallenge(message.id)}
             >
               <Lightbulb size={15} />
-              Exercice
+              <span>Exercice</span>
             </button>
             <button 
               type="button"
-              className="web-message-action-button"
+              className="web-action-button"
             >
               <BookOpen size={15} />
-              Cours
+              <span>Cours</span>
             </button>
           </div>
         )}
