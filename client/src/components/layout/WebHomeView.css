@@ -202,7 +202,7 @@
 
 /* Ajoute une marge en bas pour que le dernier message soit visible */
 .web-messages-list {
-  padding-bottom: 160px; /* Espace réduit mais suffisant pour voir les messages et actions */
+  padding-bottom: 120px; /* Espace encore plus réduit pour rapprocher la zone de saisie */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -277,17 +277,16 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  padding: 1rem 1rem 0.5rem 1rem; /* Padding réduit en bas pour moins d'espace */
-  box-shadow: 0 -30px 40px 20px white; /* Ombre blanche étendue pour masquer complètement le contenu */
-  border-top: 1px solid rgba(0, 0, 0, 0.08); /* Bordure légèrement plus visible */
-  /* Rendre le fond complètement opaque */
+  padding: 0.75rem 1rem 0.25rem 1rem; /* Padding fortement réduit pour rapprocher du footer */
+  box-shadow: 0 -20px 30px 15px white; /* Ombre blanche réduite */
+  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Bordure plus légère */
   position: relative;
 }
 
 /* Style pour le texte d'information en bas */
 .web-question-footer {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.85rem;
+  margin: 0.25rem 0 0 0; /* Marge réduite */
+  font-size: 0.75rem; /* Texte légèrement plus petit */
   color: #666;
   text-align: center;
 }
@@ -326,10 +325,10 @@
 /* Styles pour les boutons d'action des messages de Kora */
 .web-message-actions {
   display: flex;
-  margin-top: 1rem;
+  margin-top: 0.75rem; /* Réduit */
   gap: 0.75rem;
-  padding-bottom: 2rem; /* Ajout d'un espacement significatif après les boutons */
-  margin-bottom: 1rem; /* Marge supplémentaire */
+  padding-bottom: 1rem; /* Réduit de moitié */
+  margin-bottom: 0.5rem; /* Réduit */
 }
 
 .web-action-button {
