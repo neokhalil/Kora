@@ -866,22 +866,36 @@ const ChatAssistant: React.FC = () => {
   
   return (
     <MathJaxContext config={mathJaxConfig}>
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
+      <div className={`flex flex-col h-full ${isMobile ? 'w-full' : 'max-w-3xl mx-auto'}`}>
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
-            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
+            className={`flex-1 overflow-y-auto ${isMobile ? 'p-4' : 'px-6 py-4'} chat-messages-container messages-container`} 
           >
             {messages.length === 0 ? (
-              <div className="h-full flex flex-col justify-center items-center">
-                <div className="text-center max-w-xl mx-auto">
-                  <h2 className="text-4xl font-bold mb-1 font-sans">Hello,</h2>
-                  <h2 className="text-4xl font-bold mb-6 font-sans">Ibrahima</h2>
-                  <p className="text-gray-600 text-3xl leading-tight font-sans">
-                    Comment<br />
-                    puis-je t'aider<br />
-                    aujourd'hui ?
-                  </p>
+              <div className="h-full flex flex-col justify-center items-center pt-12 pb-24">
+                <div className="text-center max-w-xl w-full">
+                  {isMobile ? (
+                    <>
+                      <h2 className="text-4xl font-bold mb-1 font-sans">Hello,</h2>
+                      <h2 className="text-4xl font-bold mb-6 font-sans">Ibrahima</h2>
+                      <p className="text-gray-600 text-3xl leading-tight font-sans">
+                        Comment<br />
+                        puis-je t'aider<br />
+                        aujourd'hui ?
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-3xl font-semibold tracking-tight text-center text-black dark:text-white font-sans">Hello,</h2>
+                      <h2 className="text-3xl font-semibold tracking-tight text-center text-black dark:text-white mb-5 font-sans">Ibrahima</h2>
+                      <p className="text-gray-700 dark:text-gray-300 text-lg text-center font-sans">
+                        Comment<br />
+                        puis-je t'aider<br />
+                        aujourd'hui ?
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (
@@ -910,7 +924,7 @@ const ChatAssistant: React.FC = () => {
           
           {/* Zone de saisie fixe en bas */}
           <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
-            <div className="max-w-4xl mx-auto px-2">
+            <div className={`${isMobile ? 'max-w-4xl' : 'max-w-3xl'} mx-auto px-2`}>
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
                 <div className="mb-2 relative bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
@@ -944,9 +958,12 @@ const ChatAssistant: React.FC = () => {
                 </div>
               )}
               
-              {/* Composeur de message style ChatGPT, centré dans son conteneur */}
+              {/* Composeur de message adapté selon la plateforme */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 mx-auto max-w-3xl w-full"
+                className={isMobile 
+                  ? "bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 mx-auto max-w-3xl w-full" 
+                  : "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg rounded-xl flex flex-col gap-0 mb-2 mx-auto max-w-3xl w-full"
+                }
                 ref={composerRef}
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
