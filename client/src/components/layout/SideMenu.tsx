@@ -29,45 +29,13 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [readOnly, setReadOnly] = useState(true);
   
-  // Éléments fixes du menu - enrichis pour web et mobile
+  // Éléments fixes du menu (aide aux études)
   const menuItems: MenuItem[] = [
     { 
       id: 'studies-help', 
       title: 'Aide aux études', 
       icon: <Book className="h-5 w-5 mr-3" />, 
       href: '/chat-assistant' 
-    },
-    {
-      id: 'homework-help',
-      title: 'Aide aux devoirs',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-      </svg>,
-      href: '/homework-help'
-    },
-    {
-      id: 'exam-prep',
-      title: 'Préparation aux examens',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>,
-      href: '/exam-prep'
-    },
-    {
-      id: 'interactive-lessons',
-      title: 'Leçons interactives',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-      </svg>,
-      href: '/interactive-lessons'
-    },
-    {
-      id: 'learning-history',
-      title: 'Historique d\'apprentissage',
-      icon: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>,
-      href: '/learning-history'
     }
   ];
   

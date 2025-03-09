@@ -5,36 +5,24 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/Header";
-import SideNavigation from "@/components/layout/SideNavigation";
 import ChatAssistant from "@/pages/ChatAssistant";
-import ExamPrep from "@/pages/ExamPrep";
-import HomeworkHelp from "@/pages/HomeworkHelp";
-import InteractiveLessons from "@/pages/InteractiveLessons";
-import LearningHistory from "@/pages/LearningHistory";
 
 // Configuration des routes
 const routes = [
   { path: "/", Component: ChatAssistant },
-  { path: "/chat-assistant", Component: ChatAssistant },
-  { path: "/homework-help", Component: HomeworkHelp },
-  { path: "/exam-prep", Component: ExamPrep },
-  { path: "/interactive-lessons", Component: InteractiveLessons },
-  { path: "/learning-history", Component: LearningHistory }
+  { path: "/chat-assistant", Component: ChatAssistant }
 ];
 
-// App avec menu latéral responsive
+// App simplifié sans menu latéral
 const AppContainer = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Header fixe en haut */}
       <Header />
       
-      {/* Navigation latérale pour grand écran */}
-      <SideNavigation />
-      
       <div className="flex h-full">
-        {/* Contenu principal avec marge à gauche sur les écrans larges */}
-        <main className="flex-1 overflow-y-auto w-full md:pl-64">
+        {/* Contenu principal */}
+        <main className="flex-1 overflow-y-auto w-full">
           <Switch>
             {routes.map(({ path, Component }) => (
               <Route key={path} path={path}>
