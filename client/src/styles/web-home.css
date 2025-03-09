@@ -122,6 +122,7 @@ body, html {
   flex-shrink: 0;
   min-width: 16px;
   width: 16px;
+  display: inline-block;
 }
 
 .web-sidebar-link:hover {
@@ -134,6 +135,25 @@ body, html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+/* Correction spécifique pour Aides aux études */
+.aide-etudes {
+  align-items: center !important;
+  display: flex !important;
+}
+
+.aide-etudes svg {
+  margin-top: 0 !important;
+  margin-right: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+.aide-etudes span {
+  display: inline-block !important;
+  vertical-align: middle !important;
 }
 
 /* Séparateur */

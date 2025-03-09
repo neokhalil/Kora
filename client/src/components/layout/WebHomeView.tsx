@@ -63,10 +63,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
           {/* Section Aides aux études */}
           <div className="web-sidebar-section">
-            <Link href="/chat-assistant" className="web-sidebar-link aide-etudes">
+            <a href="/chat-assistant" className="web-sidebar-link aide-etudes">
               <FileText size={16} strokeWidth={2} />
               <span>Aides aux études</span>
-            </Link>
+            </a>
           </div>
 
           {/* Séparateur */}
