@@ -874,10 +874,10 @@ const ChatAssistant: React.FC = () => {
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-center items-center">
-                <div className="text-center">
-                  <h2 className="text-4xl font-bold mb-1">Hello,</h2>
-                  <h2 className="text-4xl font-bold mb-6">Ibrahima</h2>
-                  <p className="text-gray-600 text-3xl leading-tight">
+                <div className="text-center max-w-xl mx-auto">
+                  <h2 className="text-4xl font-bold mb-1 font-sans">Hello,</h2>
+                  <h2 className="text-4xl font-bold mb-6 font-sans">Ibrahima</h2>
+                  <p className="text-gray-600 text-3xl leading-tight font-sans">
                     Comment<br />
                     puis-je t'aider<br />
                     aujourd'hui ?
@@ -944,9 +944,9 @@ const ChatAssistant: React.FC = () => {
                 </div>
               )}
               
-              {/* Composeur de message style iOS, reformaté avec le texte en haut */}
+              {/* Composeur de message style ChatGPT, centré dans son conteneur */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
+                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2 mx-auto max-w-3xl w-full"
                 ref={composerRef}
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
