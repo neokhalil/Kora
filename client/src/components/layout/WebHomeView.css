@@ -25,9 +25,10 @@
 .web-message {
   width: 100%;
   padding: 1rem 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
   white-space: pre-wrap;
   position: relative;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
 /* Message de l'utilisateur */
@@ -38,7 +39,7 @@
 /* Message de KORA */
 .web-kora-message {
   background-color: white;
-  color: #333;
+  color: #1a1a1a;
 }
 
 /* En-tête du message (nom de l'expéditeur) */
@@ -47,14 +48,18 @@
   font-weight: 600;
   margin-bottom: 4px;
   padding: 0 1.5rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
 }
 
 .web-message-sender {
-  color: #555;
+  color: #3f3f46;
+  font-weight: 600;
 }
 
 .web-user-message .web-message-sender {
-  color: #444;
+  color: #3f3f46;
 }
 
 /* Contenu du message - style ChatGPT */
@@ -260,30 +265,75 @@
 /* Style pour les formules mathématiques */
 .web-math-formula {
   display: block;
-  margin: 0.75rem 0;
+  margin: 1.25rem 0;
   text-align: center;
+  font-size: 1.1em;
+}
+
+/* Style pour les formules mathématiques inline */
+.katex {
+  font-size: 1.1em;
+}
+
+/* Style pour les blocs mathématiques */
+.katex-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+
+/* Style pour les équations mathématiques */
+.web-message-content .mjx-math {
+  font-size: 1.1em;
 }
 
 /* Style pour les listes numérotées */
 .web-numbered-list {
   counter-reset: item;
   list-style-type: none;
-  padding-left: 1.5rem;
+  padding-left: 2rem;
+  margin: 1rem 0;
 }
 
 .web-numbered-list li {
   counter-increment: item;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   position: relative;
 }
 
 .web-numbered-list li::before {
   content: counter(item) ".";
   position: absolute;
-  left: -1.5rem;
-  width: 1.2rem;
+  left: -2rem;
+  width: 1.5rem;
   text-align: right;
-  font-weight: bold;
+  font-weight: 600;
+  color: #3f3f46;
+}
+
+/* Style pour les étapes de résolution (similaire à ChatGPT) */
+.web-message-content ol {
+  list-style-type: none;
+  counter-reset: step-counter;
+  padding-left: 2rem;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.web-message-content ol li {
+  counter-increment: step-counter;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.web-message-content ol li::before {
+  content: counter(step-counter) ".";
+  position: absolute;
+  left: -2rem;
+  width: 1.5rem;
+  text-align: right;
+  font-weight: 600;
+  color: #3f3f46;
 }
 
 /* Titres dans les messages */
@@ -315,12 +365,42 @@
 /* Style pour les cas particuliers */
 .web-case-item {
   margin: 0.5rem 0;
-  padding-left: 1rem;
+  padding-left: 1.5rem;
   position: relative;
 }
 
 .web-case-item::before {
   content: "•";
   position: absolute;
-  left: 0;
+  left: 0.5rem;
+  color: #3f3f46;
+}
+
+/* Style pour les équations centrées comme dans la capture d'écran ChatGPT */
+.web-message-content .centered-equation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+  font-size: 1.15em;
+}
+
+/* Style pour les blocs de cas particuliers */
+.web-message-content ul {
+  list-style-type: none;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.web-message-content ul li {
+  position: relative;
+  margin-bottom: 0.75rem;
+  padding-left: 0.5rem;
+}
+
+.web-message-content ul li::before {
+  content: "•";
+  position: absolute;
+  left: -1rem;
+  color: #3f3f46;
 }
