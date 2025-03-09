@@ -113,7 +113,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         <div className="web-main-content">
           <div className="web-welcome-container">
             <h1 className="web-welcome-title">Hello Ibrahima</h1>
-            <p className="web-welcome-subtitle">Comment puis t'aider aujourd'hui?</p>
+            <div className="web-welcome-subtitle">
+              <div>Comment puis t'aider</div>
+              <div>aujourd'hui?</div>
+            </div>
           </div>
           
           {/* Zone de question avec boutons */}
