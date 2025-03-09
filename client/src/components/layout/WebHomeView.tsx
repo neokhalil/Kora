@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, Plus, User, FileText } from 'lucide-react';
 
 interface WebHomeViewProps {
   recentQuestions: RecentQuestion[];
@@ -9,6 +9,7 @@ interface WebHomeViewProps {
 
 const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [question, setQuestion] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Pour correspondre exactement à la maquette
   const recentTopics = [
@@ -30,12 +31,49 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   };
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      console.log('Recherche:', searchQuery);
+      // Implémentation de la recherche
+    }
+  };
+
   return (
     <div className="web-home-container">
-      <div className="flex flex-col">
-        {/* Colonne de gauche - liste des sujets récents */}
-        <div className="web-topics-list">
-          <div className="mb-8">
+      <div className="web-layout">
+        {/* Sidebar - menu latéral gauche */}
+        <div className="web-sidebar">
+          {/* Barre de recherche */}
+          <div className="web-search-container">
+            <form onSubmit={handleSearch} className="web-search-form">
+              <Search className="web-search-icon" size={16} />
+              <input 
+                type="text" 
+                placeholder="Rechercher" 
+                className="web-search-input"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </form>
+            <button className="web-new-chat-button" aria-label="Nouvelle conversation">
+              <Plus size={20} />
+            </button>
+          </div>
+
+          {/* Section Aides aux études */}
+          <div className="web-sidebar-section">
+            <Link href="/aide-etudes" className="web-sidebar-link aide-etudes">
+              <FileText size={18} />
+              <span>Aides aux études</span>
+            </Link>
+          </div>
+
+          {/* Séparateur */}
+          <div className="web-sidebar-divider"></div>
+
+          {/* Section Hier */}
+          <div className="web-sidebar-section">
             <h2>Hier</h2>
             <ul>
               {recentTopics.map(topic => (
@@ -48,7 +86,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             </ul>
           </div>
           
-          <div>
+          {/* Section Il y a 7 jours */}
+          <div className="web-sidebar-section">
             <h2>Il y a 7 jours</h2>
             <ul>
               {olderTopics.map(topic => (
@@ -60,51 +99,59 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               ))}
             </ul>
           </div>
+
+          {/* Profil utilisateur en bas */}
+          <div className="web-profile-container">
+            <Link href="/profile" className="web-profile-link">
+              <User size={18} />
+              <span>Mon profil</span>
+            </Link>
+          </div>
         </div>
         
         {/* Contenu principal - partie centrale avec message de bienvenue */}
-        <div className="flex-1">
-          <div>
+        <div className="web-main-content">
+          <div className="web-welcome-container">
             <h1 className="web-welcome-title">Hello Ibrahima</h1>
             <p className="web-welcome-subtitle">Comment puis-je t'aider aujourd'hui?</p>
-            
-            {/* Zone de question avec boutons */}
-            <div>
-              <form onSubmit={handleSubmit}>
-                <div className="web-question-box">
-                  <input 
-                    type="text" 
-                    placeholder="Pose ta question"
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                  />
-                  <button 
-                    type="button"
-                    className="rounded-full"
-                    aria-label="Télécharger une image"
-                  >
-                    <Image className="h-5 w-5" />
-                  </button>
-                  <button 
-                    type="button"
-                    className="rounded-full"
-                    aria-label="Enregistrer audio"
-                  >
-                    <Mic className="h-5 w-5" />
-                  </button>
-                  <button 
-                    type="submit"
-                    className="send-button"
-                    aria-label="Envoyer"
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </form>
-              <p className="web-question-footer">
-                KORA, ton assistant IA pour réviser et faire tes exercices.
-              </p>
-            </div>
+          </div>
+          
+          {/* Zone de question avec boutons */}
+          <div className="web-question-container">
+            <form onSubmit={handleSubmit}>
+              <div className="web-question-box">
+                <input 
+                  type="text" 
+                  placeholder="Pose ta question"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                />
+                <button 
+                  type="button"
+                  className="web-input-button"
+                  aria-label="Télécharger une image"
+                >
+                  <Image className="h-5 w-5" />
+                </button>
+                <button 
+                  type="button"
+                  className="web-input-button"
+                  aria-label="Enregistrer audio"
+                >
+                  <Mic className="h-5 w-5" />
+                </button>
+                <button 
+                  type="submit"
+                  className="web-send-button"
+                  aria-label="Envoyer"
+                >
+                  <ArrowRight className="h-5 w-5" />
+                </button>
+              </div>
+            </form>
+            <p className="web-question-footer">
+              KORA, ton assistant IA pour réviser et faire tes exercices.
+            </p>
           </div>
         </div>
       </div>

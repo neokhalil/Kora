@@ -9,106 +9,244 @@ body, html {
   overflow-x: hidden;
 }
 
-/* Assurer que le fond est propre pour la vue web */
+/* Layout principal */
 .web-home-container {
   background-color: white;
   width: 100%;
-  height: calc(100vh - 60px); /* Hauteur totale moins la hauteur du header */
+  height: calc(100vh - 56px); /* Hauteur totale moins la hauteur du header */
   display: flex;
   flex-direction: column;
   padding: 0;
+  overflow: hidden;
 }
 
-/* Structure de la page web */
-.web-home-container .flex-col {
+.web-layout {
   display: flex;
-  flex-direction: row;
   height: 100%;
   width: 100%;
 }
 
-/* Styles pour la section de gauche (liste des sujets récents) */
-.web-topics-list {
+/* Sidebar - menu latéral gauche */
+.web-sidebar {
   width: 250px;
   min-width: 250px;
-  padding: 2rem 1.5rem;
   border-right: 1px solid #e5e7eb;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
   overflow-y: auto;
+  position: relative;
 }
 
-.web-topics-list h2 {
+/* Barre de recherche */
+.web-search-container {
+  display: flex;
+  align-items: center;
+  padding: 16px 16px 8px;
+  gap: 8px;
+}
+
+.web-search-form {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background-color: #f1f3f5;
+  border-radius: 24px;
+  padding: 6px 12px;
+}
+
+.web-search-icon {
   color: #6b7280;
+  margin-right: 8px;
+}
+
+.web-search-input {
+  border: none;
+  background: transparent;
+  outline: none;
   font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 0.75rem;
+  width: 100%;
+  color: #374151;
 }
 
-.web-topics-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 2rem 0;
+.web-new-chat-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.web-topics-list a {
-  color: #1f2937;
-  text-decoration: none;
-  transition: color 0.2s;
-  display: block;
-  padding: 0.4rem 0;
-  font-size: 0.95rem;
-}
-
-.web-topics-list a:hover {
+.web-new-chat-button:hover {
+  background-color: #f3f4f6;
   color: #4f46e5;
 }
 
-/* Styles pour la partie principale - prend tout l'espace disponible */
-.web-home-container .flex-1 {
+/* Section Aides aux études */
+.web-sidebar-section {
+  padding: 16px 16px 8px;
+}
+
+.web-sidebar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #1f2937;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.web-sidebar-link:hover {
+  background-color: #f3f4f6;
+}
+
+.web-sidebar-link.aide-etudes {
+  margin-bottom: 8px;
+}
+
+.web-sidebar-link span {
+  margin-left: 10px;
+  font-size: 0.95rem;
+}
+
+/* Séparateur */
+.web-sidebar-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 8px 16px;
+}
+
+/* Sections de sujets récents */
+.web-sidebar-section h2 {
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 12px;
+  margin-left: 12px;
+}
+
+.web-sidebar-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.web-sidebar-section li {
+  margin-bottom: 2px;
+}
+
+.web-sidebar-section a {
+  color: #1f2937;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  display: block;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.web-sidebar-section a:hover {
+  background-color: #f3f4f6;
+}
+
+/* Profil utilisateur en bas */
+.web-profile-container {
+  margin-top: auto;
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.web-profile-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #1f2937;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.web-profile-link:hover {
+  background-color: #f3f4f6;
+}
+
+.web-profile-link span {
+  margin-left: 10px;
+  font-size: 0.95rem;
+}
+
+/* Contenu principal */
+.web-main-content {
   flex: 1;
-  padding: 4rem 5rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  padding: 0;
   height: 100%;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Conteneur de bienvenue */
+.web-welcome-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 120px;
+  padding-bottom: 30px;
 }
 
 /* Styles pour le titre et le sous-titre de bienvenue */
 .web-welcome-title {
   font-size: 2.5rem;
   font-weight: 700;
-  letter-spacing: -0.025em;
-  text-align: left;
-  margin-bottom: 1rem;
+  text-align: center;
+  margin-bottom: 16px;
   margin-top: 0;
 }
 
 .web-welcome-subtitle {
   color: #6b7280;
   font-size: 1.25rem;
-  margin-bottom: 6rem;
-  text-align: left;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 30px;
 }
 
-/* Conteneur pour la zone de saisie */
-.web-home-container .flex-1 > div {
+/* Conteneur pour la zone de question */
+.web-question-container {
   width: 100%;
-  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
 }
 
 /* Styles pour la boîte de question */
 .web-question-box {
-  width: 100%;
-  max-width: 800px;
+  width: 90%;
+  max-width: 600px;
   border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
   background-color: white;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
 }
 
 .web-question-box input {
@@ -120,44 +258,52 @@ body, html {
   padding: 0.5rem 0;
 }
 
-.web-question-box button {
+.web-input-button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #6b7280;
   transition: all 0.2s ease;
   border-radius: 50%;
-  margin-left: 0.5rem;
+  margin-left: 4px;
 }
 
-.web-question-box button:hover {
+.web-input-button:hover {
   background-color: #f3f4f6;
   color: #4f46e5;
 }
 
-.web-question-box .send-button {
+.web-send-button {
   background-color: #000000;
   color: white;
-  border-radius: 9999px;
-  padding: 0.6rem;
-  margin-left: 0.5rem;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background-color 0.2s;
 }
 
-.web-question-box .send-button:hover {
+.web-send-button:hover {
   background-color: #1f2937;
-  color: white;
 }
 
 /* Footer de la boîte de question */
 .web-question-footer {
   width: 100%;
-  max-width: 800px;
+  max-width: 600px;
   text-align: center;
   color: #6b7280;
   font-size: 0.75rem;
-  margin-top: 1rem;
+  margin-top: 10px;
+  margin-bottom: 0;
 }
