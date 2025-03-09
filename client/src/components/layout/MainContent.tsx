@@ -50,33 +50,32 @@ const MainContent: React.FC<MainContentProps> = ({ recentQuestions }) => {
       <div className="flex-1 flex flex-col h-full">
         {/* Welcome Message */}
         <div className="flex-1 flex flex-col items-center justify-center p-4">
-          <h1 className="text-3xl font-bold mb-3">Hello {username}</h1>
-          <p className="text-gray-500 text-center mb-6">Comment puis-je t'aider aujourd'hui?</p>
+          <h1 className="text-3xl font-bold mb-2">Hello {username}</h1>
+          <p className="text-gray-500 text-center">Comment puis-je t'aider</p>
+          <p className="text-gray-500 text-center mb-8">aujourd'hui?</p>
         </div>
 
-        {/* Input Area */}
+        {/* Input Area - Styled like the image */}
         <div className="p-4 border-t border-gray-200">
-          <div className="bg-white border rounded-full shadow-sm flex items-center p-1">
-            <input
-              type="text"
-              placeholder="Pose ta question"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              className="flex-1 px-4 py-2 outline-none text-sm"
-            />
-            <div className="flex items-center pr-2">
+          <div className="rounded-2xl shadow-sm bg-white border flex flex-col">
+            <div className="p-4">
+              <input
+                type="text"
+                placeholder="Pose ta question"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="w-full outline-none text-sm bg-transparent"
+              />
+            </div>
+            <div className="border-t flex items-center justify-between p-2 px-4">
               <button className="p-2 rounded-full hover:bg-gray-100" aria-label="Joindre une image">
                 <Image className="h-5 w-5 text-gray-500" />
               </button>
-              <button className="p-2 rounded-full hover:bg-gray-100" aria-label="Enregistrer audio">
-                <Mic className="h-5 w-5 text-gray-500" />
-              </button>
               <button 
-                className={`p-2 rounded-full ${inputValue.trim() ? 'bg-black text-white' : 'bg-gray-200 text-gray-500'}`}
-                disabled={!inputValue.trim()}
+                className="p-2 rounded-full bg-black text-white"
                 aria-label="Envoyer"
               >
-                <MessageSquare className="h-5 w-5" />
+                <Mic className="h-5 w-5" />
               </button>
             </div>
           </div>

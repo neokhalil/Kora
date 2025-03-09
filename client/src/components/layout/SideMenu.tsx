@@ -42,15 +42,22 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   // État pour les conversations récentes (à remplir via API)
   const [recentConversations, setRecentConversations] = useState<RecentConversation[]>([]);
   
-  // Effet pour charger les conversations récentes (simulé pour le moment)
+  // Conversations récentes basées sur l'image
   useEffect(() => {
-    // Dans un cas réel, vous utiliseriez une requête API avec react-query
-    // Cette structure permet l'intégration future avec l'API
     const loadRecentConversations = async () => {
       try {
-        // Conversations récentes à charger via API plus tard
-        // Pour le moment, utilisons un tableau vide pour avoir une UI propre
-        setRecentConversations([]);
+        // Groupes de conversations par date
+        const hierConversations = [
+          { id: '1', title: 'Soustraction posée', date: new Date() },
+          { id: '2', title: 'Conjugaison au présent', date: new Date() }
+        ];
+        
+        const semaineDerniereConversations = [
+          { id: '3', title: 'Les groupes nominaux', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) },
+          { id: '4', title: 'Les adjectifs', date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) }
+        ];
+        
+        setRecentConversations([...hierConversations, ...semaineDerniereConversations]);
       } catch (error) {
         console.error("Erreur lors du chargement des conversations récentes:", error);
       }
@@ -226,18 +233,14 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             )}
           </div>
           
-          {/* Pied de menu avec le profil */}
+          {/* Pied de menu avec le profil exactement comme dans l'image */}
           <div className="mt-auto p-4 border-t border-gray-200">
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-center font-medium mr-3">
-                {/* Première lettre du nom */}
-                <span className="text-gray-600">M</span>
+            <Link href="/profile" className="flex items-center">
+              <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-center mr-2">
+                <span className="text-gray-600 text-xs">M</span>
               </div>
-              <span className="font-medium text-sm">Mon profil</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-auto text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </div>
+              <span className="text-sm">Mon profil</span>
+            </Link>
           </div>
         </div>
       </div>
