@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, Plus, User, FileText } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, User, FileText, Settings } from 'lucide-react';
 
 interface WebHomeViewProps {
   recentQuestions: RecentQuestion[];
@@ -57,7 +57,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               />
             </form>
             <button className="web-new-chat-button" aria-label="Nouvelle conversation">
-              <Plus size={16} strokeWidth={2.5} />
+              <PenLine size={16} strokeWidth={2} />
             </button>
           </div>
 
@@ -102,10 +102,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
           {/* Profil utilisateur en bas */}
           <div className="web-profile-container">
-            <Link href="/profile" className="web-profile-link">
-              <User size={16} strokeWidth={2} />
-              <span>Mon profil</span>
-            </Link>
+            <div className="web-profile-wrapper">
+              <Link href="/profile" className="web-profile-link">
+                <User size={16} strokeWidth={2} />
+                <span>Mon profil</span>
+              </Link>
+              <Link href="/settings" className="web-settings-link">
+                <Settings size={16} strokeWidth={2} />
+              </Link>
+            </div>
           </div>
         </div>
         

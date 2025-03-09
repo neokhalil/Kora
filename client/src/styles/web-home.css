@@ -163,6 +163,12 @@ body, html {
   padding: 16px;
 }
 
+.web-profile-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .web-profile-link {
   display: flex;
   align-items: center;
@@ -172,6 +178,7 @@ body, html {
   border-radius: 6px;
   transition: background-color 0.2s;
   font-weight: 500;
+  flex: 1;
 }
 
 .web-profile-link:hover {
@@ -181,6 +188,21 @@ body, html {
 .web-profile-link span {
   margin-left: 12px;
   font-size: 0.95rem;
+}
+
+.web-settings-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 4px;
+  color: #6b7280;
+  transition: all 0.2s;
+}
+
+.web-settings-link:hover {
+  background-color: #f3f4f6;
+  color: #4b5563;
 }
 
 /* Contenu principal */
