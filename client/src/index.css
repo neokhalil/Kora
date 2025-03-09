@@ -23,13 +23,17 @@
 
 /* Style spécifique pour KORA dans le header */
 #kora-header-title.kora-name {
-  font-size: 1.3rem;
-  letter-spacing: 0.1em;
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
   margin-left: 4px;
-  color: #000000; /* Remis en noir */
-  font-family: 'Arial Black', 'Helvetica Black', 'Impact', sans-serif;
+  color: #000000; /* Texte noir */
+  font-family: 'Arial Black', 'Helvetica Black', sans-serif; 
   font-weight: 900;
   text-transform: uppercase;
+  line-height: 1;
+  /* Renforcer l'effet de graisse */
+  text-shadow: 0 0 1px #000000;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Base styles appliqués globalement */
