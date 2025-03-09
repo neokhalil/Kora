@@ -329,18 +329,28 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const originalMessage = messages.find(m => m.id === messageId);
     if (!originalMessage) return;
     
+    // Cherche le message utilisateur précédent
+    const userMessages = messages.filter(m => m.sender === 'user');
+    const lastUserMessage = userMessages[userMessages.length - 1];
+    
+    if (!lastUserMessage) {
+      console.error("Aucun message utilisateur trouvé pour la reformulation");
+      return;
+    }
+    
     // Indiquer que KORA réfléchit
     setIsThinking(true);
     
     try {
-      // Appel API pour la ré-explication
+      // Appel API pour la ré-explication avec paramètres corrects
       const response = await fetch('/api/tutoring/reexplain', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: originalMessage.content,
+          originalQuestion: lastUserMessage.content,
+          originalExplanation: originalMessage.content,
         }),
       });
       
@@ -379,18 +389,28 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const originalMessage = messages.find(m => m.id === messageId);
     if (!originalMessage) return;
     
+    // Cherche le message utilisateur précédent
+    const userMessages = messages.filter(m => m.sender === 'user');
+    const lastUserMessage = userMessages[userMessages.length - 1];
+    
+    if (!lastUserMessage) {
+      console.error("Aucun message utilisateur trouvé pour l'exercice");
+      return;
+    }
+    
     // Indiquer que KORA réfléchit
     setIsThinking(true);
     
     try {
-      // Appel API pour générer un exercice
+      // Appel API pour générer un exercice avec paramètres corrects
       const response = await fetch('/api/tutoring/challenge', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          content: originalMessage.content,
+          originalQuestion: lastUserMessage.content,
+          explanation: originalMessage.content,
         }),
       });
       
