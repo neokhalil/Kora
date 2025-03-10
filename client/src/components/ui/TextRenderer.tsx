@@ -1,5 +1,5 @@
 import React from 'react';
-import './text.css';
+// Le fichier CSS global est déjà importé dans main.tsx
 
 interface TextContentProps {
   content: string;
