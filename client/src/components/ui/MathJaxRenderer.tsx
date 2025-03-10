@@ -98,7 +98,10 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           const langClass = codeLanguage ? `language-${codeLanguage}` : '';
           const escapedCode = escapeHtml(codeContent);
           
-          html += `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${codeLanguage}">${escapedCode}</code></pre>`;
+          // Appliquer un style spécifique pour le langage PHP
+          const langSpecificClass = codeLanguage.toLowerCase() === 'php' ? 'php-code-block' : '';
+          
+          html += `<pre class="code-block ${langClass} ${langSpecificClass}"><code class="${langClass}" data-lang="${codeLanguage}">${escapedCode}</code></pre>`;
           codeContent = '';
           codeLanguage = '';
         }
@@ -131,23 +134,30 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           paragraphContent = '';
         }
         
-        // Détection spéciale pour les titres de sections PHP (comme dans les captures d'écran)
+        // Détection des titres de sections numérotées (incluant PHP et autres sections)
         const sectionMatch = line.trim().match(/^(\d+)\.\s+(.*?)[\s:]*$/);
-        if (sectionMatch && sectionMatch[2].includes('Commentaires') || 
-            sectionMatch && sectionMatch[2].includes('Variables') || 
-            sectionMatch && sectionMatch[2].includes('Fonctions') ||
-            sectionMatch && sectionMatch[2].includes('Déclaration')) {
-          // C'est un titre de section PHP (format "1. Commentaires :")
+        
+        if (sectionMatch) {
           const number = sectionMatch[1];
           const title = sectionMatch[2].replace(/:$/, '');
-          html += `<div class="php-section-title"><span class="php-section-number">${number}.</span> ${formatTextContent(title)}</div>`;
-        } else {
-          // Liste numérotée normale
-          const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
-          if (match) {
-            const number = match[1];
-            const itemContent = match[2];
-            html += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${formatTextContent(itemContent)}</span></div>`;
+          
+          // Déterminer si c'est une section spéciale (PHP, etc.) ou une ligne numérotée ordinaire
+          const isSectionTitle = title.includes('Commentaires') || 
+                                title.includes('Variables') || 
+                                title.includes('Fonctions') ||
+                                title.includes('Déclaration') ||
+                                title.includes('Après') ||
+                                // Autres mots-clés de sections courantes
+                                title.includes('étapes') ||
+                                title.includes('Étapes') ||
+                                /^[A-Z]/.test(title); // Commence par une majuscule = probablement un titre
+          
+          if (isSectionTitle) {
+            // C'est un titre de section (format "1. Section :")
+            html += `<div class="php-section-title"><span class="php-section-number">${number}.</span> ${formatTextContent(title)}</div>`;
+          } else {
+            // Ligne numérotée ordinaire (liste, étape, etc.)
+            html += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${formatTextContent(title)}</span></div>`;
           }
         }
       } else {
@@ -166,42 +176,65 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   
   // Formatage du texte dans les paragraphes
   const formatTextContent = (text: string) => {
-    // Pour les réponses de l'IA pour les explications de code, convertir tous les backticks visibles
     let formattedText = text;
     
-    // Expressions régulières pour les codes PHP et les exemples spécifiques
+    // 1. Traitement des expressions mathématiques (à protéger avant le traitement du code)
+    // Recherche et stockage temporaire des expressions mathématiques pour les protéger
+    const mathExpressions: string[] = [];
+    
+    // Protéger les expressions mathématiques inline avec $ ... $
+    formattedText = formattedText.replace(/\$([^\$\n]+)\$/g, (match, expr) => {
+      const placeholder = `__MATH_EXPR_${mathExpressions.length}__`;
+      mathExpressions.push(match);
+      return placeholder;
+    });
+    
+    // 2. Expressions régulières pour les codes PHP et les exemples spécifiques
     const phpPatterns = [
+      // Tags PHP
       { pattern: /\'?(\<?php|\?>)\'?/g, replacement: '<code class="inline-code php-tag">$1</code>' },
+      // Variables PHP
       { pattern: /\'?(\$[a-zA-Z_][a-zA-Z0-9_]*)\'?/g, replacement: '<code class="inline-code php-var">$1</code>' },
+      // Commentaires PHP
       { pattern: /\'(\/\/\s*[^\']+)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
       { pattern: /\'(\*\/)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
       { pattern: /\'(\/\*)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
+      // Fonctions PHP
       { pattern: /\'(echo\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
       { pattern: /\'(function\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
+      // Structures de contrôle PHP
       { pattern: /\'(if\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
       { pattern: /\'(\}\s*else\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
       { pattern: /\'(\}\s*elseif\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
     ];
     
-    // Appliquer tous les patterns PHP spécifiques d'abord
+    // 3. Appliquer tous les patterns PHP spécifiques
     phpPatterns.forEach(({ pattern, replacement }) => {
       formattedText = formattedText.replace(pattern, replacement);
     });
     
-    // Code inline général (pour tout ce qui reste)
+    // 4. Formatage de code inline général (pour tout ce qui reste)
     formattedText = formattedText
-      // Code inline - version améliorée avec meilleure détection
+      // Code inline avec backticks
       .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
-      // Texte dans des guillemets simples (rendus comme code) - seulement s'ils n'ont pas encore été traités
-      .replace(/'([^'\n]+)'/g, '<code class="inline-code mobile-friendly-code">$1</code>')
+      // Texte dans des guillemets simples (rendus comme code) - uniquement s'ils n'ont pas déjà été traités
+      .replace(/'([^'\n]+)'/g, '<code class="inline-code mobile-friendly-code">$1</code>');
+    
+    // 5. Formatage du texte (Markdown)
+    formattedText = formattedText
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      // Italique
-      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      // Italique (mais pas dans le code)
+      .replace(/\*([^*<>]+)\*/g, '<em>$1</em>')
       // Soulignement
       .replace(/\_\_([^_]+)\_\_/g, '<u>$1</u>')
       // Barré
       .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
+    
+    // 6. Restaurer les expressions mathématiques protégées
+    mathExpressions.forEach((expr, index) => {
+      formattedText = formattedText.replace(`__MATH_EXPR_${index}__`, expr);
+    });
       
     return formattedText;
   };

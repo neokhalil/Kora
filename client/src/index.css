@@ -606,6 +606,13 @@
     font-size: 1.15em;
   }
   
+  /* Style spécifique pour les blocs de code PHP */
+  .php-code-block {
+    background-color: #1e2937 !important;
+    border-radius: 6px;
+    color: #f8fafc;
+  }
+  
   /* Mise en forme des éléments de texte du message */
   .math-content p {
     margin-bottom: 1rem;
@@ -768,6 +775,25 @@
   margin-bottom: 0.5rem;
   display: block;
   width: 100%;
+}
+
+/* Style pour les titres des sections PHP */
+.math-content .php-section-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid #eaeaea;
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  color: #222;
+}
+
+.math-content .php-section-number {
+  font-weight: 700;
+  margin-right: 0.35rem;
 }
 
 /* Style spécifique pour les titres avec ### */
