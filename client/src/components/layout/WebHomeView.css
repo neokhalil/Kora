@@ -1,5 +1,32 @@
 /* Styles spécifiques pour la version web de la conversation */
 
+/* Layout principal */
+.web-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.web-sidebar {
+  width: 280px;
+  min-width: 280px;
+  height: 100vh;
+  background-color: #f9f9f9;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.web-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
+}
+
 /* Container de la conversation */
 .web-conversation-container {
   display: flex;
@@ -177,12 +204,6 @@
 }
 
 /* Ajustements pour le mode conversation */
-.web-main-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  overflow-y: auto;
-}
 
 /* Donne plus d'espace à la conversation lorsqu'elle est active */
 .web-conversation-container {
@@ -287,9 +308,11 @@
 /* Style pour le texte d'information en bas */
 .web-question-footer {
   margin: 0; /* Suppression de toutes les marges */
+  padding: 0; /* Suppression de tout padding */
   font-size: 0.7rem; /* Texte plus petit */
   color: #666;
   text-align: center;
+  line-height: 1; /* Ligne plus serrée */
 }
 
 /* Style pour le nom KORA dans le footer */
@@ -527,4 +550,56 @@
   background-color: #0066ff;
   border: none;
   color: white;
+}
+
+/* Media queries pour assurer la cohérence du design responsive */
+@media (max-width: 1200px) {
+  .web-layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  .web-sidebar {
+    width: 250px;
+    min-width: 250px; /* Garantit que la sidebar garde sa taille */
+  }
+
+  .web-main-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .web-layout {
+    flex-direction: column;
+  }
+
+  .web-sidebar {
+    width: 100%;
+    height: auto;
+    min-height: 80px;
+    max-height: 80px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .web-main-content {
+    height: calc(100vh - 80px);
+  }
+
+  /* Masquer tous les éléments de la sidebar sauf le logo sur mobile */
+  .web-search-container,
+  .web-sidebar-section,
+  .web-sidebar-divider,
+  .web-profile-container {
+    display: none;
+  }
+
+  .web-logo-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
