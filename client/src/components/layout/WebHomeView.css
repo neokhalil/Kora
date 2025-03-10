@@ -278,7 +278,7 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  padding: 0.5rem 1rem 0.1rem 1rem; /* Padding minimal */
+  padding: 0.5rem 1rem 0 1rem; /* Padding sans espace en bas */
   box-shadow: none; /* Suppression de l'ombre */
   border-top: none; /* Suppression de la bordure */
   position: relative;
@@ -286,7 +286,7 @@
 
 /* Style pour le texte d'information en bas */
 .web-question-footer {
-  margin: 0.1rem 0 0 0; /* Marge minimale */
+  margin: 0; /* Suppression de toutes les marges */
   font-size: 0.7rem; /* Texte plus petit */
   color: #666;
   text-align: center;
