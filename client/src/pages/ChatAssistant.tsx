@@ -11,7 +11,9 @@ import {
   Camera, 
   Mic, 
   Square, 
-  AlertCircle 
+  AlertCircle,
+  HelpCircle,
+  Lightbulb
 } from 'lucide-react';
 import { Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -759,7 +761,8 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    Ré-explique
+                    <RefreshCw size={15} />
+                    <span>Reformuler</span>
                   </button>
                 )}
                 
@@ -823,7 +826,8 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    Indice
+                    <HelpCircle size={15} />
+                    <span>Indice</span>
                   </button>
                 )}
                 
@@ -853,7 +857,8 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    Faire un exercice
+                    <Lightbulb size={15} />
+                    <span>Exercice</span>
                   </button>
                 )}
               </div>
