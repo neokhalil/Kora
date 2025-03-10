@@ -306,6 +306,16 @@
   margin-bottom: -0.5rem; /* Compense tout espacement résiduel en bas */
 }
 
+/* Conteneur du footer (nouveau) */
+.web-footer-container {
+  width: 100%;
+  max-width: 800px;
+  margin: -0.5rem auto 0 auto; /* Marge négative en haut pour éliminer l'espace */
+  padding: 0;
+  position: relative;
+  z-index: 90; /* Z-index inférieur au question-container */
+}
+
 /* Style pour le texte d'information en bas */
 .web-question-footer {
   margin: 0; /* Suppression de toutes les marges */
@@ -313,11 +323,8 @@
   font-size: 0.7rem; /* Texte plus petit */
   color: #666;
   text-align: center;
-  line-height: 0.8; /* Ligne encore plus serrée */
-  position: relative;
-  top: -8px; /* Remonte davantage le texte pour éliminer tout espace */
+  line-height: 1; /* Ligne normale */
   height: 0.7rem; /* Hauteur fixe égale à la taille de la police */
-  overflow: visible; /* Permet au texte de déborder si nécessaire */
 }
 
 /* Style pour le nom KORA dans le footer */
