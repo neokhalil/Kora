@@ -494,6 +494,47 @@
     transform: translateZ(0);
     contain: style;
   }
+
+  /* Style pour les formules mathématiques dans MathJax */
+  .math-content mjx-container[jax="CHTML"][display="true"] {
+    margin: 1em 0;
+    display: block;
+    text-align: center;
+    position: relative;
+  }
+
+  .math-content mjx-container[jax="CHTML"] {
+    direction: ltr;
+    line-height: 0;
+    text-align: center;
+    position: relative;
+    text-indent: 0;
+    font-size: 1.15em;
+  }
+
+  /* Assurer que les fractions sont correctement alignées */
+  .math-content mjx-frac {
+    padding: 0.2em 0;
+  }
+
+  /* Style pour les symboles mathématiques spéciaux */
+  .math-content mjx-texatom[texclass="ORD"] {
+    margin: 0 0.1em;
+  }
+
+  /* Style pour les expressions type "delta > 0" */
+  .math-content mjx-container.math-inline {
+    display: inline-block !important;
+    margin: 0 0.2em;
+  }
+
+  /* Style pour les expressions mathématiques sur leur propre ligne */
+  .math-content mjx-container[display="block"] {
+    display: block !important;
+    margin: 1em 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
   
   .math-content-inner {
     transform: translateZ(0);

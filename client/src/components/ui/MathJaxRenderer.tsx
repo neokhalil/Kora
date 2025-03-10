@@ -277,26 +277,32 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Correction des erreurs courantes dans le contenu mathématique
     // Cette fonction corrige certaines formulations incorrectes dans le texte
     const correctMathNotation = (text: string): string => {
+      // Corriger d'abord les formules LaTeX
+      text = text.replace(/\\Delta\s*}/g, '\\Delta}');
+      
+      // Assurer que les formules mathématiques sont complètes
+      // Correction des formules mathématiques incomplètes pour équations du second degré
+      text = text.replace(/\\\[\s*x_2\s*=\s*\\frac\{-b\s*$/m, '\\[ x_2 = \\frac{-b - \\sqrt{\\Delta}}{2a} \\]')
+           .replace(/\\\[\s*x_[12]\s*=\s*\\frac\{-b\s*[+-]\s*\\sqrt/m, '\\[ x_{1,2} = \\frac{-b \\pm \\sqrt');
+      
       // Remplacer uniquement dans le contexte approprié (équations du second degré)
       if (text.includes("discriminant") || text.includes("équation") || text.includes("solution")) {
         // Solution pour les équations du second degré
         text = text
-          // Utiliser des expressions régulières avec /g pour remplacer toutes les occurrences
-          // Correction des cas les plus courants
-          .replace(/\bSi\s+b0\b/g, "Si Δ > 0")
-          .replace(/\bSi\s+b1\b/g, "Si Δ = 0")
-          .replace(/\bSi\s+b2\b/g, "Si Δ < 0")
-          
-          // Cibler exactement les expressions de l'image
-          .replace(/- Si b0,/g, "- Si Δ > 0,")
-          .replace(/- Si b1,/g, "- Si Δ = 0,")
-          .replace(/- Si b2,/g, "- Si Δ < 0,")
-          
-          // Autres formes possibles avec "il y a"
-          .replace(/\bb0\s*,\s*il\s+y\s+a\b/g, "Δ > 0, il y a")
-          .replace(/\bb1\s*,\s*il\s+y\s+a\b/g, "Δ = 0, il y a")
-          .replace(/\bb2\s*,\s*il\s+n['']y\s+a\b/g, "Δ < 0, il n'y a");
+          // Correction des expressions avec b0, b1, b2
+          .replace(/\b[Ss]i\s+b0\b/g, "Si Δ > 0")
+          .replace(/\b[Ss]i\s+b1\b/g, "Si Δ = 0")
+          .replace(/\b[Ss]i\s+b2\b/g, "Si Δ < 0")
+          .replace(/\b[Ss]i\s+b0,/g, "Si Δ > 0,")
+          .replace(/\b[Ss]i\s+b1,/g, "Si Δ = 0,")
+          .replace(/\b[Ss]i\s+b2,/g, "Si Δ < 0,")
+          .replace(/\bb0\b/g, "Δ > 0")
+          .replace(/\bb1\b/g, "Δ = 0")
+          .replace(/\bb2\b/g, "Δ < 0");
       }
+      
+      // S'assurer que les formules mathématiques sont bien espacées
+      text = text.replace(/\\\[/g, '\n\\[\n').replace(/\\\]/g, '\n\\]\n');
       
       // Autres corrections mathématiques générales
       return text;
