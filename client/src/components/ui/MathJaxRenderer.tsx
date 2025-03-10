@@ -199,9 +199,18 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     // Protéger les expressions mathématiques inline avec $ ... $
     formattedText = formattedText.replace(/\$([^\$\n]+)\$/g, (match, expr) => {
+      // Créer un placeholder unique avec un caractère spécial pour éviter les collisions
       const placeholder = `__MATH_EXPR_${mathExpressions.length}__`;
+      // Stocker l'expression originale
       mathExpressions.push(match);
       return placeholder;
+    });
+    
+    // Vérification supplémentaire pour les placeholders qui n'auraient pas été remplacés précédemment
+    // (problème qui pourrait se produire si le contenu avait déjà des placeholders similaires)
+    formattedText = formattedText.replace(/__MATH_EXPR_\d+__/g, match => {
+      // On ajoute un caractère invisible pour distinguer nos vrais placeholders
+      return `${match}\u200B`;
     });
     
     // 2. Protection du code monospace inline pour éviter les conflits
@@ -275,9 +284,29 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       );
     });
     
-    // 8. Restaurer les expressions mathématiques protégées
+    // 8. Restaurer les expressions mathématiques protégées en deux phases
+    // D'abord, marquer tous les placeholders avec une classe spéciale pour mieux les identifier
     mathExpressions.forEach((expr, index) => {
-      formattedText = formattedText.replace(`__MATH_EXPR_${index}__`, expr);
+      const placeholder = `__MATH_EXPR_${index}__`;
+      // Rechercher de manière littérale sans utiliser d'expressions régulières
+      // pour éviter les problèmes de caractères spéciaux      
+      let position = -1;
+      while ((position = formattedText.indexOf(placeholder, position + 1)) !== -1) {
+        const before = formattedText.substring(0, position);
+        const after = formattedText.substring(position + placeholder.length);
+        formattedText = before + `<span class="math-placeholder" data-math-index="${index}">${placeholder}</span>` + after;
+        // Sauter le placeholder nouvellement inséré
+        position = position + `<span class="math-placeholder" data-math-index="${index}">`.length + placeholder.length + '</span>'.length;
+      }
+    });
+    
+    // Maintenant remplacer tous les placeholders marqués avec leur expression mathématique d'origine
+    formattedText = formattedText.replace(/<span class="math-placeholder" data-math-index="(\d+)">__MATH_EXPR_\d+__<\/span>/g, (match, indexStr) => {
+      const index = parseInt(indexStr, 10);
+      if (index >= 0 && index < mathExpressions.length) {
+        return mathExpressions[index];
+      }
+      return match; // Garde le placeholder si l'index est invalide
     });
       
     return formattedText;
