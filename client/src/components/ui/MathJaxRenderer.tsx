@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
+import 'katex/dist/katex.min.css';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
+import katex from 'katex';
 
 interface MathContentProps {
   content: string;
@@ -8,8 +10,8 @@ interface MathContentProps {
 }
 
 /**
- * Composant pour rendre du contenu mathématique avec formatage HTML
- * Version simplifiée pour assurer la compatibilité
+ * Composant pour rendre du contenu mathématique avec KaTeX
+ * Version simplifiée mais robuste pour gérer les formules mathématiques
  */
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -86,15 +88,10 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     text = text.replace(/\bb1\b/g, "Δ = 0");
     text = text.replace(/\bb2\b/g, "Δ < 0");
     
-    // Formatage et préparation pour MathJax
+    // Formatage et préparation
     text = text
       // Ajouter des sauts de ligne pour les listes avec Si...
-      .replace(/(- Si [^,]+, )(.*?)(?=\n|$)/g, "$1\n    $2")
-      // Améliorer l'affichage des formules
-      .replace(/\\\[/g, '<div class="math-block">')
-      .replace(/\\\]/g, '</div>')
-      .replace(/\\\(/g, '<span class="math-inline">')
-      .replace(/\\\)/g, '</span>');
+      .replace(/(- Si [^,]+, )(.*?)(?=\n|$)/g, "$1\n    $2");
     
     return text;
   };
@@ -103,19 +100,8 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   const processContent = () => {
     if (!content) return '';
     
-    // 1. PRÉ-TRAITEMENT: Protéger les expressions mathématiques
-    const mathExpressions: string[] = [];
-    
-    // Fonction qui crée un placeholder pour les expressions mathématiques
-    const createMathPlaceholder = (match: string) => {
-      const id = mathExpressions.length;
-      mathExpressions.push(match);
-      return `MATH_PLACEHOLDER_${id}`;
-    };
-    
-    // Remplacer temporairement les expressions $ par des placeholders
-    let processedContent = content
-      .replace(/\$([^\$]+?)\$/g, (match) => createMathPlaceholder(match));
+    // 1. PRÉ-TRAITEMENT: Protéger les expressions mathématiques et les améliorer
+    let processedContent = correctMathematicalExpressions(content);
     
     // 2. TRAITEMENT du contenu principal
     // Séparation, traitement des listes, blocs de code, etc.
@@ -130,9 +116,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     const formatListItems = (text: string): string => {
       return text
         // Traitement des listes avec tirets
-        .replace(/(?<!\$[^\$]*)(- )([^-\$]+?)(?=(?:- |$))/g, '<div class="list-item">$1$2</div>')
-        // Expressions mathématiques sur une ligne séparée
-        .replace(/(?<!\<div class="[^"]+">\s*)(\$[^\$]+\$)(?!\s*<\/div>)/g, '<div class="formula-item">$1</div>');
+        .replace(/(?<!\$[^\$]*)(- )([^-\$]+?)(?=(?:- |$))/g, '<div class="list-item">$1$2</div>');
     };
     
     // Traiter chaque ligne du contenu
@@ -227,15 +211,6 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       htmlContent += `<p>${formattedParagraph}</p>`;
     }
     
-    // 3. POST-TRAITEMENT: Restaurer les expressions mathématiques
-    mathExpressions.forEach((expr, index) => {
-      const placeholder = `MATH_PLACEHOLDER_${index}`;
-      htmlContent = htmlContent.split(placeholder).join(expr);
-    });
-    
-    // 4. Appliquer les corrections mathématiques
-    htmlContent = correctMathematicalExpressions(htmlContent);
-    
     return htmlContent;
   };
   
@@ -250,6 +225,30 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       codeSnippets.push(code);
       return `CODE_SNIPPET_${id}`;
     });
+    
+    // Protéger les formules mathématiques
+    const mathExpressions: {formula: string, isBlock: boolean}[] = [];
+    
+    // Remplacer les formules LaTeX par des placeholders
+    text = text
+      // Formules display (blocs)
+      .replace(/\\\[(.*?)\\\]/gs, (match, formula) => {
+        const id = mathExpressions.length;
+        mathExpressions.push({ formula, isBlock: true });
+        return `MATH_PLACEHOLDER_${id}`;
+      })
+      // Formules inline
+      .replace(/\\\((.*?)\\\)/gs, (match, formula) => {
+        const id = mathExpressions.length;
+        mathExpressions.push({ formula, isBlock: false });
+        return `MATH_PLACEHOLDER_${id}`;
+      })
+      // Format $ inline
+      .replace(/\$([^\$]+?)\$/g, (match, formula) => {
+        const id = mathExpressions.length;
+        mathExpressions.push({ formula, isBlock: false });
+        return `MATH_PLACEHOLDER_${id}`;
+      });
     
     // Appliquer le formatage Markdown basique
     let formattedText = text
@@ -284,6 +283,37 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       }
       
       return match;
+    });
+    
+    // Restaurer les formules mathématiques avec le rendu KaTeX
+    mathExpressions.forEach((expr, index) => {
+      try {
+        const placeholder = `MATH_PLACEHOLDER_${index}`;
+        let renderedMath = '';
+        
+        if (expr.isBlock) {
+          renderedMath = katex.renderToString(expr.formula, {
+            displayMode: true,
+            throwOnError: false
+          });
+          renderedMath = `<div class="katex-block">${renderedMath}</div>`;
+        } else {
+          renderedMath = katex.renderToString(expr.formula, {
+            displayMode: false,
+            throwOnError: false
+          });
+          renderedMath = `<span class="katex-inline">${renderedMath}</span>`;
+        }
+        
+        formattedText = formattedText.replace(placeholder, renderedMath);
+      } catch (e) {
+        console.error("Erreur KaTeX:", e);
+        // En cas d'erreur, afficher la formule brute
+        formattedText = formattedText.replace(
+          `MATH_PLACEHOLDER_${index}`,
+          `<span class="math-error">${expr.isBlock ? '\\[' : '\\('}${expr.formula}${expr.isBlock ? '\\]' : '\\)'}</span>`
+        );
+      }
     });
     
     // Restaurer le code inline
