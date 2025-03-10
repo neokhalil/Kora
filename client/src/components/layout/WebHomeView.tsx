@@ -4,7 +4,7 @@ import { RecentQuestion } from '@/lib/types';
 import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
-import TextRenderer from '@/components/ui/TextRenderer';
+import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import './WebHomeView.css';
 
@@ -519,7 +519,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         
         {/* Contenu du message avec formatage mathématique et code */}
         <div className="web-message-content">
-          <TextRenderer content={message.content} />
+          <MathJaxRenderer content={message.content} />
         </div>
         
         {/* Boutons d'action standards pour les messages de Kora */}
