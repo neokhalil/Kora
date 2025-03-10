@@ -274,6 +274,37 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Détection des mots français courants avec apostrophes (n', l', d', j', etc.)
     const frenchWithApostrophe = /\b[nljdcsmt]'[a-zàâäçéèêëîïôöùûüÿ]/i;
     
+    // Correction des erreurs courantes dans le contenu mathématique
+    // Cette fonction corrige certaines formulations incorrectes dans le texte
+    const correctMathNotation = (text: string): string => {
+      // Remplacer uniquement dans le contexte approprié (équations du second degré)
+      if (text.includes("discriminant") || text.includes("équation") || text.includes("solution")) {
+        // Solution pour les équations du second degré
+        text = text
+          // Utiliser des expressions régulières avec /g pour remplacer toutes les occurrences
+          // Correction des cas les plus courants
+          .replace(/\bSi\s+b0\b/g, "Si Δ > 0")
+          .replace(/\bSi\s+b1\b/g, "Si Δ = 0")
+          .replace(/\bSi\s+b2\b/g, "Si Δ < 0")
+          
+          // Cibler exactement les expressions de l'image
+          .replace(/- Si b0,/g, "- Si Δ > 0,")
+          .replace(/- Si b1,/g, "- Si Δ = 0,")
+          .replace(/- Si b2,/g, "- Si Δ < 0,")
+          
+          // Autres formes possibles avec "il y a"
+          .replace(/\bb0\s*,\s*il\s+y\s+a\b/g, "Δ > 0, il y a")
+          .replace(/\bb1\s*,\s*il\s+y\s+a\b/g, "Δ = 0, il y a")
+          .replace(/\bb2\s*,\s*il\s+n['']y\s+a\b/g, "Δ < 0, il n'y a");
+      }
+      
+      // Autres corrections mathématiques générales
+      return text;
+    };
+    
+    // Appliquer les corrections au texte
+    formattedText = correctMathNotation(formattedText);
+    
     formattedText = formattedText.replace(/'([^']+)'/g, (match, content) => {
       // Liste des mots possiblement français dans le contenu
       if (
