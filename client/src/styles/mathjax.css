@@ -8,8 +8,16 @@
   width: 100%;
   overflow-wrap: break-word;
   word-wrap: break-word;
-  word-break: break-word;
+  word-break: normal;
   hyphens: auto;
+}
+
+/* Préserver les espaces dans le texte en italique */
+.math-renderer .mjx-math,
+.math-renderer em,
+.math-renderer i {
+  white-space: normal;
+  word-spacing: normal;
 }
 
 /* Styles pour les formules mathématiques */
