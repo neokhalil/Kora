@@ -312,7 +312,9 @@
   font-size: 0.7rem; /* Texte plus petit */
   color: #666;
   text-align: center;
-  line-height: 1; /* Ligne plus serrée */
+  line-height: 0.8; /* Ligne encore plus serrée */
+  position: relative;
+  top: -5px; /* Remonte légèrement le texte pour éliminer l'espace */
 }
 
 /* Style pour le nom KORA dans le footer */

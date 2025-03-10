@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-import MainContent from '@/components/layout/MainContent';
 import WebHomeView from '@/components/layout/WebHomeView';
 import { RecentQuestion } from '@/lib/types';
 import { apiRequest } from '@/lib/queryClient';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 const Home = () => {
   const [recentQuestions, setRecentQuestions] = useState<RecentQuestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const isMobile = useIsMobile();
   
   useEffect(() => {
     const fetchRecentQuestions = async () => {
@@ -43,12 +40,8 @@ const Home = () => {
     fetchRecentQuestions();
   }, []);
 
-  // Utilisez la version mobile ou desktop en fonction de la taille de l'écran
-  return isMobile ? (
-    <MainContent recentQuestions={recentQuestions} />
-  ) : (
-    <WebHomeView recentQuestions={recentQuestions} />
-  );
+  // Utiliser uniquement le nouveau design WebHomeView quelle que soit la taille de l'écran
+  return <WebHomeView recentQuestions={recentQuestions} />;
 };
 
 export default Home;
