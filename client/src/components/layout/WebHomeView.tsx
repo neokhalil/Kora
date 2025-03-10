@@ -547,7 +547,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <button 
               type="button"
               className="web-action-button"
-              onClick={() => handleReExplain(message.id)}
+              onClick={() => {
+                // Ajouter un message utilisateur pour la reformulation
+                const userMessage: Message = {
+                  id: Date.now().toString(),
+                  content: "Peux-tu me reformuler ton explication ?",
+                  sender: 'user',
+                };
+                setMessages(prev => [...prev, userMessage]);
+                handleReExplain(message.id);
+              }}
             >
               <RefreshCcw size={15} />
               <span>Reformuler</span>
@@ -555,7 +564,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <button 
               type="button"
               className="web-action-button"
-              onClick={() => handleChallenge(message.id)}
+              onClick={() => {
+                // Ajouter un message utilisateur pour demander un exercice
+                const userMessage: Message = {
+                  id: Date.now().toString(),
+                  content: "Peux-tu me proposer un exercice sur ce sujet ?",
+                  sender: 'user',
+                };
+                setMessages(prev => [...prev, userMessage]);
+                handleChallenge(message.id);
+              }}
             >
               <Lightbulb size={15} />
               <span>Exercice</span>
@@ -576,7 +594,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <button 
               type="button"
               className="web-action-button"
-              onClick={() => handleHint(message.challengeId!)}
+              onClick={() => {
+                // Ajouter un message utilisateur pour demander un indice
+                const userMessage: Message = {
+                  id: Date.now().toString(),
+                  content: "Peux-tu me donner un indice pour résoudre cet exercice ?",
+                  sender: 'user',
+                };
+                setMessages(prev => [...prev, userMessage]);
+                handleHint(message.challengeId!);
+              }}
             >
               <HelpCircle size={15} />
               <span>Indice</span>
