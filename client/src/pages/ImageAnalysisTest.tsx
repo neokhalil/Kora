@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import ImageAnalysisForm from '@/components/ImageAnalysisForm';
 import { Separator } from '@/components/ui/separator';
-import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
+import TextRenderer from '@/components/ui/TextRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AnalysisResponse {

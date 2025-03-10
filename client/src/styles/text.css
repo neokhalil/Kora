@@ -1,0 +1,41 @@
+/* Styles simples pour l'affichage de texte standard */
+
+.message-content.text-content {
+  width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Style pour les blocs de texte */
+.text-block-container {
+  max-width: 100%;
+  padding: 0.5rem 0;
+  margin: 0.75rem 0;
+}
+
+/* Styles pour le mode sombre */
+@media (prefers-color-scheme: dark) {
+  .message-content.text-content pre {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Amélioration de la lisibilité des blocs de code en mode sombre */
+  .message-content.text-content code {
+    color: #e8e8e8;
+  }
+}
+
+/* Amélioration de l'espacement pour une meilleure lisibilité sur petits écrans */
+@media (max-width: 640px) {
+  .message-content.text-content p {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Rendre les liens plus accessibles sur mobile */
+  .message-content.text-content a {
+    padding: 0.1rem 0;
+    display: inline-block;
+  }
+}

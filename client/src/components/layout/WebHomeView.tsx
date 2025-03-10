@@ -4,32 +4,11 @@ import { RecentQuestion } from '@/lib/types';
 import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
-import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
-import { MathJaxContext } from 'better-react-mathjax';
+import TextRenderer from '@/components/ui/TextRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import './WebHomeView.css';
 
-// Configuration MathJax
-const mathJaxConfig = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']],
-    processEscapes: true,
-    processEnvironments: true
-  },
-  options: {
-    enableMenu: false,    // Désactive le menu contextuel
-    menuOptions: {
-      settings: {
-        assistiveMml: false,
-        zoom: 'NoZoom'    // Désactive le zoom
-      }
-    }
-  },
-  startup: {
-    typeset: false        // Ne pas traiter automatiquement la page (pour éviter les conflits)
-  }
-};
+// Configuration pour le texte simple (sans formatage mathématique)
 
 // Interface pour les messages de la conversation
 interface Message {
@@ -540,7 +519,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         
         {/* Contenu du message avec formatage mathématique et code */}
         <div className="web-message-content">
-          <MathJaxRenderer content={message.content} />
+          <TextRenderer content={message.content} />
         </div>
         
         {/* Boutons d'action standards pour les messages de Kora */}
@@ -617,7 +596,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   };
 
   return (
-    <MathJaxContext config={mathJaxConfig}>
       <div className="web-home-container">
         <div className="web-layout">
           {/* Sidebar - menu latéral gauche */}
@@ -874,7 +852,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           </div>
         </div>
       </div>
-    </MathJaxContext>
   );
 };
 
