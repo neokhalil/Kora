@@ -189,7 +189,17 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       return placeholder;
     });
     
-    // 2. Expressions régulières pour les codes PHP et les exemples spécifiques
+    // 2. Protection du code monospace inline pour éviter les conflits
+    const monospaceLiterals: string[] = [];
+    
+    // Format spécial pour le code à police fixe qui ne doit pas être coloré
+    formattedText = formattedText.replace(/`([^`\n]+)`/g, (match, content) => {
+      const placeholder = `__MONO_CODE_${monospaceLiterals.length}__`;
+      monospaceLiterals.push(content);
+      return placeholder;
+    });
+    
+    // 3. Expressions régulières pour les codes PHP et les exemples spécifiques
     const phpPatterns = [
       // Tags PHP
       { pattern: /\'?(\<?php|\?>)\'?/g, replacement: '<code class="inline-code php-tag">$1</code>' },
@@ -208,19 +218,22 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       { pattern: /\'(\}\s*elseif\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
     ];
     
-    // 3. Appliquer tous les patterns PHP spécifiques
+    // 4. Appliquer tous les patterns PHP spécifiques
     phpPatterns.forEach(({ pattern, replacement }) => {
       formattedText = formattedText.replace(pattern, replacement);
     });
     
-    // 4. Formatage de code inline général (pour tout ce qui reste)
-    formattedText = formattedText
-      // Code inline avec backticks
-      .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
-      // Texte dans des guillemets simples (rendus comme code) - uniquement s'ils n'ont pas déjà été traités
-      .replace(/'([^'\n]+)'/g, '<code class="inline-code mobile-friendly-code">$1</code>');
+    // 5. Formatage de code inline général mais uniquement pour du vrai code (single quotes)
+    // On évite de traiter les apostrophes normales en français
+    formattedText = formattedText.replace(/'([^'\n]{3,})'/g, (match, content) => {
+      // Ne convertit en code que s'il ressemble à du code (contient des caractères spéciaux)
+      if (/[:;(){}=<>\/\[\]\.,$]/.test(content) || /^[a-z]+$/.test(content)) {
+        return `<code class="inline-code mobile-friendly-code">${content}</code>`;
+      }
+      return match; // Sinon on garde tel quel (apostrophe française)
+    });
     
-    // 5. Formatage du texte (Markdown)
+    // 6. Formatage du texte (Markdown)
     formattedText = formattedText
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -231,7 +244,15 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       // Barré
       .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
     
-    // 6. Restaurer les expressions mathématiques protégées
+    // 7. Restaurer le code monospace protégé avec style intégré
+    monospaceLiterals.forEach((content, index) => {
+      formattedText = formattedText.replace(
+        `__MONO_CODE_${index}__`, 
+        `<code class="inline-code monospace-literal">${content}</code>`
+      );
+    });
+    
+    // 8. Restaurer les expressions mathématiques protégées
     mathExpressions.forEach((expr, index) => {
       formattedText = formattedText.replace(`__MATH_EXPR_${index}__`, expr);
     });

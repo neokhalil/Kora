@@ -676,6 +676,20 @@
     overflow-wrap: break-word;
   }
   
+  /* Style pour le texte monospace littéral (backticks) - plus subtil que le code coloré */
+  .math-content .monospace-literal {
+    font-family: 'Source Code Pro', 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    font-size: 0.9em;
+    padding: 0.1em 0.2em;
+    margin: 0 1px;
+    color: #444;
+    white-space: normal;
+    word-break: break-word;
+  }
+  
   /* Mise en forme des éléments de texte du message */
   .math-content p {
     margin-bottom: 1rem;
