@@ -303,6 +303,7 @@
   box-shadow: none; /* Suppression de l'ombre */
   border-top: none; /* Suppression de la bordure */
   position: relative;
+  margin-bottom: -0.5rem; /* Compense tout espacement résiduel en bas */
 }
 
 /* Style pour le texte d'information en bas */
@@ -314,7 +315,9 @@
   text-align: center;
   line-height: 0.8; /* Ligne encore plus serrée */
   position: relative;
-  top: -5px; /* Remonte légèrement le texte pour éliminer l'espace */
+  top: -8px; /* Remonte davantage le texte pour éliminer tout espace */
+  height: 0.7rem; /* Hauteur fixe égale à la taille de la police */
+  overflow: visible; /* Permet au texte de déborder si nécessaire */
 }
 
 /* Style pour le nom KORA dans le footer */
