@@ -10,7 +10,7 @@ interface MathContentProps {
 
 /**
  * Composant pour rendre du contenu mathématique avec MathJax
- * Version simplifiée pour améliorer la stabilité
+ * Implémentation simplifiée avec un meilleur traitement des expressions mathématiques
  */
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,9 +64,31 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
 
   // Traiter le contenu pour le formatage
   const processContent = () => {
-    // Séparer le contenu en lignes
-    const lines = content.split('\n');
-    let html = '';
+    if (!content) return '';
+    
+    // 1. PRÉ-TRAITEMENT: Protéger les expressions mathématiques en premier
+    // Nous allons remplacer temporairement les expressions LaTeX par des placeholders
+    // au format MATH_PLACEHOLDER_{index} pour les protéger des manipulations HTML
+    
+    // Isoler toutes les expressions mathématiques
+    const mathExpressions: string[] = [];
+    
+    // Fonction qui crée un placeholder unique pour chaque expression mathématique
+    const createMathPlaceholder = (match: string) => {
+      const id = mathExpressions.length;
+      mathExpressions.push(match);
+      return `MATH_PLACEHOLDER_${id}`;
+    };
+    
+    // Remplacer temporairement les expressions mathématiques par des placeholders
+    let processedContent = content
+      // Expressions inline: $...$
+      .replace(/\$([^\$]+?)\$/g, (match) => createMathPlaceholder(match));
+    
+    // 2. TRAITEMENT DU CONTENU
+    // Séparer le contenu en lignes et traiter chaque élément
+    const lines = processedContent.split('\n');
+    let htmlContent = '';
     let inCodeBlock = false;
     let codeLanguage = '';
     let codeContent = '';
@@ -76,15 +98,15 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       
-      // Détecter les blocs de code
+      // Traitement des blocs de code
       if (line.trim().startsWith('```')) {
         if (!inCodeBlock) {
           // Début d'un bloc de code
           inCodeBlock = true;
           
-          // Vider le contenu du paragraphe précédent s'il existe
+          // Terminer le paragraphe précédent s'il existe
           if (paragraphContent) {
-            html += `<p>${formatTextContent(paragraphContent)}</p>`;
+            htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
             paragraphContent = '';
           }
           
@@ -94,29 +116,25 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           // Fin d'un bloc de code
           inCodeBlock = false;
           
-          // Vérifier si le contenu ressemble vraiment à du code ou est juste du texte normal
+          // Vérifier si c'est vraiment du code ou juste du texte normal
           const looksLikeCode = (
-            codeLanguage ||  // Si un langage est spécifié, c'est probablement du code
-            /[:;(){}=<>\/\[\]\.,$+\-*%]/.test(codeContent) || // Contient des caractères de programmation
-            /^(let|var|const|for|while|if|else|function|return)/m.test(codeContent) || // Contient des mots-clés de programmation
-            codeContent.includes('\t') || // Contient des tabulations
-            codeContent.split('\n').some(line => line.trim().startsWith('//')) || // Contient des commentaires
-            codeContent.split('\n').some(line => /^\s{2,}/.test(line)) // Contient une indentation
+            codeLanguage || // Si un langage est spécifié, c'est du code
+            /[:;(){}=<>\/\[\]\.,$+\-*%]/.test(codeContent) || // Caractères de programmation
+            /^(let|var|const|function|for|while|if|else|return)/m.test(codeContent) || // Mots-clés
+            codeContent.includes('\t') // Tabulations
           );
           
           if (looksLikeCode) {
-            // C'est vraiment du code, formater comme un bloc de code
+            // C'est du code, appliquer le style de code
             const langClass = codeLanguage ? `language-${codeLanguage}` : '';
             const escapedCode = escapeHtml(codeContent);
             
-            // Appliquer un style spécifique pour le langage PHP
-            const langSpecificClass = codeLanguage.toLowerCase() === 'php' ? 'php-code-block' : '';
-            
-            html += `<pre class="code-block ${langClass} ${langSpecificClass}"><code class="${langClass}" data-lang="${codeLanguage}">${escapedCode}</code></pre>`;
+            htmlContent += `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${codeLanguage || 'text'}">${escapedCode}</code></pre>`;
           } else {
-            // Ce n'est pas du code, le formater comme du texte normal
-            html += `<p>${formatTextContent(codeContent)}</p>`;
+            // Ce n'est pas du code, formater comme du texte normal
+            htmlContent += `<p>${formatTextContent(codeContent)}</p>`;
           }
+          
           codeContent = '';
           codeLanguage = '';
         }
@@ -126,53 +144,46 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       } else if (line.trim() === '') {
         // Ligne vide - fin de paragraphe
         if (paragraphContent) {
-          html += `<p>${formatTextContent(paragraphContent)}</p>`;
+          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
           paragraphContent = '';
         }
       } else if (line.trim().match(/^#{1,3}\s+(.+)$/)) {
-        // Titre Markdown (# Titre)
+        // Titre (# Titre)
         if (paragraphContent) {
-          html += `<p>${formatTextContent(paragraphContent)}</p>`;
+          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
           paragraphContent = '';
         }
         
         const match = line.trim().match(/^(#{1,3})\s+(.+)$/);
         if (match) {
           const level = match[1].length;
-          const title = match[2];
-          html += `<h${level} class="section-heading">${title}</h${level}>`;
+          const title = formatTextContent(match[2]);
+          htmlContent += `<h${level} class="section-heading">${title}</h${level}>`;
         }
       } else if (line.trim().match(/^\d+\.\s+(.+)$/)) {
-        // Liste numérotée (1. Item)
+        // Liste numérotée ou section numérotée
         if (paragraphContent) {
-          html += `<p>${formatTextContent(paragraphContent)}</p>`;
+          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
           paragraphContent = '';
         }
         
-        // Détection des titres de sections numérotées (incluant PHP et autres sections)
-        const sectionMatch = line.trim().match(/^(\d+)\.\s+(.*?)[\s:]*$/);
-        
-        if (sectionMatch) {
-          const number = sectionMatch[1];
-          const title = sectionMatch[2].replace(/:$/, '');
+        const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
+        if (match) {
+          const number = match[1];
+          const content = formatTextContent(match[2]);
           
-          // Déterminer si c'est une section spéciale (PHP, etc.) ou une ligne numérotée ordinaire
-          const isSectionTitle = title.includes('Commentaires') || 
-                                title.includes('Variables') || 
-                                title.includes('Fonctions') ||
-                                title.includes('Déclaration') ||
-                                title.includes('Après') ||
-                                // Autres mots-clés de sections courantes
-                                title.includes('étapes') ||
-                                title.includes('Étapes') ||
-                                /^[A-Z]/.test(title); // Commence par une majuscule = probablement un titre
+          // Déterminer si c'est un titre de section ou une simple ligne numérotée
+          const isProbablyTitle = 
+            /^[A-Z]/.test(match[2]) || // Commence par une majuscule
+            match[2].includes('étape') || 
+            match[2].includes('Étape') ||
+            match[2].includes('Exemple') ||
+            match[2].includes('Comprendre');
           
-          if (isSectionTitle) {
-            // C'est un titre de section (format "1. Section :")
-            html += `<div class="php-section-title"><span class="php-section-number">${number}.</span> ${formatTextContent(title)}</div>`;
+          if (isProbablyTitle) {
+            htmlContent += `<div class="section-title"><span class="section-number">${number}.</span> ${content}</div>`;
           } else {
-            // Ligne numérotée ordinaire (liste, étape, etc.)
-            html += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${formatTextContent(title)}</span></div>`;
+            htmlContent += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${content}</span></div>`;
           }
         }
       } else {
@@ -181,141 +192,77 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       }
     }
     
-    // Traiter tout contenu de paragraphe restant
+    // Traiter tout paragraphe restant
     if (paragraphContent) {
-      html += `<p>${formatTextContent(paragraphContent)}</p>`;
+      htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
     }
     
-    return html;
+    // 3. POST-TRAITEMENT: Restaurer les expressions mathématiques
+    // Remplacer tous les placeholders par les expressions mathématiques originales
+    mathExpressions.forEach((expr, index) => {
+      const placeholder = `MATH_PLACEHOLDER_${index}`;
+      // Remplacer de manière littérale, sans expressions régulières
+      htmlContent = htmlContent.split(placeholder).join(expr);
+    });
+    
+    return htmlContent;
   };
   
-  // Formatage du texte dans les paragraphes
-  const formatTextContent = (text: string) => {
-    let formattedText = text;
+  // Formater le texte dans les paragraphes et autres éléments
+  const formatTextContent = (text: string): string => {
+    if (!text) return '';
     
-    // 1. Traitement des expressions mathématiques (à protéger avant le traitement du code)
-    // Recherche et stockage temporaire des expressions mathématiques pour les protéger
-    const mathExpressions: string[] = [];
+    // Protéger certains caractères spéciaux (pour éviter des remplacements indésirables)
+    const codeSnippets: string[] = [];
     
-    // Protéger les expressions mathématiques inline avec $ ... $
-    formattedText = formattedText.replace(/\$([^\$\n]+)\$/g, (match, expr) => {
-      // Créer un placeholder unique avec un caractère spécial pour éviter les collisions
-      const placeholder = `__MATH_EXPR_${mathExpressions.length}__`;
-      // Stocker l'expression originale
-      mathExpressions.push(match);
-      return placeholder;
+    // Remplacer temporairement le code inline avec backticks
+    text = text.replace(/`([^`]+)`/g, (match, code) => {
+      const id = codeSnippets.length;
+      codeSnippets.push(code);
+      return `CODE_SNIPPET_${id}`;
     });
     
-    // Vérification supplémentaire pour les placeholders qui n'auraient pas été remplacés précédemment
-    // (problème qui pourrait se produire si le contenu avait déjà des placeholders similaires)
-    formattedText = formattedText.replace(/__MATH_EXPR_\d+__/g, match => {
-      // On ajoute un caractère invisible pour distinguer nos vrais placeholders
-      return `${match}\u200B`;
-    });
-    
-    // 2. Protection du code monospace inline pour éviter les conflits
-    const monospaceLiterals: string[] = [];
-    
-    // Format spécial pour le code à police fixe qui ne doit pas être coloré
-    formattedText = formattedText.replace(/`([^`\n]+)`/g, (match, content) => {
-      const placeholder = `__MONO_CODE_${monospaceLiterals.length}__`;
-      monospaceLiterals.push(content);
-      return placeholder;
-    });
-    
-    // 3. Expressions régulières pour les codes PHP et les exemples spécifiques
-    const phpPatterns = [
-      // Tags PHP
-      { pattern: /\'?(\<?php|\?>)\'?/g, replacement: '<code class="inline-code php-tag">$1</code>' },
-      // Variables PHP
-      { pattern: /\'?(\$[a-zA-Z_][a-zA-Z0-9_]*)\'?/g, replacement: '<code class="inline-code php-var">$1</code>' },
-      // Commentaires PHP
-      { pattern: /\'(\/\/\s*[^\']+)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
-      { pattern: /\'(\*\/)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
-      { pattern: /\'(\/\*)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
-      // Fonctions PHP
-      { pattern: /\'(echo\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
-      { pattern: /\'(function\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
-      // Structures de contrôle PHP
-      { pattern: /\'(if\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
-      { pattern: /\'(\}\s*else\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
-      { pattern: /\'(\}\s*elseif\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
-    ];
-    
-    // 4. Appliquer tous les patterns PHP spécifiques
-    phpPatterns.forEach(({ pattern, replacement }) => {
-      formattedText = formattedText.replace(pattern, replacement);
-    });
-    
-    // 5. Formatage de code inline général mais uniquement pour du vrai code (single quotes)
-    // On évite de traiter les apostrophes normales en français
-    formattedText = formattedText.replace(/'([^'\n]{2,})'/g, (match, content) => {
-      // Ne convertit en code que s'il ressemble vraiment à du code (contient des caractères spéciaux de programmation)
-      if (
-        // Ne traiter que s'il contient des caractères spécifiques au code
-        (/[:;(){}=<>\/\[\]\.,$+\-*%]/.test(content) && /[a-zA-Z]/.test(content)) || 
-        // Ou si c'est du code court comme 'let' ou 'if'
-        /^(let|var|const|for|while|if|else|switch|case|break|function|return|true|false|null|this|new)$/.test(content)
-      ) {
-        return `<code class="inline-code mobile-friendly-code">${content}</code>`;
-      } else if (content.includes(" ") || /^[a-z]/i.test(content)) {
-        // C'est probablement du texte normal en français avec apostrophes
-        return `<span class="normal-text-with-apostrophes">${match}</span>`;
-      }
-      return match; // Sinon on garde tel quel (cas ambigus)
-    });
-    
-    // 6. Formatage du texte (Markdown)
-    formattedText = formattedText
+    // Appliquer le formatage Markdown basique
+    let formattedText = text
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-      // Italique (mais pas dans le code)
-      .replace(/\*([^*<>]+)\*/g, '<em>$1</em>')
-      // Soulignement
+      // Italique
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+      // Souligné
       .replace(/\_\_([^_]+)\_\_/g, '<u>$1</u>')
       // Barré
       .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
     
-    // 7. Restaurer le code monospace protégé avec style intégré
-    monospaceLiterals.forEach((content, index) => {
+    // Traiter les apostrophes pour du texte français vs du code
+    formattedText = formattedText.replace(/'([^']+)'/g, (match, content) => {
+      // Détecter si c'est du code ou du texte avec apostrophes
+      if (
+        // C'est du code si contient des caractères spécifiques à la programmation
+        (/[:;(){}=<>\/\[\]\.,$+\-*%]/.test(content) && /[a-zA-Z]/.test(content)) ||
+        // Ou si c'est un mot-clé de programmation
+        /^(let|var|const|for|while|if|else|function|return|true|false|null)$/.test(content)
+      ) {
+        return `<code class="inline-code">${content}</code>`;
+      }
+      // C'est probablement du texte en français avec apostrophes
+      return match;
+    });
+    
+    // Restaurer les fragments de code
+    codeSnippets.forEach((code, index) => {
       formattedText = formattedText.replace(
-        `__MONO_CODE_${index}__`, 
-        `<code class="inline-code monospace-literal">${content}</code>`
+        `CODE_SNIPPET_${index}`,
+        `<code class="inline-code">${escapeHtml(code)}</code>`
       );
     });
     
-    // 8. Restaurer les expressions mathématiques protégées en deux phases
-    // D'abord, marquer tous les placeholders avec une classe spéciale pour mieux les identifier
-    mathExpressions.forEach((expr, index) => {
-      const placeholder = `__MATH_EXPR_${index}__`;
-      // Rechercher de manière littérale sans utiliser d'expressions régulières
-      // pour éviter les problèmes de caractères spéciaux      
-      let position = -1;
-      while ((position = formattedText.indexOf(placeholder, position + 1)) !== -1) {
-        const before = formattedText.substring(0, position);
-        const after = formattedText.substring(position + placeholder.length);
-        formattedText = before + `<span class="math-placeholder" data-math-index="${index}">${placeholder}</span>` + after;
-        // Sauter le placeholder nouvellement inséré
-        position = position + `<span class="math-placeholder" data-math-index="${index}">`.length + placeholder.length + '</span>'.length;
-      }
-    });
-    
-    // Maintenant remplacer tous les placeholders marqués avec leur expression mathématique d'origine
-    formattedText = formattedText.replace(/<span class="math-placeholder" data-math-index="(\d+)">__MATH_EXPR_\d+__<\/span>/g, (match, indexStr) => {
-      const index = parseInt(indexStr, 10);
-      if (index >= 0 && index < mathExpressions.length) {
-        return mathExpressions[index];
-      }
-      return match; // Garde le placeholder si l'index est invalide
-    });
-      
     return formattedText;
   };
   
-  // HTML formaté
+  // Générer le HTML formaté
   const formattedHtml = processContent();
   
-  // Observer les changements de hauteur et stabiliser
+  // Observer les changements de hauteur et stabiliser le contenu
   useEffect(() => {
     if (!content) {
       setStableHeight(null);
@@ -341,12 +288,12 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
         const codeBlocks = containerRef.current.querySelectorAll('pre code');
         codeBlocks.forEach(block => {
           try {
-            // Appliquer la coloration syntaxique
+            // Coloration syntaxique
             hljs.highlightElement(block as HTMLElement);
             
             // Ajouter l'étiquette de langage
             const lang = block.getAttribute('data-lang');
-            if (lang && lang.trim() !== '') {
+            if (lang && lang.trim() !== '' && lang !== 'text') {
               const pre = block.parentElement;
               if (pre && !pre.querySelector('.language-label')) {
                 const label = document.createElement('div');
