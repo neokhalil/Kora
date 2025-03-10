@@ -154,8 +154,10 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   // Formatage du texte dans les paragraphes
   const formatTextContent = (text: string) => {
     return text
-      // Code inline
-      .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
+      // Code inline - version améliorée avec meilleure détection
+      .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
+      // Texte monospace entre backticks spécifiques pour les exemples de code (meilleur rendu sur mobile)
+      .replace(/'([^'\n]+)'/g, '<code class="inline-code mobile-friendly-code">$1</code>')
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       // Italique
