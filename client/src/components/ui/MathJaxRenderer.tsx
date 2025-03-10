@@ -98,16 +98,101 @@ const processContent = (content: string): React.ReactNode[] => {
   ];
 };
 
-// Fonction pour traiter le formatage du texte (titres en gras, etc.)
+// Fonction pour traiter le formatage du texte (titres en gras, titres markdown, etc.)
 const processFormattedText = (text: string): React.ReactNode => {
   // Ne pas traiter si vide
   if (!text) return text;
 
+  // Créer une copie du texte pour le traitement
+  let processedText = text;
+  let lastIndex = 0;
+  const parts: React.ReactNode[] = [];
+
+  // 1. D'abord, traiter les titres markdown avec ###
+  const markdownTitleRegex = /^(#{1,6})\s+(.+?)(?:\s*(?:\n|$))/gm;
+  
+  // Trouver tous les titres markdown
+  let mdMatch;
+  let mdMatches = Array.from(processedText.matchAll(markdownTitleRegex));
+  
+  if (mdMatches.length > 0) {
+    // Si nous avons des titres markdown, traitons-les
+    for (const match of mdMatches) {
+      // Ajouter le texte avant le titre
+      if (match.index && match.index > lastIndex) {
+        parts.push(processedText.substring(lastIndex, match.index));
+      }
+      
+      // Extraire les composants du titre
+      const hashLevel = match[1].length;  // nombre de # (1-6)
+      const titleText = match[2].trim();  // le texte du titre
+      
+      // Déterminer la taille du titre selon le niveau
+      let titleClassName = '';
+      let Component: keyof JSX.IntrinsicElements = 'h3';
+      
+      switch (hashLevel) {
+        case 1:
+          titleClassName = 'text-3xl font-bold';
+          Component = 'h1';
+          break;
+        case 2:
+          titleClassName = 'text-2xl font-bold';
+          Component = 'h2';
+          break;
+        case 3:
+          titleClassName = 'text-xl font-bold';
+          Component = 'h3';
+          break;
+        case 4:
+          titleClassName = 'text-lg font-bold';
+          Component = 'h4';
+          break;
+        case 5:
+        case 6:
+          titleClassName = 'text-base font-bold';
+          Component = 'h5';
+          break;
+        default:
+          titleClassName = 'text-lg font-bold';
+          Component = 'h3';
+      }
+      
+      // Ajouter le titre formatté
+      parts.push(
+        <Component 
+          key={`md-title-${match.index}`} 
+          className={titleClassName}
+        >
+          {titleText}
+        </Component>
+      );
+      
+      lastIndex = match.index! + match[0].length;
+    }
+    
+    // Ajouter le reste du texte après le dernier titre markdown
+    if (lastIndex < processedText.length) {
+      // Traiter le reste du texte pour les titres avec **
+      const restText = processedText.substring(lastIndex);
+      parts.push(processBoldTitles(restText));
+    }
+    
+    return parts;
+  } else {
+    // S'il n'y a pas de titres markdown, traiter les titres avec **
+    return processBoldTitles(processedText);
+  }
+};
+
+// Sous-fonction pour traiter les titres avec ** (style gras)
+const processBoldTitles = (text: string): React.ReactNode => {
+  if (!text) return text;
+  
   // Remplacer les titres avec ** par des éléments en gras
-  // Format: "**Titre**:" ou "**Titre** :"
+  // Format: "**Titre**:" ou "**Titre** :" ou numéro + "**Titre**:"
   const titleRegex = /(\d+\.\s*)?(\*\*([^*]+)\*\*)(\s*:)?/g;
   
-  let result = text;
   let lastIndex = 0;
   const parts: React.ReactNode[] = [];
   
@@ -126,7 +211,7 @@ const processFormattedText = (text: string): React.ReactNode => {
     
     // Ajouter le titre formatté en HTML
     parts.push(
-      <React.Fragment key={`title-${match.index}`}>
+      <React.Fragment key={`bold-title-${match.index}`}>
         {number && <span>{number}</span>}
         <strong className="font-bold">{titleText}</strong>
         {colon}
