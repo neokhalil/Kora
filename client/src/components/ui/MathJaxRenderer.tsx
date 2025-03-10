@@ -94,14 +94,29 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           // Fin d'un bloc de code
           inCodeBlock = false;
           
-          // Ajouter le bloc de code avec coloration syntaxique
-          const langClass = codeLanguage ? `language-${codeLanguage}` : '';
-          const escapedCode = escapeHtml(codeContent);
+          // Vérifier si le contenu ressemble vraiment à du code ou est juste du texte normal
+          const looksLikeCode = (
+            codeLanguage ||  // Si un langage est spécifié, c'est probablement du code
+            /[:;(){}=<>\/\[\]\.,$+\-*%]/.test(codeContent) || // Contient des caractères de programmation
+            /^(let|var|const|for|while|if|else|function|return)/m.test(codeContent) || // Contient des mots-clés de programmation
+            codeContent.includes('\t') || // Contient des tabulations
+            codeContent.split('\n').some(line => line.trim().startsWith('//')) || // Contient des commentaires
+            codeContent.split('\n').some(line => /^\s{2,}/.test(line)) // Contient une indentation
+          );
           
-          // Appliquer un style spécifique pour le langage PHP
-          const langSpecificClass = codeLanguage.toLowerCase() === 'php' ? 'php-code-block' : '';
-          
-          html += `<pre class="code-block ${langClass} ${langSpecificClass}"><code class="${langClass}" data-lang="${codeLanguage}">${escapedCode}</code></pre>`;
+          if (looksLikeCode) {
+            // C'est vraiment du code, formater comme un bloc de code
+            const langClass = codeLanguage ? `language-${codeLanguage}` : '';
+            const escapedCode = escapeHtml(codeContent);
+            
+            // Appliquer un style spécifique pour le langage PHP
+            const langSpecificClass = codeLanguage.toLowerCase() === 'php' ? 'php-code-block' : '';
+            
+            html += `<pre class="code-block ${langClass} ${langSpecificClass}"><code class="${langClass}" data-lang="${codeLanguage}">${escapedCode}</code></pre>`;
+          } else {
+            // Ce n'est pas du code, le formater comme du texte normal
+            html += `<p>${formatTextContent(codeContent)}</p>`;
+          }
           codeContent = '';
           codeLanguage = '';
         }
@@ -225,12 +240,20 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     // 5. Formatage de code inline général mais uniquement pour du vrai code (single quotes)
     // On évite de traiter les apostrophes normales en français
-    formattedText = formattedText.replace(/'([^'\n]{3,})'/g, (match, content) => {
-      // Ne convertit en code que s'il ressemble à du code (contient des caractères spéciaux)
-      if (/[:;(){}=<>\/\[\]\.,$]/.test(content) || /^[a-z]+$/.test(content)) {
+    formattedText = formattedText.replace(/'([^'\n]{2,})'/g, (match, content) => {
+      // Ne convertit en code que s'il ressemble vraiment à du code (contient des caractères spéciaux de programmation)
+      if (
+        // Ne traiter que s'il contient des caractères spécifiques au code
+        (/[:;(){}=<>\/\[\]\.,$+\-*%]/.test(content) && /[a-zA-Z]/.test(content)) || 
+        // Ou si c'est du code court comme 'let' ou 'if'
+        /^(let|var|const|for|while|if|else|switch|case|break|function|return|true|false|null|this|new)$/.test(content)
+      ) {
         return `<code class="inline-code mobile-friendly-code">${content}</code>`;
+      } else if (content.includes(" ") || /^[a-z]/i.test(content)) {
+        // C'est probablement du texte normal en français avec apostrophes
+        return `<span class="normal-text-with-apostrophes">${match}</span>`;
       }
-      return match; // Sinon on garde tel quel (apostrophe française)
+      return match; // Sinon on garde tel quel (cas ambigus)
     });
     
     // 6. Formatage du texte (Markdown)
