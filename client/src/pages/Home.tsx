@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import WebHomeView from '@/components/layout/WebHomeView';
+import ChatAssistant from '@/pages/ChatAssistant';
 import { RecentQuestion } from '@/lib/types';
 import { apiRequest } from '@/lib/queryClient';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Home = () => {
   const [recentQuestions, setRecentQuestions] = useState<RecentQuestion[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile(); // Détecte si l'appareil est mobile
   
   useEffect(() => {
     const fetchRecentQuestions = async () => {
@@ -40,8 +43,9 @@ const Home = () => {
     fetchRecentQuestions();
   }, []);
 
-  // Utiliser uniquement le nouveau design WebHomeView quelle que soit la taille de l'écran
-  return <WebHomeView recentQuestions={recentQuestions} />;
+  // Utiliser le composant adapté selon le type d'appareil
+  // Version mobile = ChatAssistant, Version web = WebHomeView
+  return isMobile ? <ChatAssistant /> : <WebHomeView recentQuestions={recentQuestions} />;
 };
 
 export default Home;
