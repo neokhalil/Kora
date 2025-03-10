@@ -492,27 +492,25 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter l'indice de KORA avec les boutons d'action
+      // Ajouter l'indice de KORA sans boutons d'action
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         isHint: true,
-        allowActions: true, // Ajout des boutons d'action
-        messageId: Date.now().toString(), // ID pour les fonctions d'action
+        allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
     } catch (error) {
       console.error('Erreur lors de la génération de l\'indice:', error);
       
-      // Même en cas d'erreur, fournir un indice générique avec boutons d'action
+      // Même en cas d'erreur, fournir un indice générique sans boutons d'action
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         content: "Voici un indice : essaie de décomposer le problème en étapes plus simples et résoudre chaque partie séparément.",
         sender: 'kora',
         isHint: true,
-        allowActions: true, // Ajout des boutons d'action
-        messageId: Date.now().toString(), // ID pour les fonctions d'action
+        allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
     } finally {
