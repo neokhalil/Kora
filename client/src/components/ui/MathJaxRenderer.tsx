@@ -189,45 +189,91 @@ const processFormattedText = (text: string): React.ReactNode => {
 const processBoldTitles = (text: string): React.ReactNode => {
   if (!text) return text;
   
-  // Remplacer les titres avec ** par des éléments en gras
-  // Format: "**Titre**:" ou "**Titre** :" ou numéro + "**Titre**:"
-  const titleRegex = /(\d+\.\s*)?(\*\*([^*]+)\*\*)(\s*:)?/g;
+  // Nous allons traiter le texte ligne par ligne pour une meilleure précision
+  const lines = text.split('\n');
+  const processedLines: React.ReactNode[] = [];
   
-  let lastIndex = 0;
-  const parts: React.ReactNode[] = [];
-  
-  // Trouver tous les titres
-  let match;
-  while ((match = titleRegex.exec(text)) !== null) {
-    // Ajouter le texte avant le titre
-    if (match.index > lastIndex) {
-      parts.push(text.substring(lastIndex, match.index));
+  // Parcourir chaque ligne
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Vérifier si la ligne contient un format de titre numéroté avec **
+    // Format 1: "1. **Titre**:" ou "1. **Titre** :"
+    const numberedTitleRegex = /^(\d+\.\s*)(\*\*([^*]+)\*\*)(\s*:)?(.*)$/;
+    const numberedMatch = line.match(numberedTitleRegex);
+    
+    if (numberedMatch) {
+      // C'est un titre numéroté avec **
+      const number = numberedMatch[1];           // ex: "1. "
+      const titleText = numberedMatch[3];        // le texte du titre sans les **
+      const colon = numberedMatch[4] || '';      // les deux points (optionnels)
+      const restOfLine = numberedMatch[5] || ''; // le reste de la ligne après le titre
+      
+      processedLines.push(
+        <div key={`line-${i}`} className="flex items-baseline">
+          <span>{number}</span>
+          <strong className="font-bold">{titleText}</strong>
+          <span>{colon}{restOfLine}</span>
+        </div>
+      );
+    } else {
+      // Vérifier d'autres formats de titres avec **
+      // Format 2: "**Titre**:" ou "**Titre** :"
+      const simpleTitleRegex = /^(\*\*([^*]+)\*\*)(\s*:)?(.*)$/;
+      const simpleMatch = line.match(simpleTitleRegex);
+      
+      if (simpleMatch) {
+        // C'est un titre simple avec **
+        const titleText = simpleMatch[2];        // le texte du titre sans les **
+        const colon = simpleMatch[3] || '';      // les deux points (optionnels)
+        const restOfLine = simpleMatch[4] || ''; // le reste de la ligne après le titre
+        
+        processedLines.push(
+          <div key={`line-${i}`}>
+            <strong className="font-bold">{titleText}</strong>
+            <span>{colon}{restOfLine}</span>
+          </div>
+        );
+      } else {
+        // Vérifier si la ligne contient des ** à l'intérieur (pas en début de ligne)
+        const inlineBoldRegex = /\*\*([^*]+)\*\*/g;
+        let inlineMatch;
+        let inlineParts: React.ReactNode[] = [];
+        let inlineLastIndex = 0;
+        
+        // Rechercher toutes les occurrences de texte en gras dans la ligne
+        while ((inlineMatch = inlineBoldRegex.exec(line)) !== null) {
+          // Ajouter le texte avant le gras
+          if (inlineMatch.index > inlineLastIndex) {
+            inlineParts.push(line.substring(inlineLastIndex, inlineMatch.index));
+          }
+          
+          // Ajouter le texte en gras
+          inlineParts.push(
+            <strong key={`inline-${inlineMatch.index}`} className="font-bold">
+              {inlineMatch[1]}
+            </strong>
+          );
+          
+          inlineLastIndex = inlineMatch.index + inlineMatch[0].length;
+        }
+        
+        // Ajouter le reste de la ligne
+        if (inlineLastIndex < line.length) {
+          inlineParts.push(line.substring(inlineLastIndex));
+        }
+        
+        // S'il y avait du texte en gras, utiliser les parts; sinon, utiliser la ligne entière
+        processedLines.push(
+          inlineParts.length > 0 
+            ? <div key={`line-${i}`}>{inlineParts}</div>
+            : <div key={`line-${i}`}>{line}</div>
+        );
+      }
     }
-    
-    // Extraire les composants du titre
-    const number = match[1] || '';  // le numéro (optionnel)
-    const titleText = match[3];     // le texte du titre sans les **
-    const colon = match[4] || '';   // les deux points (optionnels)
-    
-    // Ajouter le titre formatté en HTML
-    parts.push(
-      <React.Fragment key={`bold-title-${match.index}`}>
-        {number && <span>{number}</span>}
-        <strong className="font-bold">{titleText}</strong>
-        {colon}
-      </React.Fragment>
-    );
-    
-    lastIndex = match.index + match[0].length;
   }
   
-  // Ajouter le reste du texte après le dernier titre
-  if (lastIndex < text.length) {
-    parts.push(text.substring(lastIndex));
-  }
-  
-  // S'il n'y avait pas de titres, retourner le texte original
-  return parts.length > 0 ? parts : text;
+  return processedLines;
 };
 
 /**
