@@ -256,6 +256,106 @@
     .numbered-item .content {
       display: inline;
     }
+    
+    /* Styles spécifiques pour les titres de sections PHP */
+    .php-section-title {
+      padding: 0.4rem 0.6rem;
+      margin: 0.75rem 0;
+      background-color: #edf5ff;
+      border-radius: 6px;
+      border-left: 3px solid #c0d7f5;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    .php-section-number {
+      font-weight: 700;
+      color: #2c3e50;
+      margin-right: 6px;
+    }
+    
+    /* Styles pour les exemples de code PHP */
+    .inline-code.php-var {
+      background-color: #f2f8ff;
+      color: #0056b3;
+      border: 1px solid #d9e8ff;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+    
+    .inline-code.php-tag {
+      background-color: #f5f2ff;
+      color: #7a43b6;
+      border: 1px solid #e8d9ff;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+    
+    .inline-code.php-comment {
+      background-color: #f8f8f8;
+      color: #6a737d;
+      border: 1px solid #ebeced;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-style: italic;
+    }
+    
+    .inline-code.php-function {
+      background-color: #f2f8ff;
+      color: #035aa6;
+      border: 1px solid #d9e8ff;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    
+    .inline-code.php-control {
+      background-color: #fff8f2;
+      color: #e36209;
+      border: 1px solid #ffecd9;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    
+    .inline-code.mobile-friendly-code {
+      background-color: #f5f6f7;
+      color: #24292e;
+      border: 1px solid #e1e4e8;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: monospace;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+    
+    /* Styles pour les blocs de code sur mobile */
+    .code-example-box {
+      background-color: #f5f7fa;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 0.6rem;
+      margin: 0.75rem 0;
+      font-family: monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.4;
+      color: #1a1a1a;
+    }
   }
   
   /* Styles pour highlight.js */

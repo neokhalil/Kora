@@ -131,11 +131,24 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           paragraphContent = '';
         }
         
-        const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
-        if (match) {
-          const number = match[1];
-          const itemContent = match[2];
-          html += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${formatTextContent(itemContent)}</span></div>`;
+        // Détection spéciale pour les titres de sections PHP (comme dans les captures d'écran)
+        const sectionMatch = line.trim().match(/^(\d+)\.\s+(.*?)[\s:]*$/);
+        if (sectionMatch && sectionMatch[2].includes('Commentaires') || 
+            sectionMatch && sectionMatch[2].includes('Variables') || 
+            sectionMatch && sectionMatch[2].includes('Fonctions') ||
+            sectionMatch && sectionMatch[2].includes('Déclaration')) {
+          // C'est un titre de section PHP (format "1. Commentaires :")
+          const number = sectionMatch[1];
+          const title = sectionMatch[2].replace(/:$/, '');
+          html += `<div class="php-section-title"><span class="php-section-number">${number}.</span> ${formatTextContent(title)}</div>`;
+        } else {
+          // Liste numérotée normale
+          const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
+          if (match) {
+            const number = match[1];
+            const itemContent = match[2];
+            html += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${formatTextContent(itemContent)}</span></div>`;
+          }
         }
       } else {
         // Contenu normal de paragraphe
@@ -153,10 +166,33 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
   
   // Formatage du texte dans les paragraphes
   const formatTextContent = (text: string) => {
-    return text
+    // Pour les réponses de l'IA pour les explications de code, convertir tous les backticks visibles
+    let formattedText = text;
+    
+    // Expressions régulières pour les codes PHP et les exemples spécifiques
+    const phpPatterns = [
+      { pattern: /\'?(\<?php|\?>)\'?/g, replacement: '<code class="inline-code php-tag">$1</code>' },
+      { pattern: /\'?(\$[a-zA-Z_][a-zA-Z0-9_]*)\'?/g, replacement: '<code class="inline-code php-var">$1</code>' },
+      { pattern: /\'(\/\/\s*[^\']+)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
+      { pattern: /\'(\*\/)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
+      { pattern: /\'(\/\*)\'/g, replacement: '<code class="inline-code php-comment">$1</code>' },
+      { pattern: /\'(echo\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
+      { pattern: /\'(function\s+[^\']+)\'/g, replacement: '<code class="inline-code php-function">$1</code>' },
+      { pattern: /\'(if\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
+      { pattern: /\'(\}\s*else\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
+      { pattern: /\'(\}\s*elseif\s*\([^\']+\)\s*\{)\'/g, replacement: '<code class="inline-code php-control">$1</code>' },
+    ];
+    
+    // Appliquer tous les patterns PHP spécifiques d'abord
+    phpPatterns.forEach(({ pattern, replacement }) => {
+      formattedText = formattedText.replace(pattern, replacement);
+    });
+    
+    // Code inline général (pour tout ce qui reste)
+    formattedText = formattedText
       // Code inline - version améliorée avec meilleure détection
       .replace(/`([^`\n]+)`/g, '<code class="inline-code">$1</code>')
-      // Texte monospace entre backticks spécifiques pour les exemples de code (meilleur rendu sur mobile)
+      // Texte dans des guillemets simples (rendus comme code) - seulement s'ils n'ont pas encore été traités
       .replace(/'([^'\n]+)'/g, '<code class="inline-code mobile-friendly-code">$1</code>')
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -166,6 +202,8 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       .replace(/\_\_([^_]+)\_\_/g, '<u>$1</u>')
       // Barré
       .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
+      
+    return formattedText;
   };
   
   // HTML formaté
