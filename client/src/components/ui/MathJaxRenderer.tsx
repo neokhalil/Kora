@@ -96,14 +96,27 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     // Fonction d'aide pour formater les propriétés mathématiques
     const formatListItems = (text: string): string => {
-      // Recherche les items de liste numérotés ou commençant par des tirets
-      return text
-        // Chaque tiret suivi d'un espace devient un élément de liste
-        .replace(/- ([^-]+?)(?=(?:- |$))/g, '<div class="list-item">- $1</div>')
-        // Ajouter des sauts de ligne avant et après les expressions mathématiques
-        .replace(/(\$[^$]+\$)/g, '<div class="formula-item">$1</div>')
+      // Détecter si le texte contient une formule quadratique complète
+      const hasQuadraticFormula = /\\frac\{-b \\\pm \\sqrt\{b\^2 - 4ac\}\}\{2a\}/.test(text) || 
+                                  /x = \\frac\{-b/.test(text);
+      
+      // Si c'est une formule quadratique, ne pas la découper
+      if (hasQuadraticFormula) {
+        return `<div class="formula-block">${text}</div>`;
+      }
+      
+      // Traitement normal pour les autres cas
+      let result = text
+        // Chaque tiret suivi d'un espace devient un élément de liste, sauf s'il fait partie d'une formule
+        .replace(/(?<!\$[^\$]*)(- )([^-\$]+?)(?=(?:- |$))/g, '<div class="list-item">$1$2</div>')
+        
+        // Gérer les expressions mathématiques sur leur propre ligne
+        .replace(/(?<!\<div class="[^"]+">\s*)(\$[^\$]+\$)(?!\s*<\/div>)/g, '<div class="formula-item">$1</div>')
+        
         // Si une propriété contient ":" pour séparer des définitions
-        .replace(/([^:]+) : ([^.]+)\./g, '<div class="property-item">$1 : $2.</div>');
+        .replace(/([^:]+?) : ([^.]+?\.)/g, '<div class="property-item">$1 : $2</div>');
+      
+      return result;
     };
     
     // Traiter chaque ligne

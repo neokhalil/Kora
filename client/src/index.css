@@ -517,6 +517,17 @@
     padding-bottom: 0.3rem;
   }
   
+  /* Style spécial pour les blocs de formule quadratique */
+  .formula-block {
+    display: block;
+    margin: 1rem 0;
+    text-align: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    padding: 0.5rem 0;
+  }
+  
   /* Important pour réduire les tremblements lors de l'ajout des formules mathématiques */
   .MathJax_Display {
     contain: layout style;
