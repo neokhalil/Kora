@@ -25,8 +25,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
-import { MathJaxContext } from 'better-react-mathjax';
+import TextRenderer from '@/components/ui/MathJaxRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 
@@ -56,27 +55,7 @@ interface Message {
   challengeId?: string; // Pour associer un indice à un défi spécifique
 }
 
-// Configuration MathJax
-const mathJaxConfig = {
-  tex: {
-    inlineMath: [['$', '$'], ['\\(', '\\)']],
-    displayMath: [['$$', '$$'], ['\\[', '\\]']],
-    processEscapes: true,
-    processEnvironments: true
-  },
-  options: {
-    enableMenu: false,    // Désactive le menu contextuel
-    menuOptions: {
-      settings: {
-        assistiveMml: false,
-        zoom: 'NoZoom'    // Désactive le zoom
-      }
-    }
-  },
-  startup: {
-    typeset: false        // Ne pas traiter automatiquement la page (pour éviter les conflits)
-  }
-};
+// Configuration pour le texte simple (sans formatage mathématique)
 
 const ChatAssistant: React.FC = () => {
   // État principal
@@ -729,7 +708,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Contenu du message avec formatage amélioré pour les maths via MathJax */}
             <div className="prose dark:prose-invert text-base leading-relaxed px-1">
-              <MathJaxRenderer content={message.content} />
+              <TextRenderer content={message.content} />
             </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
@@ -870,7 +849,6 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-    <MathJaxContext config={mathJaxConfig}>
       <div className="flex flex-col h-full max-w-4xl mx-auto">
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
@@ -1191,7 +1169,6 @@ const ChatAssistant: React.FC = () => {
           </div>
         </div>
       </div>
-    </MathJaxContext>
   );
 };
 
