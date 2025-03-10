@@ -169,6 +169,25 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     // Pour les réponses de l'IA pour les explications de code, convertir tous les backticks visibles
     let formattedText = text;
     
+    // Vérifier si le contenu est un exemple de code français (comme l'indicatif/subjonctif)
+    // Dans ce cas, nous voulons traiter tout le contenu entre guillemets comme un bloc de code
+    if (formattedText.includes('indicatif') || formattedText.includes('subjonctif') || 
+        formattedText.includes('que je') || formattedText.includes('que tu')) {
+      
+      // Détection des phrases complètes entre guillemets simples
+      formattedText = formattedText.replace(/'([^'\n]+)'/g, '<code class="inline-code grammar-example">$1</code>');
+      
+      // Cas spécial pour les exemples de conjugaison
+      formattedText = formattedText.replace(/(indicatif|subjonctif|conditionnel|impératif)(\s*\([^)]+\))/g, 
+        '<span class="grammar-term">$1$2</span>');
+      
+      // Traiter les tirets utilisés dans les exemples de conjugaison
+      formattedText = formattedText.replace(/(\s-\s)([^-]+)(?=\s-|\s*$)/g, 
+        '$1<code class="inline-code grammar-example">$2</code>');
+      
+      return formattedText;
+    }
+    
     // Expressions régulières pour les codes PHP et les exemples spécifiques
     const phpPatterns = [
       { pattern: /\'?(\<?php|\?>)\'?/g, replacement: '<code class="inline-code php-tag">$1</code>' },

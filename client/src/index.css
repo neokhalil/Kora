@@ -336,6 +336,24 @@
       word-break: keep-all;
     }
     
+    /* Styles spécifiques pour les exemples de grammaire et conjugaison */
+    .inline-code.grammar-example {
+      background-color: #f5f8fa;
+      color: #24292e;
+      border: 1px solid #e1e4e8;
+      border-radius: 3px;
+      padding: 0.1rem 0.25rem;
+      font-family: 'Tenon', 'Inter', sans-serif;
+      font-size: 0.95rem;
+      white-space: normal;
+      font-weight: normal;
+    }
+    
+    .grammar-term {
+      font-weight: 600;
+      color: #0550ae;
+    }
+    
     /* Styles pour les blocs de code sur mobile */
     .code-example-box {
       background-color: #f5f7fa;
