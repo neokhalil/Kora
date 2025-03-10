@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import 'katex/dist/katex.min.css';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
-import katex from 'katex';
 
 interface MathContentProps {
   content: string;
@@ -10,8 +8,8 @@ interface MathContentProps {
 }
 
 /**
- * Composant pour rendre du contenu mathématique avec KaTeX
- * Version simplifiée mais robuste pour gérer les formules mathématiques
+ * Composant pour rendre du contenu mathématique avec formatage HTML simple
+ * Version ultra basique sans dépendances externes
  */
 const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,292 +43,115 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       'ruby': 'Ruby',
       'go': 'Go',
       'rust': 'Rust',
-      'swift': 'Swift',
-      'kotlin': 'Kotlin',
-      'scala': 'Scala',
-      'html': 'HTML',
-      'css': 'CSS',
-      'sql': 'SQL',
-      'bash': 'Bash',
-      'sh': 'Shell',
-      'xml': 'XML',
-      'json': 'JSON',
-      'yaml': 'YAML',
-      'markdown': 'Markdown',
-      'md': 'Markdown',
     };
     
     return langMap[lang.toLowerCase()] || lang.charAt(0).toUpperCase() + lang.slice(1);
   };
 
-  // Fonction pour remplacer les expressions mathématiques par des expressions corrigées
-  const correctMathematicalExpressions = (text: string): string => {
+  // Fonction pour corriger certaines notations mathématiques
+  const correctMathNotation = (text: string): string => {
     if (!text) return '';
     
-    // Corrections du symbole delta
-    text = text.replace(/\bD\s*=\s*b\^2\s*-\s*4ac/g, "Δ = b² - 4ac");
-    text = text.replace(/\bSi\s+D\s*([<>=])\s*0/g, "Si Δ $1 0");
-    text = text.replace(/\bLe discriminant\s+D\b/g, "Le discriminant Δ");
-    
-    // Corrections pour les équations à valeurs numériques
-    text = text.replace(/\bax\^2\s*\+\s*bx\s*\+\s*c\s*=\s*00\b/g, "ax² + bx + c où Δ > 0");
-    text = text.replace(/\bax\^2\s*\+\s*bx\s*\+\s*c\s*=\s*01\b/g, "ax² + bx + c où Δ = 0");
-    text = text.replace(/\bax\^2\s*\+\s*bx\s*\+\s*c\s*=\s*02\b/g, "ax² + bx + c où Δ < 0");
-    
-    // Corrections pour b0, b1, b2
-    text = text.replace(/\b[Ss]i\s+b0\b/g, "Si Δ > 0");
-    text = text.replace(/\b[Ss]i\s+b1\b/g, "Si Δ = 0");
-    text = text.replace(/\b[Ss]i\s+b2\b/g, "Si Δ < 0");
-    text = text.replace(/\b[Ss]i\s+b0,/g, "Si Δ > 0,");
-    text = text.replace(/\b[Ss]i\s+b1,/g, "Si Δ = 0,");
-    text = text.replace(/\b[Ss]i\s+b2,/g, "Si Δ < 0,");
-    text = text.replace(/\bb0\b/g, "Δ > 0");
-    text = text.replace(/\bb1\b/g, "Δ = 0");
-    text = text.replace(/\bb2\b/g, "Δ < 0");
-    
-    // Formatage et préparation
-    text = text
-      // Ajouter des sauts de ligne pour les listes avec Si...
-      .replace(/(- Si [^,]+, )(.*?)(?=\n|$)/g, "$1\n    $2");
-    
-    return text;
+    // 1. Remplacements pour corriger la notation du discriminant
+    return text
+      // Remplacer D par Δ pour le discriminant
+      .replace(/\bD\s*=\s*b\^2\s*-\s*4ac/g, "<span class=\"delta-symbol\">Δ</span> = b² - 4ac")
+      .replace(/\bSi\s+D\s*([<>=])\s*0/g, "Si <span class=\"delta-symbol\">Δ</span> $1 0")
+      .replace(/\bLe discriminant\s+D\b/g, "Le discriminant <span class=\"delta-symbol\">Δ</span>")
+      
+      // Corriger les conditions b0, b1, b2
+      .replace(/\b[Ss]i\s+b0\b/g, "Si <span class=\"delta-symbol\">Δ</span> > 0")
+      .replace(/\b[Ss]i\s+b1\b/g, "Si <span class=\"delta-symbol\">Δ</span> = 0")
+      .replace(/\b[Ss]i\s+b2\b/g, "Si <span class=\"delta-symbol\">Δ</span> < 0")
+      .replace(/\bb0\b/g, "<span class=\"delta-symbol\">Δ</span> > 0")
+      .replace(/\bb1\b/g, "<span class=\"delta-symbol\">Δ</span> = 0")
+      .replace(/\bb2\b/g, "<span class=\"delta-symbol\">Δ</span> < 0")
+      
+      // Améliorer l'affichage des puissances
+      .replace(/\^2/g, "²")
+      .replace(/\^3/g, "³")
+      .replace(/\^n/g, "ⁿ");
   };
 
-  // Traiter le contenu pour le formatage
-  const processContent = () => {
+  // Formater le contenu principal
+  const formatContent = (): string => {
     if (!content) return '';
     
-    // 1. PRÉ-TRAITEMENT: Protéger les expressions mathématiques et les améliorer
-    let processedContent = correctMathematicalExpressions(content);
+    // Préparation initiale : corriger les formules mathématiques
+    let text = correctMathNotation(content);
     
-    // 2. TRAITEMENT du contenu principal
-    // Séparation, traitement des listes, blocs de code, etc.
-    const lines = processedContent.split('\n');
-    let htmlContent = '';
-    let inCodeBlock = false;
-    let codeLanguage = '';
-    let codeContent = '';
-    let paragraphContent = '';
+    // Remplacer les délimiteurs LaTeX par du HTML
+    text = text
+      // Formules mathématiques de blocage
+      .replace(/\\\[(.*?)\\\]/gs, '<div class="math-formula-block">$1</div>')
+      // Formules mathématiques inline
+      .replace(/\\\((.*?)\\\)/gs, '<span class="math-formula-inline">$1</span>')
+      // Formules mathématiques avec dollars
+      .replace(/\$(.*?)\$/g, '<span class="math-formula-inline">$1</span>');
     
-    // Fonction pour formater les listes avec tirets
-    const formatListItems = (text: string): string => {
-      return text
-        // Traitement des listes avec tirets
-        .replace(/(?<!\$[^\$]*)(- )([^-\$]+?)(?=(?:- |$))/g, '<div class="list-item">$1$2</div>');
-    };
+    // Remplacer les sauts de ligne par des balises <br>
+    text = text.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
     
-    // Traiter chaque ligne du contenu
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      
-      // Blocs de code
-      if (line.trim().startsWith('```')) {
-        if (!inCodeBlock) {
-          // Début du bloc de code
-          inCodeBlock = true;
-          
-          // Terminer paragraphe précédent s'il existe
-          if (paragraphContent) {
-            const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
-            htmlContent += `<p>${formattedParagraph}</p>`;
-            paragraphContent = '';
-          }
-          
-          codeLanguage = line.trim().slice(3).trim();
-        } else {
-          // Fin du bloc de code
-          inCodeBlock = false;
-          
-          const langClass = codeLanguage ? `language-${codeLanguage}` : '';
-          const escapedCode = escapeHtml(codeContent);
-          
-          htmlContent += `<pre class="code-block ${langClass}"><code class="${langClass}" data-lang="${codeLanguage || 'text'}">${escapedCode}</code></pre>`;
-          
-          codeContent = '';
-          codeLanguage = '';
-        }
-      } else if (inCodeBlock) {
-        // Ajouter la ligne au contenu du code
-        codeContent += (codeContent ? '\n' : '') + line;
-      } else if (line.trim() === '') {
-        // Ligne vide - fin de paragraphe
-        if (paragraphContent) {
-          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
-          htmlContent += `<p>${formattedParagraph}</p>`;
-          paragraphContent = '';
-        }
-      } else if (line.trim().match(/^#{1,3}\s+(.+)$/)) {
-        // Titres (# Titre)
-        if (paragraphContent) {
-          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
-          htmlContent += `<p>${formattedParagraph}</p>`;
-          paragraphContent = '';
-        }
-        
-        const match = line.trim().match(/^(#{1,3})\s+(.+)$/);
-        if (match) {
-          const level = match[1].length;
-          const title = formatTextContent(match[2]);
-          htmlContent += `<h${level} class="section-heading">${title}</h${level}>`;
-        }
-      } else if (line.trim().match(/^\d+\.\s+(.+)$/)) {
-        // Éléments numérotés
-        if (paragraphContent) {
-          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
-          htmlContent += `<p>${formattedParagraph}</p>`;
-          paragraphContent = '';
-        }
-        
-        const match = line.trim().match(/^(\d+)\.\s+(.+)$/);
-        if (match) {
-          const number = match[1];
-          const content = formatTextContent(match[2]);
-          
-          // Déterminer si c'est un titre de section
-          const isProbablyTitle = 
-            /^[A-Z]/.test(match[2]) || 
-            match[2].includes('étape') || 
-            match[2].includes('Étape') ||
-            match[2].includes('Exemple');
-          
-          if (isProbablyTitle) {
-            htmlContent += `<div class="section-title"><span class="section-number">${number}.</span> ${content}</div>`;
-          } else {
-            htmlContent += `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${content}</span></div>`;
-          }
-        }
-      } else {
-        // Contenu normal de paragraphe
-        paragraphContent += (paragraphContent ? ' ' : '') + line;
-      }
-    }
-    
-    // Traiter tout paragraphe restant
-    if (paragraphContent) {
-      const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
-      htmlContent += `<p>${formattedParagraph}</p>`;
-    }
-    
-    return htmlContent;
+    // Wrappe le contenu dans un paragraphe
+    return `<p>${text}</p>`;
   };
   
-  // Formater le texte dans les paragraphes et autres éléments
-  const formatTextContent = (text: string): string => {
-    if (!text) return '';
-    
-    // Protéger le code inline
-    const codeSnippets: string[] = [];
-    text = text.replace(/`([^`]+)`/g, (match, code) => {
-      const id = codeSnippets.length;
-      codeSnippets.push(code);
-      return `CODE_SNIPPET_${id}`;
+  // Formater les blocs de code
+  const processCodeBlocks = (html: string): string => {
+    // Identifier et formater les blocs de code
+    const codeBlockRegex = /```([a-z]*)\n([\s\S]*?)```/g;
+    return html.replace(codeBlockRegex, (match, language, code) => {
+      const languageClass = language ? `language-${language}` : '';
+      const escapedCode = escapeHtml(code);
+      return `<pre class="code-block ${languageClass}"><code class="${languageClass}" data-lang="${language || 'text'}">${escapedCode}</code></pre>`;
     });
-    
-    // Protéger les formules mathématiques
-    const mathExpressions: {formula: string, isBlock: boolean}[] = [];
-    
-    // Remplacer les formules LaTeX par des placeholders
-    text = text
-      // Formules display (blocs)
-      .replace(/\\\[(.*?)\\\]/gs, (match, formula) => {
-        const id = mathExpressions.length;
-        mathExpressions.push({ formula, isBlock: true });
-        return `MATH_PLACEHOLDER_${id}`;
-      })
-      // Formules inline
-      .replace(/\\\((.*?)\\\)/gs, (match, formula) => {
-        const id = mathExpressions.length;
-        mathExpressions.push({ formula, isBlock: false });
-        return `MATH_PLACEHOLDER_${id}`;
-      })
-      // Format $ inline
-      .replace(/\$([^\$]+?)\$/g, (match, formula) => {
-        const id = mathExpressions.length;
-        mathExpressions.push({ formula, isBlock: false });
-        return `MATH_PLACEHOLDER_${id}`;
-      });
-    
-    // Appliquer le formatage Markdown basique
-    let formattedText = text
+  };
+  
+  // Appliquer le formatage markdown basic
+  const applyMarkdownFormatting = (html: string): string => {
+    return html
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       // Italique
       .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-      // Souligné
-      .replace(/\_\_([^_]+)\_\_/g, '<u>$1</u>')
-      // Barré
-      .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
-    
-    // Formatage pour le français
-    const frenchWithApostrophe = /\b[nljdcsmt]'[a-zàâäçéèêëîïôöùûüÿ]/i;
-    
-    formattedText = formattedText.replace(/'([^']+)'/g, (match, content) => {
-      // Texte français
-      if (
-        content.includes(' ') || 
-        frenchWithApostrophe.test(content) || 
-        /[àâäçéèêëîïôöùûüÿÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]/.test(content)
-      ) {
-        return match;
-      }
-      
-      // Code de programmation
-      if (
-        /^(let|var|const|for|while|if|else|function|return|true|false|null|this|new|import|export|class|throw|try|catch)$/.test(content) ||
-        (/[:;{}=\/\[\]\.+\-*%]/.test(content) && !/\s+/.test(content))
-      ) {
-        return `<code class="inline-code">${content}</code>`;
-      }
-      
-      return match;
-    });
-    
-    // Restaurer les formules mathématiques avec le rendu KaTeX
-    mathExpressions.forEach((expr, index) => {
-      try {
-        const placeholder = `MATH_PLACEHOLDER_${index}`;
-        let renderedMath = '';
-        
-        if (expr.isBlock) {
-          renderedMath = katex.renderToString(expr.formula, {
-            displayMode: true,
-            throwOnError: false
-          });
-          renderedMath = `<div class="katex-block">${renderedMath}</div>`;
-        } else {
-          renderedMath = katex.renderToString(expr.formula, {
-            displayMode: false,
-            throwOnError: false
-          });
-          renderedMath = `<span class="katex-inline">${renderedMath}</span>`;
-        }
-        
-        formattedText = formattedText.replace(placeholder, renderedMath);
-      } catch (e) {
-        console.error("Erreur KaTeX:", e);
-        // En cas d'erreur, afficher la formule brute
-        formattedText = formattedText.replace(
-          `MATH_PLACEHOLDER_${index}`,
-          `<span class="math-error">${expr.isBlock ? '\\[' : '\\('}${expr.formula}${expr.isBlock ? '\\]' : '\\)'}</span>`
-        );
-      }
-    });
-    
-    // Restaurer le code inline
-    codeSnippets.forEach((code, index) => {
-      formattedText = formattedText.replace(
-        `CODE_SNIPPET_${index}`,
-        `<code class="inline-code">${escapeHtml(code)}</code>`
-      );
-    });
-    
-    return formattedText;
+      // Code inline
+      .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
   };
   
-  // Générer le HTML formaté
-  const formattedHtml = processContent();
+  // Gérer les listes numérotées
+  const formatNumberedLists = (html: string): string => {
+    // Motif pour les éléments numérotés (1. Item, 2. Item, etc.)
+    const numberedItemPattern = /<p>(\d+)\.\s*(.*?)<\/p>/g;
+    
+    return html.replace(numberedItemPattern, (match, number, content) => {
+      // Déterminer s'il s'agit d'un titre ou d'un simple élément de liste
+      const isTitle = /^[A-Z]/.test(content) || content.includes('étape') || content.includes('Étape');
+      
+      if (isTitle) {
+        return `<div class="section-title"><span class="section-number">${number}.</span> ${content}</div>`;
+      } else {
+        return `<div class="numbered-item"><span class="number">${number}.</span><span class="content">${content}</span></div>`;
+      }
+    });
+  };
   
-  // Observer les changements de hauteur
+  // Générer le HTML formaté complet
+  const generateFormattedHtml = (): string => {
+    // Format de base
+    let html = formatContent();
+    
+    // Appliquer les transformations
+    html = processCodeBlocks(html);
+    html = applyMarkdownFormatting(html);
+    html = formatNumberedLists(html);
+    
+    return html;
+  };
+  
+  // Calculer le HTML formaté
+  const formattedHtml = generateFormattedHtml();
+  
+  // Observer les changements de hauteur pour stabiliser l'affichage
   useEffect(() => {
     if (!content) {
       setStableHeight(null);
@@ -349,7 +170,7 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     return () => clearTimeout(timer);
   }, [content]);
   
-  // Appliquer highlight.js aux blocs de code
+  // Appliquer la coloration syntaxique aux blocs de code
   useEffect(() => {
     const timer = setTimeout(() => {
       if (containerRef.current) {

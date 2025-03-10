@@ -488,56 +488,54 @@
     contain: layout style paint;
   }
 
-  /* Styles pour KaTeX - Rendu mathématique amélioré */
-  .math-content .katex {
-    font-size: 1.15em;
-    white-space: normal;
-    text-rendering: auto;
-  }
-
-  /* Style pour les blocs de formules mathématiques */
-  .math-content .math-block {
+  /* Styles pour les formules mathématiques - Approche simplifiée */
+  .math-content .math-formula-block {
     display: block;
-    margin: 1.2em 0;
+    margin: 1em 0;
+    padding: 0.5em;
     text-align: center;
+    font-family: 'Cambria Math', 'STIX Two Math', serif;
+    font-size: 1.1em;
+    background-color: #f9f9f9;
+    border-radius: 4px;
     overflow-x: auto;
-    max-width: 100%;
-    padding: 0.5em 0;
   }
 
   /* Style pour les formules mathématiques en ligne */
-  .math-content .math-inline {
+  .math-content .math-formula-inline {
     display: inline-block;
     vertical-align: middle;
-    margin: 0 0.2em;
-    font-size: 1.1em;
+    margin: 0 0.15em;
+    font-family: 'Cambria Math', 'STIX Two Math', serif;
+    font-size: 1.05em;
+    white-space: nowrap;
   }
 
-  /* Style pour gérer le problème de débordement */
-  .math-content .katex-display {
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0.5em 0;
-    margin: 1em 0;
+  /* Style pour le symbole delta */
+  .math-content .delta-symbol {
+    font-family: 'Cambria Math', 'STIX Two Math', serif;
+    font-weight: normal;
   }
 
-  /* Style pour les expressions mathématiques avec delta */
-  .math-content .delta-condition {
+  /* Style pour les exposants */
+  .math-content sup, 
+  .math-content .superscript {
+    vertical-align: super;
+    font-size: 0.8em;
+    line-height: 0;
+  }
+
+  /* Style pour les conditions mathématiques (delta > 0, etc.) */
+  .math-content .math-condition {
     font-weight: 500;
-    margin: 0.5em 0;
-    display: block;
+    font-family: 'Cambria Math', 'STIX Two Math', serif;
+    white-space: nowrap;
   }
 
   /* Améliorer l'espacement des messages en liste */
   .math-content p {
     margin-bottom: 0.75em;
     line-height: 1.6;
-  }
-
-  /* Style pour les caractères mathématiques */
-  .math-content .math-symbol {
-    font-family: 'Cambria Math', 'STIX Two Math', serif;
-    margin: 0 0.1em;
   }
   
   .math-content-inner {
