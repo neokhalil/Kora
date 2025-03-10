@@ -57,7 +57,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
-  const [reducedSpace, setReducedSpace] = useState(false); // État pour réduire l'espace
   
   // États pour les fonctionnalités d'image et de voix
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
@@ -103,9 +102,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setConversationStarted(true);
     }
     
-    // Réinitialiser l'état d'espacement quand on pose une nouvelle question
-    setReducedSpace(false);
-
     // Créer un message utilisateur
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -240,9 +236,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const handleImageSubmit = async (imageText: string = '') => {
     if (!uploadedImage || !imagePreviewUrl) return;
     
-    // Réinitialiser l'état d'espacement quand on pose une nouvelle question
-    setReducedSpace(false);
-    
     // Démarrage de la conversation si ce n'est pas déjà fait
     if (!conversationStarted) {
       setConversationStarted(true);
@@ -337,9 +330,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const handleReExplain = async (messageId: string) => {
     if (!messageId) return;
     
-    // Réduire l'espace quand on clique sur un bouton d'action
-    setReducedSpace(true);
-    
     // Récupère le message original
     const originalMessage = messages.find(m => m.id === messageId);
     if (!originalMessage) return;
@@ -399,9 +389,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Demande un exercice de challenge
   const handleChallenge = async (messageId: string) => {
     if (!messageId) return;
-    
-    // Réduire l'espace quand on clique sur un bouton d'action
-    setReducedSpace(true);
     
     // Récupère le message original
     const originalMessage = messages.find(m => m.id === messageId);
@@ -466,9 +453,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Demande un indice pour un exercice
   const handleHint = async (challengeId: string) => {
     if (!challengeId) return;
-    
-    // Réduire l'espace quand on clique sur un bouton d'action
-    setReducedSpace(true);
     
     // Récupère l'exercice original
     const challengeMessage = messages.find(m => m.challengeId === challengeId);
@@ -706,7 +690,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             ) : (
               // Affichage de la conversation en cours
               <div className="web-conversation-container">
-                <div className={`web-messages-list ${reducedSpace ? 'reduced-space' : ''}`}>
+                <div className="web-messages-list">
                   {messages.map(renderMessage)}
                   {isThinking && (
                     <div className="web-message web-kora-message">
