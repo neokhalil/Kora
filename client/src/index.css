@@ -691,6 +691,11 @@ input, textarea, select, button {
   white-space: nowrap;
 }
 
+/* Ajouter de l'espace entre l'icône et le texte */
+.kora-action-button svg {
+  margin-right: 6px;
+}
+
 .kora-action-button:hover {
   background-color: #e6eaf2;
 }
