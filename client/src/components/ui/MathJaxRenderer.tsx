@@ -27,8 +27,8 @@ const mathJaxConfig = {
   }
 };
 
-// Fonction pour détecter les blocs de code dans le contenu
-const processCodeBlocks = (content: string): React.ReactNode[] => {
+// Fonction pour détecter les blocs de code et formatter le texte (titres, etc.)
+const processContent = (content: string): React.ReactNode[] => {
   if (!content) return [];
 
   // Expression régulière pour capturer les blocs de code avec optionnellement un langage spécifié
@@ -39,11 +39,12 @@ const processCodeBlocks = (content: string): React.ReactNode[] => {
 
   // Parcourir tous les blocs de code
   while ((match = codeBlockRegex.exec(content)) !== null) {
-    // Ajouter le texte avant le bloc de code
+    // Traiter le texte avant le bloc de code
     if (match.index > lastIndex) {
+      const textPart = content.substring(lastIndex, match.index);
       parts.push(
         <MathJax key={`text-${lastIndex}`}>
-          {content.substring(lastIndex, match.index)}
+          {processFormattedText(textPart)}
         </MathJax>
       );
     }
@@ -80,16 +81,68 @@ const processCodeBlocks = (content: string): React.ReactNode[] => {
     lastIndex = match.index + match[0].length;
   }
 
-  // Ajouter le reste du texte après le dernier bloc de code
+  // Traiter le reste du texte après le dernier bloc de code
   if (lastIndex < content.length) {
+    const textPart = content.substring(lastIndex);
     parts.push(
       <MathJax key={`text-${lastIndex}`}>
-        {content.substring(lastIndex)}
+        {processFormattedText(textPart)}
       </MathJax>
     );
   }
 
-  return parts.length > 0 ? parts : [<MathJax key="text-full">{content}</MathJax>];
+  return parts.length > 0 ? parts : [
+    <MathJax key="text-full">
+      {processFormattedText(content)}
+    </MathJax>
+  ];
+};
+
+// Fonction pour traiter le formatage du texte (titres en gras, etc.)
+const processFormattedText = (text: string): React.ReactNode => {
+  // Ne pas traiter si vide
+  if (!text) return text;
+
+  // Remplacer les titres avec ** par des éléments en gras
+  // Format: "**Titre**:" ou "**Titre** :"
+  const titleRegex = /(\d+\.\s*)?(\*\*([^*]+)\*\*)(\s*:)?/g;
+  
+  let result = text;
+  let lastIndex = 0;
+  const parts: React.ReactNode[] = [];
+  
+  // Trouver tous les titres
+  let match;
+  while ((match = titleRegex.exec(text)) !== null) {
+    // Ajouter le texte avant le titre
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    
+    // Extraire les composants du titre
+    const number = match[1] || '';  // le numéro (optionnel)
+    const titleText = match[3];     // le texte du titre sans les **
+    const colon = match[4] || '';   // les deux points (optionnels)
+    
+    // Ajouter le titre formatté en HTML
+    parts.push(
+      <React.Fragment key={`title-${match.index}`}>
+        {number && <span>{number}</span>}
+        <strong className="font-bold">{titleText}</strong>
+        {colon}
+      </React.Fragment>
+    );
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Ajouter le reste du texte après le dernier titre
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  
+  // S'il n'y avait pas de titres, retourner le texte original
+  return parts.length > 0 ? parts : text;
 };
 
 /**
@@ -112,7 +165,7 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     <div className={`math-renderer ${className}`}>
       <MathJaxContext config={mathJaxConfig}>
         <div className="whitespace-pre-wrap">
-          {processCodeBlocks(content)}
+          {processContent(content)}
         </div>
       </MathJaxContext>
     </div>
