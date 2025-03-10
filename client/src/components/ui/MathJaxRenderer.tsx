@@ -233,18 +233,35 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       // Barré
       .replace(/\~\~([^~]+)\~\~/g, '<s>$1</s>');
     
-    // Traiter les apostrophes pour du texte français vs du code
+    // Traitement spécial pour le texte français avec apostrophes
+    // On ne modifie pas le texte normal en français, seulement le vrai code de programmation
+    
+    // Détection des mots français courants avec apostrophes (n', l', d', j', etc.)
+    const frenchWithApostrophe = /\b[nljdcsmt]'[a-zàâäçéèêëîïôöùûüÿ]/i;
+    
     formattedText = formattedText.replace(/'([^']+)'/g, (match, content) => {
-      // Détecter si c'est du code ou du texte avec apostrophes
+      // Liste des mots possiblement français dans le contenu
       if (
-        // C'est du code si contient des caractères spécifiques à la programmation
-        (/[:;(){}=<>\/\[\]\.,$+\-*%]/.test(content) && /[a-zA-Z]/.test(content)) ||
-        // Ou si c'est un mot-clé de programmation
-        /^(let|var|const|for|while|if|else|function|return|true|false|null)$/.test(content)
+        content.includes(' ') || // Contient des espaces => probablement une phrase
+        frenchWithApostrophe.test(content) || // Contient n', l', d', etc. => français
+        /[àâäçéèêëîïôöùûüÿÀÂÄÇÉÈÊËÎÏÔÖÙÛÜŸ]/.test(content) // Caractères français
       ) {
+        // C'est du texte français, ne pas le formater comme du code
+        return match;
+      }
+      
+      // Vérification stricte pour la détection du code de programmation
+      if (
+        // C'est du code UNIQUEMENT si c'est un mot-clé exact ou une instruction exacte
+        /^(let|var|const|for|while|if|else|function|return|true|false|null|this|new|import|export|class|throw|try|catch)$/.test(content) ||
+        // Ou si c'est une expression typique de code sans caractères français
+        (/[:;{}=\/\[\]\.+\-*%]/.test(content) && !/\s+/.test(content))
+      ) {
+        // C'est du code => formater comme tel
         return `<code class="inline-code">${content}</code>`;
       }
-      // C'est probablement du texte en français avec apostrophes
+      
+      // Dans le doute, considérer comme du texte normal
       return match;
     });
     
