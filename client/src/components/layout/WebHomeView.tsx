@@ -57,6 +57,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [conversationStarted, setConversationStarted] = useState(false);
+  const [reducedSpace, setReducedSpace] = useState(false); // État pour réduire l'espace
   
   // États pour les fonctionnalités d'image et de voix
   const [isRecordingVoice, setIsRecordingVoice] = useState(false);
