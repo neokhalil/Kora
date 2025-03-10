@@ -1,4 +1,5 @@
 import React from 'react';
+import './text.css';
 
 interface TextContentProps {
   content: string;
@@ -10,9 +11,15 @@ interface TextContentProps {
  * Sans formatage mathématique ou coloration syntaxique
  */
 const TextRenderer: React.FC<TextContentProps> = ({ content, className = '' }) => {
+  if (!content) {
+    return null;
+  }
+
   return (
-    <div className={`message-content text-content ${className}`}>
-      {content}
+    <div 
+      className={`text-renderer ${className}`}
+    >
+      <div className="whitespace-pre-wrap">{content}</div>
     </div>
   );
 };

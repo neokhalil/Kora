@@ -30,11 +30,7 @@ export default function ImageAnalysisTest() {
     }, 200);
   };
 
-  // Function to detect if content has LaTeX and needs MathJax rendering
-  const containsMathExpressions = (content: string): boolean => {
-    // Check for math delimiters: $...$ or \[ ... \]
-    return /\$|\\\[|\\\]/.test(content);
-  };
+  // Plus besoin de détecter les expressions mathématiques car on utilise maintenant un simple rendu de texte
 
   return (
     <div className="container mx-auto p-4 max-w-5xl">
@@ -58,13 +54,7 @@ export default function ImageAnalysisTest() {
             </CardHeader>
             <Separator />
             <CardContent className="pt-4">
-              {containsMathExpressions(analysisResponse.content) ? (
-                <MathJaxRenderer content={analysisResponse.content} />
-              ) : (
-                <div className="whitespace-pre-wrap">
-                  {analysisResponse.content}
-                </div>
-              )}
+              <TextRenderer content={analysisResponse.content} />
               
               <div className="text-xs text-gray-500 mt-4">
                 Timestamp: {new Date(analysisResponse.timestamp).toLocaleString()}
