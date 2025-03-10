@@ -250,7 +250,7 @@
   margin-bottom: 1.5rem; /* Espacement doublé comme demandé */
   margin-top: 0.75rem;
   display: flex;
-  justify-content: flex-end; /* Aligner le bouton à droite */
+  justify-content: flex-start; /* Aligner le bouton à gauche comme les autres boutons */
 }
 
 .web-challenge-actions .web-action-button {
