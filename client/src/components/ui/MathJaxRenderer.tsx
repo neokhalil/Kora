@@ -94,6 +94,18 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     let codeContent = '';
     let paragraphContent = '';
     
+    // Fonction d'aide pour formater les propriétés mathématiques
+    const formatListItems = (text: string): string => {
+      // Recherche les items de liste numérotés ou commençant par des tirets
+      return text
+        // Chaque tiret suivi d'un espace devient un élément de liste
+        .replace(/- ([^-]+?)(?=(?:- |$))/g, '<div class="list-item">- $1</div>')
+        // Ajouter des sauts de ligne avant et après les expressions mathématiques
+        .replace(/(\$[^$]+\$)/g, '<div class="formula-item">$1</div>')
+        // Si une propriété contient ":" pour séparer des définitions
+        .replace(/([^:]+) : ([^.]+)\./g, '<div class="property-item">$1 : $2.</div>');
+    };
+    
     // Traiter chaque ligne
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -106,7 +118,9 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
           
           // Terminer le paragraphe précédent s'il existe
           if (paragraphContent) {
-            htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
+            // Appliquer formatage spécial pour les listes et propriétés
+            const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
+            htmlContent += `<p>${formattedParagraph}</p>`;
             paragraphContent = '';
           }
           
@@ -144,13 +158,17 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       } else if (line.trim() === '') {
         // Ligne vide - fin de paragraphe
         if (paragraphContent) {
-          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
+          // Appliquer formatage spécial pour les listes et propriétés
+          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
+          htmlContent += `<p>${formattedParagraph}</p>`;
           paragraphContent = '';
         }
       } else if (line.trim().match(/^#{1,3}\s+(.+)$/)) {
         // Titre (# Titre)
         if (paragraphContent) {
-          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
+          // Appliquer formatage spécial pour les listes et propriétés
+          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
+          htmlContent += `<p>${formattedParagraph}</p>`;
           paragraphContent = '';
         }
         
@@ -163,7 +181,9 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
       } else if (line.trim().match(/^\d+\.\s+(.+)$/)) {
         // Liste numérotée ou section numérotée
         if (paragraphContent) {
-          htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
+          // Appliquer formatage spécial pour les listes et propriétés
+          const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
+          htmlContent += `<p>${formattedParagraph}</p>`;
           paragraphContent = '';
         }
         
@@ -194,7 +214,9 @@ const MathJaxRenderer: React.FC<MathContentProps> = ({ content, className = "" }
     
     // Traiter tout paragraphe restant
     if (paragraphContent) {
-      htmlContent += `<p>${formatTextContent(paragraphContent)}</p>`;
+      // Appliquer formatage spécial pour les listes et propriétés
+      const formattedParagraph = formatListItems(formatTextContent(paragraphContent));
+      htmlContent += `<p>${formattedParagraph}</p>`;
     }
     
     // 3. POST-TRAITEMENT: Restaurer les expressions mathématiques
