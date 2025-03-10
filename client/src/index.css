@@ -499,6 +499,22 @@
     transform: translateZ(0);
     position: relative;
     contain: layout style;
+    line-height: 1.7;
+  }
+  
+  /* Styles pour les propriétés mathématiques et étapes d'explication */
+  .list-item, 
+  .formula-item, 
+  .property-item {
+    display: block;
+    margin: 0.5rem 0;
+    line-height: 1.8;
+  }
+  
+  /* Séparateurs visuels entre propriétés */
+  .property-item {
+    border-bottom: 1px solid rgba(125, 125, 125, 0.1);
+    padding-bottom: 0.3rem;
   }
   
   /* Important pour réduire les tremblements lors de l'ajout des formules mathématiques */
