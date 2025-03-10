@@ -254,18 +254,19 @@
 }
 
 .web-challenge-actions .web-action-button {
-  background-color: #e9f7ff; /* Couleur bleue claire pour la distinguer */
-  color: #0066cc;
-  border: 1px solid #c2e4ff;
-  padding: 0.5rem 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
+  /* Utilisation du même style que les autres boutons d'action */
+  background-color: #f5f5f7;
+  color: #333;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
 
 .web-challenge-actions .web-action-button:hover {
-  background-color: #d8efff;
+  background-color: #e8e8e8;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
