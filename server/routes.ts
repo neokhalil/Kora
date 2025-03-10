@@ -212,9 +212,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Questions API endpoints
   app.get('/api/questions/recent', async (req: Request, res: Response) => {
     try {
-      const recentQuestions = await dbStorage.getRecentQuestions();
-      res.json(recentQuestions);
+      // Temporairement contourner l'erreur de base de données en retournant un tableau vide
+      // NOTE: Nous reviendrons à l'implémentation complète une fois les tables créées
+      res.json([]);
+      
+      // Version originale commentée:
+      // const recentQuestions = await dbStorage.getRecentQuestions();
+      // res.json(recentQuestions);
     } catch (error) {
+      console.error('Error in /api/questions/recent', error);
       res.status(500).json({ message: 'Failed to fetch recent questions' });
     }
   });

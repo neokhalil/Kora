@@ -613,6 +613,69 @@
     color: #f8fafc;
   }
   
+  /* Style pour le code inline */
+  .math-content .inline-code {
+    font-family: 'Source Code Pro', 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 3px;
+    font-size: 0.9em;
+    padding: 0.15em 0.3em;
+    white-space: nowrap;
+    margin: 0 2px;
+  }
+  
+  /* Amélioration des blocs de code pour mobile */
+  @media screen and (max-width: 768px) {
+    .math-content pre.code-block {
+      margin: 1rem 0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .math-content .inline-code {
+      font-size: 0.85em;
+      padding: 0.1em 0.25em;
+    }
+    
+    .math-content .mobile-friendly-code {
+      white-space: normal !important;
+      word-break: break-word !important;
+    }
+  }
+  
+  /* Style spécifique pour les éléments PHP inline */
+  .math-content .php-tag {
+    color: #8044d8;
+    font-weight: 600;
+  }
+  
+  .math-content .php-var {
+    color: #e05661;
+  }
+  
+  .math-content .php-comment {
+    color: #6d6d6d;
+    font-style: italic;
+  }
+  
+  .math-content .php-function {
+    color: #2271b3;
+  }
+  
+  .math-content .php-control {
+    color: #b32259;
+  }
+  
+  /* Style pour le code qui doit pouvoir passer à la ligne sur mobile */
+  .math-content .mobile-friendly-code {
+    white-space: normal !important;
+    word-break: break-word !important;
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+  
   /* Mise en forme des éléments de texte du message */
   .math-content p {
     margin-bottom: 1rem;
@@ -652,6 +715,24 @@
     overflow-x: auto;
     overflow-y: hidden;
     max-width: 100%;
+    padding: 0.5rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  }
+  
+  /* Amélioration de l'affichage des formules mathématiques sur mobile */
+  @media screen and (max-width: 768px) {
+    .math-content .katex-display > .katex {
+      max-width: calc(100vw - 40px);
+      font-size: 1.05em !important;
+    }
+    
+    .math-content .katex-display {
+      padding: 0.5rem 0;
+      margin: 1rem 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
   }
   
   /* Suppression des attributs de style problématiques */
@@ -667,6 +748,21 @@
   /* Assurer que les spans dans KaTeX n'affichent pas le contenu des attributs */
   .katex span[data-mml-node] {
     background-color: transparent !important;
+  }
+  
+  /* Style pour la barre de défilement des équations */
+  .math-content .katex-display::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .math-content .katex-display::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+  
+  .math-content .katex-display::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
   }
   
   /* Style pour les étapes numérotées */
