@@ -236,15 +236,12 @@
     
     /* Style pour les éléments numérotés sur mobile */
     .numbered-item {
-      padding: 0.5rem;
+      padding: 0.5rem 0;
       margin-bottom: 0.75rem;
-      background-color: #f2f7ff;
-      border-radius: 6px;
-      border-left: 2px solid #c8d8f7;
+      background-color: transparent;
       color: #333;
       font-size: 0.95rem;
       line-height: 1.5;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     }
     
     .numbered-item .number {
@@ -724,7 +721,7 @@
   display: flex;
   align-items: flex-start;
   margin-bottom: 1rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
   background-color: transparent;
 }
 
