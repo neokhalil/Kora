@@ -44,19 +44,38 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
       hljs.highlightElement(block as HTMLElement);
     });
     
-    // Process MathJax after the DOM is ready
-    const timer = setTimeout(() => {
-      if (window.MathJax && mathJaxRef.current) {
-        try {
-          window.MathJax.typesetPromise([mathJaxRef.current])
-            .catch((err: any) => console.error('MathJax error:', err));
-        } catch (error) {
-          console.error('MathJax error:', error);
-        }
+    // Pour éviter les problèmes de rendu, on procède en deux étapes
+    const preProcessTimer = setTimeout(() => {
+      // Conversion manuelle des \[...\] en $$...$$
+      if (mathJaxRef.current) {
+        const elements = mathJaxRef.current.querySelectorAll('div');
+        elements.forEach(element => {
+          const html = element.innerHTML;
+          if (html && html.includes('\\[') && html.includes('\\]')) {
+            console.log('Converting \\[...\\] to $$...$$');
+            const newHtml = html.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+            element.innerHTML = newHtml;
+          }
+        });
       }
+      
+      // Traitement MathJax
+      const renderTimer = setTimeout(() => {
+        if (window.MathJax && mathJaxRef.current) {
+          try {
+            console.log('Running MathJax typeset');
+            window.MathJax.typesetPromise([mathJaxRef.current])
+              .catch((err: any) => console.error('MathJax error:', err));
+          } catch (error) {
+            console.error('MathJax error:', error);
+          }
+        }
+      }, 100);
+      
+      return () => clearTimeout(renderTimer);
     }, 100);
     
-    return () => clearTimeout(timer);
+    return () => clearTimeout(preProcessTimer);
   }, [content]);
 
   if (!content) {
@@ -65,6 +84,17 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
   
   // Format code blocks
   let formattedContent = content;
+
+  // IMPORTANT: Prétraiter les notations alternatives de LaTeX
+  // Convertir \[...\] en $$...$$
+  formattedContent = formattedContent.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+  
+  // Convertir \(...\) en $...$
+  formattedContent = formattedContent.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
+  
+  // Traiter spécifiquement les délimiteurs non correctement traités
+  formattedContent = formattedContent.replace(/\\x = \\frac/g, '$x = \\frac');
+  formattedContent = formattedContent.replace(/\\] ax/g, '$$ ax');
   
   // Process code blocks
   formattedContent = formattedContent.replace(/```(\w*)\n([\s\S]*?)```/g, (match, language, code) => {
@@ -96,10 +126,17 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
   const paragraphs = formattedContent.split('<br><br>');
   const wrappedParagraphs = paragraphs.map((para, index) => {
     if (para.trim() === '') return '';
+    
     // Add special handling for numbered items
     if (/^\d+\.\s/.test(para)) {
+      // Traitement spécial des équations après les numéros
+      if (para.includes('\\[') || para.includes('\\(')) {
+        para = para.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+        para = para.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
+      }
       return `<div class="numbered-item" key="${index}">${para}</div>`;
     }
+    
     return `<div class="paragraph" key="${index}">${para}</div>`;
   }).join('');
   
