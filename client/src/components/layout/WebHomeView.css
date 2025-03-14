@@ -620,14 +620,38 @@
   .web-conversation-container {
     height: calc(100% - 140px); /* Ajusté pour le mobile */
     max-height: calc(100vh - 230px); /* Limitation de hauteur max pour éviter les problèmes de défilement */
-    overflow-y: auto;
+    overflow-y: scroll; /* Force scroll au lieu de auto pour une meilleure compatibilité */
     -webkit-overflow-scrolling: touch; /* Pour améliorer le défilement sur iOS */
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 140px;
-    padding-bottom: 20px;
+    padding-bottom: 40px; /* Plus d'espace en bas pour éviter que le dernier message soit caché */
+    padding-top: 15px; /* Espace en haut */
+    will-change: transform; /* Optimisation de performance pour le défilement */
+    transform: translateZ(0); /* Force l'utilisation de l'accélération matérielle */
+    transition: height 0.3s ease; /* Transition douce pour les ajustements de hauteur */
+  }
+  
+  /* Ajustement spécifique quand le clavier virtuel est ouvert */
+  .keyboard-open .web-conversation-container {
+    height: calc(100% - 180px); /* Hauteur réduite pour s'adapter au clavier */
+    max-height: calc(100vh - 300px); /* Limitation de hauteur max pour éviter les problèmes de défilement avec clavier */
+  }
+  
+  /* Assurer que les messages mathématiques s'affichent correctement sur mobile */
+  .web-conversation-container .message-content {
+    overflow-x: auto; /* Permettre le défilement horizontal pour les formules larges */
+    max-width: 100%;
+    word-break: break-word; /* Cassure des mots longs */
+  }
+  
+  /* Assurer que les blocs de code sont correctement affichés sur mobile */
+  .web-conversation-container pre {
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: pre-wrap; /* Permettre le retour à la ligne dans les blocs de code */
   }
   
   .web-question-container {
