@@ -805,7 +805,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
   return (
       <div className="web-home-container">
-        <div className="web-layout">
+        <div className={`web-layout ${isKeyboardOpen ? 'keyboard-open' : ''}`}>
           {/* Sidebar - menu latéral gauche */}
           <div className="web-sidebar">
             {/* Logo KORA */}
