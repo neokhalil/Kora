@@ -7,6 +7,7 @@ import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import { scrollToBottom, scheduleScroll, scrollAfterRender } from '@/utils/scrollHelper';
+import { ensureLastMessageVisibility, diagnoseScrollIssues } from './ScrollTestUtils';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -166,12 +167,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     });
   };
   
-  // Fonction unifiée pour remplacer tous les appels requestAnimationFrame
-  // Cette fonction est utilisée partout où nous avions précédemment requestAnimationFrame
-  const scrollAfterRender = () => {
-    // Nous utilisons notre fonction de défilement optimisée
-    localScheduleScroll();
-  };
+  // Nous utilisons la fonction scrollAfterRender importée de scrollHelper.ts
+  // qui a été spécialement optimisée pour gérer le problème d'espace blanc
   
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {

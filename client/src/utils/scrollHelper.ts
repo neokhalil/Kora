@@ -111,20 +111,50 @@ export const scheduleScroll = (options: ScrollOptions = {}) => {
  */
 export const scrollAfterRender = (options: ScrollOptions = {}) => {
   requestAnimationFrame(() => {
-    const target = options.target || document.querySelector('.scroll-anchor') || document.querySelector('.web-conversation-container');
-    if (!target) return;
+    const targetElement = options.target || 
+                          document.querySelector('.scroll-anchor') || 
+                          document.querySelector('.web-conversation-container');
     
-    const behavior = isMobileDevice() ? 'auto' : (options.behavior || 'smooth');
-    target.scrollIntoView({ 
-      behavior, 
-      block: 'end' 
-    });
+    if (!targetElement) return;
     
-    // Double défilement pour s'assurer que le contenu est rendu
-    scheduleScroll({ 
-      ...options, 
-      target,
-      behavior
-    });
+    // Vérifier que la cible est bien un HTMLElement
+    if (targetElement instanceof HTMLElement) {
+      const behavior = isMobileDevice() ? 'auto' : (options.behavior || 'smooth');
+      
+      // Utiliser scrollIntoView avec le comportement adapté
+      targetElement.scrollIntoView({ 
+        behavior, 
+        block: 'end' 
+      });
+      
+      // Double défilement avec délai différent pour s'assurer que le contenu est rendu
+      // y compris les formules mathématiques et blocs de code qui sont rendus de façon asynchrone
+      setTimeout(() => {
+        targetElement.scrollIntoView({ 
+          behavior: 'auto', 
+          block: 'end' 
+        });
+      }, 200);
+      
+      // Troisième défilement pour garantir la visibilité après tout rendu asynchrone
+      setTimeout(() => {
+        targetElement.scrollIntoView({ 
+          behavior: 'auto', 
+          block: 'end' 
+        });
+      }, 500);
+      
+      // S'assurer que le défilement est bien pris en compte sur les appareils mobiles
+      if (isMobileDevice()) {
+        const container = document.querySelector('.web-conversation-container');
+        if (container instanceof HTMLElement) {
+          setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
+          }, 100);
+        }
+      }
+    } else {
+      console.warn('La cible de défilement n\'est pas un HTMLElement valide');
+    }
   });
 };

@@ -227,13 +227,15 @@
   padding-bottom: 20px; /* Réduit l'espacement pour éviter la barre blanche */
 }
 
-/* Styles pour l'ancre de défilement */
+/* Styles pour l'ancre de défilement - amélioré pour garantir visibilité */
 .scroll-anchor {
-  height: 1px; /* Hauteur minimale */
-  margin-top: 1px; /* Espace minimal au-dessus de l'ancre */
-  margin-bottom: 1px; /* Espace minimal en-dessous */
+  height: 20px; /* Hauteur plus importante pour garantir la visibilité */
+  margin-top: 5px; /* Plus d'espace au-dessus */
+  margin-bottom: 30px; /* Beaucoup plus d'espace en-dessous pour assurer que le message est visible */
   width: 100%;
   pointer-events: none; /* Pour ne pas interférer avec les interactions de l'utilisateur */
+  position: relative; /* Position relative pour permettre un positionnement plus précis */
+  z-index: 5; /* Assure que l'ancre est au-dessus d'autres éléments */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -617,26 +619,32 @@
     justify-content: center;
   }
   
-  /* Ajustements spécifiques pour corriger le défilement sur mobile */
+  /* Ajustements spécifiques pour corriger le défilement sur mobile - optimisé pour la visibilité */
   .web-conversation-container {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 140px; /* Hauteur exacte du conteneur de questions */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Commence par le haut */
+    align-items: stretch;
     overflow-y: auto; /* Scroll automatique selon le contenu */
     -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
-    padding: 15px 15px 0 15px; /* Padding en haut et sur les côtés uniquement */
+    padding: 15px 15px 80px 15px; /* Padding important en bas pour assurer la visibilité */
     margin: 0; /* Pas de marge */
     will-change: transform; /* Optimisation pour le défilement */
     transform: translateZ(0); /* Force l'accélération matérielle */
     border: none; /* Pas de bordure */
     z-index: 10; /* S'assurer que le conteneur est au-dessus */
+    scroll-padding-bottom: 100px; /* Ajoute du padding au scroll pour éviter que le contenu soit caché */
   }
   
   /* Ajustement quand le clavier virtuel est ouvert */
   .keyboard-open .web-conversation-container {
-    bottom: 180px; /* Distance plus grande quand le clavier est ouvert */
+    bottom: 160px; /* Distance plus grande quand le clavier est ouvert */
+    padding-bottom: 120px; /* Padding supplémentaire en bas */
   }
   
   /* Styles des messages améliorés pour mobile */
@@ -690,12 +698,15 @@
     gap: 10px; /* Espace entre les messages */
   }
   
-  /* Styles pour l'ancre de défilement */
+  /* Styles pour l'ancre de défilement sur mobile - optimisé pour visibilité */
   .scroll-anchor {
-    height: 1px;
+    height: 30px; /* Hauteur plus importante pour garantir la visibilité sur mobile */
     padding: 0;
     margin: 0;
+    margin-bottom: 60px; /* Grand espace pour assurer que le message est visible sur mobile */
     opacity: 0; /* Invisible mais toujours fonctionnel pour le défilement */
     pointer-events: none; /* Ne pas interférer avec les interactions */
+    position: relative;
+    z-index: 50; /* Z-index élevé pour être certain qu'il est trouvé */
   }
 }
