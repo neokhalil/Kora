@@ -161,43 +161,32 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   }, [messages]);
 
-  // Fonction utilitaire pour gérer le défilement - version améliorée
+  // Fonction simplifiée pour gérer le défilement
   const scrollToBottom = () => {
+    // Détecter si messagesEndRef existe
+    if (!messagesEndRef.current) return;
+    
     if (isMobile) {
-      // Stratégie spécifique pour mobile avec plusieurs tentatives
-      
-      // Tentative immédiate
-      const scrollImmediately = () => {
+      // Pour mobile, une approche plus directe sans animations qui peuvent interférer
+      const scrollElement = () => {
         const container = document.querySelector('.web-conversation-container');
         if (container) {
-          container.scrollTop = container.scrollHeight + 1000; // Ajouter une marge pour s'assurer du défilement complet
+          // Défilement direct et sans smooth pour éviter les problèmes
+          container.scrollTop = container.scrollHeight;
+          
+          // S'assurer que le dernier message est visible
+          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
         }
       };
       
-      // Appliquer immédiatement
-      scrollImmediately();
-      
-      // Puis avec un délai progressif pour s'assurer du rendu complet
-      setTimeout(scrollImmediately, 50);
-      setTimeout(scrollImmediately, 150);
-      setTimeout(scrollImmediately, 300);
-      setTimeout(scrollImmediately, 500);
-      
-      // Utiliser également scrollIntoView comme fallback
-      if (messagesEndRef.current) {
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
-        }, 100);
-      }
+      // Exécution immédiate et après un court délai pour s'assurer que tout le contenu est rendu
+      scrollElement();
+      setTimeout(scrollElement, 100);
     } else {
-      // Sur desktop, comportement normal avec scrollIntoView
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
+      // Sur desktop, comportement simplifié avec scrollIntoView
+      messagesEndRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'end'
       });
     }
   };

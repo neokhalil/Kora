@@ -619,28 +619,24 @@
   
   /* Ajustements spécifiques pour corriger le défilement sur mobile */
   .web-conversation-container {
-    height: calc(100% - 140px); /* Ajusté pour le mobile */
-    max-height: calc(100vh - 230px); /* Limitation de hauteur max pour éviter les problèmes de défilement */
-    overflow-y: scroll; /* Force scroll au lieu de auto pour une meilleure compatibilité */
-    -webkit-overflow-scrolling: touch; /* Pour améliorer le défilement sur iOS */
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    bottom: 140px;
-    padding-bottom: 0; /* Supprimé l'espace en bas qui cause la barre blanche */
-    padding-top: 15px; /* Espace en haut */
-    margin-bottom: 0; /* Supprimé toute marge en bas */
-    will-change: transform; /* Optimisation de performance pour le défilement */
-    transform: translateZ(0); /* Force l'utilisation de l'accélération matérielle */
-    transition: height 0.3s ease; /* Transition douce pour les ajustements de hauteur */
-    border-bottom: none; /* Supprimé toute bordure en bas */
+    bottom: 140px; /* Hauteur exacte du conteneur de questions */
+    overflow-y: auto; /* Scroll automatique selon le contenu */
+    -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+    padding: 15px 15px 0 15px; /* Padding en haut et sur les côtés uniquement */
+    margin: 0; /* Pas de marge */
+    will-change: transform; /* Optimisation pour le défilement */
+    transform: translateZ(0); /* Force l'accélération matérielle */
+    border: none; /* Pas de bordure */
+    z-index: 10; /* S'assurer que le conteneur est au-dessus */
   }
   
-  /* Ajustement spécifique quand le clavier virtuel est ouvert */
+  /* Ajustement quand le clavier virtuel est ouvert */
   .keyboard-open .web-conversation-container {
-    height: calc(100% - 180px); /* Hauteur réduite pour s'adapter au clavier */
-    max-height: calc(100vh - 300px); /* Limitation de hauteur max pour éviter les problèmes de défilement avec clavier */
+    bottom: 180px; /* Distance plus grande quand le clavier est ouvert */
   }
   
   /* Assurer que les messages mathématiques s'affichent correctement sur mobile */
@@ -663,15 +659,12 @@
     left: 0;
     right: 0;
     background-color: white;
-    z-index: 100;
-    padding: 10px 10px 10px 10px; /* Padding égal sur tous les côtés */
-    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05); /* Ombre très légère en haut seulement */
-    height: 140px;
-    /* Éliminer tout espace blanc entre les messages et le conteneur de questions */
-    margin-top: 0;
-    border-top: 0;
-    margin-bottom: 0;
-    border-bottom: 0;
+    z-index: 100; /* S'assurer qu'il est au-dessus de tout */
+    padding: 10px;
+    border: none; /* Pas de bordure */
+    margin: 0; /* Pas de marge */
+    height: 140px; /* Hauteur fixe */
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05); /* Légère séparation visuelle */
   }
   
   .web-messages-list {
