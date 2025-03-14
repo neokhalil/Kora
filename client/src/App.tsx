@@ -7,12 +7,14 @@ import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/Header";
 import ChatAssistant from "@/pages/ChatAssistant";
 import Home from "@/pages/Home";
+import MathTest from "@/pages/MathTest";
 
 // Configuration des routes
 const routes = [
   { path: "/", Component: Home },
   { path: "/home", Component: Home },
-  { path: "/chat-assistant", Component: ChatAssistant }
+  { path: "/chat-assistant", Component: ChatAssistant },
+  { path: "/math-test", Component: MathTest }
 ];
 
 // App simplifié sans menu latéral

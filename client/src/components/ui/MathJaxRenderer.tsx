@@ -2,35 +2,32 @@ import React, { useEffect, useRef } from 'react';
 import { MathJaxContext, MathJax } from 'better-react-mathjax';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
-import { formatMathContent } from '../../utils/mathJaxFormatter';
 
 interface TextContentProps {
   content: string;
   className?: string;
 }
 
-// Configuration de MathJax optimisée
+// Configuration MathJax optimisée et simplifiée
 const mathJaxConfig = {
   loader: {
-    load: ['input/tex-full', 'output/svg']
+    load: ['input/tex', 'output/chtml']
   },
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true,
-    processEnvironments: true,
-    packages: ['base', 'ams', 'noerrors', 'noundefined', 'cancel', 'color', 'boldsymbol']
+    tags: 'ams',
+    packages: {'[+]': ['ams', 'noerrors', 'base', 'boldsymbol', 'color']}
   },
-  svg: {
-    fontCache: 'global',
+  chtml: {
+    fontFamily: 'serif',
     scale: 1,
     minScale: 0.5
   },
   options: {
     skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    renderActions: {
-      addMenu: [0, '', '']
-    }
+    processHtmlClass: 'math-content'
   },
   startup: {
     typeset: true
@@ -54,17 +51,17 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     const timer = setTimeout(() => {
       if (window.MathJax && mathJaxRef.current) {
         try {
-          console.log('Running MathJax typeset');
-          // Reset any previous typesetting
+          console.log('Cleaning previous MathJax typesetting');
           window.MathJax.typesetClear && window.MathJax.typesetClear([mathJaxRef.current]);
-          // Process new content
+          
+          console.log('Running MathJax typeset');
           window.MathJax.typesetPromise([mathJaxRef.current])
             .catch((err: any) => console.error('MathJax error:', err));
         } catch (error) {
           console.error('MathJax error:', error);
         }
       }
-    }, 200);
+    }, 300);
     
     return () => clearTimeout(timer);
   }, [content]);
@@ -73,60 +70,80 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     return null;
   }
   
-  // Traiter les expressions mathématiques de manière plus fiable
-  // en utilisant les fonctions de mathJaxFormatter
-  let formattedContent = formatMathContent(content);
+  // PREMIÈRE ÉTAPE: PROTECTION DES SECTIONS NON MATHÉMATIQUES
+  // Sauvegarde des sections non mathématiques
+  const codeBlocks: string[] = [];
+  let processedContent = content.replace(/```[\s\S]*?```/g, (match) => {
+    codeBlocks.push(match);
+    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+  });
   
+  // DEUXIÈME ÉTAPE: STANDARDISATION DES FORMULES MATHÉMATIQUES
+  // Standardisation des délimiteurs
+  processedContent = processedContent
+    // Convertir \[...\] en $$...$$
+    .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
+    // Convertir \(...\) en $...$
+    .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$')
+    // Supprimer les espaces autour des symboles $
+    .replace(/\s*\$\s*/g, '$')
+    .replace(/\s*\$\$\s*/g, '$$');
+  
+  // TROISIÈME ÉTAPE: FORMATAGE MARKDOWN
   // Format code blocks
-  formattedContent = formattedContent.replace(/```(\w*)\n([\s\S]*?)```/g, (match, language, code) => {
+  processedContent = processedContent.replace(/__CODE_BLOCK_(\d+)__/g, (match, index) => {
+    const code = codeBlocks[parseInt(index)];
+    const match2 = code.match(/```(\w*)\n([\s\S]*?)```/);
+    
+    if (!match2) return code;
+    
+    const language = match2[1];
+    const codeContent = match2[2];
+    
     try {
       const highlightedCode = language 
-        ? hljs.highlight(code, { language }).value 
-        : hljs.highlightAuto(code).value;
+        ? hljs.highlight(codeContent, { language }).value 
+        : hljs.highlightAuto(codeContent).value;
       
       return `<pre class="hljs-pre"><code class="language-${language || 'plaintext'} hljs">${highlightedCode}</code></pre>`;
     } catch (error) {
-      return `<pre class="hljs-pre"><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`;
+      return `<pre class="hljs-pre"><code class="hljs">${hljs.highlightAuto(codeContent).value}</code></pre>`;
     }
   });
   
   // Format Markdown headings
-  formattedContent = formattedContent.replace(/^(#{1,6})\s+(.+?)$/gm, (match, hashes, title) => {
+  processedContent = processedContent.replace(/^(#{1,6})\s+(.+?)$/gm, (match, hashes, title) => {
     const level = hashes.length;
     const size = ['text-3xl', 'text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-base'][Math.min(level - 1, 5)];
     return `<h${level} class="${size} font-bold">${title}</h${level}>`;
   });
   
   // Format bold text
-  formattedContent = formattedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  processedContent = processedContent.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
   
   // Preserve line breaks in a readable way
-  formattedContent = formattedContent.replace(/\n\n+/g, '<br><br>');
+  processedContent = processedContent.replace(/\n\n+/g, '<br><br>');
   
+  // QUATRIÈME ÉTAPE: STRUCTURE DES PARAGRAPHES
   // Format the content into paragraphs with proper structure
-  const paragraphs = formattedContent.split('<br><br>');
+  const paragraphs = processedContent.split('<br><br>');
   const wrappedParagraphs = paragraphs.map((para, index) => {
     if (para.trim() === '') return '';
     
     // Special handling for numbered lists
     if (/^\d+\.\s/.test(para)) {
-      return `<div class="numbered-item" key="${index}">${para}</div>`;
+      return `<div class="numbered-item math-content" key="${index}">${para}</div>`;
     }
     
-    return `<div class="paragraph" key="${index}">${para}</div>`;
+    return `<div class="paragraph math-content" key="${index}">${para}</div>`;
   }).join('');
   
-  // Filtrage supplémentaire pour éliminer les "1" et "$\displaystyle 1$" qui apparaissent parfois
-  let cleanedHtml = wrappedParagraphs;
-  // Remplacer les "11" ou "1" isolés qui pourraient être des erreurs de formule
-  cleanedHtml = cleanedHtml.replace(/<div[^>]*>\s*11\s*<\/div>/g, '');
-  cleanedHtml = cleanedHtml.replace(/(\$\\displaystyle\s+1\$)|(\$1\$)/g, '');
-
+  // CINQUIÈME ÉTAPE: RENDU AVEC MATHJAX
   return (
     <div className={`math-renderer ${className}`} ref={mathJaxRef}>
       <MathJaxContext config={mathJaxConfig}>
-        <MathJax>
-          <div dangerouslySetInnerHTML={{ __html: cleanedHtml }} />
+        <MathJax inline dynamic>
+          <div dangerouslySetInnerHTML={{ __html: wrappedParagraphs }} />
         </MathJax>
       </MathJaxContext>
     </div>
