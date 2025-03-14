@@ -45,6 +45,12 @@ const processContent = (content: string): React.ReactNode[] => {
     .replace(/\$([^\s])/g, '$ $1')
     .replace(/([^\s])\$/g, '$1 $');
 
+  // Convertir les sauts de ligne simples en espaces pour éviter la fragmentation
+  let nonBreakingContent = preprocessedContent.replace(/([^\n])\n([^\n])/g, "$1 $2");
+  
+  // Préserver les paragraphes distincts (sauts de ligne doubles)
+  nonBreakingContent = nonBreakingContent.replace(/\n\n+/g, "\n\n");
+
   // Expression régulière pour capturer les blocs de code avec optionnellement un langage spécifié
   const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
   const parts: React.ReactNode[] = [];
@@ -52,14 +58,14 @@ const processContent = (content: string): React.ReactNode[] => {
   let match;
 
   // Parcourir tous les blocs de code
-  while ((match = codeBlockRegex.exec(preprocessedContent)) !== null) {
+  while ((match = codeBlockRegex.exec(nonBreakingContent)) !== null) {
     // Traiter le texte avant le bloc de code
     if (match.index > lastIndex) {
-      const textPart = preprocessedContent.substring(lastIndex, match.index);
+      const textPart = nonBreakingContent.substring(lastIndex, match.index);
       // Détection des équations $...$ et $$...$$
       const mathParts = splitAndProcessMath(textPart);
       parts.push(
-        <MathJax key={`text-${lastIndex}`}>
+        <MathJax key={`text-${lastIndex}`} className="text-paragraph">
           {mathParts.length > 0 ? mathParts : processFormattedText(textPart)}
         </MathJax>
       );
@@ -98,22 +104,22 @@ const processContent = (content: string): React.ReactNode[] => {
   }
 
   // Traiter le reste du texte après le dernier bloc de code
-  if (lastIndex < preprocessedContent.length) {
-    const textPart = preprocessedContent.substring(lastIndex);
+  if (lastIndex < nonBreakingContent.length) {
+    const textPart = nonBreakingContent.substring(lastIndex);
     // Détection des équations $...$ et $$...$$
     const mathParts = splitAndProcessMath(textPart);
     parts.push(
-      <MathJax key={`text-${lastIndex}`}>
+      <MathJax key={`text-${lastIndex}`} className="text-paragraph">
         {mathParts.length > 0 ? mathParts : processFormattedText(textPart)}
       </MathJax>
     );
   }
 
   return parts.length > 0 ? parts : [
-    <MathJax key="text-full">
-      {splitAndProcessMath(preprocessedContent).length > 0 
-        ? splitAndProcessMath(preprocessedContent) 
-        : processFormattedText(preprocessedContent)}
+    <MathJax key="text-full" className="text-paragraph">
+      {splitAndProcessMath(nonBreakingContent).length > 0 
+        ? splitAndProcessMath(nonBreakingContent) 
+        : processFormattedText(nonBreakingContent)}
     </MathJax>
   ];
 };
@@ -182,7 +188,8 @@ const processFormattedText = (text: string): React.ReactNode => {
     for (const match of mdMatches) {
       // Ajouter le texte avant le titre
       if (match.index && match.index > lastIndex) {
-        parts.push(processedText.substring(lastIndex, match.index));
+        const textBeforeTitle = processedText.substring(lastIndex, match.index);
+        parts.push(<span className="inline">{textBeforeTitle}</span>);
       }
       
       // Extraire les composants du titre
@@ -240,10 +247,10 @@ const processFormattedText = (text: string): React.ReactNode => {
       parts.push(processBoldTitles(restText));
     }
     
-    return parts;
+    return <div className="normal-text">{parts}</div>;
   } else {
     // S'il n'y a pas de titres markdown, traiter les titres avec **
-    return processBoldTitles(processedText);
+    return <div className="normal-text">{processBoldTitles(processedText)}</div>;
   }
 };
 
@@ -251,91 +258,46 @@ const processFormattedText = (text: string): React.ReactNode => {
 const processBoldTitles = (text: string): React.ReactNode => {
   if (!text) return text;
   
-  // Nous allons traiter le texte ligne par ligne pour une meilleure précision
-  const lines = text.split('\n');
-  const processedLines: React.ReactNode[] = [];
+  // Au lieu de traiter ligne par ligne, nous allons essayer un approche plus globale
+  // pour empêcher la fragmentation des paragraphes
   
-  // Parcourir chaque ligne
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    
-    // Vérifier si la ligne contient un format de titre numéroté avec **
-    // Format 1: "1. **Titre**:" ou "1. **Titre** :"
-    const numberedTitleRegex = /^(\d+\.\s*)(\*\*([^*]+)\*\*)(\s*:)?(.*)$/;
-    const numberedMatch = line.match(numberedTitleRegex);
-    
-    if (numberedMatch) {
-      // C'est un titre numéroté avec **
-      const number = numberedMatch[1];           // ex: "1. "
-      const titleText = numberedMatch[3];        // le texte du titre sans les **
-      const colon = numberedMatch[4] || '';      // les deux points (optionnels)
-      const restOfLine = numberedMatch[5] || ''; // le reste de la ligne après le titre
-      
-      processedLines.push(
-        <div key={`line-${i}`} className="flex items-baseline">
-          <span>{number}</span>
-          <strong className="font-bold">{titleText}</strong>
-          <span>{colon}{restOfLine}</span>
-        </div>
-      );
-    } else {
-      // Vérifier d'autres formats de titres avec **
-      // Format 2: "**Titre**:" ou "**Titre** :"
-      const simpleTitleRegex = /^(\*\*([^*]+)\*\*)(\s*:)?(.*)$/;
-      const simpleMatch = line.match(simpleTitleRegex);
-      
-      if (simpleMatch) {
-        // C'est un titre simple avec **
-        const titleText = simpleMatch[2];        // le texte du titre sans les **
-        const colon = simpleMatch[3] || '';      // les deux points (optionnels)
-        const restOfLine = simpleMatch[4] || ''; // le reste de la ligne après le titre
-        
-        processedLines.push(
-          <div key={`line-${i}`}>
-            <strong className="font-bold">{titleText}</strong>
-            <span>{colon}{restOfLine}</span>
-          </div>
-        );
-      } else {
-        // Vérifier si la ligne contient des ** à l'intérieur (pas en début de ligne)
-        const inlineBoldRegex = /\*\*([^*]+)\*\*/g;
-        let inlineMatch;
-        let inlineParts: React.ReactNode[] = [];
-        let inlineLastIndex = 0;
-        
-        // Rechercher toutes les occurrences de texte en gras dans la ligne
-        while ((inlineMatch = inlineBoldRegex.exec(line)) !== null) {
-          // Ajouter le texte avant le gras
-          if (inlineMatch.index > inlineLastIndex) {
-            inlineParts.push(line.substring(inlineLastIndex, inlineMatch.index));
-          }
-          
-          // Ajouter le texte en gras
-          inlineParts.push(
-            <strong key={`inline-${inlineMatch.index}`} className="font-bold">
-              {inlineMatch[1]}
-            </strong>
+  // Remplacer les sauts de ligne double par un marqueur pour préserver les paragraphes
+  const paragraphMarker = "||PARAGRAPH_BREAK||";
+  let processedText = text.replace(/\n\n/g, paragraphMarker);
+  
+  // Traiter les titres en gras à l'intérieur du texte
+  const boldRegex = /\*\*([^*]+)\*\*/g;
+  processedText = processedText.replace(boldRegex, '<strong>$1</strong>');
+  
+  // Traiter les numérotations et les titres spéciaux
+  const numberedTitleRegex = /^(\d+\.\s*)(\*\*([^*]+)\*\*)(\s*:)?(.*)$/gm;
+  processedText = processedText.replace(numberedTitleRegex, '$1<strong>$3</strong>$4$5');
+  
+  // Diviser en paragraphes et créer les éléments JSX
+  const paragraphs = processedText.split(paragraphMarker);
+  
+  return (
+    <div className="text-content">
+      {paragraphs.map((paragraph, index) => {
+        // Vérifier si le paragraphe contient du HTML (des balises <strong>)
+        if (paragraph.includes("<strong>")) {
+          // Créer un paragraphe avec dangerouslySetInnerHTML
+          return (
+            <p key={`p-${index}`} 
+               className="paragraph mb-2" 
+               dangerouslySetInnerHTML={{ __html: paragraph }} />
           );
-          
-          inlineLastIndex = inlineMatch.index + inlineMatch[0].length;
+        } else {
+          // Paragraphe simple sans formatage
+          return (
+            <p key={`p-${index}`} className="paragraph mb-2">
+              {paragraph}
+            </p>
+          );
         }
-        
-        // Ajouter le reste de la ligne
-        if (inlineLastIndex < line.length) {
-          inlineParts.push(line.substring(inlineLastIndex));
-        }
-        
-        // S'il y avait du texte en gras, utiliser les parts; sinon, utiliser la ligne entière
-        processedLines.push(
-          inlineParts.length > 0 
-            ? <div key={`line-${i}`}>{inlineParts}</div>
-            : <div key={`line-${i}`}>{line}</div>
-        );
-      }
-    }
-  }
-  
-  return processedLines;
+      })}
+    </div>
+  );
 };
 
 /**

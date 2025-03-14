@@ -1,5 +1,5 @@
 /**
- * Styles spécifiques pour les équations mathématiques
+ * Styles spécifiques pour les équations mathématiques et le formatage de texte
  */
 
 /* Styles de base pour le conteneur MathJax */
@@ -7,6 +7,28 @@
   font-size: 1rem;
   line-height: 1.6;
   color: #333;
+}
+
+/* Résoudre le problème de caractères sur des lignes séparées */
+.math-renderer p, 
+.math-renderer .paragraph,
+.math-renderer span.inline,
+.math-renderer .normal-text,
+.math-renderer .text-paragraph,
+.math-renderer .text-content {
+  display: inline-block;
+  white-space: normal;
+  width: 100%;
+}
+
+/* Forcer le texte à rester sur la même ligne */
+.math-renderer * {
+  white-space: normal;
+}
+
+/* Rétablir le passage à la ligne pour certains éléments */
+.math-renderer pre.hljs-pre {
+  white-space: pre;
 }
 
 /* Espacement des équations en block */
@@ -19,6 +41,7 @@
 /* Style pour les équations inline */
 .MathJax {
   font-size: 1.1em;
+  display: inline !important;
 }
 
 /* Style amélioré pour les équations display (block) */
@@ -79,9 +102,19 @@ pre.hljs-pre {
   margin-bottom: 0.5em;
 }
 
+/* Style pour la mise en page normale du texte */
+.normal-text {
+  display: block;
+  margin-bottom: 1em;
+}
+
+/* Style pour les paragraphes normaux */
+.paragraph {
+  margin-bottom: 0.5em;
+}
+
 /* Séparation claire entre les équations et le texte */
 .whitespace-pre-wrap {
-  white-space: pre-wrap;
   word-break: break-word;
 }
 
