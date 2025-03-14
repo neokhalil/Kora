@@ -1,63 +1,42 @@
 /**
- * Utilitaire pour formater correctement les notations mathématiques
+ * Utilitaire simplifié pour le traitement des formules mathématiques
  */
 
 /**
- * Formate les commandes LaTeX pour une meilleure compatibilité
+ * Corrige les délimiteurs mathématiques pour garantir une bonne reconnaissance par MathJax
  */
 export function formatMathContent(content: string): string {
   if (!content) return content;
   
-  // Isoler les blocs de code pour éviter de modifier le contenu à l'intérieur
+  // Protéger les blocs de code
   const codeBlocks: string[] = [];
-  let codeProtectedContent = content.replace(/```[\s\S]*?```/g, (match) => {
+  let processedContent = content.replace(/```[\s\S]*?```/g, (match) => {
     codeBlocks.push(match);
     return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
   });
   
-  // Convertir les notations mathématiques alternatives en standard MathJax
-  let processedContent = codeProtectedContent
-    // Convertir \[ ... \] en $$...$$
+  // 1. Remplacer les délimiteurs LaTeX alternatifs par leur équivalent MathJax
+  processedContent = processedContent
     .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
-    // Convertir \( ... \) en $...$
     .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
   
-  // Corrections pour les commandes LaTeX mal formatées
+  // 2. Correction des commandes LaTeX courantes
   processedContent = processedContent
-    // Corriger les indices pour les logarithmes
-    .replace(/\\log_([0-9]+)/g, '\\log_{$1}')
-    .replace(/\\log\_([0-9]+)/g, '\\log_{$1}')
-    // Ajouter des accolades pour les fractions
     .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
-    // Ajouter des accolades pour les racines carrées
     .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
-    // Améliorer les indices et exposants
     .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
     .replace(/\^([a-zA-Z0-9])/g, '^{$1}');
-    
-  // Préserver les espaces dans les formules mathématiques
+  
+  // 3. Balises spécifiques pour résoudre les problèmes d'affichage
   processedContent = processedContent
-    .replace(/([^\s\\])\$\$/g, '$1 $$')
-    .replace(/\$\$([^\s\\])/g, '$$ $1')
-    .replace(/([^\s\\])\$/g, '$1 $')
-    .replace(/\$([^\s\\])/g, '$ $1');
-    
-  // Nettoyer les espaces superflus
-  processedContent = processedContent
-    .replace(/\$ /g, '$')
-    .replace(/ \$/g, '$')
-    .replace(/\$\$ /g, '$$')
-    .replace(/ \$\$/g, '$$');
-    
-  // Améliorer le rendu des équations en bloc en ajoutant \displaystyle
-  processedContent = processedContent
+    // Ajouter displaystyle pour les équations en bloc
     .replace(/\$\$(?!\s*\\displaystyle)/g, '$$\\displaystyle ');
     
-  // Restaurer les blocs de code
+  // 4. Restaurer les blocs de code
   processedContent = processedContent.replace(/__CODE_BLOCK_(\d+)__/g, (match, index) => {
     return codeBlocks[parseInt(index)];
   });
-  
+    
   return processedContent;
 }
 
@@ -66,37 +45,18 @@ export function formatMathContent(content: string): string {
  */
 export function containsMathFormulas(text: string): boolean {
   if (!text) return false;
-  
-  // Détecter les différentes notations mathématiques
   return /\$|\\\(|\\\[|\\begin\{/g.test(text);
 }
 
 /**
- * Nettoie les entrées mathématiques pour éviter les erreurs de rendu
+ * Nettoie et corrige les problèmes de syntaxe dans les formules mathématiques
  */
 export function sanitizeMathInput(input: string): string {
   if (!input) return input;
   
-  let sanitized = input;
-  
-  // Corriger les commandes mathématiques mal formatées
-  sanitized = sanitized
+  // Version simplifiée qui corrige uniquement les problèmes essentiels
+  return input
+    // Corriger les commandes mathématiques courantes
     .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
-    .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
-    .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
-    .replace(/\^([a-zA-Z0-9])/g, '^{$1}');
-  
-  // Corriger des problèmes spécifiques avec les délimiteurs
-  const openInline = (sanitized.match(/\$/g) || []).length;
-  if (openInline % 2 !== 0) {
-    // Si nombre impair de $ - ajouter un $ à la fin pour fermer
-    sanitized += ' $';
-  }
-  
-  // Assurer que les délimiteurs sont bien séparés du texte
-  sanitized = sanitized
-    .replace(/([^\s\\])\$/g, '$1 $')
-    .replace(/\$([^\s\\])/g, '$ $1');
-  
-  return sanitized;
+    .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}');
 }
