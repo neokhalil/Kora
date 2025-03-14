@@ -1,89 +1,65 @@
-/**
- * Styles pour le rendu des expressions mathématiques et du code
- */
+/* Math and Code Component Styles */
 
-/* Styles pour KaTeX */
+/* KaTeX wrapper styles */
+.katex-inline-wrapper {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.15em;
+  vertical-align: middle;
+}
+
 .katex-block-wrapper {
-  margin: 1.5rem 0;
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.katex {
-  font-size: 1.1em;
-  text-rendering: optimizeLegibility;
-}
-
-.katex-display > .katex {
   display: block;
+  margin: 1em 0;
+  overflow-x: auto;
   text-align: center;
-  white-space: nowrap;
 }
 
+/* Error display for KaTeX */
 .katex-error {
   color: #f44336;
-  border-bottom: 1px dotted #f44336;
-  cursor: help;
-  padding: 0 3px;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-family: monospace;
 }
 
-/* Styles pour les blocs de code */
+/* Code block styling */
 .code-block-wrapper {
-  margin: 1.5rem 0;
+  margin: 1.5em 0;
   border-radius: 0.375rem;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.code-block-wrapper pre {
-  margin: 0;
-  padding: 1rem;
-  overflow-x: auto;
-  background-color: rgba(0, 0, 0, 0.03); /* Light background for light mode */
-}
-
-.dark .code-block-wrapper pre {
-  background-color: rgba(0, 0, 0, 0.2); /* Darker background for dark mode */
 }
 
 .code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #2d3748;
+  color: #e2e8f0;
   padding: 0.5rem 1rem;
-  background-color: rgba(0, 0, 0, 0.05);
   font-size: 0.75rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.dark .code-header {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .copy-button {
-  cursor: pointer;
   background: none;
   border: none;
-  color: inherit;
-  font: inherit;
-  padding: 2px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s, color 0.2s;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s;
 }
 
 .copy-button:hover {
-  background-color: rgba(0, 0, 0, 0.1);
+  color: #90cdf4;
 }
 
-.dark .copy-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* Styles pour le composant ContentRenderer */
+/* Content renderer general styles */
 .content-renderer {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   line-height: 1.6;
-  word-break: break-word;
+  color: #2d3748;
 }
 
 .content-renderer h1,
@@ -92,42 +68,59 @@
 .content-renderer h4,
 .content-renderer h5,
 .content-renderer h6 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
   font-weight: 600;
-}
-
-.content-renderer strong {
-  font-weight: 600;
-}
-
-.content-renderer em {
-  font-style: italic;
+  line-height: 1.25;
 }
 
 .content-renderer ul,
 .content-renderer ol {
-  margin: 1rem 0;
-  padding-left: 2rem;
+  margin-left: 1.5em;
+  margin-bottom: 1em;
 }
 
 .content-renderer li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5em;
 }
 
-/* Responsive adjustments */
-@media (max-width: 640px) {
-  .katex {
-    font-size: 1em;
-  }
-  
-  .code-block-wrapper pre {
-    font-size: 0.75rem;
-    padding: 0.75rem;
-  }
-  
-  .code-header {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.7rem;
-  }
+.content-renderer pre {
+  border-radius: 0.375rem;
+  background-color: #1a202c;
+  color: #e2e8f0;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.content-renderer code {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+/* Line numbers for code blocks */
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  font-size: 100%;
+  left: -3.8em;
+  width: 3em;
+  letter-spacing: -1px;
+  border-right: 1px solid #999;
+  user-select: none;
+}
+
+.line-numbers-rows > span {
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+  content: counter(linenumber);
+  color: #999;
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
 }

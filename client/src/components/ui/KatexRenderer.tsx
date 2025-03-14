@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
@@ -26,30 +26,20 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
   errorColor = '#f44336',
   renderError
 }) => {
-  const [cleanFormula, setCleanFormula] = useState(formula);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Nettoyer la formule pour éviter les erreurs courantes
-    let cleaned = formula || '';
+  // Nettoyer la formule pour éviter les erreurs courantes
+  const cleanFormula = formula
+    // Remplacer les fractions sans accolades
+    .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
     
-    // Remplacer les caractères problématiques
-    cleaned = cleaned
-      // Remplacer les fractions sans accolades
-      .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
-      
-      // Remplacer les racines carrées sans accolades
-      .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
-      
-      // Ajouter des accolades aux indices et exposants
-      .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
-      .replace(/\^([a-zA-Z0-9])/g, '^{$1}')
-      
-      // Vérifier l'équilibre des accolades
-      .trim();
-      
-    setCleanFormula(cleaned);
-  }, [formula]);
+    // Remplacer les racines carrées sans accolades
+    .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
+    
+    // Ajouter des accolades aux indices et exposants
+    .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
+    .replace(/\^([a-zA-Z0-9])/g, '^{$1}')
+    
+    // Nettoyer les espaces superflus
+    .trim();
 
   // Fonction personnalisée pour gérer les erreurs de rendu
   const handleError = (error: any) => {
@@ -71,10 +61,7 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
   };
 
   return (
-    <div 
-      ref={containerRef}
-      className={`katex-${display ? 'block' : 'inline'}-wrapper ${className}`}
-    >
+    <div className={`katex-${display ? 'block' : 'inline'}-wrapper ${className}`}>
       {display ? (
         <BlockMath 
           math={cleanFormula} 

@@ -17,9 +17,6 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
     return null;
   }
   
-  // Diviser le contenu en segments (texte, formules mathématiques, et code)
-  const segments = segmentTextWithMath(content);
-  
   // Formatter le contenu texte normal (appliquer les styles Markdown, liens, etc.)
   const formatTextContent = (text: string): JSX.Element => {
     // Remplacer les sauts de ligne par des <br />
@@ -45,53 +42,56 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
     return <span dangerouslySetInnerHTML={{ __html: withMarkdown }} />;
   };
   
-  // Rendre chaque segment selon son type
-  const renderedSegments = segments.map((segment: MathSegment, index: number) => {
-    switch (segment.type) {
-      case 'inline-math':
-        return (
-          <KatexRenderer
-            key={`math-${index}`}
-            formula={sanitizeFormula(segment.content)}
-            display={false}
-          />
-        );
-        
-      case 'block-math':
-        return (
-          <KatexRenderer
-            key={`math-block-${index}`}
-            formula={sanitizeFormula(segment.content)}
-            display={true}
-            className="my-4"
-          />
-        );
-        
-      case 'code':
-        const { language, code } = parseCodeBlock(segment.content);
-        return (
-          <CodeBlock
-            key={`code-${index}`}
-            code={code}
-            language={language}
-            showLineNumbers={true}
-            showCopyButton={true}
-          />
-        );
-        
-      case 'text':
-      default:
-        return (
-          <React.Fragment key={`text-${index}`}>
-            {formatTextContent(segment.content)}
-          </React.Fragment>
-        );
+  // Diviser le contenu en segments (texte, formules mathématiques, et code)
+  const segments = segmentTextWithMath(content);
+  
+  // Préparer le rendu des segments
+  const renderedContent = segments.map((segment: MathSegment, index: number) => {
+    if (segment.type === 'inline-math') {
+      return (
+        <KatexRenderer
+          key={`math-${index}`}
+          formula={sanitizeFormula(segment.content)}
+          display={false}
+        />
+      );
     }
+    
+    if (segment.type === 'block-math') {
+      return (
+        <KatexRenderer
+          key={`math-block-${index}`}
+          formula={sanitizeFormula(segment.content)}
+          display={true}
+          className="my-4"
+        />
+      );
+    }
+    
+    if (segment.type === 'code') {
+      const { language, code } = parseCodeBlock(segment.content);
+      return (
+        <CodeBlock
+          key={`code-${index}`}
+          code={code}
+          language={language}
+          showLineNumbers={true}
+          showCopyButton={true}
+        />
+      );
+    }
+    
+    // Segment text par défaut
+    return (
+      <React.Fragment key={`text-${index}`}>
+        {formatTextContent(segment.content)}
+      </React.Fragment>
+    );
   });
   
   return (
     <div className={`content-renderer ${className}`}>
-      {renderedSegments}
+      {renderedContent}
     </div>
   );
 };
