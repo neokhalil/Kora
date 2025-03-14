@@ -51,9 +51,19 @@
 .math-renderer pre,
 .math-renderer .math-block,
 .math-renderer .step-result,
-.math-renderer .possible-equation {
+.math-renderer .possible-equation,
+.math-renderer .instruction-step,
+.math-renderer .list-item {
   display: block !important;
   margin: 0.8em 0;
+}
+
+/* Indentation spécifique pour les éléments de liste et instructions */
+.math-renderer .instruction-step,
+.math-renderer .list-item {
+  margin-left: 1.5em;
+  padding-left: 0.5em;
+  border-left: 2px solid #eaeaea;
 }
 
 /* Formater les numéros qui pourraient être des résultats d'équations */
