@@ -101,3 +101,30 @@ export const scheduleScroll = (options: ScrollOptions = {}) => {
     scrollToBottom({ ...options, immediate: true });
   }, delay);
 };
+
+/**
+ * Fonction de remplacement pour requestAnimationFrame
+ * Utilisée pour standardiser le comportement de défilement après le rendu
+ * Remplace les blocs requestAnimationFrame dispersés dans le code
+ * 
+ * @param options Options de défilement optionnelles
+ */
+export const scrollAfterRender = (options: ScrollOptions = {}) => {
+  requestAnimationFrame(() => {
+    const target = options.target || document.querySelector('.scroll-anchor') || document.querySelector('.web-conversation-container');
+    if (!target) return;
+    
+    const behavior = isMobileDevice() ? 'auto' : (options.behavior || 'smooth');
+    target.scrollIntoView({ 
+      behavior, 
+      block: 'end' 
+    });
+    
+    // Double défilement pour s'assurer que le contenu est rendu
+    scheduleScroll({ 
+      ...options, 
+      target,
+      behavior
+    });
+  });
+};
