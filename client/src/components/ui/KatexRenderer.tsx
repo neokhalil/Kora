@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 
@@ -63,47 +63,69 @@ function renderFormattedContent(text: string): React.ReactNode {
 
 /**
  * Formate le texte avec prise en charge des expressions mathématiques
- * Supporte les formules entre $$ et $ (block et inline)
+ * Supporte à la fois $ et \[ pour les expressions mathématiques
  */
 function formatTextWithMath(text: string): React.ReactNode[] {
-  // Patterns pour les formules mathématiques:
-  // 1. Formules en bloc - entre $$
-  // 2. Formules inline - entre $
-  const mathPattern = /(\$\$(.*?)\$\$)|(\$(.*?)\$)/gs;
-  
   const parts: React.ReactNode[] = [];
-  let lastIndex = 0;
-  let match;
   
-  // Parcourt toutes les correspondances dans le texte
-  while ((match = mathPattern.exec(text)) !== null) {
-    // Texte avant la formule mathématique
-    if (match.index > lastIndex) {
-      parts.push(formatTextWithStyles(text.substring(lastIndex, match.index)));
+  // Phase 1: Traiter directement le texte pour trouver et remplacer les délimiteurs \[ \]
+  // En utilisant un marqueur temporaire
+  const tempText = text.replace(/\\\[(.*?)\\\]/gs, (match, formula) => {
+    // Ajouter directement un élément React à la liste des parties
+    parts.push(<BlockMath key={`block-${Math.random()}`} math={formula} />);
+    // Remplacer par un marqueur unique qui ne sera pas affiché
+    return `__BLOCK_MATH_PLACEHOLDER_${parts.length - 1}__`;
+  });
+  
+  // Phase 2: Traiter les délimiteurs $$ $$
+  const updatedText = tempText.replace(/\$\$(.*?)\$\$/gs, (match, formula) => {
+    parts.push(<BlockMath key={`block-${Math.random()}`} math={formula} />);
+    return `__BLOCK_MATH_PLACEHOLDER_${parts.length - 1}__`;
+  });
+  
+  // Phase 3: Traiter les délimiteurs \( \)
+  const updatedText2 = updatedText.replace(/\\\((.*?)\\\)/gs, (match, formula) => {
+    parts.push(<InlineMath key={`inline-${Math.random()}`} math={formula} />);
+    return `__INLINE_MATH_PLACEHOLDER_${parts.length - 1}__`;
+  });
+  
+  // Phase 4: Traiter les délimiteurs $ $
+  const finalText = updatedText2.replace(/\$(.*?)\$/gs, (match, formula) => {
+    parts.push(<InlineMath key={`inline-${Math.random()}`} math={formula} />);
+    return `__INLINE_MATH_PLACEHOLDER_${parts.length - 1}__`;
+  });
+  
+  // Maintenant formatTextWithStyles pour le texte restant
+  const formattedText = formatTextWithStyles(finalText);
+  
+  // Construire un tableau de tous les éléments dans le bon ordre
+  const result: React.ReactNode[] = [];
+  let currentIndex = 0;
+  
+  // Traiter le texte et remplacer les marqueurs par les éléments React correspondants
+  const textContent = (formattedText.props as any).dangerouslySetInnerHTML.__html;
+  const segments = textContent.split(/__(?:BLOCK|INLINE)_MATH_PLACEHOLDER_(\d+)__/);
+  
+  for (let i = 0; i < segments.length; i++) {
+    if (segments[i]) {
+      if (i % 2 === 0) {
+        // Segment de texte normal
+        result.push(
+          <span key={`text-${i}`} dangerouslySetInnerHTML={{ __html: segments[i] }} />
+        );
+      } else {
+        // Référence à une formule mathématique
+        const partIndex = parseInt(segments[i], 10);
+        if (!isNaN(partIndex) && partIndex < parts.length) {
+          result.push(React.cloneElement(parts[partIndex] as React.ReactElement, {
+            key: `math-${i}`
+          }));
+        }
+      }
     }
-    
-    // Détermine si c'est une formule en bloc ou inline
-    if (match[1]) { // Formule en bloc ($$...$$)
-      const mathContent = match[2];
-      parts.push(
-        <BlockMath key={`math-${match.index}`} math={mathContent} />
-      );
-    } else if (match[3]) { // Formule inline ($...$)
-      const mathContent = match[4];
-      parts.push(
-        <InlineMath key={`math-${match.index}`} math={mathContent} />
-      );
-    }
-    
-    lastIndex = match.index + match[0].length;
   }
   
-  // Ajoute le reste du texte après la dernière formule
-  if (lastIndex < text.length) {
-    parts.push(formatTextWithStyles(text.substring(lastIndex)));
-  }
-  
-  return parts;
+  return result;
 }
 
 /**
