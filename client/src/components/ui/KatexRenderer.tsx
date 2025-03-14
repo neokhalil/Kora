@@ -8,13 +8,11 @@ interface TextContentProps {
 }
 
 /**
- * Composant de rendu pour le texte et les formules mathématiques utilisant KaTeX
- * Cette implémentation est plus légère et plus performante que MathJax
+ * Composant pour le rendu des expressions mathématiques et du texte
  */
 const KatexRenderer: React.FC<TextContentProps> = ({ content, className = '' }) => {
   if (!content) return null;
 
-  // Render le contenu en séparant les formules mathématiques du texte
   return (
     <div className={`katex-content ${className}`}>
       {renderFormattedContent(content)}
@@ -23,103 +21,159 @@ const KatexRenderer: React.FC<TextContentProps> = ({ content, className = '' }) 
 };
 
 /**
- * Render le contenu d'un paragraphe avec prise en charge des formules mathématiques
- * et du formatage de base
+ * Render le contenu formaté avec séparation des paragraphes
  */
 function renderFormattedContent(text: string): React.ReactNode {
-  // Découper le texte en sections par les sauts de ligne
+  // Découpe le texte en sections (paragraphes)
   const sections = text.split('\n\n');
   
-  // Transforme chaque section en paragraphe formaté
   return sections.map((section, index) => {
-    // Vérifie si c'est un titre
+    // Traitement des titres
     if (section.startsWith('# ')) {
-      return <h1 key={index} className="text-2xl font-bold mb-4">{formatTextWithMath(section.substring(2))}</h1>;
+      return <h1 key={index} className="text-2xl font-bold mb-4">{processContentWithMath(section.substring(2))}</h1>;
     } else if (section.startsWith('## ')) {
-      return <h2 key={index} className="text-xl font-bold mb-3">{formatTextWithMath(section.substring(3))}</h2>;
+      return <h2 key={index} className="text-xl font-bold mb-3">{processContentWithMath(section.substring(3))}</h2>;
     } else if (section.startsWith('### ')) {
-      return <h3 key={index} className="text-lg font-bold mb-2">{formatTextWithMath(section.substring(4))}</h3>;
+      return <h3 key={index} className="text-lg font-bold mb-2">{processContentWithMath(section.substring(4))}</h3>;
     }
 
-    // Traite les listes
+    // Traitement des listes
     if (section.match(/^[*-] /m)) {
       const items = section.split('\n').filter(line => line.trim().length > 0);
       return (
         <ul key={index} className="list-disc pl-5 mb-4">
           {items.map((item, idx) => {
             if (item.startsWith('* ') || item.startsWith('- ')) {
-              return <li key={idx}>{formatTextWithMath(item.substring(2))}</li>;
+              return <li key={idx}>{processContentWithMath(item.substring(2))}</li>;
             }
-            return <li key={idx}>{formatTextWithMath(item)}</li>;
+            return <li key={idx}>{processContentWithMath(item)}</li>;
           })}
         </ul>
       );
     }
 
-    // Par défaut, renvoie un paragraphe
-    return <p key={index} className="mb-4">{formatTextWithMath(section)}</p>;
+    // Par défaut, c'est un paragraphe
+    return <p key={index} className="mb-4">{processContentWithMath(section)}</p>;
   });
 }
 
 /**
- * Formate le texte avec prise en charge des expressions mathématiques
- * Supporte à la fois $ et \[ pour les expressions mathématiques
+ * Traite un segment de texte et remplace les expressions mathématiques
+ * par des composants React appropriés
  */
-function formatTextWithMath(text: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  
-  // Phase 1: Traiter directement le texte pour trouver et remplacer les délimiteurs \[ \]
-  // En utilisant un marqueur temporaire
-  const tempText = text.replace(/\\\[(.*?)\\\]/gs, (match, formula) => {
-    // Ajouter directement un élément React à la liste des parties
-    parts.push(<BlockMath key={`block-${Math.random()}`} math={formula} />);
-    // Remplacer par un marqueur unique qui ne sera pas affiché
-    return `__BLOCK_MATH_PLACEHOLDER_${parts.length - 1}__`;
-  });
-  
-  // Phase 2: Traiter les délimiteurs $$ $$
-  const updatedText = tempText.replace(/\$\$(.*?)\$\$/gs, (match, formula) => {
-    parts.push(<BlockMath key={`block-${Math.random()}`} math={formula} />);
-    return `__BLOCK_MATH_PLACEHOLDER_${parts.length - 1}__`;
-  });
-  
-  // Phase 3: Traiter les délimiteurs \( \)
-  const updatedText2 = updatedText.replace(/\\\((.*?)\\\)/gs, (match, formula) => {
-    parts.push(<InlineMath key={`inline-${Math.random()}`} math={formula} />);
-    return `__INLINE_MATH_PLACEHOLDER_${parts.length - 1}__`;
-  });
-  
-  // Phase 4: Traiter les délimiteurs $ $
-  const finalText = updatedText2.replace(/\$(.*?)\$/gs, (match, formula) => {
-    parts.push(<InlineMath key={`inline-${Math.random()}`} math={formula} />);
-    return `__INLINE_MATH_PLACEHOLDER_${parts.length - 1}__`;
-  });
-  
-  // Maintenant formatTextWithStyles pour le texte restant
-  const formattedText = formatTextWithStyles(finalText);
-  
-  // Construire un tableau de tous les éléments dans le bon ordre
+function processContentWithMath(text: string): React.ReactNode[] {
   const result: React.ReactNode[] = [];
-  let currentIndex = 0;
   
-  // Traiter le texte et remplacer les marqueurs par les éléments React correspondants
-  const textContent = (formattedText.props as any).dangerouslySetInnerHTML.__html;
-  const segments = textContent.split(/__(?:BLOCK|INLINE)_MATH_PLACEHOLDER_(\d+)__/);
+  // Tableau de règles de délimiteurs math à traiter
+  const mathRules = [
+    { 
+      pattern: /\\\[(.*?)\\\]/gs, 
+      processMatch: (content: string, key: string) => <BlockMath key={key} math={content} /> 
+    },
+    { 
+      pattern: /\$\$(.*?)\$\$/gs, 
+      processMatch: (content: string, key: string) => <BlockMath key={key} math={content} /> 
+    },
+    { 
+      pattern: /\\\((.*?)\\\)/gs, 
+      processMatch: (content: string, key: string) => <InlineMath key={key} math={content} /> 
+    },
+    { 
+      pattern: /\$(.*?)\$/gs, 
+      processMatch: (content: string, key: string) => <InlineMath key={key} math={content} /> 
+    }
+  ];
   
+  // On va traiter une section à la fois, en gardant le texte intermédiaire
+  let currentText = text;
+  let segments: { type: 'text' | 'math'; content: string; originalMatch?: string }[] = [];
+  
+  // Fonction pour trouver le prochain délimiteur math dans le texte
+  function findNextMathDelimiter() {
+    let firstMatch: { index: number; length: number; content: string; rule: typeof mathRules[0] } | null = null;
+    
+    // Chercher la première correspondance parmi toutes les règles
+    for (const rule of mathRules) {
+      rule.pattern.lastIndex = 0; // Réinitialiser le pointeur de recherche
+      const match = rule.pattern.exec(currentText);
+      if (match && (firstMatch === null || match.index < firstMatch.index)) {
+        firstMatch = {
+          index: match.index,
+          length: match[0].length,
+          content: match[1], // Le contenu capturé
+          rule: rule
+        };
+      }
+    }
+    
+    return firstMatch;
+  }
+  
+  // Tant qu'il y a des délimiteurs math, on les traite
+  let nextMatch = findNextMathDelimiter();
+  let lastIndex = 0;
+  
+  while (nextMatch !== null) {
+    // Traiter le texte avant le délimiteur
+    if (nextMatch.index > lastIndex) {
+      segments.push({
+        type: 'text',
+        content: currentText.substring(lastIndex, nextMatch.index)
+      });
+    }
+    
+    // Traiter le délimiteur math
+    segments.push({
+      type: 'math',
+      content: nextMatch.content,
+      originalMatch: currentText.substring(nextMatch.index, nextMatch.index + nextMatch.length)
+    });
+    
+    // Mettre à jour l'index pour la prochaine recherche
+    lastIndex = nextMatch.index + nextMatch.length;
+    
+    // Chercher le prochain délimiteur
+    nextMatch = findNextMathDelimiter();
+  }
+  
+  // Traiter le texte restant
+  if (lastIndex < currentText.length) {
+    segments.push({
+      type: 'text',
+      content: currentText.substring(lastIndex)
+    });
+  }
+  
+  // Maintenant, on transforme les segments en composants React
   for (let i = 0; i < segments.length; i++) {
-    if (segments[i]) {
-      if (i % 2 === 0) {
-        // Segment de texte normal
-        result.push(
-          <span key={`text-${i}`} dangerouslySetInnerHTML={{ __html: segments[i] }} />
-        );
-      } else {
-        // Référence à une formule mathématique
-        const partIndex = parseInt(segments[i], 10);
-        if (!isNaN(partIndex) && partIndex < parts.length) {
-          result.push(React.cloneElement(parts[partIndex] as React.ReactElement, {
-            key: `math-${i}`
-          }));
+    const segment = segments[i];
+    
+    if (segment.type === 'text') {
+      // Traiter le formatage de texte basique
+      result.push(
+        <span 
+          key={`text-${i}`} 
+          dangerouslySetInnerHTML={{ __html: formatTextWithStyles(segment.content) }} 
+        />
+      );
+    } else if (segment.type === 'math' && segment.originalMatch) {
+      // Trouver quelle règle s'applique
+      for (const rule of mathRules) {
+        rule.pattern.lastIndex = 0;
+        if (rule.pattern.test(segment.originalMatch)) {
+          try {
+            // Créer le composant pour cette formule
+            result.push(rule.processMatch(segment.content, `math-${i}`));
+            break;
+          } catch (error) {
+            console.error('Erreur KaTeX:', error);
+            // En cas d'erreur, afficher le code brut
+            result.push(
+              <code key={`math-error-${i}`} style={{ color: 'red' }}>
+                {segment.originalMatch}
+              </code>
+            );
+          }
         }
       }
     }
@@ -129,11 +183,9 @@ function formatTextWithMath(text: string): React.ReactNode[] {
 }
 
 /**
- * Applique le formatage de texte de base (gras, italique, etc.)
+ * Applique le formatage basique au texte (gras, italique, etc.)
  */
-function formatTextWithStyles(text: string): React.ReactNode {
-  // Trouver toutes les occurrences de formatage:
-  
+function formatTextWithStyles(text: string): string {
   // ** pour le gras
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
@@ -149,8 +201,7 @@ function formatTextWithStyles(text: string): React.ReactNode {
   // ` pour le code inline
   text = text.replace(/`(.*?)`/g, '<code>$1</code>');
   
-  // Créer un élément span avec HTML interprété
-  return <span dangerouslySetInnerHTML={{ __html: text }} />;
+  return text;
 }
 
 export default KatexRenderer;
