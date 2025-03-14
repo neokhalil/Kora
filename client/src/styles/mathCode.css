@@ -74,20 +74,68 @@
   background: transparent;
 }
 
-/* Syntax highlighting for code */
-.language-python .token.keyword { color: #ff79c6; }
-.language-python .token.function { color: #50fa7b; }
-.language-python .token.string { color: #f1fa8c; }
-.language-python .token.comment { color: #6272a4; }
-.language-python .token.number { color: #bd93f9; }
-.language-python .token.operator { color: #ff79c6; }
+/* Syntax highlighting for code with more vivid colors */
+/* Python syntax highlighting */
+.language-python .token.keyword { color: #ff5f9f; font-weight: bold; text-shadow: none; }
+.language-python .token.function { color: #00ff7f; font-weight: bold; text-shadow: none; }
+.language-python .token.string { color: #ffff00; text-shadow: none; }
+.language-python .token.comment { color: #7986cb; text-shadow: none; }
+.language-python .token.number { color: #b388ff; text-shadow: none; }
+.language-python .token.operator { color: #ff5f9f; text-shadow: none; }
+.language-python .token.punctuation { color: #e1e1e1; text-shadow: none; }
+.language-python .token.builtin { color: #00ffff; text-shadow: none; }
 
-.language-javascript .token.keyword { color: #ff79c6; }
-.language-javascript .token.function { color: #50fa7b; }
-.language-javascript .token.string { color: #f1fa8c; }
-.language-javascript .token.comment { color: #6272a4; }
-.language-javascript .token.number { color: #bd93f9; }
-.language-javascript .token.operator { color: #ff79c6; }
+/* JavaScript syntax highlighting */
+.language-javascript .token.keyword { color: #ff5f9f; font-weight: bold; text-shadow: none; }
+.language-javascript .token.function { color: #00ff7f; font-weight: bold; text-shadow: none; }
+.language-javascript .token.string { color: #ffff00; text-shadow: none; }
+.language-javascript .token.comment { color: #7986cb; text-shadow: none; }
+.language-javascript .token.number { color: #b388ff; text-shadow: none; }
+.language-javascript .token.operator { color: #ff5f9f; text-shadow: none; }
+.language-javascript .token.punctuation { color: #e1e1e1; text-shadow: none; }
+.language-javascript .token.property { color: #80cbc4; text-shadow: none; }
+
+/* General token styling for all languages */
+.token { 
+  text-shadow: none !important; 
+  background: transparent !important; 
+  font-weight: normal;
+  opacity: 1 !important;
+}
+
+/* Suppression des effets de surexposition/transparence */
+code[class*="language-"], 
+pre[class*="language-"] {
+  text-shadow: none !important;
+  background-color: #1a202c !important;
+  border: none !important;
+}
+
+/* Forcer le style sur tous les éléments du code */
+.code-block-wrapper pre .token,
+.code-block-wrapper code .token,
+code[class*="language-"] .token,
+pre[class*="language-"] .token {
+  text-shadow: none !important;
+  background: transparent !important;
+  opacity: 1 !important;
+  border: none !important;
+  font-style: normal;
+}
+
+/* Renforcer les couleurs pour être plus vives */
+.language-python .token,
+.language-javascript .token,
+.token {
+  filter: brightness(1.2) !important;
+}
+
+/* Prévenir les sélecteurs de Prism.js qui pourraient avoir une spécificité plus élevée */
+[class].token, .token[class], 
+[class][class].token, .token[class][class] {
+  text-shadow: none !important;
+  background: transparent !important;
+}
 
 /* Content renderer general styles */
 .content-renderer {

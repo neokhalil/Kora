@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Prism from 'prismjs';
-import 'prismjs/themes/prism.css';
+// Ne pas importer le thème par défaut de Prism - nous utilisons notre propre CSS
+// import 'prismjs/themes/prism.css';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
@@ -66,10 +67,44 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 
   const prismLanguage = languageMap[supportedLanguage] || supportedLanguage;
 
+  // Suppression des effets de surexposition
+useEffect(() => {
+    // Cette fonction s'exécute une seule fois au montage du composant
+    const style = document.createElement('style');
+    style.innerHTML = `
+      code[class*="language-"], pre[class*="language-"] {
+        text-shadow: none !important;
+        background: transparent !important;
+      }
+      .token {
+        text-shadow: none !important;
+        background: transparent !important;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Nettoyage lors du démontage
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   useEffect(() => {
     // Appliquer la coloration syntaxique
     if (codeRef.current) {
       Prism.highlightElement(codeRef.current);
+      
+      // Nettoyer les styles en ligne indésirables après highlight
+      if (codeRef.current.querySelectorAll) {
+        const tokens = codeRef.current.querySelectorAll('.token');
+        tokens.forEach(token => {
+          if (token instanceof HTMLElement) {
+            // Supprimer tout style inline qui pourrait causer un effet de transparence
+            token.style.textShadow = 'none';
+            token.style.background = 'transparent';
+          }
+        });
+      }
     }
   }, [code, prismLanguage]);
 
