@@ -597,6 +597,8 @@
 
   .web-main-content {
     height: calc(100vh - 80px);
+    position: relative;
+    overflow: hidden;
   }
 
   /* Masquer tous les éléments de la sidebar sauf le logo sur mobile */
@@ -612,5 +614,42 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  /* Ajustements spécifiques pour corriger le défilement sur mobile */
+  .web-conversation-container {
+    height: calc(100% - 140px); /* Ajusté pour le mobile */
+    max-height: calc(100vh - 230px); /* Limitation de hauteur max pour éviter les problèmes de défilement */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Pour améliorer le défilement sur iOS */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 140px;
+    padding-bottom: 20px;
+  }
+  
+  .web-question-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    z-index: 100;
+    padding: 10px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    height: 140px;
+  }
+  
+  .web-messages-list {
+    padding-bottom: 40px; /* Espace réduit pour mobile */
+  }
+  
+  /* Styles pour l'ancre de défilement sur mobile */
+  .scroll-anchor {
+    height: 30px;
+    margin-top: 5px;
+    margin-bottom: 20px;
   }
 }

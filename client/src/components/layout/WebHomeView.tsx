@@ -62,30 +62,107 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [filteredRecentTopics, setFilteredRecentTopics] = useState(recentTopics);
   const [filteredOlderTopics, setFilteredOlderTopics] = useState(olderTopics);
   
+  // Détection de la vue mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Effet pour détecter si on est sur mobile
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Vérification initiale
+    checkIfMobile();
+    
+    // Mettre à jour lors du redimensionnement
+    window.addEventListener('resize', checkIfMobile);
+    
+    // Nettoyage
+    return () => {
+      window.removeEventListener('resize', checkIfMobile);
+    };
+  }, []);
+  
   // Effet pour faire défiler automatiquement vers le dernier message
   // Utilisation d'une référence pour suivre les défilements récents pour éviter les répétitions
   const lastScrollRef = useRef<number>(0);
   
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && messages.length > 0) {
       // Vérifier si un défilement a été effectué récemment (dans les dernières 300ms)
       const now = Date.now();
       if (now - lastScrollRef.current > 300) {
         // Mettre à jour le timestamp du dernier défilement
         lastScrollRef.current = now;
         
-        // Ajout d'un délai plus long pour laisser le temps au contenu de se charger et se rendre correctement
-        setTimeout(() => {
-          // Défilement vers le dernier message avec position end (au lieu de start par défaut)
-          messagesEndRef.current?.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'  // Garantit que l'élément est affiché en bas de la zone visible
-          });
-        }, 150); // Délai légèrement plus long pour s'assurer que le contenu est rendu
+        // Stratégie de défilement différente selon mobile ou desktop
+        if (isMobile) {
+          // Sur mobile, on force immédiatement un premier défilement
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+          }
+          
+          // Puis on applique un second défilement après rendu
+          setTimeout(() => {
+            if (messagesEndRef.current) {
+              const container = document.querySelector('.web-conversation-container');
+              if (container) {
+                container.scrollTop = container.scrollHeight;
+              }
+            }
+          }, 100);
+          
+          // Et un troisième après un délai plus long pour s'assurer que le contenu est chargé
+          setTimeout(() => {
+            if (messagesEndRef.current) {
+              const container = document.querySelector('.web-conversation-container');
+              if (container) {
+                container.scrollTop = container.scrollHeight;
+              }
+            }
+          }, 300);
+        } else {
+          // Sur desktop, on utilise le comportement smooth
+          setTimeout(() => {
+            // Défilement vers le dernier message avec position end (au lieu de start par défaut)
+            messagesEndRef.current?.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'end'  // Garantit que l'élément est affiché en bas de la zone visible
+            });
+          }, 150);
+        }
       }
     }
-  }, [messages]);
+  }, [messages, isMobile]);
 
+  // Fonction utilitaire pour gérer le défilement
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (messagesEndRef.current) {
+        if (isMobile) {
+          // Sur mobile, utiliser le défilement direct du conteneur
+          const container = document.querySelector('.web-conversation-container');
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+            
+            // Double vérification avec un délai
+            setTimeout(() => {
+              if (container) {
+                container.scrollTop = container.scrollHeight;
+              }
+            }, 100);
+          }
+        } else {
+          // Sur desktop, utiliser scrollIntoView
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      }
+    });
+  };
+  
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
