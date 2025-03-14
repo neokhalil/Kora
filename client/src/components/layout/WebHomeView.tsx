@@ -126,37 +126,19 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Utilisation d'une référence pour suivre les défilements récents pour éviter les répétitions
   const lastScrollRef = useRef<number>(0);
   
-  // Effet principal pour le défilement automatique après chaque nouveau message
+  // Effet optimisé pour le défilement automatique après chaque nouveau message
   useEffect(() => {
     if (messages.length > 0) {
-      // Appeler scrollToBottom chaque fois que les messages changent
+      // Défilement immédiat
       scrollToBottom();
-    }
-  }, [messages]);
-  
-  // Effet supplémentaire pour s'occuper des messages avec des formules mathématiques ou du code
-  // qui pourraient prendre plus de temps à se rendre
-  useEffect(() => {
-    if (messages.length > 0) {
-      // Défilement après un court délai pour attendre le rendu
-      const timer1 = setTimeout(() => {
-        scrollToBottom();
-      }, 100);
       
-      // Deuxième défilement après un délai plus long
-      const timer2 = setTimeout(() => {
+      // Défilement différé (après rendu des formules mathématiques et du code)
+      const timer = setTimeout(() => {
         scrollToBottom();
-      }, 500);
-      
-      // Troisième défilement après un délai encore plus long pour s'assurer que tout est rendu
-      const timer3 = setTimeout(() => {
-        scrollToBottom();
-      }, 1000);
+      }, 300);
       
       return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        clearTimeout(timer3);
+        clearTimeout(timer);
       };
     }
   }, [messages]);
@@ -189,6 +171,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         block: 'end'
       });
     }
+  };
+  
+  // Fonction utilitaire pour déclencher le défilement après toute mise à jour de l'interface
+  // Remplace tous les appels requestAnimationFrame dans les gestionnaires d'événements
+  const scheduleScroll = () => {
+    // Défilement immédiat
+    scrollToBottom();
+    
+    // Deuxième défilement après un délai pour s'assurer que tout le contenu est rendu (formules, etc.)
+    setTimeout(() => scrollToBottom(), 300);
   };
   
   // Fonction pour gérer la soumission du formulaire de question

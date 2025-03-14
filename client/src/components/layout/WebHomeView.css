@@ -639,18 +639,31 @@
     bottom: 180px; /* Distance plus grande quand le clavier est ouvert */
   }
   
-  /* Assurer que les messages mathématiques s'affichent correctement sur mobile */
+  /* Styles des messages améliorés pour mobile */
   .web-conversation-container .message-content {
-    overflow-x: auto; /* Permettre le défilement horizontal pour les formules larges */
+    overflow-x: auto; /* Défilement horizontal pour formules larges */
     max-width: 100%;
     word-break: break-word; /* Cassure des mots longs */
+    padding: 8px; /* Padding uniforme */
+    font-size: 16px; /* Taille de police lisible sur mobile */
   }
   
-  /* Assurer que les blocs de code sont correctement affichés sur mobile */
+  /* Optimisation des blocs de code pour mobile */
   .web-conversation-container pre {
     overflow-x: auto;
     max-width: 100%;
-    white-space: pre-wrap; /* Permettre le retour à la ligne dans les blocs de code */
+    white-space: pre-wrap; /* Retour à la ligne dans les blocs de code */
+    font-size: 0.9em; /* Légèrement plus petit sur mobile */
+    padding: 8px; /* Padding uniforme */
+    border-radius: 4px; /* Coins arrondis */
+    background-color: #f5f5f5; /* Fond légèrement contrasté */
+  }
+  
+  /* Améliorer l'affichage des équations mathématiques sur mobile */
+  .web-conversation-container .katex-display {
+    overflow-x: auto; /* Permettre le défilement pour les formules longues */
+    max-width: 100%;
+    padding: 5px 0; /* Espacement vertical */
   }
   
   .web-question-container {
@@ -667,14 +680,22 @@
     box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.05); /* Légère séparation visuelle */
   }
   
+  /* Optimisation de la liste des messages */
   .web-messages-list {
-    padding-bottom: 0; /* Supprime tout padding en bas pour éliminer la barre blanche */
+    padding: 0; /* Pas de padding */
+    margin: 0; /* Pas de marge */
+    list-style-type: none; /* Pas de puces */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Espace entre les messages */
   }
   
-  /* Styles pour l'ancre de défilement sur mobile */
+  /* Styles pour l'ancre de défilement */
   .scroll-anchor {
-    height: 1px; /* Réduit pour supprimer l'espace blanc */
-    margin-top: 0;
-    margin-bottom: 0;
+    height: 1px;
+    padding: 0;
+    margin: 0;
+    opacity: 0; /* Invisible mais toujours fonctionnel pour le défilement */
+    pointer-events: none; /* Ne pas interférer avec les interactions */
   }
 }
