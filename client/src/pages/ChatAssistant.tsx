@@ -25,7 +25,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
+import ContentRenderer from '@/components/ui/ContentRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 
@@ -706,9 +706,9 @@ const ChatAssistant: React.FC = () => {
               </div>
             )}
             
-            {/* Contenu du message avec formatage amélioré pour les maths via MathJax */}
+            {/* Contenu du message avec formatage amélioré pour les maths et le code */}
             <div className="prose dark:prose-invert text-base leading-relaxed px-1">
-              <MathJaxRenderer content={message.content} />
+              <ContentRenderer content={message.content} />
             </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
