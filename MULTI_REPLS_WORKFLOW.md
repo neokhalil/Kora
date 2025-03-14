@@ -86,192 +86,70 @@ server/config/
 
 ### 3. Migration vers l'environnement TEST
 
-Une fois que les changements sont validés en environnement de développement et que vous avez effectué un commit, suivez ces étapes détaillées pour migrer vers l'environnement de test :
+Une fois que les changements sont validés en environnement de développement et que vous avez effectué un commit, suivez ces étapes simplifiées pour migrer vers l'environnement de test :
 
 1. **Connectez-vous à l'environnement de test** via Replit
 
-2. **Vérifiez l'état actuel** de l'environnement de test :
-   ```bash
-   git status
-   ```
-   - Assurez-vous qu'il n'y a pas de changements non commités en attente
-
-3. **Sauvegardez les fichiers de configuration spécifiques à TEST** :
-   ```bash
-   # Créer un répertoire temporaire pour les sauvegardes
-   mkdir -p /tmp/test-env-backup
-   
-   # Sauvegarder les fichiers de configuration
-   cp .env /tmp/test-env-backup/
-   cp server/config/env.test.ts /tmp/test-env-backup/
-   ```
-
-4. **Récupérez les changements depuis l'environnement DEV** :
-   ```bash
-   # Ajoutez le dépôt de développement comme source distante si ce n'est pas déjà fait
-   git remote add dev https://github.com/username/kora-dev.git
-   
-   # Mettez à jour les références distantes
-   git fetch dev
-   
-   # Fusionnez les changements (récupérez le commit que vous avez fait en DEV)
-   git merge dev/main
-   ```
-   
-   Si vous préférez utiliser un script automatisé :
+2. **Exécutez le script automatisé** qui gère la sauvegarde, la récupération des changements et la restauration :
    ```bash
    ./scripts/multi-repls-setup/pull-from-dev.sh
    ```
 
-5. **Restaurez les fichiers de configuration spécifiques à TEST** :
-   ```bash
-   # Restaurer les fichiers de configuration
-   cp /tmp/test-env-backup/.env .
-   cp /tmp/test-env-backup/env.test.ts server/config/
-   ```
+   Ce script effectue automatiquement toutes les opérations nécessaires :
+   - Sauvegarde des fichiers de configuration spécifiques à TEST
+   - Récupération des derniers changements depuis le dépôt GitHub partagé
+   - Préservation des configurations spécifiques à TEST
+   - Mise à jour des dépendances
+   - Construction de l'application
+   - Application des migrations de base de données
 
-6. **Installez/mettez à jour les dépendances** :
-   ```bash
-   npm install
-   ```
+3. **Testez les nouvelles fonctionnalités** dans l'environnement de test:
+   - Vérifiez que toutes les fonctionnalités migrées fonctionnent correctement
+   - Réalisez des tests approfondis de régression
+   - Documentez tout problème identifié
 
-7. **Appliquez les migrations de base de données** :
-   ```bash
-   npm run db:push
-   ```
-
-8. **Reconstruisez l'application** :
-   ```bash
-   npm run build
-   ```
-
-9. **Redémarrez le serveur** :
-   ```bash
-   npm run dev
-   ```
-
-10. **Testez les nouvelles fonctionnalités** dans l'environnement de test:
-    - Vérifiez que toutes les fonctionnalités migrées fonctionnent correctement
-    - Réalisez des tests approfondis de régression
-    - Documentez tout problème identifié
-
-11. **Correction des problèmes** :
-    - Si des problèmes sont identifiés, retournez en environnement DEV, corrigez-les et répétez le processus de migration
+4. **En cas de problème** :
+   - Si des problèmes sont identifiés, retournez en environnement DEV, corrigez-les et répétez le processus de migration
 
 ### 4. Migration vers l'environnement PRODUCTION
 
-Une fois que vous avez validé les changements dans l'environnement de test et que tout fonctionne comme prévu, vous pouvez procéder à la migration vers l'environnement de production avec les étapes suivantes :
+Une fois que vous avez validé les changements dans l'environnement de test et que tout fonctionne comme prévu, vous pouvez procéder à la migration vers l'environnement de production avec ces étapes simplifiées :
 
-1. **Effectuez un commit des changements validés en TEST** :
-   ```bash
-   # Dans l'environnement TEST
-   git add .
-   git commit -m "Validation des changements pour la production - [Description de la fonctionnalité]"
-   git push origin main
-   ```
+1. **Connectez-vous à l'environnement de production** via Replit
 
-2. **Connectez-vous à l'environnement de production** via Replit
-
-3. **Vérifiez l'état actuel** de l'environnement de production :
-   ```bash
-   git status
-   ```
-   - Assurez-vous qu'il n'y a pas de changements non commités en attente
-
-4. **Sauvegardez les fichiers de configuration spécifiques à PRODUCTION** :
-   ```bash
-   # Créer un répertoire temporaire pour les sauvegardes
-   mkdir -p /tmp/prod-env-backup
-   
-   # Sauvegarder les fichiers de configuration critiques
-   cp .env /tmp/prod-env-backup/
-   cp server/config/env.production.ts /tmp/prod-env-backup/
-   ```
-
-5. **Arrêtez temporairement le service en production** (si possible) :
-   ```bash
-   # Si vous utilisez pm2 ou un autre gestionnaire de processus
-   pm2 stop kora-app
-   
-   # Ou arrêtez simplement le processus Node.js en cours
-   # (uniquement si peu d'utilisateurs ou pendant une fenêtre de maintenance)
-   ```
-
-6. **Récupérez les changements depuis l'environnement TEST** :
-   ```bash
-   # Ajoutez le dépôt de test comme source distante si ce n'est pas déjà fait
-   git remote add test https://github.com/username/kora-test.git
-   
-   # Mettez à jour les références distantes
-   git fetch test
-   
-   # Fusionnez les changements (récupérez le commit que vous avez fait en TEST)
-   git merge test/main
-   ```
-   
-   Si vous préférez utiliser un script automatisé :
+2. **Exécutez le script automatisé** qui gère tout le processus de migration :
    ```bash
    ./scripts/multi-repls-setup/pull-from-test.sh
    ```
 
-7. **Restaurez les fichiers de configuration spécifiques à PRODUCTION** :
-   ```bash
-   # Restaurer les fichiers de configuration
-   cp /tmp/prod-env-backup/.env .
-   cp /tmp/prod-env-backup/env.production.ts server/config/
-   ```
+   Ce script effectue automatiquement toutes les opérations nécessaires :
+   - Sauvegarde des fichiers de configuration spécifiques à PRODUCTION
+   - Récupération des derniers changements depuis le dépôt GitHub partagé
+   - Préservation des configurations spécifiques à PRODUCTION
+   - Mise à jour des dépendances
+   - Construction de l'application
+   - Application des migrations de base de données
 
-8. **Installez/mettez à jour les dépendances** :
-   ```bash
-   npm ci  # Installation propre, utilisant package-lock.json
-   ```
+3. **Vérifiez que l'application fonctionne correctement** :
+   - Testez les principales fonctionnalités
+   - Vérifiez les journaux pour détecter d'éventuelles erreurs
+   - Surveillez les performances pendant quelques minutes
 
-9. **Appliquez les migrations de base de données avec précaution** :
-   ```bash
-   # Optionnel mais recommandé : créez une sauvegarde de la base de données
-   pg_dump -U $PGUSER -d $PGDATABASE > /tmp/kora_prod_backup_$(date +%Y%m%d_%H%M%S).sql
+4. **En cas de problème** :
+   Si des problèmes critiques sont détectés en production, vous pouvez revenir à l'état précédent en exécutant :
    
-   # Appliquez les migrations
-   NODE_ENV=production npm run db:push
+   ```bash
+   # 1. Revenez au commit précédent
+   git reset --hard HEAD~1
+   
+   # 2. Restaurez les configurations sauvegardées par le script
+   cp .env.backup.* .env
+   cp server/config/env.production.ts.backup.* server/config/env.production.ts
+   
+   # 3. Reconstruisez et redémarrez
+   npm run build
+   npm run start
    ```
-
-10. **Reconstruisez l'application pour la production** :
-    ```bash
-    npm run build
-    ```
-
-11. **Redémarrez le service** :
-    ```bash
-    # Si vous utilisez pm2
-    pm2 restart kora-app
-    
-    # Sinon, démarrez normalement
-    NODE_ENV=production npm start
-    ```
-
-12. **Vérifiez que l'application fonctionne correctement** :
-    - Testez les principales fonctionnalités
-    - Vérifiez les journaux pour détecter d'éventuelles erreurs
-    - Surveillez les performances pendant quelques minutes
-
-13. **Procédure de rollback en cas de problème** :
-    Si des problèmes critiques sont détectés en production, suivez ces étapes pour revenir à l'état précédent :
-    
-    ```bash
-    # 1. Revenez au commit précédent
-    git reset --hard HEAD~1
-    
-    # 2. Restaurez les configurations
-    cp /tmp/prod-env-backup/.env .
-    cp /tmp/prod-env-backup/env.production.ts server/config/
-    
-    # 3. Restaurez la base de données si nécessaire
-    psql -U $PGUSER -d $PGDATABASE < /tmp/kora_prod_backup_XXXXXXXX.sql
-    
-    # 4. Reconstruisez et redémarrez
-    npm run build
-    NODE_ENV=production npm start
-    ```
 
 ### Résolution de l'erreur "Could not find the build directory"
 
@@ -350,6 +228,36 @@ C'est généralement parce que le module `drizzle-kit` n'est pas correctement in
    ./scripts/db-push.sh
    ```
 
+### Gestion des fichiers spécifiques à l'environnement
+
+Lors de la migration entre environnements, les fichiers de configuration spécifiques à chaque environnement nécessitent une attention particulière :
+
+1. **Fichiers à protéger lors de la migration** :
+   - `.env` - Contient les variables d'environnement et les secrets
+   - `server/config/env.[environment].ts` - Configuration spécifique à l'environnement
+   - Tout fichier contenant des informations spécifiques à l'environnement (certificats, clés, etc.)
+
+2. **Procédure recommandée** :
+   ```bash
+   # 1. Avant la migration, sauvegardez les fichiers
+   mkdir -p /tmp/env-backup-$(date +%Y%m%d)
+   cp .env /tmp/env-backup-$(date +%Y%m%d)/
+   cp server/config/env.test.ts /tmp/env-backup-$(date +%Y%m%d)/  # pour l'environnement TEST
+   
+   # 2. Après la migration, restaurez les fichiers
+   cp /tmp/env-backup-$(date +%Y%m%d)/.env .
+   cp /tmp/env-backup-$(date +%Y%m%d)/env.test.ts server/config/
+   ```
+
+3. **Utilisation du fichier `.gitignore`** :
+   - Assurez-vous que `.env` est inclus dans `.gitignore`
+   - Ne versionnez jamais les fichiers contenant des secrets
+   - Utilisez un fichier `.env.example` comme modèle versionné sans valeurs sensibles
+
+4. **Solution pour les workflows automatisés** :
+   - Les scripts de migration (`pull-from-dev.sh` et `pull-from-test.sh`) doivent sauvegarder et restaurer automatiquement ces fichiers
+   - Surveillez les messages d'erreur indiquant des problèmes avec ces fichiers
+
 ### Résolution des conflits
 
 Si des conflits surviennent pendant la synchronisation :
@@ -358,6 +266,7 @@ Si des conflits surviennent pendant la synchronisation :
    - Vérifiez les fichiers `.backup` créés par le script
    - Comparez les changements avec les nouveaux fichiers
    - Fusionnez manuellement les modifications pertinentes
+   - Pour les fichiers `.env`, privilégiez toujours la version de l'environnement cible
 
 2. **Conflit dans d'autres fichiers** :
    - Utilisez `git diff` pour examiner les différences
@@ -442,28 +351,24 @@ Si des conflits surviennent pendant la synchronisation :
 
 ### Vue d'ensemble du processus
 
+Pour synchroniser entre les environnements, il n'y a qu'une seule commande à exécuter sur chaque environnement cible :
+
 1. **Développement (DEV)**
    - Développer la fonctionnalité
    - Tester localement
    - Commiter les changements
-   - Pousser vers le dépôt principal
+   - Pousser vers le dépôt GitHub principal : `git push origin main`
 
 2. **Test (TEST)**
-   - Récupérer les changements depuis DEV
-   - Appliquer les configurations spécifiques à TEST
-   - Exécuter les migrations de base de données
+   - Se connecter à l'environnement TEST
+   - Exécuter `./scripts/multi-repls-setup/pull-from-dev.sh`
    - Tester de manière approfondie
    - Corriger les problèmes si nécessaire
-   - Commiter les changements validés
 
 3. **Production (PROD)**
-   - Planifier le déploiement
-   - Sauvegarder l'état actuel
-   - Récupérer les changements depuis TEST
-   - Appliquer les configurations spécifiques à PROD
-   - Exécuter les migrations avec précaution
-   - Déployer et vérifier
-   - Surveiller après déploiement
+   - Se connecter à l'environnement PROD
+   - Exécuter `./scripts/multi-repls-setup/pull-from-test.sh`
+   - Vérifier et surveiller après déploiement
 
 ### Conseil spécifiques à Replit
 

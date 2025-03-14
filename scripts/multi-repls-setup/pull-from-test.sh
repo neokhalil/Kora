@@ -14,13 +14,10 @@ cp server/config/env.production.ts server/config/env.production.ts.backup.$(date
 # Remplacez l'URL ci-dessous par l'URL réelle de votre environnement de test
 echo "2. Récupération des derniers changements depuis l'environnement de test..."
 
-# Si vous utilisez git
-# git remote add test https://github.com/user/kora-test.git
-# git fetch test
-# git merge test/main --no-commit
-
-# Si vous utilisez un transfert direct (ajustez l'URL selon votre configuration)
-# rsync -av --exclude='.env' --exclude='server/config/env.production.ts' --exclude='node_modules' test-environment:~/kora/ ./
+# Configuration Git pour récupération depuis le dépôt partagé
+git remote -v | grep -q origin || git remote add origin https://github.com/neokhalil/Kora.git
+git fetch origin
+git merge origin/main
 
 # 3. Réappliquer les configurations spécifiques à l'environnement de production
 echo "3. Réapplication des configurations de production..."
