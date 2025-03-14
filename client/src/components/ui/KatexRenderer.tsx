@@ -1,8 +1,6 @@
-import React from 'react';
-import 'katex/dist/katex.min.css';
+import React, { useEffect } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css';
+import 'katex/dist/katex.min.css';
 
 interface TextContentProps {
   content: string;
@@ -11,77 +9,15 @@ interface TextContentProps {
 
 /**
  * Composant de rendu pour le texte et les formules mathématiques utilisant KaTeX
- * Approche simple et efficace basée sur un système de marquage des sections
+ * Cette implémentation est plus légère et plus performante que MathJax
  */
 const KatexRenderer: React.FC<TextContentProps> = ({ content, className = '' }) => {
-  if (!content) {
-    return null;
-  }
+  if (!content) return null;
 
-  // Préparation - Diviser le contenu en blocs pour traitement
-  const paragraphs = content.split(/\n\n+/);
-  
+  // Render le contenu en séparant les formules mathématiques du texte
   return (
-    <div className={`katex-renderer ${className}`}>
-      {paragraphs.map((paragraph, index) => {
-        // 1. Traitement des blocs de code
-        if (paragraph.startsWith('```')) {
-          const codeMatch = paragraph.match(/```(\w*)\n([\s\S]*?)```/);
-          if (codeMatch) {
-            const language = codeMatch[1] || 'plaintext';
-            const code = codeMatch[2];
-            
-            try {
-              const highlightedCode = language 
-                ? hljs.highlight(code, { language }).value 
-                : hljs.highlightAuto(code).value;
-              
-              return (
-                <pre key={`code-${index}`} className="code-block">
-                  <code
-                    className={`language-${language}`}
-                    dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                  />
-                </pre>
-              );
-            } catch (error) {
-              return (
-                <pre key={`code-${index}`} className="code-block">
-                  <code dangerouslySetInnerHTML={{ __html: hljs.highlightAuto(code).value }} />
-                </pre>
-              );
-            }
-          }
-        }
-        
-        // 2. Traiter les titres markdown
-        if (/^#{1,6}\s+.+$/.test(paragraph)) {
-          const match = paragraph.match(/^(#{1,6})\s+(.+)$/);
-          if (match) {
-            const level = match[1].length;
-            const title = match[2];
-            const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
-            return <HeadingTag key={`heading-${index}`} className="math-heading">{renderInlineContent(title)}</HeadingTag>;
-          }
-        }
-        
-        // 3. Traiter les paragraphes réguliers ou numérotés
-        if (/^\d+\.\s/.test(paragraph)) {
-          // Paragraphe numéroté (comme une étape de résolution)
-          return (
-            <div key={`numbered-${index}`} className="numbered-paragraph">
-              {renderFormattedContent(paragraph)}
-            </div>
-          );
-        }
-        
-        // 4. Paragraphe standard
-        return (
-          <div key={`p-${index}`} className="paragraph">
-            {renderFormattedContent(paragraph)}
-          </div>
-        );
-      })}
+    <div className={`katex-content ${className}`}>
+      {renderFormattedContent(content)}
     </div>
   );
 };
@@ -91,112 +27,108 @@ const KatexRenderer: React.FC<TextContentProps> = ({ content, className = '' }) 
  * et du formatage de base
  */
 function renderFormattedContent(text: string): React.ReactNode {
-  // Diviser le texte en segments : texte normal et formules mathématiques
-  const segments: React.ReactNode[] = [];
-  let currentText = '';
-  let lastIndex = 0;
+  // Découper le texte en sections par les sauts de ligne
+  const sections = text.split('\n\n');
   
-  // Recherche des formules en bloc $$...$$
-  const blockRegex = /\$\$([\s\S]*?)\$\$/g;
-  let blockMatch;
-  
-  while ((blockMatch = blockRegex.exec(text)) !== null) {
-    // Ajouter le texte avant la formule en bloc
-    if (blockMatch.index > lastIndex) {
-      currentText += text.substring(lastIndex, blockMatch.index);
-      segments.push(renderInlineContent(currentText));
-      currentText = '';
+  // Transforme chaque section en paragraphe formaté
+  return sections.map((section, index) => {
+    // Vérifie si c'est un titre
+    if (section.startsWith('# ')) {
+      return <h1 key={index} className="text-2xl font-bold mb-4">{formatTextWithMath(section.substring(2))}</h1>;
+    } else if (section.startsWith('## ')) {
+      return <h2 key={index} className="text-xl font-bold mb-3">{formatTextWithMath(section.substring(3))}</h2>;
+    } else if (section.startsWith('### ')) {
+      return <h3 key={index} className="text-lg font-bold mb-2">{formatTextWithMath(section.substring(4))}</h3>;
     }
-    
-    // Ajouter la formule en bloc
-    try {
-      segments.push(
-        <div key={`block-${blockMatch.index}`} className="katex-block">
-          <BlockMath math={blockMatch[1]} />
-        </div>
-      );
-    } catch (error) {
-      segments.push(
-        <div key={`block-error-${blockMatch.index}`} className="katex-error">
-          Erreur de rendu: {blockMatch[0]}
-        </div>
+
+    // Traite les listes
+    if (section.match(/^[*-] /m)) {
+      const items = section.split('\n').filter(line => line.trim().length > 0);
+      return (
+        <ul key={index} className="list-disc pl-5 mb-4">
+          {items.map((item, idx) => {
+            if (item.startsWith('* ') || item.startsWith('- ')) {
+              return <li key={idx}>{formatTextWithMath(item.substring(2))}</li>;
+            }
+            return <li key={idx}>{formatTextWithMath(item)}</li>;
+          })}
+        </ul>
       );
     }
-    
-    lastIndex = blockMatch.index + blockMatch[0].length;
-  }
-  
-  // Ajouter le texte restant après la dernière formule en bloc
-  if (lastIndex < text.length) {
-    currentText += text.substring(lastIndex);
-    segments.push(renderInlineContent(currentText));
-  }
-  
-  return segments;
+
+    // Par défaut, renvoie un paragraphe
+    return <p key={index} className="mb-4">{formatTextWithMath(section)}</p>;
+  });
 }
 
 /**
- * Render le contenu en ligne avec prise en charge des formules mathématiques inline
- * et du formatage de base (gras, italique, etc.)
+ * Formate le texte avec prise en charge des expressions mathématiques
+ * Supporte les formules entre $$ et $ (block et inline)
  */
-function renderInlineContent(text: string): React.ReactNode {
-  if (!text) return null;
+function formatTextWithMath(text: string): React.ReactNode[] {
+  // Patterns pour les formules mathématiques:
+  // 1. Formules en bloc - entre $$
+  // 2. Formules inline - entre $
+  const mathPattern = /(\$\$(.*?)\$\$)|(\$(.*?)\$)/gs;
   
-  // Traiter les formules mathématiques inline $...$
-  const segments: React.ReactNode[] = [];
-  const inlineRegex = /\$(.*?)\$/g;
-  let currentText = '';
+  const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let match;
   
-  while ((match = inlineRegex.exec(text)) !== null) {
-    // Ajouter le texte avant la formule
+  // Parcourt toutes les correspondances dans le texte
+  while ((match = mathPattern.exec(text)) !== null) {
+    // Texte avant la formule mathématique
     if (match.index > lastIndex) {
-      currentText += text.substring(lastIndex, match.index);
-      segments.push(formatTextWithStyles(currentText));
-      currentText = '';
+      parts.push(formatTextWithStyles(text.substring(lastIndex, match.index)));
     }
     
-    // Ajouter la formule inline
-    try {
-      segments.push(
-        <span key={`inline-${match.index}`} className="katex-inline">
-          <InlineMath math={match[1]} />
-        </span>
+    // Détermine si c'est une formule en bloc ou inline
+    if (match[1]) { // Formule en bloc ($$...$$)
+      const mathContent = match[2];
+      parts.push(
+        <BlockMath key={`math-${match.index}`} math={mathContent} />
       );
-    } catch (error) {
-      segments.push(
-        <span key={`inline-error-${match.index}`} className="katex-error">
-          {match[0]}
-        </span>
+    } else if (match[3]) { // Formule inline ($...$)
+      const mathContent = match[4];
+      parts.push(
+        <InlineMath key={`math-${match.index}`} math={mathContent} />
       );
     }
     
     lastIndex = match.index + match[0].length;
   }
   
-  // Ajouter le texte restant après la dernière formule
+  // Ajoute le reste du texte après la dernière formule
   if (lastIndex < text.length) {
-    currentText += text.substring(lastIndex);
-    segments.push(formatTextWithStyles(currentText));
+    parts.push(formatTextWithStyles(text.substring(lastIndex)));
   }
   
-  return segments;
+  return parts;
 }
 
 /**
  * Applique le formatage de texte de base (gras, italique, etc.)
  */
 function formatTextWithStyles(text: string): React.ReactNode {
-  if (!text) return null;
+  // Trouver toutes les occurrences de formatage:
   
-  // Remplacer le texte en gras ** ... **
-  let formattedText = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // ** pour le gras
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
-  // Remplacer le texte en italique * ... *
-  formattedText = formattedText.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  // * pour l'italique
+  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
   
-  return <span dangerouslySetInnerHTML={{ __html: formattedText }} />;
+  // __ pour le souligné
+  text = text.replace(/__(.*?)__/g, '<u>$1</u>');
+  
+  // ~ pour le barré
+  text = text.replace(/~(.*?)~/g, '<del>$1</del>');
+  
+  // ` pour le code inline
+  text = text.replace(/`(.*?)`/g, '<code>$1</code>');
+  
+  // Créer un élément span avec HTML interprété
+  return <span dangerouslySetInnerHTML={{ __html: text }} />;
 }
 
 export default KatexRenderer;

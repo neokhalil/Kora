@@ -519,7 +519,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         
         {/* Contenu du message avec formatage mathématique et code */}
         <div className="web-message-content">
-          <MathJaxRenderer content={message.content} />
+          <KatexRenderer content={message.content} />
         </div>
         
         {/* Boutons d'action standards pour les messages de Kora */}
