@@ -1,38 +1,45 @@
 /**
  * Environment configuration management for Kora application
- * Simplified for single environment per Repl approach
+ * Modular architecture with environment-specific configuration files
  */
 
 import dotenv from 'dotenv';
-import path from 'path';
 
 // Load environment variables from .env file
 dotenv.config();
 
-// Base configuration
-const config = {
-  environment: 'development', // This will be different in each Repl
-  server: {
-    port: process.env.PORT || 5000,
-  },
-  upload: {
-    maxSize: 10 * 1024 * 1024, // 10MB max file size
-    directory: path.join(process.cwd(), 'uploads'),
-  },
-  api: {
-    openai: {
-      apiKey: process.env.OPENAI_API_KEY,
-    },
-  },
-  database: {
-    url: process.env.DATABASE_URL,
-    ssl: false,
-    logging: true,
-  },
-  debug: true,
+// Import environment-specific configurations
+import developmentConfig from './env.development';
+import testConfig from './env.test';
+import productionConfig from './env.production';
+
+// Determine which configuration to use based on NODE_ENV
+// Default to development if not specified
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+let config;
+switch (nodeEnv.toLowerCase()) {
+  case 'production':
+    config = productionConfig;
+    break;
+  case 'test':
+    config = testConfig;
+    break;
+  case 'development':
+  default:
+    config = developmentConfig;
+    break;
+}
+
+// Add runtime environment variables that shouldn't be stored in files
+config.api = {
+  ...config.api,
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY,
+  }
 };
 
-// Utility functions for environment checks - simplified for single environment approach
+// Utility functions for environment checks
 export const isDevelopment = (): boolean => config.environment === 'development';
 export const isTest = (): boolean => config.environment === 'test';
 export const isProduction = (): boolean => config.environment === 'production';
