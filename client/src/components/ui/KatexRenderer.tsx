@@ -60,21 +60,28 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
     );
   };
 
+  // Pour les formules inline, on peut se passer du div wrapper supplémentaire
+  // qui peut ajouter de l'espace blanc non nécessaire
+  if (!display) {
+    return (
+      <InlineMath 
+        math={cleanFormula} 
+        errorColor={errorColor}
+        renderError={handleError}
+        className={`${className}`}
+      />
+    );
+  }
+  
+  // Pour les formules en bloc, on garde le wrapper mais on s'assure
+  // qu'il n'ajoute pas d'espace superflu
   return (
-    <div className={`katex-${display ? 'block' : 'inline'}-wrapper ${className}`}>
-      {display ? (
-        <BlockMath 
-          math={cleanFormula} 
-          errorColor={errorColor}
-          renderError={handleError}
-        />
-      ) : (
-        <InlineMath 
-          math={cleanFormula} 
-          errorColor={errorColor}
-          renderError={handleError}
-        />
-      )}
+    <div className={`katex-block-wrapper ${className}`} style={{ margin: '0.4em 0' }}>
+      <BlockMath 
+        math={cleanFormula} 
+        errorColor={errorColor}
+        renderError={handleError}
+      />
     </div>
   );
 };
