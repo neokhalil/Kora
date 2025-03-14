@@ -69,7 +69,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
           key={`math-block-${index}`}
           formula={sanitizeFormula(segment.content)}
           display={true}
-          className="my-4"
+          className="" /* Suppression de la classe my-4 qui ajoutait des marges */
         />
       );
     }
