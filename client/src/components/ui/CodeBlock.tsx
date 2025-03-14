@@ -145,10 +145,14 @@ useEffect(() => {
         )}
       </div>
       
-      <pre className={`${showLineNumbers ? 'line-numbers' : ''}`}>
+      <pre 
+        className={`${showLineNumbers ? 'line-numbers' : ''}`}
+        style={{ backgroundColor: '#1a202c', color: '#e2e8f0' }}
+      >
         <code 
           ref={codeRef}
           className={`language-${prismLanguage}`}
+          style={{ backgroundColor: '#1a202c', color: '#e2e8f0' }}
         >
           {code}
         </code>

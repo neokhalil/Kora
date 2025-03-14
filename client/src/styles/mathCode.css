@@ -104,11 +104,14 @@
 }
 
 /* Suppression des effets de surexposition/transparence */
-code[class*="language-"], 
-pre[class*="language-"] {
+.code-block-wrapper code[class*="language-"], 
+.code-block-wrapper pre[class*="language-"],
+.code-block-wrapper pre,
+.code-block-wrapper code {
   text-shadow: none !important;
   background-color: #1a202c !important;
   border: none !important;
+  color: #e2e8f0 !important;
 }
 
 /* Forcer le style sur tous les éléments du code */
