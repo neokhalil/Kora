@@ -6,6 +6,7 @@ import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
+import { scrollToBottom, scheduleScroll } from '@/utils/scrollHelper';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -92,7 +93,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setIsKeyboardOpen(true);
       // Petite pause pour laisser le temps au clavier de s'ouvrir
       setTimeout(() => {
-        scrollToBottom();
+        // Utiliser notre fonction locale optimisée
+        localScrollToBottom();
       }, 300);
     };
     
@@ -100,7 +102,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setIsKeyboardOpen(false);
       // Scroll après fermeture du clavier
       setTimeout(() => {
-        scrollToBottom();
+        // Utiliser notre fonction locale optimisée
+        localScrollToBottom();
       }, 100);
     };
     
@@ -129,49 +132,38 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Effet optimisé pour le défilement automatique après chaque nouveau message
   useEffect(() => {
     if (messages.length > 0) {
-      // Utiliser la fonction de défilement optimisée
-      scheduleScroll();
+      // Utiliser notre fonction locale optimisée
+      localScheduleScroll();
     }
   }, [messages]);
 
-  // Fonction simplifiée pour gérer le défilement
-  const scrollToBottom = () => {
-    // Détecter si messagesEndRef existe
-    if (!messagesEndRef.current) return;
+  // Fonction locale pour gérer le défilement
+  // Utilise notre utilitaire de défilement importé
+  const localScrollToBottom = () => {
+    // Déterminer la cible du défilement
+    const target = messagesEndRef.current;
+    if (!target) return;
     
-    if (isMobile) {
-      // Pour mobile, une approche plus directe sans animations qui peuvent interférer
-      const scrollElement = () => {
-        const container = document.querySelector('.web-conversation-container');
-        if (container) {
-          // Défilement direct et sans smooth pour éviter les problèmes
-          container.scrollTop = container.scrollHeight;
-          
-          // S'assurer que le dernier message est visible
-          messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
-        }
-      };
-      
-      // Exécution immédiate et après un court délai pour s'assurer que tout le contenu est rendu
-      scrollElement();
-      setTimeout(scrollElement, 100);
-    } else {
-      // Sur desktop, comportement simplifié avec scrollIntoView
-      messagesEndRef.current.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'end'
-      });
-    }
+    // Utiliser notre utilitaire de défilement avec les options adaptées au contexte
+    scrollToBottom({
+      target,
+      behavior: isMobile ? 'auto' : 'smooth',
+      delay: isMobile ? 100 : 300
+    });
   };
   
-  // Fonction utilitaire pour déclencher le défilement après toute mise à jour de l'interface
-  // Remplace tous les appels requestAnimationFrame dans les gestionnaires d'événements
-  const scheduleScroll = () => {
-    // Défilement immédiat
-    scrollToBottom();
+  // Fonction locale pour planifier le défilement
+  // Utilise notre utilitaire de défilement importé
+  const localScheduleScroll = () => {
+    // Déterminer la cible du défilement
+    const target = messagesEndRef.current;
+    if (!target) return;
     
-    // Deuxième défilement après un délai pour s'assurer que tout le contenu est rendu (formules, etc.)
-    setTimeout(() => scrollToBottom(), 300);
+    // Utiliser notre utilitaire de planification de défilement
+    scheduleScroll({
+      target,
+      behavior: isMobile ? 'auto' : 'smooth'
+    });
   };
   
   // Fonction pour gérer la soumission du formulaire de question
