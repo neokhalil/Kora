@@ -19,16 +19,16 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
   
   // Formatter le contenu texte normal (appliquer les styles Markdown, liens, etc.)
   const formatTextContent = (text: string): JSX.Element => {
-    // Remplacer les sauts de ligne par des <br />
-    const withLineBreaks = text.replace(/\n/g, '<br />');
+    // Nous traitons d'abord le formatage Markdown avant de gérer les sauts de ligne
+    // pour éviter d'interférer avec la syntaxe Markdown
     
     // Appliquer le formatage Markdown de base (titres, gras, italique, etc.)
-    const withMarkdown = withLineBreaks
-      // Titres
-      .replace(/^(#{1,6})\s+(.+?)$/gm, (_, hashes, title) => {
+    const withMarkdown = text
+      // Titres (multi-lignes)
+      .replace(/(^|\n)(#{1,6})\s+(.+?)(\n|$)/g, (match, pre, hashes, title, post) => {
         const level = hashes.length;
         const size = ['text-3xl', 'text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-base'][Math.min(level - 1, 5)];
-        return `<h${level} class="${size} font-bold">${title}</h${level}>`;
+        return `${pre}<h${level} class="${size} font-bold mt-4 mb-2">${title}</h${level}>${post}`;
       })
       // Gras
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
@@ -39,7 +39,13 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
       // Listes numérotées
       .replace(/^(\d+)\.\s+(.+?)$/gm, '<li value="$1">$2</li>');
     
-    return <span dangerouslySetInnerHTML={{ __html: withMarkdown }} />;
+    // Maintenant, remplacer les sauts de ligne restants par des <br />
+    // mais pas juste après une balise de titre (pour éviter les espaces vides)
+    const withLineBreaks = withMarkdown
+      .replace(/(<\/h[1-6]>)\n/g, '$1')  // Supprimer le saut de ligne après un titre
+      .replace(/\n/g, '<br />');         // Convertir les autres sauts de ligne en <br />
+    
+    return <span dangerouslySetInnerHTML={{ __html: withLineBreaks }} />;
   };
   
   // Diviser le contenu en segments (texte, formules mathématiques, et code)
