@@ -8,6 +8,7 @@ import "./styles/text.css"; // Styles de texte simples
 import "./styles/animations.css"; // Animations pour l'interface utilisateur
 import "./styles/web-home.css"; // Styles spécifiques pour la vue web de la page d'accueil
 import "./styles/mathjax.css"; // Styles pour MathJax et la coloration syntaxique
+import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRenderer
 
 // Solution définitive pour le header fixe - doit être chargé en dernier pour avoir priorité
 import "./styles/header-fix.css";

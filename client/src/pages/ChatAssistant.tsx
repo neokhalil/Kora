@@ -708,7 +708,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Contenu du message avec formatage amélioré pour les maths et le code */}
             <div className="prose dark:prose-invert text-base leading-relaxed px-1">
-              <ContentRenderer content={message.content} />
+              <ContentRenderer content={message.content} className="chat-content" />
             </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
