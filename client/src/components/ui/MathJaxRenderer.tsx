@@ -8,15 +8,23 @@ interface TextContentProps {
   className?: string;
 }
 
-// Configuration de MathJax simplifiée et optimisée
+// Configuration de MathJax complète
 const mathJaxConfig = {
+  loader: {
+    load: ['input/tex-full', 'output/svg']
+  },
   tex: {
-    inlineMath: [['$', '$']],
-    displayMath: [['$$', '$$']],
-    processEscapes: true
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: ['base', 'ams', 'noerrors', 'noundefined']
   },
   svg: {
     fontCache: 'global'
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
   },
   startup: {
     typeset: true

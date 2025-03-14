@@ -72,11 +72,27 @@
   display: inline-block !important;
 }
 
+/* Support pour tous types d'équations LaTeX */
+.mjx-mrow {
+  display: inline-block;
+}
+
+.mjx-frac {
+  vertical-align: -0.5em;
+}
+
+/* Améliorations pour les équations complexes avec racines carrées */
+.mjx-sqrt {
+  display: inline-block;
+}
+
 /* Corrections pour les équations en bloc */
-.MathJax_Display {
+.MathJax_Display, .MathJax_SVG_Display {
   display: block !important;
   text-align: center !important;
   margin: 1em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* Corrections pour l'affichage mobile */
