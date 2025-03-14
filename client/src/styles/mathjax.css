@@ -1,5 +1,5 @@
 /**
- * Styles simplifiés pour les équations mathématiques
+ * Styles pour les équations mathématiques et la mise en page du texte
  */
 
 /* Styles de base pour le conteneur MathJax */
@@ -12,9 +12,18 @@
 
 /* Contenu mathématique - correction de l'affichage */
 .math-content {
-  white-space: normal;
+  white-space: normal !important;
   text-align: left;
   width: 100%;
+  display: block;
+}
+
+/* Styles de base pour les types d'éléments courants */
+.math-renderer div, 
+.math-renderer p, 
+.math-renderer span {
+  display: inline;
+  white-space: normal;
 }
 
 /* Styles pour les équations en bloc */
@@ -22,6 +31,8 @@
   margin: 1em 0;
   overflow-x: auto;
   overflow-y: hidden;
+  display: block !important;
+  text-align: center;
 }
 
 /* Styles pour les équations inline */
@@ -30,25 +41,42 @@
   font-size: 1.1em;
 }
 
-/* Correction pour les éléments HTML générés */
-.math-renderer p, 
-.math-renderer strong,
-.math-renderer span,
-.math-renderer div {
-  display: inline;
-  white-space: normal;
-}
-
-/* Exceptions pour les éléments de bloc */
+/* Assurer que les conteneurs spéciaux sont en mode bloc */
 .math-renderer h1, 
 .math-renderer h2, 
 .math-renderer h3, 
 .math-renderer h4, 
 .math-renderer h5, 
 .math-renderer h6,
-.math-renderer pre {
-  display: block;
-  margin: 1em 0;
+.math-renderer pre,
+.math-renderer .math-block,
+.math-renderer .step-result,
+.math-renderer .possible-equation {
+  display: block !important;
+  margin: 0.8em 0;
+}
+
+/* Formater les numéros qui pourraient être des résultats d'équations */
+.step-result {
+  font-weight: 500;
+  padding: 0.5em 0;
+  margin-left: 1.5em;
+}
+
+/* Style spécifique pour les équations qui sont susceptibles de devenir des "1" */
+.possible-equation {
+  font-style: italic;
+  color: #555;
+  padding: 0.3em;
+  border-left: 3px solid #ddd;
+  margin-left: 1em;
+}
+
+/* Style pour les blocs mathématiques après des titres numérotés */
+.math-block {
+  display: block !important;
+  margin: 0.5em 0 0.5em 1.5em;
+  padding: 0.3em 0;
 }
 
 /* Gestion des sauts de ligne */
@@ -65,10 +93,24 @@ pre.hljs-pre {
   border-radius: 0.5em;
   background-color: #f5f5f5;
   overflow-x: auto;
-  white-space: pre;
+  white-space: pre !important;
 }
 
-/* Afficher les variables mathématiques correctement */
+/* Réglage spécifique pour les éléments MathJax */
+.mjx-chtml {
+  display: inline-block !important;
+  line-height: 0;
+  text-indent: 0;
+  text-align: left;
+  text-transform: none;
+  font-size: 100% !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  white-space: normal !important;
+}
+
+/* Assurer que les SVG MathJax s'affichent correctement */
 span.MathJax_SVG {
   display: inline-block !important;
 }
