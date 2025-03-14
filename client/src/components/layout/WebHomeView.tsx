@@ -4,7 +4,7 @@ import { RecentQuestion } from '@/lib/types';
 import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
-import MathJaxRenderer from '@/components/ui/MathJaxRenderer';
+import KatexRenderer from '@/components/ui/KatexRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import './WebHomeView.css';
 
