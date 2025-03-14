@@ -63,11 +63,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [filteredOlderTopics, setFilteredOlderTopics] = useState(olderTopics);
   
   // Effet pour faire défiler automatiquement vers le dernier message
+  // Utilisation d'une référence pour suivre les défilements récents pour éviter les répétitions
+  const lastScrollRef = useRef<number>(0);
+  
   useEffect(() => {
     if (messagesEndRef.current) {
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      // Vérifier si un défilement a été effectué récemment (dans les dernières 300ms)
+      const now = Date.now();
+      if (now - lastScrollRef.current > 300) {
+        // Mettre à jour le timestamp du dernier défilement
+        lastScrollRef.current = now;
+        
+        // Ajout d'un délai plus long pour laisser le temps au contenu de se charger et se rendre correctement
+        setTimeout(() => {
+          // Défilement vers le dernier message avec position end (au lieu de start par défaut)
+          messagesEndRef.current?.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'  // Garantit que l'élément est affiché en bas de la zone visible
+          });
+        }, 150); // Délai légèrement plus long pour s'assurer que le contenu est rendu
+      }
     }
   }, [messages]);
 
@@ -122,14 +137,25 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA
+      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
+      const newMessageId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newMessageId,
         content: data.content,
         sender: 'kora',
         allowActions: true, // Assurons-nous que cette propriété est correctement définie
-        messageId: Date.now().toString(), // ID pour les fonctions d'action
+        messageId: newMessageId, // ID pour les fonctions d'action
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -708,7 +734,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       </div>
                     </div>
                   )}
-                  <div ref={messagesEndRef} />
+                  {/* Ancre de défilement avec hauteur minimale pour garantir un espace de défilement adéquat */}
+                  <div ref={messagesEndRef} className="scroll-anchor" />
                 </div>
               </div>
             )}

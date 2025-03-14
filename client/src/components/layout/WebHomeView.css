@@ -226,6 +226,15 @@
   padding-bottom: 200px; /* Espace doublé comme demandé */
 }
 
+/* Styles pour l'ancre de défilement */
+.scroll-anchor {
+  height: 24px; /* Hauteur minimale pour garantir un espace de défilement */
+  margin-top: 10px; /* Espace au-dessus de l'ancre */
+  margin-bottom: 50px; /* Large espace en-dessous pour le défilement */
+  width: 100%;
+  pointer-events: none; /* Pour ne pas interférer avec les interactions de l'utilisateur */
+}
+
 /* Réduire l'espace quand Kora est en train de réfléchir */
 .web-thinking {
   padding: 1rem 1.5rem; /* Moins d'espace pour les points de réflexion */
