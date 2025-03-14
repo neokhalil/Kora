@@ -1,0 +1,86 @@
+/* Corrections spécifiques pour l'affichage mobile */
+
+/* Correction générale pour le conteneur principal sur mobile */
+.content-renderer {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Correction générale des problèmes d'espacement */
+@media (max-width: 768px) {
+  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
+  .chat-messages-container {
+    padding-bottom: 120px !important; /* Plus d'espace pour le composeur en bas */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Empêcher les débordements qui causent des problèmes de mise en page */
+  .prose {
+    width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    overflow: visible;
+  }
+  
+  /* Forcer les conteneurs de messages à être correctement dimensionnés */
+  .prose .content-renderer {
+    max-width: 100%;
+    width: 100%;
+    display: block;
+  }
+  
+  /* Corrections spécifiques pour les équations et le code */
+  .prose code,
+  .prose pre {
+    white-space: pre-wrap;
+    max-width: 100%;
+    font-size: 0.85em;
+  }
+  
+  /* Correction importante pour les mathématiques en bloc */
+  .katex-display {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0.25em 0 !important;
+  }
+  
+  /* Ajouter un indicateur visuel pour le défilement horizontal */
+  .katex-display::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3));
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  /* Correction pour l'espacement final sur mobile */
+  .prose .content-renderer:last-child,
+  .web-message-content .content-renderer:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  /* Correction spécifique pour les messages avec équations ou code */
+  .chat-messages-container .prose {
+    padding-bottom: 8px;
+  }
+}
+
+/* Corrections spécifiques pour les très petits écrans */
+@media (max-width: 375px) {
+  .content-renderer {
+    font-size: 14px;
+  }
+  
+  .katex {
+    font-size: 0.9em;
+  }
+}

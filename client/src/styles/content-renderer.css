@@ -125,14 +125,43 @@
 
 /* Correction pour l'affichage sur mobile */
 @media (max-width: 768px) {
+  /* Réduire les marges et la taille de police pour les blocs de code */
   .content-renderer pre {
     margin: 0.5em 0;
     font-size: 0.9em;
+    padding: 0.5rem;
   }
   
+  /* Ajuster les formules mathématiques */
   .content-renderer .katex-display {
-    padding: 0.5em 0;
-    font-size: 0.95em;
+    padding: 0.25em 0;
+    font-size: 0.92em;
     margin: 0.5em 0;
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
+  }
+  
+  /* Forcer le bon positionnement des conteneurs */
+  .prose .content-renderer,
+  .chat-content,
+  .web-content {
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+  }
+  
+  /* Correction pour l'interface ChatAssistant spécifiquement */
+  .prose .content-renderer {
+    transform: translateZ(0); /* Forcer le rendu hardware pour éviter les sauts */
+    contain: content; /* Aide à isoler le contenu pour la performance */
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Ajuster la largeur des mathématiques inline pour éviter le débordement */
+  .content-renderer .katex {
+    max-width: 100%;
   }
 }
