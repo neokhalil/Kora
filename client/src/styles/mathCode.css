@@ -29,6 +29,7 @@
   margin: 1.5em 0;
   border-radius: 0.375rem;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .code-header {
@@ -54,6 +55,39 @@
 .copy-button:hover {
   color: #90cdf4;
 }
+
+/* Amélioration des blocs de code pour éviter l'effet de surexposition */
+.code-block-wrapper pre {
+  margin: 0;
+  background-color: #1a202c;
+  border-radius: 0 0 0.375rem 0.375rem;
+  padding: 1rem;
+  position: relative;
+  overflow-x: auto;
+}
+
+.code-block-wrapper code {
+  display: block;
+  color: #e2e8f0;
+  line-height: 1.5;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  background: transparent;
+}
+
+/* Syntax highlighting for code */
+.language-python .token.keyword { color: #ff79c6; }
+.language-python .token.function { color: #50fa7b; }
+.language-python .token.string { color: #f1fa8c; }
+.language-python .token.comment { color: #6272a4; }
+.language-python .token.number { color: #bd93f9; }
+.language-python .token.operator { color: #ff79c6; }
+
+.language-javascript .token.keyword { color: #ff79c6; }
+.language-javascript .token.function { color: #50fa7b; }
+.language-javascript .token.string { color: #f1fa8c; }
+.language-javascript .token.comment { color: #6272a4; }
+.language-javascript .token.number { color: #bd93f9; }
+.language-javascript .token.operator { color: #ff79c6; }
 
 /* Content renderer general styles */
 .content-renderer {
@@ -93,10 +127,14 @@
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 0.875rem;
   line-height: 1.6;
+  margin: 0; /* Reset margin to avoid whitespace */
+  position: relative;
 }
 
 .content-renderer code {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  display: block;
+  background: transparent;
 }
 
 /* Line numbers for code blocks */

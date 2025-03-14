@@ -95,14 +95,14 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   };
 
   return (
-    <div className={`code-block-wrapper relative my-4 ${className}`}>
-      <div className="code-header flex justify-between items-center bg-gray-800 text-white text-xs py-1 px-4 rounded-t">
+    <div className={`code-block-wrapper ${className}`}>
+      <div className="code-header">
         <span className="language-label font-mono">{languageMap[supportedLanguage] || supportedLanguage}</span>
         
         {showCopyButton && (
           <button 
             onClick={copyToClipboard}
-            className="copy-button font-medium hover:text-blue-300 transition-colors"
+            className="copy-button"
             aria-label="Copier le code"
           >
             {copied ? 'Copié !' : 'Copier'}
@@ -110,7 +110,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
         )}
       </div>
       
-      <pre className={`relative overflow-x-auto p-4 bg-gray-900 rounded-b text-sm ${showLineNumbers ? 'line-numbers' : ''}`}>
+      <pre className={`${showLineNumbers ? 'line-numbers' : ''}`}>
         <code 
           ref={codeRef}
           className={`language-${prismLanguage}`}
@@ -118,8 +118,6 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
           {code}
         </code>
       </pre>
-      
-{/* Styles moved to CSS file */}
     </div>
   );
 };
