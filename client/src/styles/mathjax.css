@@ -1,127 +1,152 @@
 /**
  * Styles pour les équations mathématiques et la mise en page du texte
+ * Style complètement refactorisé pour une meilleure compatibilité
  */
 
 /* Styles de base pour le conteneur MathJax */
 .math-renderer {
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.5;
   color: #333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Contenu mathématique - correction de l'affichage */
+/* Contenu mathématique global */
 .math-content {
-  white-space: normal !important;
-  text-align: left;
-  width: 100%;
   display: block;
+  width: 100%;
 }
 
-/* Styles de base pour les types d'éléments courants */
-.math-renderer div, 
-.math-renderer p, 
-.math-renderer span {
-  display: inline;
-  white-space: normal;
+/* Styles pour les paragraphes et les sections numérotées */
+.paragraph, .numbered-section {
+  display: block;
+  margin: 0.75em 0;
+  padding: 0.25em 0;
 }
 
-/* Styles pour les équations en bloc */
+/* Style pour le contenu des paragraphes */
+.paragraph-content {
+  display: block;
+  width: 100%;
+}
+
+/* Styles pour les titres */
+.math-renderer h1, .math-renderer h2, .math-renderer h3, 
+.math-renderer h4, .math-renderer h5, .math-renderer h6 {
+  display: block;
+  margin: 1em 0 0.5em 0;
+  line-height: 1.4;
+  font-weight: bold;
+}
+
+.math-renderer h1 { font-size: 1.8em; }
+.math-renderer h2 { font-size: 1.6em; }
+.math-renderer h3 { font-size: 1.4em; }
+.math-renderer h4 { font-size: 1.2em; }
+.math-renderer h5, .math-renderer h6 { font-size: 1.1em; }
+
+/* Styles spécifiques pour MathJax */
 .MathJax_Display {
+  display: block !important;
+  text-align: center;
   margin: 1em 0;
   overflow-x: auto;
   overflow-y: hidden;
-  display: block !important;
-  text-align: center;
 }
 
-/* Styles pour les équations inline */
 .MathJax {
-  display: inline !important;
-  font-size: 1.1em;
+  display: inline-block !important;
+  margin: 0 0.15em;
+  vertical-align: middle;
 }
 
-/* Assurer que les conteneurs spéciaux sont en mode bloc */
-.math-renderer h1, 
-.math-renderer h2, 
-.math-renderer h3, 
-.math-renderer h4, 
-.math-renderer h5, 
-.math-renderer h6,
-.math-renderer pre,
-.math-renderer .math-block,
-.math-renderer .step-result,
-.math-renderer .possible-equation {
-  display: block !important;
-  margin: 0.8em 0;
-}
-
-/* Formater les numéros qui pourraient être des résultats d'équations */
-.step-result {
-  font-weight: 500;
-  padding: 0.5em 0;
-  margin-left: 1.5em;
-}
-
-/* Style spécifique pour les équations qui sont susceptibles de devenir des "1" */
-.possible-equation {
-  font-style: italic;
-  color: #555;
-  padding: 0.3em;
-  border-left: 3px solid #ddd;
-  margin-left: 1em;
-}
-
-/* Style pour les blocs mathématiques après des titres numérotés */
-.math-block {
-  display: block !important;
-  margin: 0.5em 0 0.5em 1.5em;
-  padding: 0.3em 0;
-}
-
-/* Gestion des sauts de ligne */
-.math-renderer br {
+/* Bloc de code */
+.hljs-pre {
   display: block;
-  content: "";
-  margin-top: 0.5em;
-}
-
-/* Amélioration de la lisibilité du code */
-pre.hljs-pre {
   margin: 1em 0;
   padding: 1em;
   border-radius: 0.5em;
   background-color: #f5f5f5;
   overflow-x: auto;
   white-space: pre !important;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9em;
 }
 
-/* Réglage spécifique pour les éléments MathJax */
+/* Règles pour les variables et équations mathématiques */
+.mjx-math {
+  display: inline-block !important;
+}
+
 .mjx-chtml {
   display: inline-block !important;
-  line-height: 0;
-  text-indent: 0;
-  text-align: left;
-  text-transform: none;
-  font-size: 100% !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  white-space: normal !important;
 }
 
-/* Assurer que les SVG MathJax s'affichent correctement */
-span.MathJax_SVG {
+.mjx-container {
   display: inline-block !important;
+  margin: 0 !important;
+}
+
+/* Style spécifique pour éviter les conflits avec les numéros de liste */
+.numbered-section .mjx-container {
+  display: inline-block !important;
+  margin-left: 0.25em !important;
+}
+
+/* Style pour les saut de ligne */
+.math-renderer br {
+  display: block;
+  content: "";
+  margin-top: 0.75em;
+}
+
+/* Amélioration des styles pour le texte en ligne */
+strong, em, a {
+  display: inline;
+}
+
+/* Corrections pour les espaces dans les équations */
+.math-renderer .MathJax_SVG {
+  margin: 0 0.15em;
+}
+
+/* Corrections spécifiques pour les équations affichées après des listes numérotées */
+.numbered-section p,
+.numbered-section div {
+  display: block;
+  margin: 0.5em 0;
+  padding-left: 1em;
+}
+
+/* Styles spécifiques pour les protections contre les "1" apparaissant à la place des équations */
+.math-after-number, .eqn-after-number, .standalone-equation {
+  display: block !important;
+  margin: 0.5em 0 0.5em 1.5em;
+}
+
+.special-number {
+  color: #666;
+  font-style: italic;
+  background-color: #f8f8f8;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* Empêcher l'affichage simple des "1" en lieu et place des équations */
+.numbered-section div > span:only-child:not(.mjx-math):not(.MathJax):not(.MathJax_SVG),
+span:only-child:not(.mjx-math):not(.MathJax):not(.MathJax_SVG) {
+  color: #888;
+  font-style: italic;
 }
 
 /* Corrections pour l'affichage mobile */
 @media (max-width: 768px) {
-  .MathJax_SVG {
-    font-size: 100% !important;
+  .math-renderer {
+    font-size: 0.95rem;
   }
   
-  .math-renderer {
-    font-size: 0.9rem;
+  .MathJax_SVG {
+    max-width: 100% !important;
+    overflow-x: auto;
   }
 }
