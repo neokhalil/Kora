@@ -39,11 +39,14 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
       // Listes numérotées
       .replace(/^(\d+)\.\s+(.+?)$/gm, '<li value="$1">$2</li>');
     
-    // Maintenant, remplacer les sauts de ligne restants par des <br />
-    // mais pas juste après une balise de titre (pour éviter les espaces vides)
+    // Optimisation du traitement des sauts de ligne pour éviter les espaces excessifs
     const withLineBreaks = withMarkdown
-      .replace(/(<\/h[1-6]>)\n/g, '$1')  // Supprimer le saut de ligne après un titre
-      .replace(/\n/g, '<br />');         // Convertir les autres sauts de ligne en <br />
+      // Supprimer les sauts de ligne après les balises HTML
+      .replace(/(<\/[a-z1-6]+>)\n/g, '$1')
+      // Supprimer les sauts de ligne consécutifs (les réduire à un seul)
+      .replace(/\n{3,}/g, '\n\n')
+      // Convertir les sauts de ligne individuels en <br /> avec une classe spéciale
+      .replace(/\n/g, '<br class="content-linebreak" />');
     
     return <span dangerouslySetInnerHTML={{ __html: withLineBreaks }} />;
   };

@@ -157,6 +157,14 @@ pre[class*="language-"] .token {
   margin-top: 0.3em; /* Marge contrôlée entre les lignes */
 }
 
+/* Marge spécifique pour les sauts de ligne de contenu */
+.content-renderer .content-linebreak {
+  content: "";
+  display: block;
+  margin-top: 0.2em; /* Marge réduite pour les sauts de ligne dans le contenu */
+  margin-bottom: 0;
+}
+
 /* Style des paragraphes pour éviter trop d'espace blanc */
 .content-renderer p {
   margin-top: 0.4em;

@@ -518,7 +518,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         )}
         
         {/* Contenu du message avec formatage mathématique et code */}
-        <div className="web-message-content">
+        <div className="web-message-content prose-no-margin">
           <ContentRenderer content={message.content} />
         </div>
         
