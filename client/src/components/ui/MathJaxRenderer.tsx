@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { MathJaxContext, MathJax } from 'better-react-mathjax';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import { formatMathContent, sanitizeMathInput } from '../../utils/mathJaxFormatter';
 
 interface TextContentProps {
   content: string;
@@ -14,13 +15,19 @@ const mathJaxConfig = {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true,
-    processEnvironments: true
+    processEnvironments: true,
+    packages: ['base', 'ams', 'noerrors', 'noundefined']
+  },
+  svg: {
+    fontCache: 'global'
   },
   options: {
+    enableMenu: false,
     skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
     processHtmlClass: 'math-tex'
   },
   startup: {
+    typeset: true,
     pageReady: () => {
       return Promise.resolve();
     }
@@ -292,11 +299,14 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     return null;
   }
 
+  // Prétraiter le contenu pour assurer une bonne compatibilité avec MathJax
+  const preprocessedContent = formatMathContent(sanitizeMathInput(content));
+
   return (
     <div className={`math-renderer ${className}`}>
       <MathJaxContext config={mathJaxConfig}>
         <div className="whitespace-pre-wrap">
-          {processContent(content)}
+          {processContent(preprocessedContent)}
         </div>
       </MathJaxContext>
     </div>
