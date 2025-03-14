@@ -6,7 +6,7 @@ import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import { scrollToBottom, scheduleScroll } from '@/utils/scrollHelper';
+import { scrollToBottom, scheduleScroll, scrollAfterRender } from '@/utils/scrollHelper';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -166,6 +166,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     });
   };
   
+  // Fonction unifiée pour remplacer tous les appels requestAnimationFrame
+  // Cette fonction est utilisée partout où nous avions précédemment requestAnimationFrame
+  const scrollAfterRender = () => {
+    // Nous utilisons notre fonction de défilement optimisée
+    localScheduleScroll();
+  };
+  
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,15 +234,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         messageId: newMessageId, // ID pour les fonctions d'action
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -376,15 +376,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         messageId: newImageMessageId, // ID pour les fonctions d'action
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
       
@@ -471,15 +464,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         isReExplanation: true,
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la ré-explication:', error);
       
@@ -546,15 +532,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         challengeId: challengeId
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la génération de l\'exercice:', error);
       
@@ -605,15 +584,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           challengeId: challengeId
         }]);
         
-        // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-        requestAnimationFrame(() => {
-          if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'end'
-            });
-          }
-        });
+        // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
         
         setIsThinking(false);
         return;
@@ -632,15 +604,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         challengeId: challengeId
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la génération de l\'indice:', error);
       
@@ -655,15 +620,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         challengeId: challengeId
       }]);
       
-      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
-      requestAnimationFrame(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      });
+      // Utiliser notre fonction optimisée de défilement
+      scrollAfterRender();
     } finally {
       setIsThinking(false);
     }
