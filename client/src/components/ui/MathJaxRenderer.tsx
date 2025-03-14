@@ -116,11 +116,17 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     return `<div class="paragraph" key="${index}">${para}</div>`;
   }).join('');
   
+  // Filtrage supplémentaire pour éliminer les "1" et "$\displaystyle 1$" qui apparaissent parfois
+  let cleanedHtml = wrappedParagraphs;
+  // Remplacer les "11" ou "1" isolés qui pourraient être des erreurs de formule
+  cleanedHtml = cleanedHtml.replace(/<div[^>]*>\s*11\s*<\/div>/g, '');
+  cleanedHtml = cleanedHtml.replace(/(\$\\displaystyle\s+1\$)|(\$1\$)/g, '');
+
   return (
     <div className={`math-renderer ${className}`} ref={mathJaxRef}>
       <MathJaxContext config={mathJaxConfig}>
         <MathJax>
-          <div dangerouslySetInnerHTML={{ __html: wrappedParagraphs }} />
+          <div dangerouslySetInnerHTML={{ __html: cleanedHtml }} />
         </MathJax>
       </MathJaxContext>
     </div>
