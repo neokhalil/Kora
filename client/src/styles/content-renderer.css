@@ -82,6 +82,27 @@
   line-height: 1.2;
 }
 
+/* Amélioration des formules mathématiques */
+.content-renderer .katex-display > .katex {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1px; /* Permet le défilement correct sur certains navigateurs */
+}
+
+/* Améliorations visuelles pour les formules en bloc */
+.content-renderer .katex-display {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}
+
+/* Styles pour le dark mode */
+@media (prefers-color-scheme: dark) {
+  .content-renderer .katex-display {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
 /* Styles pour les blocs de code */
 .content-renderer pre {
   margin: 1em 0;
@@ -89,4 +110,29 @@
   position: relative;
   max-width: 100%;
   overflow-x: auto;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 0.75rem;
+}
+
+/* Styles pour le dark mode */
+@media (prefers-color-scheme: dark) {
+  .content-renderer pre {
+    background: #2d3748;
+    border-color: #4a5568;
+  }
+}
+
+/* Correction pour l'affichage sur mobile */
+@media (max-width: 768px) {
+  .content-renderer pre {
+    margin: 0.5em 0;
+    font-size: 0.9em;
+  }
+  
+  .content-renderer .katex-display {
+    padding: 0.5em 0;
+    font-size: 0.95em;
+    margin: 0.5em 0;
+  }
 }
