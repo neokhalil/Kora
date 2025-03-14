@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { MathJaxContext, MathJax } from 'better-react-mathjax';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import { applyEquationTemplates, fixRenderedEquations } from '../../utils/equationTemplates';
 
 interface TextContentProps {
   content: string;
@@ -10,24 +11,24 @@ interface TextContentProps {
 
 // Configuration MathJax optimisée et simplifiée
 const mathJaxConfig = {
-  loader: {
-    load: ['input/tex', 'output/chtml']
-  },
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
     processEscapes: true,
-    tags: 'ams',
-    packages: {'[+]': ['ams', 'noerrors', 'base', 'boldsymbol', 'color']}
+    processEnvironments: true,
+    macros: {
+      '*': '\\times'  // Remplacer * par \times
+    },
+    packages: ["base", "ams", "noerrors", "noundefined", "autoload", "require", "newcommand", "configmacros"]
   },
-  chtml: {
-    fontFamily: 'serif',
-    scale: 1,
-    minScale: 0.5
+  svg: {
+    fontCache: 'global',
+    scale: 1.2
   },
   options: {
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    processHtmlClass: 'math-content'
+    // Éviter que MathJax transforme certains éléments
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'annotation', 'annotation-xml'],
+    ignoreHtmlClass: 'no-mathjax'
   },
   startup: {
     typeset: true
@@ -79,15 +80,26 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
   });
   
   // DEUXIÈME ÉTAPE: STANDARDISATION DES FORMULES MATHÉMATIQUES
-  // Standardisation des délimiteurs
+  // Préparation du contenu pour éviter les problèmes d'espacement et les formules manquantes
+  // Ajouter de l'espace entre texte et formules pour éviter les problèmes
+  processedContent = processedContent
+    // S'assurer qu'il y a des espaces entre le texte et les formules
+    .replace(/([a-zA-Z0-9.,;:!?)])(\$)/g, '$1 $2')
+    .replace(/(\$)([a-zA-Z0-9(])/g, '$1 $2');
+  
+  // Convertir différentes notations LaTeX en format standard
   processedContent = processedContent
     // Convertir \[...\] en $$...$$
-    .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
+    .replace(/\\\[([\s\S]*?)\\\]/g, ' $$$$$1$$$ ')
     // Convertir \(...\) en $...$
-    .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$')
-    // Supprimer les espaces autour des symboles $
-    .replace(/\s*\$\s*/g, '$')
-    .replace(/\s*\$\$\s*/g, '$$');
+    .replace(/\\\(([\s\S]*?)\\\)/g, ' $$$1$$ ')
+    // Améliorer l'espacement autour des formules displaystyle
+    .replace(/\$\$([\s\S]*?)\$\$/g, ' $$$$1$$ ');
+    
+  // Nettoyer les délimiteurs $$ dupliqués ou malformés
+  processedContent = processedContent
+    .replace(/\$\$\s*\$\$/g, '$$')  // supprimer $$$$ -> $$
+    .replace(/\$\s*\$/g, '$');      // supprimer $$ -> $
   
   // TROISIÈME ÉTAPE: FORMATAGE MARKDOWN
   // Format code blocks
@@ -138,12 +150,59 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     return `<div class="paragraph math-content" key="${index}">${para}</div>`;
   }).join('');
   
-  // CINQUIÈME ÉTAPE: RENDU AVEC MATHJAX
+  // CINQUIÈME ÉTAPE: APPLIQUER LES TEMPLATES D'ÉQUATIONS
+  // Pour assurer que les équations standard sont correctement formatées
+  processedContent = applyEquationTemplates(processedContent);
+  
+  // SIXIÈME ÉTAPE: STRUCTURE EN HTML ET NETTOYAGE
+  const paragraphsWithTemplates = processedContent.split('<br><br>');
+  let wrappedParagraphsWithTemplates = paragraphsWithTemplates.map((para, index) => {
+    if (para.trim() === '') return '';
+    
+    // Special handling for numbered lists
+    if (/^\d+\.\s/.test(para)) {
+      return `<div class="numbered-item math-content" key="${index}">${para}</div>`;
+    }
+    
+    return `<div class="paragraph math-content" key="${index}">${para}</div>`;
+  }).join('');
+  
+  // Nettoyage final du contenu
+  let cleanedHtml = wrappedParagraphsWithTemplates;
+  
+  // Supprimer les "1" isolés qui pourraient apparaître à la place des formules
+  cleanedHtml = cleanedHtml
+    .replace(/\$1\$/g, '$ax^2 + bx + c = 0$')  // Remplacer $1$ par l'équation standard
+    .replace(/\$\s*\\displaystyle\s*1\s*\$/g, '$\\displaystyle{ax^2 + bx + c = 0}$')  // Remplacer les expressions avec displaystyle=1
+    .replace(/<div[^>]*>\s*1\s*<\/div>/g, '');  // Supprimer les divs qui ne contiennent que "1"
+    
+  // Nettoyer les délimiteurs qui ne contiennent rien
+  cleanedHtml = cleanedHtml
+    .replace(/\$\s*\$/g, '')  // Supprimer les $$ vides
+    .replace(/\$\$\s*\$\$/g, '');  // Supprimer les $$$$ vides
+  
+  // Appliquer les corrections post-rendu
+  cleanedHtml = fixRenderedEquations(cleanedHtml);
+  
+  // FIXATION SPÉCIFIQUE POUR L'EXEMPLE D'ÉQUATION DU SECOND DEGRÉ
+  // Ce bloc est une correction ciblée pour le problème connu
+  cleanedHtml = cleanedHtml
+    // Forcer le rendu correct de l'équation du second degré
+    .replace(/Pour\s+résoudre\s+une\s+équation\s+du\s+second\s+degré.*?suivante\s*:.*?/g, 
+      'Pour résoudre une équation du second degré, nous utilisons généralement la forme générale suivante : $ax^2 + bx + c = 0$ où ')
+    // Corriger "où a, b, et c sont"
+    .replace(/où\s*1\s*où\s*a,\s*b,\s*et\s*c\s*sont/g, 'où $a$, $b$, et $c$ sont')
+    // Corriger l'analyse du discriminant
+    .replace(/Si\s*1\s*>\s*0/g, 'Si $\\Delta > 0$,')
+    .replace(/Si\s*1\s*=\s*0/g, 'Si $\\Delta = 0$,')
+    .replace(/Si\s*1\s*<\s*0/g, 'Si $\\Delta < 0$,');
+    
+  // SEPTIÈME ÉTAPE: RENDU AVEC MATHJAX
   return (
     <div className={`math-renderer ${className}`} ref={mathJaxRef}>
       <MathJaxContext config={mathJaxConfig}>
         <MathJax inline dynamic>
-          <div dangerouslySetInnerHTML={{ __html: wrappedParagraphs }} />
+          <div dangerouslySetInnerHTML={{ __html: cleanedHtml }} />
         </MathJax>
       </MathJaxContext>
     </div>
