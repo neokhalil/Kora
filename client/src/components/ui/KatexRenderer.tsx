@@ -8,189 +8,159 @@ interface TextContentProps {
 }
 
 /**
- * Composant pour le rendu des expressions mathématiques et du texte
+ * Composant simplifié pour le rendu des expressions mathématiques avec KaTeX
  */
 const KatexRenderer: React.FC<TextContentProps> = ({ content, className = '' }) => {
   if (!content) return null;
-
+  
+  // Utiliser une approche simple pour traiter le contenu
+  const processedContent = preprocessLaTeX(content);
+  
   return (
     <div className={`katex-content ${className}`}>
-      {renderFormattedContent(content)}
+      <ProcessedContent content={processedContent} />
     </div>
   );
 };
 
-/**
- * Render le contenu formaté avec séparation des paragraphes
- */
-function renderFormattedContent(text: string): React.ReactNode {
-  // Découpe le texte en sections (paragraphes)
-  const sections = text.split('\n\n');
+// Prétraitement pour convertir les délimiteurs LaTeX en délimiteurs KaTeX
+function preprocessLaTeX(content: string): string {
+  // Remplacer \[ ... \] par $$ ... $$
+  let processed = content.replace(/\\\[(.*?)\\\]/gs, '$$$$1$$');
   
-  return sections.map((section, index) => {
-    // Traitement des titres
-    if (section.startsWith('# ')) {
-      return <h1 key={index} className="text-2xl font-bold mb-4">{processContentWithMath(section.substring(2))}</h1>;
-    } else if (section.startsWith('## ')) {
-      return <h2 key={index} className="text-xl font-bold mb-3">{processContentWithMath(section.substring(3))}</h2>;
-    } else if (section.startsWith('### ')) {
-      return <h3 key={index} className="text-lg font-bold mb-2">{processContentWithMath(section.substring(4))}</h3>;
-    }
+  // Remplacer \( ... \) par $ ... $
+  processed = processed.replace(/\\\((.*?)\\\)/gs, '$$$1$');
+  
+  return processed;
+}
 
-    // Traitement des listes
-    if (section.match(/^[*-] /m)) {
-      const items = section.split('\n').filter(line => line.trim().length > 0);
-      return (
-        <ul key={index} className="list-disc pl-5 mb-4">
-          {items.map((item, idx) => {
-            if (item.startsWith('* ') || item.startsWith('- ')) {
-              return <li key={idx}>{processContentWithMath(item.substring(2))}</li>;
-            }
-            return <li key={idx}>{processContentWithMath(item)}</li>;
-          })}
-        </ul>
-      );
-    }
+// Composant pour traiter le contenu avec paragraphes et formules
+const ProcessedContent: React.FC<{ content: string }> = ({ content }) => {
+  // Découper le contenu en paragraphes
+  const paragraphs = content.split('\n\n');
+  
+  return (
+    <>
+      {paragraphs.map((paragraph, index) => {
+        // Gestion des titres
+        if (paragraph.startsWith('# ')) {
+          return <h1 key={index} className="text-2xl font-bold mb-4">{renderParagraphWithMath(paragraph.substring(2))}</h1>;
+        } else if (paragraph.startsWith('## ')) {
+          return <h2 key={index} className="text-xl font-bold mb-3">{renderParagraphWithMath(paragraph.substring(3))}</h2>;
+        } else if (paragraph.startsWith('### ')) {
+          return <h3 key={index} className="text-lg font-bold mb-2">{renderParagraphWithMath(paragraph.substring(4))}</h3>;
+        }
+        
+        // Gestion des listes
+        if (paragraph.match(/^[*-] /m)) {
+          const items = paragraph.split('\n').filter(line => line.trim().length > 0);
+          return (
+            <ul key={index} className="list-disc pl-5 mb-4">
+              {items.map((item, idx) => {
+                if (item.startsWith('* ') || item.startsWith('- ')) {
+                  return <li key={idx}>{renderParagraphWithMath(item.substring(2))}</li>;
+                }
+                return <li key={idx}>{renderParagraphWithMath(item)}</li>;
+              })}
+            </ul>
+          );
+        }
+        
+        // Paragraphe standard
+        return <p key={index} className="mb-4">{renderParagraphWithMath(paragraph)}</p>;
+      })}
+    </>
+  );
+};
 
-    // Par défaut, c'est un paragraphe
-    return <p key={index} className="mb-4">{processContentWithMath(section)}</p>;
+// Fonction qui rend un paragraphe avec formules mathématiques
+function renderParagraphWithMath(text: string) {
+  // Séparer le texte en segments basés sur les délimiteurs mathématiques
+  const segments = [];
+  let currentText = '';
+  let i = 0;
+  
+  while (i < text.length) {
+    // Recherche d'un délimiteur $$ (formule en bloc)
+    if (text.substr(i, 2) === '$$' && text.indexOf('$$', i + 2) !== -1) {
+      // Ajouter le texte accumulé avant la formule
+      if (currentText) {
+        segments.push({ type: 'text', content: currentText });
+        currentText = '';
+      }
+      
+      // Trouver la fin de la formule
+      const start = i + 2;
+      const end = text.indexOf('$$', start);
+      
+      // Extraire la formule et l'ajouter au résultat
+      const formula = text.substring(start, end);
+      segments.push({ type: 'block-math', content: formula });
+      
+      // Avancer après la formule
+      i = end + 2;
+    }
+    // Recherche d'un délimiteur $ (formule en ligne)
+    else if (text[i] === '$' && text.indexOf('$', i + 1) !== -1) {
+      // Ajouter le texte accumulé avant la formule
+      if (currentText) {
+        segments.push({ type: 'text', content: currentText });
+        currentText = '';
+      }
+      
+      // Trouver la fin de la formule
+      const start = i + 1;
+      const end = text.indexOf('$', start);
+      
+      // Extraire la formule et l'ajouter au résultat
+      const formula = text.substring(start, end);
+      segments.push({ type: 'inline-math', content: formula });
+      
+      // Avancer après la formule
+      i = end + 1;
+    }
+    // Caractère normal - ajouter au texte courant
+    else {
+      currentText += text[i];
+      i++;
+    }
+  }
+  
+  // Ajouter le texte restant s'il y en a
+  if (currentText) {
+    segments.push({ type: 'text', content: currentText });
+  }
+  
+  // Rendre tous les segments
+  return segments.map((segment, index) => {
+    if (segment.type === 'text') {
+      return <span key={index} dangerouslySetInnerHTML={{ __html: formatTextWithStyles(segment.content) }} />;
+    } else if (segment.type === 'inline-math') {
+      try {
+        return <InlineMath key={index} math={segment.content} />;
+      } catch (error) {
+        console.error('KaTeX error:', error);
+        return <code key={index} style={{ color: 'red' }}>${segment.content}$</code>;
+      }
+    } else if (segment.type === 'block-math') {
+      try {
+        return <BlockMath key={index} math={segment.content} />;
+      } catch (error) {
+        console.error('KaTeX error:', error);
+        return <code key={index} style={{ color: 'red' }}>$${segment.content}$$</code>;
+      }
+    }
+    return null;
   });
 }
 
-/**
- * Traite un segment de texte et remplace les expressions mathématiques
- * par des composants React appropriés
- */
-function processContentWithMath(text: string): React.ReactNode[] {
-  const result: React.ReactNode[] = [];
-  
-  // Tableau de règles de délimiteurs math à traiter
-  const mathRules = [
-    { 
-      pattern: /\\\[(.*?)\\\]/gs, 
-      processMatch: (content: string, key: string) => <BlockMath key={key} math={content} /> 
-    },
-    { 
-      pattern: /\$\$(.*?)\$\$/gs, 
-      processMatch: (content: string, key: string) => <BlockMath key={key} math={content} /> 
-    },
-    { 
-      pattern: /\\\((.*?)\\\)/gs, 
-      processMatch: (content: string, key: string) => <InlineMath key={key} math={content} /> 
-    },
-    { 
-      pattern: /\$(.*?)\$/gs, 
-      processMatch: (content: string, key: string) => <InlineMath key={key} math={content} /> 
-    }
-  ];
-  
-  // On va traiter une section à la fois, en gardant le texte intermédiaire
-  let currentText = text;
-  let segments: { type: 'text' | 'math'; content: string; originalMatch?: string }[] = [];
-  
-  // Fonction pour trouver le prochain délimiteur math dans le texte
-  function findNextMathDelimiter() {
-    let firstMatch: { index: number; length: number; content: string; rule: typeof mathRules[0] } | null = null;
-    
-    // Chercher la première correspondance parmi toutes les règles
-    for (const rule of mathRules) {
-      rule.pattern.lastIndex = 0; // Réinitialiser le pointeur de recherche
-      const match = rule.pattern.exec(currentText);
-      if (match && (firstMatch === null || match.index < firstMatch.index)) {
-        firstMatch = {
-          index: match.index,
-          length: match[0].length,
-          content: match[1], // Le contenu capturé
-          rule: rule
-        };
-      }
-    }
-    
-    return firstMatch;
-  }
-  
-  // Tant qu'il y a des délimiteurs math, on les traite
-  let nextMatch = findNextMathDelimiter();
-  let lastIndex = 0;
-  
-  while (nextMatch !== null) {
-    // Traiter le texte avant le délimiteur
-    if (nextMatch.index > lastIndex) {
-      segments.push({
-        type: 'text',
-        content: currentText.substring(lastIndex, nextMatch.index)
-      });
-    }
-    
-    // Traiter le délimiteur math
-    segments.push({
-      type: 'math',
-      content: nextMatch.content,
-      originalMatch: currentText.substring(nextMatch.index, nextMatch.index + nextMatch.length)
-    });
-    
-    // Mettre à jour l'index pour la prochaine recherche
-    lastIndex = nextMatch.index + nextMatch.length;
-    
-    // Chercher le prochain délimiteur
-    nextMatch = findNextMathDelimiter();
-  }
-  
-  // Traiter le texte restant
-  if (lastIndex < currentText.length) {
-    segments.push({
-      type: 'text',
-      content: currentText.substring(lastIndex)
-    });
-  }
-  
-  // Maintenant, on transforme les segments en composants React
-  for (let i = 0; i < segments.length; i++) {
-    const segment = segments[i];
-    
-    if (segment.type === 'text') {
-      // Traiter le formatage de texte basique
-      result.push(
-        <span 
-          key={`text-${i}`} 
-          dangerouslySetInnerHTML={{ __html: formatTextWithStyles(segment.content) }} 
-        />
-      );
-    } else if (segment.type === 'math' && segment.originalMatch) {
-      // Trouver quelle règle s'applique
-      for (const rule of mathRules) {
-        rule.pattern.lastIndex = 0;
-        if (rule.pattern.test(segment.originalMatch)) {
-          try {
-            // Créer le composant pour cette formule
-            result.push(rule.processMatch(segment.content, `math-${i}`));
-            break;
-          } catch (error) {
-            console.error('Erreur KaTeX:', error);
-            // En cas d'erreur, afficher le code brut
-            result.push(
-              <code key={`math-error-${i}`} style={{ color: 'red' }}>
-                {segment.originalMatch}
-              </code>
-            );
-          }
-        }
-      }
-    }
-  }
-  
-  return result;
-}
-
-/**
- * Applique le formatage basique au texte (gras, italique, etc.)
- */
+// Formatage du texte avec styles basiques
 function formatTextWithStyles(text: string): string {
   // ** pour le gras
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   
-  // * pour l'italique
-  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  // * pour l'italique (seulement s'il n'est pas précédé par **)
+  text = text.replace(/(?<!\*)\*(.*?)\*(?!\*)/g, '<em>$1</em>');
   
   // __ pour le souligné
   text = text.replace(/__(.*?)__/g, '<u>$1</u>');
