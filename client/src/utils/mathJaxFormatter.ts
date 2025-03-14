@@ -11,63 +11,32 @@
 export function formatMathContent(content: string): string {
   if (!content) return content;
 
-  // Étape 1: Marquer les équations déjà correctement formatées pour les préserver
-  const placeholders: {[key: string]: string} = {};
-  let counter = 0;
-  
-  // Préserver les équations déjà formatées avec $$ ... $$
-  let processedContent = content.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
-    const placeholder = `__MATH_DISPLAY_${counter++}__`;
-    placeholders[placeholder] = match;
-    return placeholder;
-  });
-  
-  // Préserver les équations déjà formatées avec $ ... $
-  processedContent = processedContent.replace(/\$([^\$\n]+?)\$/g, (match) => {
-    const placeholder = `__MATH_INLINE_${counter++}__`;
-    placeholders[placeholder] = match;
-    return placeholder;
-  });
-  
-  // Étape 2: Convertir les notations alternatives
+  // Étape 1: Convertir les notations alternatives vers la notation standard MathJax
   // Convertir \[ ... \] en $$...$$
-  processedContent = processedContent.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+  let processedContent = content.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
   
   // Convertir \( ... \) en $...$
   processedContent = processedContent.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
   
-  // Étape 3: Détecter et formater les équations non formatées
-  // Formatage des équations de type "ax + b = c"
-  processedContent = processedContent.replace(/([a-z])([a-z])\s*\+\s*([a-z])\s*=\s*([a-z])/g, '$$$1$2 + $3 = $4$$');
+  // Corriger les commandes LaTeX mal écrites
+  processedContent = processedContent.replace(/\\log_([0-9]+)/g, '\\log_{$1}');
+  processedContent = processedContent.replace(/\\log\_([0-9]+)/g, '\\log_{$1}');
+  processedContent = processedContent.replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}');
   
-  // Formater les exemples numériques comme "2x + 5 = 11"
-  processedContent = processedContent.replace(/(\d+)([a-z])\s*\+\s*(\d+)\s*=\s*(\d+)/g, '$$$$1$2 + $3 = $4$$');
-  
-  // Formater les variables isolées
-  processedContent = processedContent.replace(/\b([a-z])\b/g, (match, p1) => {
-    // Éviter de formatter les variables déjà formatées
-    if (processedContent.match(new RegExp(`\\$${p1}\\$`)) || 
-        processedContent.match(new RegExp(`\\$\\$.*${p1}.*\\$\\$`))) {
-      return match;
-    }
-    // Mettre en forme la variable isolée
-    return `$$${p1}$$`;
-  });
-  
-  // Étape 4: Réinsérer les équations préservées
-  Object.keys(placeholders).forEach(placeholder => {
-    processedContent = processedContent.replace(placeholder, placeholders[placeholder]);
-  });
-  
-  // Étape 5: Nettoyage final et ajustements
-  // Éviter les doubles $$ adjacents qui peuvent se produire
-  processedContent = processedContent.replace(/\$\$\s*\$\$/g, '$$');
-  
-  // Assurer que les équations ont des espaces autour pour être correctement reconnues
+  // Étape 2: S'assurer que les délimiteurs ont un espace autour pour être correctement reconnus
   processedContent = processedContent.replace(/(\S)\$\$/g, '$1 $$');
   processedContent = processedContent.replace(/\$\$(\S)/g, '$$ $1');
   processedContent = processedContent.replace(/(\S)\$/g, '$1 $');
   processedContent = processedContent.replace(/\$(\S)/g, '$ $1');
+  
+  // Éviter les doubles $$ adjacents qui peuvent se produire
+  processedContent = processedContent.replace(/\$\$\s*\$\$/g, '$$');
+  
+  // Nettoyer les espaces superflus dans les délimiteurs
+  processedContent = processedContent.replace(/\$ /g, '$');
+  processedContent = processedContent.replace(/ \$/g, '$');
+  processedContent = processedContent.replace(/\$\$ /g, '$$');
+  processedContent = processedContent.replace(/ \$\$/g, '$$');
   
   return processedContent;
 }

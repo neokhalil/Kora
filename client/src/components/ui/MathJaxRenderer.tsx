@@ -11,6 +11,7 @@ interface TextContentProps {
 
 // Configuration de MathJax
 const mathJaxConfig = {
+  loader: { load: ['input/tex', 'output/svg'] },
   tex: {
     inlineMath: [['$', '$'], ['\\(', '\\)']],
     displayMath: [['$$', '$$'], ['\\[', '\\]']],
@@ -23,8 +24,11 @@ const mathJaxConfig = {
   },
   options: {
     enableMenu: false,
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
-    processHtmlClass: 'math-tex'
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    processHtmlClass: 'tex2jax_process'
+  },
+  startup: {
+    typeset: true
   }
 };
 
