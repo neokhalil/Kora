@@ -3,6 +3,8 @@
 // Declare the toggleKoraMenu function added by index.html
 interface Window {
   toggleKoraMenu?: () => void;
+  ensureMessageVisibility?: () => void;
+  diagnoseScrollIssues?: () => any;
   MathJax?: {
     typesetPromise: (elements: HTMLElement[]) => Promise<any>;
     typeset: (elements: HTMLElement[]) => void;

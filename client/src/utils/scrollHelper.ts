@@ -106,6 +106,7 @@ export const scheduleScroll = (options: ScrollOptions = {}) => {
  * Fonction de remplacement pour requestAnimationFrame
  * Utilisée pour standardiser le comportement de défilement après le rendu
  * Remplace les blocs requestAnimationFrame dispersés dans le code
+ * Intègre maintenant des diagnostics avancés de visibilité
  * 
  * @param options Options de défilement optionnelles
  */
@@ -142,6 +143,33 @@ export const scrollAfterRender = (options: ScrollOptions = {}) => {
           behavior: 'auto', 
           block: 'end' 
         });
+        
+        // Diagnostic de visibilité après rendu complet
+        // Cette partie utilise les fonctions de ScrollTestUtils.ts si elles sont disponibles
+        setTimeout(() => {
+          // Vérification si les fonctions de diagnostic sont disponibles
+          // (exposées par WebHomeView)
+          if (window.ensureMessageVisibility) {
+            window.ensureMessageVisibility();
+          } else {
+            // Solution de secours si les fonctions de diagnostic ne sont pas disponibles
+            const container = document.querySelector('.web-conversation-container');
+            const messages = document.querySelectorAll('.web-message');
+            
+            if (container && messages.length > 0) {
+              // Forcer le défilement au maximum
+              if (container instanceof HTMLElement) {
+                container.scrollTop = container.scrollHeight;
+              }
+              
+              // Essayer de faire défiler jusqu'au dernier message visible
+              const lastMessage = messages[messages.length - 1];
+              if (lastMessage instanceof HTMLElement) {
+                lastMessage.scrollIntoView({ behavior: 'auto', block: 'end' });
+              }
+            }
+          }
+        }, 300);
       }, 500);
       
       // S'assurer que le défilement est bien pris en compte sur les appareils mobiles

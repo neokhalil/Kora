@@ -86,6 +86,20 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     };
   }, []);
   
+  // Effet pour exposer les fonctions de diagnostic au window global
+  useEffect(() => {
+    // Exposer les fonctions de diagnostic à l'objet window pour permettre
+    // leur utilisation depuis scrollHelper.ts
+    window.ensureMessageVisibility = ensureLastMessageVisibility;
+    window.diagnoseScrollIssues = diagnoseScrollIssues;
+    
+    // Nettoyage à la destruction du composant
+    return () => {
+      window.ensureMessageVisibility = undefined;
+      window.diagnoseScrollIssues = undefined;
+    };
+  }, []);
+  
   // Effet pour gérer le clavier virtuel sur mobile
   useEffect(() => {
     if (!isMobile) return;
