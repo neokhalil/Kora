@@ -125,55 +125,14 @@
 
 /* Correction pour l'affichage sur mobile */
 @media (max-width: 768px) {
-  /* Ajustements généraux pour le mobile */
-  .content-renderer {
-    font-size: 14px;
-    line-height: 1.4;
-    width: 100%;
-    padding-right: 0;
-  }
-  
-  /* Correction des problèmes d'espacement */
-  .prose .content-renderer {
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Ajustements des blocs de code */
   .content-renderer pre {
     margin: 0.5em 0;
     font-size: 0.9em;
-    padding: 0.5rem;
-    max-width: 100%;
-    white-space: pre-wrap;
   }
   
-  /* Ajustements des formules KaTeX */
   .content-renderer .katex-display {
     padding: 0.5em 0;
     font-size: 0.95em;
     margin: 0.5em 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    max-width: 100%;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Correction du débordement horizontal */
-  .content-renderer .katex-display > .katex {
-    max-width: 100%;
-    overflow-x: auto;
-    padding: 2px 0;
-  }
-  
-  /* Empêcher les formules d'être coupées */
-  .content-renderer .katex {
-    white-space: nowrap;
-  }
-  
-  /* Correction spécifique pour ChatAssistant */
-  .prose .content-renderer.chat-content {
-    padding: 0;
-    margin: 0;
   }
 }

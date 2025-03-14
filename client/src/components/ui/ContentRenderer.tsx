@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import KatexRenderer from './KatexRenderer';
 import CodeBlock from './CodeBlock';
 import { MathSegment, segmentTextWithMath, sanitizeFormula, parseCodeBlock } from '../../utils/mathProcessor';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ContentRendererProps {
   content: string;
@@ -14,22 +13,6 @@ interface ContentRendererProps {
  * Remplace le composant MathJaxRenderer précédent avec une approche plus modulaire
  */
 const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = '' }) => {
-  const isMobile = useIsMobile();
-  const containerRef = useRef<HTMLDivElement>(null);
-  
-  // Effet pour gérer le débordement du contenu sur les petits écrans
-  useEffect(() => {
-    if (containerRef.current && isMobile) {
-      // S'assurer que le conteneur ne déborde pas
-      const container = containerRef.current;
-      
-      // Ajouter des classes CSS spécifiques pour le mobile
-      if (isMobile) {
-        container.classList.add('mobile-content-view');
-      }
-    }
-  }, [content, isMobile]);
-  
   if (!content) {
     return null;
   }
@@ -113,7 +96,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
   });
   
   return (
-    <div ref={containerRef} className={`content-renderer ${className} ${isMobile ? 'mobile-content-view' : ''}`}>
+    <div className={`content-renderer ${className}`}>
       {renderedContent}
     </div>
   );
