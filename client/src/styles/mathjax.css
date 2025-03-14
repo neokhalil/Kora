@@ -1,5 +1,5 @@
 /**
- * Styles spécifiques pour les équations mathématiques et le formatage de texte
+ * Styles simplifiés pour les équations mathématiques
  */
 
 /* Styles de base pour le conteneur MathJax */
@@ -7,83 +7,55 @@
   font-size: 1rem;
   line-height: 1.6;
   color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Résoudre le problème de caractères sur des lignes séparées */
-.math-renderer p, 
-.math-renderer .paragraph,
-.math-renderer span.inline,
-.math-renderer .normal-text,
-.math-renderer .text-paragraph,
-.math-renderer .text-content {
-  display: inline-block;
+/* Contenu mathématique - correction de l'affichage */
+.math-content {
   white-space: normal;
+  text-align: left;
   width: 100%;
 }
 
-/* Forcer le texte à rester sur la même ligne */
-.math-renderer * {
-  white-space: normal;
-}
-
-/* Rétablir le passage à la ligne pour certains éléments */
-.math-renderer pre.hljs-pre {
-  white-space: pre;
-}
-
-/* Espacement des équations en block */
+/* Styles pour les équations en bloc */
 .MathJax_Display {
   margin: 1em 0;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-/* Style pour les équations inline */
+/* Styles pour les équations inline */
 .MathJax {
-  font-size: 1.1em;
   display: inline !important;
+  font-size: 1.1em;
 }
 
-/* Style amélioré pour les équations display (block) */
-.MathJax_SVG_Display {
-  margin: 1.5em 0;
-  text-align: center;
+/* Correction pour les éléments HTML générés */
+.math-renderer p, 
+.math-renderer strong,
+.math-renderer span,
+.math-renderer div {
+  display: inline;
+  white-space: normal;
 }
 
-/* Correction pour les équations trop larges */
-.MathJax_SVG_Display > .MathJax_SVG {
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-/* Style pour les formules avec délimiteurs */
-.math-formula-block {
+/* Exceptions pour les éléments de bloc */
+.math-renderer h1, 
+.math-renderer h2, 
+.math-renderer h3, 
+.math-renderer h4, 
+.math-renderer h5, 
+.math-renderer h6,
+.math-renderer pre {
   display: block;
   margin: 1em 0;
-  text-align: center;
-  font-size: 1.1em;
 }
 
-.math-formula-inline {
-  display: inline-block;
-  margin: 0 0.2em;
-  vertical-align: middle;
-}
-
-/* Style pour les formules avec $$ */
-.math-tex {
-  padding: 0.5em 0;
-}
-
-/* Style pour les équations inline avec $ */
-p .MathJax {
-  vertical-align: middle;
-}
-
-/* Styles pour le rendu des numéros (1, 2, 3) dans les équations */
-span.mjx-char {
-  font-family: MathJax_Main, 'Times New Roman', serif;
+/* Gestion des sauts de ligne */
+.math-renderer br {
+  display: block;
+  content: "";
+  margin-top: 0.5em;
 }
 
 /* Amélioration de la lisibilité du code */
@@ -93,29 +65,12 @@ pre.hljs-pre {
   border-radius: 0.5em;
   background-color: #f5f5f5;
   overflow-x: auto;
+  white-space: pre;
 }
 
-/* Style pour les titres mathématiques */
-.math-title {
-  font-weight: bold;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
-}
-
-/* Style pour la mise en page normale du texte */
-.normal-text {
-  display: block;
-  margin-bottom: 1em;
-}
-
-/* Style pour les paragraphes normaux */
-.paragraph {
-  margin-bottom: 0.5em;
-}
-
-/* Séparation claire entre les équations et le texte */
-.whitespace-pre-wrap {
-  word-break: break-word;
+/* Afficher les variables mathématiques correctement */
+span.MathJax_SVG {
+  display: inline-block !important;
 }
 
 /* Corrections pour l'affichage mobile */

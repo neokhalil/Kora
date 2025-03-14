@@ -11,68 +11,65 @@
 export function formatMathContent(content: string): string {
   if (!content) return content;
 
-  // Remplacer les notations problématiques \[ et \] par $$...$$, qui est plus largement compatible
-  let formattedContent = content.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+  // Étape 1: Marquer les équations déjà correctement formatées pour les préserver
+  const placeholders: {[key: string]: string} = {};
+  let counter = 0;
   
-  // Remplacer également les notations \( et \) pour les formules en ligne
-  formattedContent = formattedContent.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
-  
-  // Traiter les commandes spéciales \log_base
-  formattedContent = formattedContent.replace(/\\log_([a-zA-Z0-9]+)\(([^)]+)\)/g, '\\log_{$1}($2)');
-  
-  // Assurer que les équations linéaires comme ax + b = c sont correctement formatées
-  // Rechercher les formules de type 'ax + b = c' et les encadrer avec $$ si ce n'est pas déjà fait
-  const linearEquationRegex = /([a-z])([a-z])\s*\+\s*([a-z])\s*=\s*([a-z])/g;
-  formattedContent = formattedContent.replace(linearEquationRegex, (match, p1, p2, p3, p4) => {
-    // Ne pas encadrer si déjà entre $$ ou $
-    if (formattedContent.includes(`$$${match}$$`) || formattedContent.includes(`$${match}$`)) {
-      return match;
-    }
-    return `$${p1}${p2} + ${p3} = ${p4}$`;
+  // Préserver les équations déjà formatées avec $$ ... $$
+  let processedContent = content.replace(/\$\$([\s\S]*?)\$\$/g, (match) => {
+    const placeholder = `__MATH_DISPLAY_${counter++}__`;
+    placeholders[placeholder] = match;
+    return placeholder;
   });
   
-  // Ajouter des espaces entre les symboles $ et le texte pour éviter les problèmes de reconnaissance
-  formattedContent = formattedContent.replace(/(\S)\$\$/g, '$1 $$');
-  formattedContent = formattedContent.replace(/\$\$(\S)/g, '$$ $1');
-  formattedContent = formattedContent.replace(/(\S)\$/g, '$1 $');
-  formattedContent = formattedContent.replace(/\$(\S)/g, '$ $1');
-  
-  // Corriger la présentation des variables isolées
-  formattedContent = formattedContent.replace(/([^$])([a-z])([^a-zA-Z0-9$])/g, '$1$$$2$$$3');
-  
-  // Assurer que les isolations de variables comme "Isoler x" sont correctement formatées
-  formattedContent = formattedContent.replace(/([Ii]soler)\s+([a-z])(\s|\.)/g, '$1 $$$2$$$3');
-  
-  // Assurer que les formulations comme "variable x" sont correctement formatées
-  formattedContent = formattedContent.replace(/variable\s+([a-z])(\s|\.)/g, 'variable $$$1$$$2');
-  
-  // Éviter le cas particulier où des numéros isolés (comme "1") apparaissent au lieu des équations
-  formattedContent = formattedContent.replace(/\$\$(\d+)\$\$/g, '$$ $1 $$');
-  formattedContent = formattedContent.replace(/\$(\d+)\$/g, '$ $1 $');
-  
-  // Correction pour les équations algebraiques avec opérateurs
-  formattedContent = formattedContent.replace(/\$\$(.*?\+.*?)\$\$/g, '$$ $1 $$');
-  formattedContent = formattedContent.replace(/\$\$(.*?\-.*?)\$\$/g, '$$ $1 $$');
-  formattedContent = formattedContent.replace(/\$\$(.*?\=.*?)\$\$/g, '$$ $1 $$');
-  
-  // Corriger le cas spécial de $$$$ qui pourrait être créé accidentellement
-  formattedContent = formattedContent.replace(/\${4}/g, '$$$$');
-  
-  // Correction spéciale pour le format $$1$$ (substitution incorrecte)
-  formattedContent = formattedContent.replace(/\$\$1\$\$/g, '$$1$$');
-  
-  // Éviter d'ajouter \text{} autour des variables uniques et des opérateurs
-  formattedContent = formattedContent.replace(/\$([a-z])\$/g, '$$$1$$');
-  
-  // Formatage spécial pour les exemples comme "2x + 5 = 11"
-  formattedContent = formattedContent.replace(/(\d+)([a-z])\s*\+\s*(\d+)\s*=\s*(\d+)/g, (match) => {
-    if (formattedContent.includes(`$$${match}$$`) || formattedContent.includes(`$${match}$`)) {
-      return match;
-    }
-    return `$$${match}$$`;
+  // Préserver les équations déjà formatées avec $ ... $
+  processedContent = processedContent.replace(/\$([^\$\n]+?)\$/g, (match) => {
+    const placeholder = `__MATH_INLINE_${counter++}__`;
+    placeholders[placeholder] = match;
+    return placeholder;
   });
   
-  return formattedContent;
+  // Étape 2: Convertir les notations alternatives
+  // Convertir \[ ... \] en $$...$$
+  processedContent = processedContent.replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$');
+  
+  // Convertir \( ... \) en $...$
+  processedContent = processedContent.replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
+  
+  // Étape 3: Détecter et formater les équations non formatées
+  // Formatage des équations de type "ax + b = c"
+  processedContent = processedContent.replace(/([a-z])([a-z])\s*\+\s*([a-z])\s*=\s*([a-z])/g, '$$$1$2 + $3 = $4$$');
+  
+  // Formater les exemples numériques comme "2x + 5 = 11"
+  processedContent = processedContent.replace(/(\d+)([a-z])\s*\+\s*(\d+)\s*=\s*(\d+)/g, '$$$$1$2 + $3 = $4$$');
+  
+  // Formater les variables isolées
+  processedContent = processedContent.replace(/\b([a-z])\b/g, (match, p1) => {
+    // Éviter de formatter les variables déjà formatées
+    if (processedContent.match(new RegExp(`\\$${p1}\\$`)) || 
+        processedContent.match(new RegExp(`\\$\\$.*${p1}.*\\$\\$`))) {
+      return match;
+    }
+    // Mettre en forme la variable isolée
+    return `$$${p1}$$`;
+  });
+  
+  // Étape 4: Réinsérer les équations préservées
+  Object.keys(placeholders).forEach(placeholder => {
+    processedContent = processedContent.replace(placeholder, placeholders[placeholder]);
+  });
+  
+  // Étape 5: Nettoyage final et ajustements
+  // Éviter les doubles $$ adjacents qui peuvent se produire
+  processedContent = processedContent.replace(/\$\$\s*\$\$/g, '$$');
+  
+  // Assurer que les équations ont des espaces autour pour être correctement reconnues
+  processedContent = processedContent.replace(/(\S)\$\$/g, '$1 $$');
+  processedContent = processedContent.replace(/\$\$(\S)/g, '$$ $1');
+  processedContent = processedContent.replace(/(\S)\$/g, '$1 $');
+  processedContent = processedContent.replace(/\$(\S)/g, '$ $1');
+  
+  return processedContent;
 }
 
 /**
