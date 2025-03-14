@@ -20,11 +20,31 @@ export function formatMathContent(content: string): string {
   // Traiter les commandes spéciales \log_base
   formattedContent = formattedContent.replace(/\\log_([a-zA-Z0-9]+)\(([^)]+)\)/g, '\\log_{$1}($2)');
   
+  // Assurer que les équations linéaires comme ax + b = c sont correctement formatées
+  // Rechercher les formules de type 'ax + b = c' et les encadrer avec $$ si ce n'est pas déjà fait
+  const linearEquationRegex = /([a-z])([a-z])\s*\+\s*([a-z])\s*=\s*([a-z])/g;
+  formattedContent = formattedContent.replace(linearEquationRegex, (match, p1, p2, p3, p4) => {
+    // Ne pas encadrer si déjà entre $$ ou $
+    if (formattedContent.includes(`$$${match}$$`) || formattedContent.includes(`$${match}$`)) {
+      return match;
+    }
+    return `$${p1}${p2} + ${p3} = ${p4}$`;
+  });
+  
   // Ajouter des espaces entre les symboles $ et le texte pour éviter les problèmes de reconnaissance
   formattedContent = formattedContent.replace(/(\S)\$\$/g, '$1 $$');
   formattedContent = formattedContent.replace(/\$\$(\S)/g, '$$ $1');
   formattedContent = formattedContent.replace(/(\S)\$/g, '$1 $');
   formattedContent = formattedContent.replace(/\$(\S)/g, '$ $1');
+  
+  // Corriger la présentation des variables isolées
+  formattedContent = formattedContent.replace(/([^$])([a-z])([^a-zA-Z0-9$])/g, '$1$$$2$$$3');
+  
+  // Assurer que les isolations de variables comme "Isoler x" sont correctement formatées
+  formattedContent = formattedContent.replace(/([Ii]soler)\s+([a-z])(\s|\.)/g, '$1 $$$2$$$3');
+  
+  // Assurer que les formulations comme "variable x" sont correctement formatées
+  formattedContent = formattedContent.replace(/variable\s+([a-z])(\s|\.)/g, 'variable $$$1$$$2');
   
   // Éviter le cas particulier où des numéros isolés (comme "1") apparaissent au lieu des équations
   formattedContent = formattedContent.replace(/\$\$(\d+)\$\$/g, '$$ $1 $$');
@@ -41,9 +61,16 @@ export function formatMathContent(content: string): string {
   // Correction spéciale pour le format $$1$$ (substitution incorrecte)
   formattedContent = formattedContent.replace(/\$\$1\$\$/g, '$$1$$');
   
-  // Ajouter automatiquement le mode texte autour des mots dans les formules mathématiques
-  formattedContent = formattedContent.replace(/\$\$(.*?)([a-zA-Z]{2,})(.*?)\$\$/g, '$$ $1\\text{$2}$3 $$');
-  formattedContent = formattedContent.replace(/\$(.*?)([a-zA-Z]{2,})(.*?)\$/g, '$ $1\\text{$2}$3 $');
+  // Éviter d'ajouter \text{} autour des variables uniques et des opérateurs
+  formattedContent = formattedContent.replace(/\$([a-z])\$/g, '$$$1$$');
+  
+  // Formatage spécial pour les exemples comme "2x + 5 = 11"
+  formattedContent = formattedContent.replace(/(\d+)([a-z])\s*\+\s*(\d+)\s*=\s*(\d+)/g, (match) => {
+    if (formattedContent.includes(`$$${match}$$`) || formattedContent.includes(`$${match}$`)) {
+      return match;
+    }
+    return `$$${match}$$`;
+  });
   
   return formattedContent;
 }

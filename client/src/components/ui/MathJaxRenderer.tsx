@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MathJaxContext, MathJax } from 'better-react-mathjax';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
@@ -342,12 +342,26 @@ const processBoldTitles = (text: string): React.ReactNode => {
  * Composant avancé pour l'affichage de texte avec support des formules mathématiques et coloration syntaxique
  */
 const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }) => {
+  // Référence pour le rafraîchissement de MathJax
+  const mathJaxRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     // Initialiser highlight.js sur les éléments de code déjà dans le DOM
     hljs.configure({ languages: [] });
     document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
       hljs.highlightElement(block as HTMLElement);
     });
+    
+    // Force MathJax to reprocess when content changes
+    const timer = setTimeout(() => {
+      if (window.MathJax && mathJaxRef.current) {
+        window.MathJax.typesetPromise([mathJaxRef.current]).catch((err: any) => 
+          console.error('MathJax typesetting failed:', err)
+        );
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [content]);
 
   if (!content) {
@@ -358,7 +372,7 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
   const preprocessedContent = formatMathContent(sanitizeMathInput(content));
 
   return (
-    <div className={`math-renderer ${className}`}>
+    <div className={`math-renderer ${className}`} ref={mathJaxRef}>
       <MathJaxContext config={mathJaxConfig}>
         <div className="whitespace-pre-wrap">
           {processContent(preprocessedContent)}
