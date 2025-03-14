@@ -49,6 +49,51 @@ Pour synchroniser l'environnement de test avec la dernière version de développ
 
 3. En cas de conflit, le script crée des fichiers `.backup` et vous informe des fichiers concernés
 
+### Synchronisation de Production depuis Test
+
+Pour synchroniser l'environnement de production avec la version testée :
+
+1. Dans l'environnement de production, exécutez :
+   ```bash
+   ./scripts/multi-repls-setup/pull-from-test.sh
+   ```
+
+Si ce script n'existe pas encore, vous pouvez le créer en suivant le modèle de `pull-from-dev.sh` mais en ajustant les URLs des dépôts.
+
+### Résolution de l'erreur "Could not find the build directory"
+
+Si vous rencontrez cette erreur dans l'environnement de test après une synchronisation :
+```
+Error: Could not find the build directory: /home/runner/workspace/server/public, make sure to build the client first
+```
+
+C'est généralement parce que les fichiers client n'ont pas été compilés. Suivez ces étapes :
+
+1. Assurez-vous que le dossier existe :
+   ```bash
+   mkdir -p server/public
+   ```
+
+2. Construisez explicitement le client :
+   ```bash
+   npm run build
+   ```
+
+3. Si l'erreur persiste, vous pouvez forcer la génération des fichiers statiques :
+   ```bash
+   # Option 1: Copier depuis l'environnement de développement si disponible
+   cp -r ../dev-environment/server/public/* server/public/
+   
+   # Option 2: Créer un fichier minimal pour que le serveur démarre
+   echo "console.log('Client loading...');" > server/public/index.js
+   echo "<html><body>Loading...</body></html>" > server/public/index.html
+   ```
+
+4. Redémarrez ensuite le serveur :
+   ```bash
+   npm run dev
+   ```
+
 ### Résolution des conflits
 
 Si des conflits surviennent pendant la synchronisation :

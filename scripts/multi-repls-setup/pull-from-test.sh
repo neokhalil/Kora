@@ -1,74 +1,50 @@
 #!/bin/bash
-# Script pour récupérer une version spécifique depuis l'environnement de test
 
-# Vérifier si une version est spécifiée
-version=$1
-if [ -z "$version" ]; then
-  echo "❌ Erreur: Version non spécifiée"
-  echo "   Usage: $0 <version>"
-  echo "   Exemple: $0 v1.0.0"
-  exit 1
-fi
+# Script pour synchroniser l'environnement de production avec l'environnement de test
+# À exécuter dans l'environnement de production
 
-echo "=== Déploiement de la version $version en production ==="
+echo "===== Synchronisation de l'environnement de production depuis l'environnement de test ====="
 
-# Vérifier si Git est initialisé
-if [ ! -d .git ]; then
-  echo "❌ Erreur: Dépôt Git non initialisé"
-  exit 1
-fi
+# 1. Sauvegarde des fichiers de configuration spécifiques à l'environnement de production
+echo "1. Sauvegarde des fichiers de configuration de production..."
+cp .env .env.backup.$(date +%Y%m%d%H%M%S)
+cp server/config/env.production.ts server/config/env.production.ts.backup.$(date +%Y%m%d%H%M%S)
 
-# Sauvegarder les fichiers de configuration spécifiques à la production
-echo "🔄 Sauvegarde des configurations spécifiques à l'environnement de production..."
-cp -f .env .env.backup 2>/dev/null || :
-cp -f server/config/environments.ts server/config/environments.ts.backup 2>/dev/null || :
+# 2. Récupération des derniers changements de l'environnement de test
+# Remplacez l'URL ci-dessous par l'URL réelle de votre environnement de test
+echo "2. Récupération des derniers changements depuis l'environnement de test..."
 
-# Vérifier si le tag existe
-echo "🔄 Vérification de la version $version..."
-git fetch --tags
-if ! git tag | grep -q "$version"; then
-  echo "❌ Erreur: Version $version introuvable"
-  echo "   Vérifiez que le tag a bien été poussé vers GitHub"
-  exit 1
-fi
+# Si vous utilisez git
+# git remote add test https://github.com/user/kora-test.git
+# git fetch test
+# git merge test/main --no-commit
 
-# Créer une branche de sauvegarde avant de checkout
-current_branch=$(git branch --show-current)
-backup_branch="backup-$(date +%Y%m%d-%H%M%S)"
-echo "🔄 Création d'une branche de sauvegarde $backup_branch..."
-git branch "$backup_branch"
+# Si vous utilisez un transfert direct (ajustez l'URL selon votre configuration)
+# rsync -av --exclude='.env' --exclude='server/config/env.production.ts' --exclude='node_modules' test-environment:~/kora/ ./
 
-# Checkout la version spécifiée
-echo "🔄 Basculement vers la version $version..."
-git checkout "$version"
+# 3. Réappliquer les configurations spécifiques à l'environnement de production
+echo "3. Réapplication des configurations de production..."
+# Cette étape est déjà gérée par la préservation des fichiers .env et env.production.ts
 
-# Restaurer les fichiers de configuration spécifiques
-echo "🔄 Restauration des configurations spécifiques à la production..."
-[ -f .env.backup ] && cp -f .env.backup .env
-[ -f server/config/environments.ts.backup ] && cp -f server/config/environments.ts.backup server/config/environments.ts
-
-# Mettre à jour les dépendances
-echo "🔄 Mise à jour des dépendances..."
+# 4. Mise à jour des dépendances
+echo "4. Mise à jour des dépendances..."
 npm ci
 
-# Appliquer les migrations de base de données
-echo "🔄 Application des migrations de base de données..."
-npm run db:push
-
-# Reconstruire l'application
-echo "🔄 Reconstruction de l'application..."
+# 5. Construction de l'application pour la production
+echo "5. Construction de l'application..."
 npm run build
 
-# Supprimer les sauvegardes
-rm -f .env.backup server/config/environments.ts.backup
+# 6. Vérification du répertoire de build
+echo "6. Vérification du répertoire de build..."
+if [ ! -d "server/public" ] || [ -z "$(ls -A server/public 2>/dev/null)" ]; then
+  echo "Le répertoire de build est vide, exécution du script de correction..."
+  ./scripts/fix-build-directory.sh
+fi
 
-echo ""
-echo "✅ Déploiement de la version $version préparé avec succès!"
-echo ""
-echo "ÉTAPES SUIVANTES:"
-echo "1. Testez l'application localement: npm run dev"
-echo "2. Si tout fonctionne correctement, cliquez sur 'Deploy' dans Replit"
-echo ""
-echo "Note: Une branche de sauvegarde '$backup_branch' a été créée."
-echo "      Pour revenir à l'état précédent, exécutez: git checkout $backup_branch"
-echo ""
+# 7. Application des migrations de base de données si nécessaire
+echo "7. Application des migrations de base de données..."
+npm run db:push
+
+echo "===== Synchronisation terminée ====="
+echo "L'environnement de production est maintenant synchronisé avec l'environnement de test."
+echo "Vous pouvez démarrer l'application avec 'npm run start'."

@@ -1,77 +1,50 @@
 #!/bin/bash
-# Script pour récupérer les changements depuis l'environnement de développement
 
-echo "=== Récupération des changements depuis l'environnement de développement ==="
+# Script pour synchroniser l'environnement de test avec l'environnement de développement
+# À exécuter dans l'environnement de test
 
-# Vérifier si Git est initialisé
-if [ ! -d .git ]; then
-  echo "❌ Erreur: Dépôt Git non initialisé"
-  echo "   Suivez les instructions dans scripts/multi-repls-setup/git-setup.md"
-  exit 1
-fi
+echo "===== Synchronisation de l'environnement de test depuis l'environnement de développement ====="
 
-# Sauvegarder les fichiers de configuration spécifiques à l'environnement de test
-echo "🔄 Sauvegarde des configurations spécifiques à l'environnement de test..."
-cp -f .env .env.backup 2>/dev/null || :
-cp -f server/config/environments.ts server/config/environments.ts.backup 2>/dev/null || :
+# 1. Sauvegarde des fichiers de configuration spécifiques à l'environnement de test
+echo "1. Sauvegarde des fichiers de configuration de test..."
+cp .env .env.backup.$(date +%Y%m%d%H%M%S)
+cp server/config/env.test.ts server/config/env.test.ts.backup.$(date +%Y%m%d%H%M%S)
 
-# Vérifier s'il y a des modifications locales non committées
-if [ -n "$(git status --porcelain)" ]; then
-  echo "⚠️ Vous avez des changements locaux non committés"
-  echo "   Ces changements seront temporairement mis de côté"
-  
-  # Stash les changements locaux
-  git stash save "Changements avant pull depuis dev - $(date +%Y-%m-%d)"
-  stashed=true
-else
-  stashed=false
-fi
+# 2. Récupération des derniers changements de l'environnement de développement
+# Remplacez l'URL ci-dessous par l'URL réelle de votre environnement de développement
+echo "2. Récupération des derniers changements depuis l'environnement de développement..."
 
-# S'assurer que nous sommes sur la branche main
-current_branch=$(git branch --show-current)
-if [ "$current_branch" != "main" ]; then
-  echo "⚠️ Vous n'êtes pas sur la branche main (branche actuelle: $current_branch)"
-  read -p "Voulez-vous basculer vers la branche main? (o/n): " should_switch
-  
-  if [[ $should_switch == "o" || $should_switch == "O" ]]; then
-    git checkout main
-    echo "✅ Basculé vers la branche main"
-  else
-    echo "⚠️ Récupération sur la branche $current_branch (non main)"
-  fi
-fi
+# Si vous utilisez git
+# git remote add dev https://github.com/user/kora-dev.git
+# git fetch dev
+# git merge dev/main --no-commit
 
-# Récupérer les derniers changements
-echo "🔄 Récupération des derniers changements depuis le dépôt distant..."
-git fetch origin
-git pull origin $(git branch --show-current)
+# Si vous utilisez un transfert direct (ajustez l'URL selon votre configuration)
+# rsync -av --exclude='.env' --exclude='server/config/env.test.ts' --exclude='node_modules' dev-environment:~/kora/ ./
 
-# Restaurer les fichiers de configuration spécifiques
-echo "🔄 Restauration des configurations spécifiques à l'environnement de test..."
-[ -f .env.backup ] && cp -f .env.backup .env
-[ -f server/config/environments.ts.backup ] && cp -f server/config/environments.ts.backup server/config/environments.ts
+# 3. Réappliquer les configurations spécifiques à l'environnement de test
+echo "3. Réapplication des configurations de test..."
+# Cette étape est déjà gérée par la préservation des fichiers .env et env.test.ts
 
-# Mettre à jour les dépendances
-echo "🔄 Mise à jour des dépendances..."
+# 4. Mise à jour des dépendances
+echo "4. Mise à jour des dépendances..."
 npm ci
 
-# Appliquer les migrations de base de données
-echo "🔄 Application des migrations de base de données..."
-npm run db:push
+# 5. Construction de l'application pour l'environnement de test
+echo "5. Construction de l'application..."
+npm run build
 
-# Restaurer les changements locaux si nécessaire
-if [ "$stashed" = true ]; then
-  echo "🔄 Restauration des changements locaux..."
-  git stash pop
+# 6. Vérification du répertoire de build
+echo "6. Vérification du répertoire de build..."
+if [ ! -d "server/public" ] || [ -z "$(ls -A server/public 2>/dev/null)" ]; then
+  echo "Le répertoire de build est vide, exécution du script de correction..."
+  ./scripts/fix-build-directory.sh
 fi
 
-# Supprimer les sauvegardes
-rm -f .env.backup server/config/environments.ts.backup
+# 7. Application des migrations de base de données si nécessaire
+echo "7. Application des migrations de base de données..."
+NODE_ENV=test npm run db:push
 
-echo ""
-echo "✅ Récupération terminée avec succès!"
-echo ""
-echo "ÉTAPES SUIVANTES:"
-echo "1. Vérifiez que l'application fonctionne correctement: npm run dev"
-echo "2. Si tout est OK, cliquez sur 'Deploy' dans Replit"
-echo ""
+echo "===== Synchronisation terminée ====="
+echo "L'environnement de test est maintenant synchronisé avec l'environnement de développement."
+echo "Vous pouvez démarrer l'application avec 'NODE_ENV=test npm run dev'."
