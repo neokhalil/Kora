@@ -916,14 +916,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       </div>
                     </div>
                   )}
-                  {/* Ancre de défilement avec hauteur minimale pour garantir un espace de défilement adéquat */}
+                  {/* Ancre de défilement minimale */}
                   <div 
                     ref={messagesEndRef} 
                     className={`scroll-anchor ${isMobile ? 'scroll-anchor-mobile' : ''}`} 
                     style={{ 
-                      height: isMobile ? '60px' : '20px', 
-                      marginBottom: isMobile ? '40px' : '20px',
-                      marginTop: isMobile ? '20px' : '5px'
+                      height: isMobile ? '5px' : '5px', 
+                      marginBottom: isMobile ? '5px' : '5px',
+                      marginTop: isMobile ? '5px' : '5px'
                     }} 
                   />
                 </div>

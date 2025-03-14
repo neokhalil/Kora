@@ -222,16 +222,16 @@
   display: none;
 }
 
-/* Ajoute une marge en bas pour que le dernier message soit visible */
+/* Message list styles */
 .web-messages-list {
-  padding-bottom: 200px; /* Espace doublé comme demandé */
+  padding-bottom: 20px; /* Réduit l'espacement pour éviter la barre blanche */
 }
 
 /* Styles pour l'ancre de défilement */
 .scroll-anchor {
-  height: 24px; /* Hauteur minimale pour garantir un espace de défilement */
-  margin-top: 10px; /* Espace au-dessus de l'ancre */
-  margin-bottom: 50px; /* Large espace en-dessous pour le défilement */
+  height: 1px; /* Hauteur minimale */
+  margin-top: 1px; /* Espace minimal au-dessus de l'ancre */
+  margin-bottom: 1px; /* Espace minimal en-dessous */
   width: 100%;
   pointer-events: none; /* Pour ne pas interférer avec les interactions de l'utilisateur */
 }
@@ -675,13 +675,13 @@
   }
   
   .web-messages-list {
-    padding-bottom: 40px; /* Espace réduit pour mobile */
+    padding-bottom: 0; /* Supprime tout padding en bas pour éliminer la barre blanche */
   }
   
   /* Styles pour l'ancre de défilement sur mobile */
   .scroll-anchor {
-    height: 30px;
-    margin-top: 5px;
-    margin-bottom: 20px;
+    height: 1px; /* Réduit pour supprimer l'espace blanc */
+    margin-top: 0;
+    margin-bottom: 0;
   }
 }
