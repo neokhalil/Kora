@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import des styles pour les composants mathématiques et code */
+@import './styles/mathCode.css';
+
 :root {
   --header-height: 56px;
 }

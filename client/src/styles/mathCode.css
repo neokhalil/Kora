@@ -1,0 +1,133 @@
+/**
+ * Styles pour le rendu des expressions mathématiques et du code
+ */
+
+/* Styles pour KaTeX */
+.katex-block-wrapper {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.katex {
+  font-size: 1.1em;
+  text-rendering: optimizeLegibility;
+}
+
+.katex-display > .katex {
+  display: block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.katex-error {
+  color: #f44336;
+  border-bottom: 1px dotted #f44336;
+  cursor: help;
+  padding: 0 3px;
+}
+
+/* Styles pour les blocs de code */
+.code-block-wrapper {
+  margin: 1.5rem 0;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background-color: rgba(0, 0, 0, 0.03); /* Light background for light mode */
+}
+
+.dark .code-block-wrapper pre {
+  background-color: rgba(0, 0, 0, 0.2); /* Darker background for dark mode */
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  font-size: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .code-header {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copy-button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.copy-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dark .copy-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Styles pour le composant ContentRenderer */
+.content-renderer {
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.content-renderer h1,
+.content-renderer h2,
+.content-renderer h3,
+.content-renderer h4,
+.content-renderer h5,
+.content-renderer h6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.content-renderer strong {
+  font-weight: 600;
+}
+
+.content-renderer em {
+  font-style: italic;
+}
+
+.content-renderer ul,
+.content-renderer ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.content-renderer li {
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .katex {
+    font-size: 1em;
+  }
+  
+  .code-block-wrapper pre {
+    font-size: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .code-header {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.7rem;
+  }
+}
