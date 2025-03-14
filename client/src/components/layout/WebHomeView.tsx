@@ -285,15 +285,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA
+      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
+      const newImageMessageId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newImageMessageId,
         content: data.content,
         sender: 'kora',
         allowActions: true,
         isImageAnalysis: true,
-        messageId: Date.now().toString(), // ID pour les fonctions d'action
+        messageId: newImageMessageId, // ID pour les fonctions d'action
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
       
@@ -370,14 +381,25 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA
+      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
+      const newReexplainId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newReexplainId,
         content: data.content,
         sender: 'kora',
         allowActions: true,
         isReExplanation: true,
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } catch (error) {
       console.error('Erreur lors de la ré-explication:', error);
       
@@ -433,15 +455,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       // Générer un ID unique pour l'exercice afin de pouvoir lier des indices
       const challengeId = `challenge-${Date.now()}`;
       
-      // Ajouter la réponse de KORA
+      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
+      const newChallengeMessageId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newChallengeMessageId,
         content: data.content,
         sender: 'kora',
         allowActions: false,
         isChallenge: true,
         challengeId: challengeId
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } catch (error) {
       console.error('Erreur lors de la génération de l\'exercice:', error);
       
@@ -483,13 +516,24 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         // Cela permet d'avoir la fonctionnalité sans avoir besoin d'implémenter l'API tout de suite
         const hintContent = "Voici un indice pour t'aider : essaie de repenser au concept que nous avons discuté précédemment et applique-le étape par étape à ce problème.";
         
+        const newHintId = Date.now().toString();
         setMessages(prev => [...prev, {
-          id: Date.now().toString(),
+          id: newHintId,
           content: hintContent,
           sender: 'kora',
           isHint: true,
           challengeId: challengeId
         }]);
+        
+        // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+        requestAnimationFrame(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'end'
+            });
+          }
+        });
         
         setIsThinking(false);
         return;
@@ -497,27 +541,49 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter l'indice de KORA sans boutons d'action
+      // Ajouter l'indice de KORA sans boutons d'action et déclencher le défilement
+      const newApiHintId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newApiHintId,
         content: data.content,
         sender: 'kora',
         isHint: true,
         allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } catch (error) {
       console.error('Erreur lors de la génération de l\'indice:', error);
       
-      // Même en cas d'erreur, fournir un indice générique sans boutons d'action
+      // Même en cas d'erreur, fournir un indice générique sans boutons d'action et déclencher le défilement
+      const newErrorHintId = Date.now().toString();
       setMessages(prev => [...prev, {
-        id: Date.now().toString(),
+        id: newErrorHintId,
         content: "Voici un indice : essaie de décomposer le problème en étapes plus simples et résoudre chaque partie séparément.",
         sender: 'kora',
         isHint: true,
         allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
+      
+      // Force un défilement supplémentaire après le rendu pour assurer la visibilité
+      requestAnimationFrame(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
+      });
     } finally {
       setIsThinking(false);
     }
