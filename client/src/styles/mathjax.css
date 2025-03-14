@@ -34,6 +34,20 @@
   overflow-y: hidden;
 }
 
+/* Style pour les formules avec délimiteurs */
+.math-formula-block {
+  display: block;
+  margin: 1em 0;
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.math-formula-inline {
+  display: inline-block;
+  margin: 0 0.2em;
+  vertical-align: middle;
+}
+
 /* Style pour les formules avec $$ */
 .math-tex {
   padding: 0.5em 0;
@@ -42,6 +56,11 @@
 /* Style pour les équations inline avec $ */
 p .MathJax {
   vertical-align: middle;
+}
+
+/* Styles pour le rendu des numéros (1, 2, 3) dans les équations */
+span.mjx-char {
+  font-family: MathJax_Main, 'Times New Roman', serif;
 }
 
 /* Amélioration de la lisibilité du code */
@@ -58,6 +77,12 @@ pre.hljs-pre {
   font-weight: bold;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
+}
+
+/* Séparation claire entre les équations et le texte */
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* Corrections pour l'affichage mobile */

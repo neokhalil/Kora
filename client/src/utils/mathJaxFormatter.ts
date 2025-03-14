@@ -26,11 +26,24 @@ export function formatMathContent(content: string): string {
   formattedContent = formattedContent.replace(/(\S)\$/g, '$1 $');
   formattedContent = formattedContent.replace(/\$(\S)/g, '$ $1');
   
+  // Éviter le cas particulier où des numéros isolés (comme "1") apparaissent au lieu des équations
+  formattedContent = formattedContent.replace(/\$\$(\d+)\$\$/g, '$$ $1 $$');
+  formattedContent = formattedContent.replace(/\$(\d+)\$/g, '$ $1 $');
+  
+  // Correction pour les équations algebraiques avec opérateurs
+  formattedContent = formattedContent.replace(/\$\$(.*?\+.*?)\$\$/g, '$$ $1 $$');
+  formattedContent = formattedContent.replace(/\$\$(.*?\-.*?)\$\$/g, '$$ $1 $$');
+  formattedContent = formattedContent.replace(/\$\$(.*?\=.*?)\$\$/g, '$$ $1 $$');
+  
   // Corriger le cas spécial de $$$$ qui pourrait être créé accidentellement
   formattedContent = formattedContent.replace(/\${4}/g, '$$$$');
   
   // Correction spéciale pour le format $$1$$ (substitution incorrecte)
   formattedContent = formattedContent.replace(/\$\$1\$\$/g, '$$1$$');
+  
+  // Ajouter automatiquement le mode texte autour des mots dans les formules mathématiques
+  formattedContent = formattedContent.replace(/\$\$(.*?)([a-zA-Z]{2,})(.*?)\$\$/g, '$$ $1\\text{$2}$3 $$');
+  formattedContent = formattedContent.replace(/\$(.*?)([a-zA-Z]{2,})(.*?)\$/g, '$ $1\\text{$2}$3 $');
   
   return formattedContent;
 }

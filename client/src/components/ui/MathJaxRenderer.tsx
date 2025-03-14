@@ -38,6 +38,13 @@ const mathJaxConfig = {
 const processContent = (content: string): React.ReactNode[] => {
   if (!content) return [];
 
+  // Remplacer les formules $$ et $ qui ne sont pas correctement espacées
+  const preprocessedContent = content
+    .replace(/\$\$([^\s])/g, '$$ $1')
+    .replace(/([^\s])\$\$/g, '$1 $$')
+    .replace(/\$([^\s])/g, '$ $1')
+    .replace(/([^\s])\$/g, '$1 $');
+
   // Expression régulière pour capturer les blocs de code avec optionnellement un langage spécifié
   const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
   const parts: React.ReactNode[] = [];
@@ -45,13 +52,15 @@ const processContent = (content: string): React.ReactNode[] => {
   let match;
 
   // Parcourir tous les blocs de code
-  while ((match = codeBlockRegex.exec(content)) !== null) {
+  while ((match = codeBlockRegex.exec(preprocessedContent)) !== null) {
     // Traiter le texte avant le bloc de code
     if (match.index > lastIndex) {
-      const textPart = content.substring(lastIndex, match.index);
+      const textPart = preprocessedContent.substring(lastIndex, match.index);
+      // Détection des équations $...$ et $$...$$
+      const mathParts = splitAndProcessMath(textPart);
       parts.push(
         <MathJax key={`text-${lastIndex}`}>
-          {processFormattedText(textPart)}
+          {mathParts.length > 0 ? mathParts : processFormattedText(textPart)}
         </MathJax>
       );
     }
@@ -89,20 +98,66 @@ const processContent = (content: string): React.ReactNode[] => {
   }
 
   // Traiter le reste du texte après le dernier bloc de code
-  if (lastIndex < content.length) {
-    const textPart = content.substring(lastIndex);
+  if (lastIndex < preprocessedContent.length) {
+    const textPart = preprocessedContent.substring(lastIndex);
+    // Détection des équations $...$ et $$...$$
+    const mathParts = splitAndProcessMath(textPart);
     parts.push(
       <MathJax key={`text-${lastIndex}`}>
-        {processFormattedText(textPart)}
+        {mathParts.length > 0 ? mathParts : processFormattedText(textPart)}
       </MathJax>
     );
   }
 
   return parts.length > 0 ? parts : [
     <MathJax key="text-full">
-      {processFormattedText(content)}
+      {splitAndProcessMath(preprocessedContent).length > 0 
+        ? splitAndProcessMath(preprocessedContent) 
+        : processFormattedText(preprocessedContent)}
     </MathJax>
   ];
+};
+
+// Fonction pour diviser et traiter séparément le texte et les équations mathématiques
+const splitAndProcessMath = (text: string): React.ReactNode[] => {
+  if (!text) return [];
+  
+  const mathRegex = /(\$\$[\s\S]*?\$\$|\$[^\$]+?\$)/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = mathRegex.exec(text)) !== null) {
+    // Ajouter le texte avant l'équation
+    if (match.index > lastIndex) {
+      const textBefore = text.substring(lastIndex, match.index);
+      parts.push(<React.Fragment key={`text-${lastIndex}`}>{processFormattedText(textBefore)}</React.Fragment>);
+    }
+    
+    // Ajouter l'équation mathématique avec un style spécial
+    // La classe `math-formula` permet d'appliquer des styles CSS spécifiques
+    const formula = match[1];
+    const isBlockFormula = formula.startsWith('$$') && formula.endsWith('$$');
+    
+    parts.push(
+      <span 
+        key={`math-${match.index}`} 
+        className={isBlockFormula ? 'math-formula-block' : 'math-formula-inline'}
+      >
+        {formula}
+      </span>
+    );
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Ajouter le reste du texte après la dernière équation
+  if (lastIndex < text.length) {
+    const textAfter = text.substring(lastIndex);
+    parts.push(<React.Fragment key={`text-${lastIndex}`}>{processFormattedText(textAfter)}</React.Fragment>);
+  }
+  
+  return parts;
 };
 
 // Fonction pour traiter le formatage du texte (titres en gras, titres markdown, etc.)
