@@ -119,34 +119,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
         </code>
       </pre>
       
-      <style jsx>{`
-        .code-block-wrapper {
-          border-radius: 0.375rem;
-          overflow: hidden;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-        
-        .line-numbers {
-          counter-reset: line;
-        }
-        
-        .line-numbers code::before {
-          counter-increment: line;
-          content: counter(line);
-          display: inline-block;
-          width: 1.5rem;
-          margin-right: 1rem;
-          text-align: right;
-          color: rgba(255, 255, 255, 0.4);
-          user-select: none;
-        }
-        
-        @media (max-width: 640px) {
-          pre {
-            font-size: 0.75rem;
-          }
-        }
-      `}</style>
+{/* Styles moved to CSS file */}
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import React from 'react';
-import 'katex/dist/katex.min.css';
+import React, { useEffect, useRef, useState } from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 interface KatexRendererProps {
   formula: string;
@@ -26,31 +26,69 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
   errorColor = '#f44336',
   renderError
 }) => {
-  // Handler d'erreur par défaut
-  const defaultErrorHandler = (error: any) => {
-    console.error('KaTeX error:', error);
+  const [cleanFormula, setCleanFormula] = useState(formula);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Nettoyer la formule pour éviter les erreurs courantes
+    let cleaned = formula || '';
+    
+    // Remplacer les caractères problématiques
+    cleaned = cleaned
+      // Remplacer les fractions sans accolades
+      .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
+      
+      // Remplacer les racines carrées sans accolades
+      .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
+      
+      // Ajouter des accolades aux indices et exposants
+      .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
+      .replace(/\^([a-zA-Z0-9])/g, '^{$1}')
+      
+      // Vérifier l'équilibre des accolades
+      .trim();
+      
+    setCleanFormula(cleaned);
+  }, [formula]);
+
+  // Fonction personnalisée pour gérer les erreurs de rendu
+  const handleError = (error: any) => {
+    console.error('Erreur de rendu KaTeX:', error);
+    
+    if (renderError) {
+      return renderError(error);
+    }
+    
     return (
       <span 
         className="katex-error" 
         title={error.toString()} 
-        style={{ color: errorColor, cursor: 'help' }}
+        style={{ color: errorColor }}
       >
-        {formula}
+        {cleanFormula}
       </span>
     );
   };
 
-  // Utiliser le handler d'erreur personnalisé ou celui par défaut
-  const errorHandler = renderError || defaultErrorHandler;
-
-  return display ? (
-    <div className={`katex-block-wrapper ${className}`}>
-      <BlockMath math={formula} errorColor={errorColor} renderError={errorHandler} />
+  return (
+    <div 
+      ref={containerRef}
+      className={`katex-${display ? 'block' : 'inline'}-wrapper ${className}`}
+    >
+      {display ? (
+        <BlockMath 
+          math={cleanFormula} 
+          errorColor={errorColor}
+          renderError={handleError}
+        />
+      ) : (
+        <InlineMath 
+          math={cleanFormula} 
+          errorColor={errorColor}
+          renderError={handleError}
+        />
+      )}
     </div>
-  ) : (
-    <span className={`katex-inline-wrapper ${className}`}>
-      <InlineMath math={formula} errorColor={errorColor} renderError={errorHandler} />
-    </span>
   );
 };
 
