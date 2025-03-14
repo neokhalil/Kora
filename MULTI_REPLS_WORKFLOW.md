@@ -94,6 +94,49 @@ C'est généralement parce que les fichiers client n'ont pas été compilés. Su
    npm run dev
    ```
 
+### Résolution de l'erreur "drizzle-kit: command not found"
+
+Si vous rencontrez cette erreur lors de l'exécution de `npm run db:push` :
+```
+drizzle-kit: command not found
+```
+
+C'est généralement parce que le module `drizzle-kit` n'est pas correctement installé ou accessible globalement. Suivez ces étapes :
+
+1. Réinstallez spécifiquement drizzle-kit :
+   ```bash
+   npm install -D drizzle-kit
+   ```
+
+2. Vérifiez que le script est correctement défini dans votre package.json :
+   ```bash
+   cat package.json | grep db:push
+   ```
+   
+   Il devrait ressembler à :
+   ```json
+   "db:push": "drizzle-kit push:pg"
+   ```
+
+3. Si le problème persiste, utilisez npx pour exécuter la commande :
+   ```bash
+   npx drizzle-kit push:pg
+   ```
+
+4. Vous pouvez aussi créer un script temporaire pour contourner ce problème :
+   ```bash
+   # Créer un script temporaire
+   echo '#!/bin/bash
+   npx drizzle-kit push:pg
+   ' > ./scripts/db-push.sh
+   
+   # Rendre le script exécutable
+   chmod +x ./scripts/db-push.sh
+   
+   # Exécuter le script
+   ./scripts/db-push.sh
+   ```
+
 ### Résolution des conflits
 
 Si des conflits surviennent pendant la synchronisation :
