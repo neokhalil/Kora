@@ -110,24 +110,6 @@ const MathJaxRenderer: React.FC<TextContentProps> = ({ content, className = '' }
     return `${label}\n<div class="step-result">${number}</div>`;
   });
   
-  // Indenter correctement les listes d'instructions après un titre numéroté
-  // Format: "2. Titre : - Instruction" -> mettre chaque instruction sur une nouvelle ligne et indentée
-  formattedContent = formattedContent.replace(/(\d+\.\s+[^:]+:)([^-]*?)(-\s+[^-\n]+)(-\s+[^-\n]+)/g, 
-    (match, titlePart, textBefore, firstInstruction, secondInstruction) => {
-    return `${titlePart}${textBefore}<div class="instruction-step">${firstInstruction}</div><div class="instruction-step">${secondInstruction}</div>`;
-  });
-  
-  // Traiter les cas avec une seule instruction
-  formattedContent = formattedContent.replace(/(\d+\.\s+[^:]+:)([^-]*?)(-\s+[^-\n]+)(?!\s*<div class="instruction-step">)/g, 
-    (match, titlePart, textBefore, instruction) => {
-    return `${titlePart}${textBefore}<div class="instruction-step">${instruction}</div>`;
-  });
-  
-  // Formater tous les tirets qui commencent une ligne comme des éléments de liste
-  formattedContent = formattedContent.replace(/(\n|^)-\s+([^\n]+)/g, (match, newline, content) => {
-    return `${newline}<div class="list-item">- ${content}</div>`;
-  });
-  
   // Préserver les paragraphes mais sans fragmenter le texte
   formattedContent = formattedContent.replace(/\n\n+/g, '<br><br>');
   
