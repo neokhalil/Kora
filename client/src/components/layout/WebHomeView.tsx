@@ -135,6 +135,21 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     if (messages.length > 0) {
       // Utiliser notre fonction locale optimisée
       localScheduleScroll();
+      
+      // Vérifier la visibilité du dernier message après le rendu
+      setTimeout(() => {
+        // Diagnostiquer des problèmes potentiels de visibilité
+        const diagnostics = diagnoseScrollIssues();
+        console.log('Diagnostic de visibilité:', diagnostics);
+        
+        // Si le message n'est pas visible, forcer la visibilité
+        if (diagnostics.lastMessage.found && 
+            (!diagnostics.lastMessage.visible || 
+             (diagnostics.lastMessage.visiblePercentage || 0) < 50)) {
+          console.log('Message partiellement visible, correction appliquée');
+          ensureLastMessageVisibility();
+        }
+      }, 500); // Délai pour laisser le temps au DOM de se mettre à jour
     }
   }, [messages]);
 

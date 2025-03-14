@@ -147,10 +147,17 @@ export function ensureLastMessageVisibility(): void {
 }
 
 /**
- * Diagnostique les problèmes de défilement en fournissant des informations détaillées
- * Utile pour déboguer les problèmes de visibilité sur différents appareils
+ * Définition de types pour le diagnostic de défilement
  */
-export function diagnoseScrollIssues(): {
+type LastMessageInfo = {
+  found: boolean;
+  visible?: boolean;
+  top?: number;
+  height?: number;
+  visiblePercentage?: number;
+};
+
+type DiagnosticResult = {
   viewport: {
     width: number;
     height: number;
@@ -164,19 +171,19 @@ export function diagnoseScrollIssues(): {
     scrollTop?: number;
     position?: string;
   },
-  lastMessage: {
-    found: boolean;
-    visible?: boolean;
-    top?: number;
-    height?: number;
-    visiblePercentage?: number;
-  },
+  lastMessage: LastMessageInfo,
   formContainer: {
     found: boolean;
     top?: number;
     height?: number;
   }
-} {
+};
+
+/**
+ * Diagnostique les problèmes de défilement en fournissant des informations détaillées
+ * Utile pour déboguer les problèmes de visibilité sur différents appareils
+ */
+export function diagnoseScrollIssues(): DiagnosticResult {
   // Informations sur le viewport
   const viewport = {
     width: window.innerWidth,
@@ -197,7 +204,7 @@ export function diagnoseScrollIssues(): {
   
   // Informations sur le dernier message
   const messages = document.querySelectorAll('.web-message');
-  let lastMessageInfo = { found: false };
+  let lastMessageInfo: LastMessageInfo = { found: false };
   
   if (messages.length) {
     const lastMessage = messages[messages.length - 1] as HTMLElement;
