@@ -2,9 +2,10 @@
  * Test environment specific configuration
  */
 
+import { AppConfig } from './types';
 import { commonConfig } from './env.common';
 
-export const testConfig = {
+export const testConfig: AppConfig = {
   environment: 'test',
   server: {
     port: process.env.PORT || 5000,

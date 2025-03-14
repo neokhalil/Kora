@@ -2,9 +2,10 @@
  * Production environment specific configuration
  */
 
+import { AppConfig } from './types';
 import { commonConfig } from './env.common';
 
-export const productionConfig = {
+export const productionConfig: AppConfig = {
   environment: 'production',
   server: {
     port: process.env.PORT || 5000,

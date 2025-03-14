@@ -4,6 +4,7 @@
  */
 
 import dotenv from 'dotenv';
+import { AppConfig } from './types';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -17,17 +18,17 @@ import productionConfig from './env.production';
 // Default to development if not specified
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-let config;
+let config: AppConfig;
 switch (nodeEnv.toLowerCase()) {
   case 'production':
-    config = productionConfig;
+    config = productionConfig as AppConfig;
     break;
   case 'test':
-    config = testConfig;
+    config = testConfig as AppConfig;
     break;
   case 'development':
   default:
-    config = developmentConfig;
+    config = developmentConfig as AppConfig;
     break;
 }
 

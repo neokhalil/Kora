@@ -2,9 +2,10 @@
  * Development environment specific configuration
  */
 
+import { AppConfig } from './types';
 import { commonConfig } from './env.common';
 
-export const developmentConfig = {
+export const developmentConfig: AppConfig = {
   environment: 'development',
   server: {
     port: process.env.PORT || 5000,

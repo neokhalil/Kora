@@ -4,6 +4,7 @@
  */
 
 import path from 'path';
+import { AppConfig } from './types';
 
 export const commonConfig = {
   upload: {
