@@ -129,17 +129,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Effet optimisé pour le défilement automatique après chaque nouveau message
   useEffect(() => {
     if (messages.length > 0) {
-      // Défilement immédiat
-      scrollToBottom();
-      
-      // Défilement différé (après rendu des formules mathématiques et du code)
-      const timer = setTimeout(() => {
-        scrollToBottom();
-      }, 300);
-      
-      return () => {
-        clearTimeout(timer);
-      };
+      // Utiliser la fonction de défilement optimisée
+      scheduleScroll();
     }
   }, [messages]);
 
