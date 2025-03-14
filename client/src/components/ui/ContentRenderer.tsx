@@ -39,14 +39,11 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
       // Listes numérotées
       .replace(/^(\d+)\.\s+(.+?)$/gm, '<li value="$1">$2</li>');
     
-    // Optimisation du traitement des sauts de ligne pour éviter les espaces excessifs
+    // Maintenant, remplacer les sauts de ligne restants par des <br />
+    // mais pas juste après une balise de titre (pour éviter les espaces vides)
     const withLineBreaks = withMarkdown
-      // Supprimer les sauts de ligne après les balises HTML
-      .replace(/(<\/[a-z1-6]+>)\n/g, '$1')
-      // Supprimer les sauts de ligne consécutifs (les réduire à un seul)
-      .replace(/\n{3,}/g, '\n\n')
-      // Convertir les sauts de ligne individuels en <br /> avec une classe spéciale
-      .replace(/\n/g, '<br class="content-linebreak" />');
+      .replace(/(<\/h[1-6]>)\n/g, '$1')  // Supprimer le saut de ligne après un titre
+      .replace(/\n/g, '<br />');         // Convertir les autres sauts de ligne en <br />
     
     return <span dangerouslySetInnerHTML={{ __html: withLineBreaks }} />;
   };
@@ -72,7 +69,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
           key={`math-block-${index}`}
           formula={sanitizeFormula(segment.content)}
           display={true}
-          className="" /* Suppression de la classe my-4 qui ajoutait des marges */
+          className="my-4"
         />
       );
     }

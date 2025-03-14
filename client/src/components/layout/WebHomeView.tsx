@@ -6,8 +6,6 @@ import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import { scrollToBottom, scheduleScroll, scrollAfterRender } from '@/utils/scrollHelper';
-import { ensureLastMessageVisibility, diagnoseScrollIssues } from './ScrollTestUtils';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -64,141 +62,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [filteredRecentTopics, setFilteredRecentTopics] = useState(recentTopics);
   const [filteredOlderTopics, setFilteredOlderTopics] = useState(olderTopics);
   
-  // Détection de la vue mobile
-  const [isMobile, setIsMobile] = useState(false);
-  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  
-  // Effet pour détecter si on est sur mobile
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    // Vérification initiale
-    checkIfMobile();
-    
-    // Mettre à jour lors du redimensionnement
-    window.addEventListener('resize', checkIfMobile);
-    
-    // Nettoyage
-    return () => {
-      window.removeEventListener('resize', checkIfMobile);
-    };
-  }, []);
-  
-  // Effet pour exposer les fonctions de diagnostic au window global
-  useEffect(() => {
-    // Exposer les fonctions de diagnostic à l'objet window pour permettre
-    // leur utilisation depuis scrollHelper.ts
-    window.ensureMessageVisibility = ensureLastMessageVisibility;
-    window.diagnoseScrollIssues = diagnoseScrollIssues;
-    
-    // Nettoyage à la destruction du composant
-    return () => {
-      window.ensureMessageVisibility = undefined;
-      window.diagnoseScrollIssues = undefined;
-    };
-  }, []);
-  
-  // Effet pour gérer le clavier virtuel sur mobile
-  useEffect(() => {
-    if (!isMobile) return;
-    
-    const handleFocus = () => {
-      setIsKeyboardOpen(true);
-      // Petite pause pour laisser le temps au clavier de s'ouvrir
-      setTimeout(() => {
-        // Utiliser notre fonction locale optimisée
-        localScrollToBottom();
-      }, 300);
-    };
-    
-    const handleBlur = () => {
-      setIsKeyboardOpen(false);
-      // Scroll après fermeture du clavier
-      setTimeout(() => {
-        // Utiliser notre fonction locale optimisée
-        localScrollToBottom();
-      }, 100);
-    };
-    
-    // Sélectionner les éléments d'entrée
-    const inputElements = document.querySelectorAll('input, textarea');
-    
-    // Ajouter les écouteurs d'événements
-    inputElements.forEach(el => {
-      el.addEventListener('focus', handleFocus);
-      el.addEventListener('blur', handleBlur);
-    });
-    
-    // Nettoyer les écouteurs d'événements
-    return () => {
-      inputElements.forEach(el => {
-        el.removeEventListener('focus', handleFocus);
-        el.removeEventListener('blur', handleBlur);
-      });
-    };
-  }, [isMobile]);
-  
   // Effet pour faire défiler automatiquement vers le dernier message
-  // Utilisation d'une référence pour suivre les défilements récents pour éviter les répétitions
-  const lastScrollRef = useRef<number>(0);
-  
-  // Effet optimisé pour le défilement automatique après chaque nouveau message
   useEffect(() => {
-    if (messages.length > 0) {
-      // Utiliser notre fonction locale optimisée
-      localScheduleScroll();
-      
-      // Vérifier la visibilité du dernier message après le rendu
+    if (messagesEndRef.current) {
       setTimeout(() => {
-        // Diagnostiquer des problèmes potentiels de visibilité
-        const diagnostics = diagnoseScrollIssues();
-        console.log('Diagnostic de visibilité:', diagnostics);
-        
-        // Si le message n'est pas visible, forcer la visibilité
-        if (diagnostics.lastMessage.found && 
-            (!diagnostics.lastMessage.visible || 
-             (diagnostics.lastMessage.visiblePercentage || 0) < 50)) {
-          console.log('Message partiellement visible, correction appliquée');
-          ensureLastMessageVisibility();
-        }
-      }, 500); // Délai pour laisser le temps au DOM de se mettre à jour
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
     }
   }, [messages]);
 
-  // Fonction locale pour gérer le défilement
-  // Utilise notre utilitaire de défilement importé
-  const localScrollToBottom = () => {
-    // Déterminer la cible du défilement
-    const target = messagesEndRef.current;
-    if (!target) return;
-    
-    // Utiliser notre utilitaire de défilement avec les options adaptées au contexte
-    scrollToBottom({
-      target,
-      behavior: isMobile ? 'auto' : 'smooth',
-      delay: isMobile ? 100 : 300
-    });
-  };
-  
-  // Fonction locale pour planifier le défilement
-  // Utilise notre utilitaire de défilement importé
-  const localScheduleScroll = () => {
-    // Déterminer la cible du défilement
-    const target = messagesEndRef.current;
-    if (!target) return;
-    
-    // Utiliser notre utilitaire de planification de défilement
-    scheduleScroll({
-      target,
-      behavior: isMobile ? 'auto' : 'smooth'
-    });
-  };
-  
-  // Nous utilisons la fonction scrollAfterRender importée de scrollHelper.ts
-  // qui a été spécialement optimisée pour gérer le problème d'espace blanc
-  
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,18 +122,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
-      const newMessageId = Date.now().toString();
+      // Ajouter la réponse de KORA
       setMessages(prev => [...prev, {
-        id: newMessageId,
+        id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         allowActions: true, // Assurons-nous que cette propriété est correctement définie
-        messageId: newMessageId, // ID pour les fonctions d'action
+        messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -391,19 +259,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
-      const newImageMessageId = Date.now().toString();
+      // Ajouter la réponse de KORA
       setMessages(prev => [...prev, {
-        id: newImageMessageId,
+        id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         allowActions: true,
         isImageAnalysis: true,
-        messageId: newImageMessageId, // ID pour les fonctions d'action
+        messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
       
@@ -480,18 +344,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
-      const newReexplainId = Date.now().toString();
+      // Ajouter la réponse de KORA
       setMessages(prev => [...prev, {
-        id: newReexplainId,
+        id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         allowActions: true,
         isReExplanation: true,
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la ré-explication:', error);
       
@@ -547,19 +407,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       // Générer un ID unique pour l'exercice afin de pouvoir lier des indices
       const challengeId = `challenge-${Date.now()}`;
       
-      // Ajouter la réponse de KORA et déclencher automatiquement le défilement
-      const newChallengeMessageId = Date.now().toString();
+      // Ajouter la réponse de KORA
       setMessages(prev => [...prev, {
-        id: newChallengeMessageId,
+        id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         allowActions: false,
         isChallenge: true,
         challengeId: challengeId
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la génération de l\'exercice:', error);
       
@@ -601,17 +457,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         // Cela permet d'avoir la fonctionnalité sans avoir besoin d'implémenter l'API tout de suite
         const hintContent = "Voici un indice pour t'aider : essaie de repenser au concept que nous avons discuté précédemment et applique-le étape par étape à ce problème.";
         
-        const newHintId = Date.now().toString();
         setMessages(prev => [...prev, {
-          id: newHintId,
+          id: Date.now().toString(),
           content: hintContent,
           sender: 'kora',
           isHint: true,
           challengeId: challengeId
         }]);
-        
-        // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
         
         setIsThinking(false);
         return;
@@ -619,35 +471,27 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       
       const data = await response.json();
       
-      // Ajouter l'indice de KORA sans boutons d'action et déclencher le défilement
-      const newApiHintId = Date.now().toString();
+      // Ajouter l'indice de KORA sans boutons d'action
       setMessages(prev => [...prev, {
-        id: newApiHintId,
+        id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         isHint: true,
         allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } catch (error) {
       console.error('Erreur lors de la génération de l\'indice:', error);
       
-      // Même en cas d'erreur, fournir un indice générique sans boutons d'action et déclencher le défilement
-      const newErrorHintId = Date.now().toString();
+      // Même en cas d'erreur, fournir un indice générique sans boutons d'action
       setMessages(prev => [...prev, {
-        id: newErrorHintId,
+        id: Date.now().toString(),
         content: "Voici un indice : essaie de décomposer le problème en étapes plus simples et résoudre chaque partie séparément.",
         sender: 'kora',
         isHint: true,
         allowActions: false, // Sans boutons d'action
         challengeId: challengeId
       }]);
-      
-      // Utiliser notre fonction optimisée de défilement
-      scrollAfterRender();
     } finally {
       setIsThinking(false);
     }
@@ -674,7 +518,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         )}
         
         {/* Contenu du message avec formatage mathématique et code */}
-        <div className="web-message-content prose-no-margin">
+        <div className="web-message-content">
           <ContentRenderer content={message.content} />
         </div>
         
@@ -753,7 +597,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
   return (
       <div className="web-home-container">
-        <div className={`web-layout ${isKeyboardOpen ? 'keyboard-open' : ''}`}>
+        <div className="web-layout">
           {/* Sidebar - menu latéral gauche */}
           <div className="web-sidebar">
             {/* Logo KORA */}
@@ -864,16 +708,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       </div>
                     </div>
                   )}
-                  {/* Ancre de défilement minimale */}
-                  <div 
-                    ref={messagesEndRef} 
-                    className={`scroll-anchor ${isMobile ? 'scroll-anchor-mobile' : ''}`} 
-                    style={{ 
-                      height: isMobile ? '5px' : '5px', 
-                      marginBottom: isMobile ? '5px' : '5px',
-                      marginTop: isMobile ? '5px' : '5px'
-                    }} 
-                  />
+                  <div ref={messagesEndRef} />
                 </div>
               </div>
             )}

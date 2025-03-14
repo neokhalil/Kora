@@ -130,7 +130,7 @@ useEffect(() => {
   };
 
   return (
-    <div className={`code-block-wrapper ${className}`} style={{ margin: '0.4em 0' }}>
+    <div className={`code-block-wrapper ${className}`}>
       <div className="code-header">
         <span className="language-label font-mono">{languageMap[supportedLanguage] || supportedLanguage}</span>
         
@@ -147,7 +147,7 @@ useEffect(() => {
       
       <pre 
         className={`${showLineNumbers ? 'line-numbers' : ''}`}
-        style={{ backgroundColor: '#1a202c', color: '#e2e8f0', margin: 0, padding: '0.75rem' }}
+        style={{ backgroundColor: '#1a202c', color: '#e2e8f0' }}
       >
         <code 
           ref={codeRef}

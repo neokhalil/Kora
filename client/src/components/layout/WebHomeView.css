@@ -1,85 +1,607 @@
-/* Styles optimisés pour WebHomeView
-   Ces styles ont été spécialement conçus pour résoudre les problèmes d'espace blanc
-   et garantir une expérience utilisateur fluide sur tous les appareils
-*/
+/* Styles spécifiques pour la version web de la conversation */
 
-/* Container principal */
-.web-home-container {
-  height: 100%;
+/* Layout principal */
+.web-layout {
   display: flex;
-  flex-direction: column;
+  height: 100vh;
+  width: 100%;
   overflow: hidden;
 }
 
-/* Conteneur de conversation avec un padding au bas pour éviter l'espace blanc */
+.web-sidebar {
+  width: 280px;
+  min-width: 280px;
+  height: 100vh;
+  background-color: #f9f9f9;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.web-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Container de la conversation */
+.web-conversation-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  height: calc(100% - 180px); /* Ajuster en fonction de la hauteur du formulaire */
+  margin-bottom: 1rem;
+  max-width: 800px; /* Largeur maximale pour rester lisible */
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+/* Liste des messages */
+.web-messages-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  width: 100%;
+  max-width: 760px; /* Un peu moins que le container pour le padding */
+  margin: 0 auto;
+}
+
+/* Style commun pour tous les messages */
+.web-message {
+  max-width: 80%;
+  padding: 1rem 1.25rem;
+  border-radius: 18px;
+  margin-bottom: 1.2rem;
+  white-space: pre-wrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  line-height: 1.5;
+}
+
+/* Message de l'utilisateur */
+.web-user-message {
+  align-self: flex-end;
+  background-color: #EAEAEA;
+  color: #333;
+  border-bottom-right-radius: 4px;
+}
+
+/* Message de KORA */
+.web-kora-message {
+  align-self: flex-start;
+  background-color: transparent;
+  color: #333;
+  border: none;
+  max-width: 100%;
+  padding: 0.75rem 0.5rem;
+  box-shadow: none;
+}
+
+/* Image dans les messages */
+.web-message-image-container {
+  margin-bottom: 0.75rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.web-message-image {
+  max-width: 100%;
+  max-height: 300px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Contenu du message */
+.web-message-content {
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: none;
+  border: none;
+}
+
+/* Actions du message de KORA */
+.web-message-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.web-message-action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background-color: #f5f5f7;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 14px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.web-message-action-button svg {
+  margin-right: 6px;
+}
+
+.web-message-action-button:hover {
+  background-color: #e5e5ea;
+}
+
+/* Style pour les blocs de code dans les messages */
+.web-message .math-content pre {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #282c34;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  position: relative;
+}
+
+.web-message .math-content .language-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 0 6px 0 6px;
+}
+
+/* Style pour les formules mathématiques */
+.web-message .math-content .mjx-chtml {
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Animation "en train de réfléchir" */
+.web-thinking {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  min-width: 60px;
+  height: 24px;
+}
+
+/* Points de l'animation "en train de réfléchir" */
+.web-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.web-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.web-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* Ajustements pour le mode conversation */
+
+/* Donne plus d'espace à la conversation lorsqu'elle est active */
 .web-conversation-container {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  padding-bottom: 16px;
-  position: relative;
+  margin-bottom: 1rem;
+  padding-top: 3rem; /* Espace en haut de la conversation - augmenté */
+  /* Masquer la barre de défilement tout en conservant la fonctionnalité */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE et Edge */
 }
 
-/* Sur mobile, optimisations spécifiques du conteneur */
-@media (max-width: 768px) {
-  .web-conversation-container {
-    position: absolute;
-    top: 60px; /* Hauteur du header */
-    bottom: 140px; /* Espace pour le formulaire */
-    left: 0;
-    right: 0;
-    padding-bottom: 20px;
-  }
-  
-  /* Quand le clavier est ouvert */
-  body.keyboard-open .web-conversation-container {
-    bottom: 60px; /* Espace réduit */
-  }
+/* Masquer la barre de défilement pour Chrome, Safari et Opera */
+.web-conversation-container::-webkit-scrollbar {
+  display: none;
 }
 
-/* Amélioration du positionnement de l'ancre de défilement 
-   Ceci est critique pour éviter l'espace blanc entre le dernier message et la zone de saisie
-*/
-.scroll-anchor {
-  height: 1px;
-  width: 100%;
-  opacity: 0;
-  pointer-events: none;
-  visibility: visible !important; /* Garantir que l'ancre ne soit jamais cachée */
+/* Ajoute une marge en bas pour que le dernier message soit visible */
+.web-messages-list {
+  padding-bottom: 200px; /* Espace doublé comme demandé */
+}
+
+/* Réduire l'espace quand Kora est en train de réfléchir */
+.web-thinking {
+  padding: 1rem 1.5rem; /* Moins d'espace pour les points de réflexion */
   margin-bottom: 0;
-  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px; /* Hauteur fixe pour éviter les sauts */
 }
 
-/* Garantir que l'input conserve son positionnement en bas sur mobile */
-.web-question-container {
-  position: relative;
-  z-index: 20;
-  padding: 10px;
-  background-color: var(--background);
-  border-top: 1px solid var(--border);
+/* Animation des points de réflexion */
+.web-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #888;
+  border-radius: 50%;
+  display: inline-block;
+  animation: dot-pulse 1.5s infinite ease-in-out;
 }
 
-/* Sur mobile */
-@media (max-width: 768px) {
-  .web-question-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 12px;
+.web-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.web-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
   }
 }
 
-/* Styles des messages pour garantir leur visibilité */
-.web-message {
-  opacity: 1;
-  margin-bottom: 12px;
-  position: relative;
-  transition: opacity 0.2s ease-in-out;
+/* Style spécifique pour les boutons d'indice */
+.web-challenge-actions {
+  padding-bottom: 2.5rem; /* Espacement doublé comme demandé */
+  margin-bottom: 1.5rem; /* Espacement doublé comme demandé */
+  margin-top: 0.75rem;
+  display: flex;
+  justify-content: flex-start; /* Aligner le bouton à gauche comme les autres boutons */
 }
 
-/* Assurer que le conteneur de conversation est toujours visible */
-.web-conversation-started .web-conversation-container {
-  visibility: visible !important;
+.web-challenge-actions .web-action-button {
+  /* Utilisation du même style que les autres boutons d'action */
+  background-color: #f5f5f7;
+  color: #333;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.web-challenge-actions .web-action-button:hover {
+  background-color: #e8e8e8;
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Ajustements pour le conteneur de questions en mode conversation */
+.web-question-container {
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  z-index: 100; /* Z-index élevé pour être toujours au-dessus des messages */
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0.5rem 1rem 0 1rem; /* Padding sans espace en bas */
+  box-shadow: none; /* Suppression de l'ombre */
+  border-top: none; /* Suppression de la bordure */
+  position: relative;
+  margin-bottom: -0.5rem; /* Compense tout espacement résiduel en bas */
+}
+
+/* Style pour le texte d'information en bas */
+.web-question-footer {
+  margin: 0; /* Suppression de toutes les marges */
+  padding: 0; /* Suppression de tout padding */
+  font-size: 0.7rem; /* Texte plus petit */
+  color: #666;
+  text-align: center;
+  line-height: 1; /* Ligne normale */
+  margin-top: 0.2rem; /* Petit espace au-dessus du texte */
+}
+
+/* Style pour le nom KORA dans le footer */
+.kora-name {
+  font-weight: 600;
+  color: #000;
+}
+
+/* Suppression totale des overlays pour s'assurer que les boutons soient visibles */
+
+/* Styles pour les boutons d'action des messages de Kora */
+.web-message-actions {
+  display: flex;
+  margin-top: 0.75rem;
+  gap: 0.75rem;
+  padding-bottom: 2.5rem; /* Espacement doublé comme demandé */
+  margin-bottom: 1.5rem; /* Espacement doublé comme demandé */
+}
+
+.web-action-button {
+  background-color: #f5f5f7;
+  border: none;
+  border-radius: 18px;
+  padding: 0.6rem 1.2rem; /* Boutons légèrement plus grands */
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Plus d'espace entre l'icône et le texte */
+  color: #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Légère ombre pour une meilleure visibilité */
+}
+
+.web-action-button:hover {
+  background-color: #e8e8e8;
+  transform: translateY(-1px); /* Léger effet de survol */
+}
+
+/* Style pour le formulaire de question */
+.web-question-form {
+  width: 100%;
+}
+
+.web-question-box {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f7;
+  border-radius: 24px;
+  padding: 0.5rem 1rem;
+  width: 100%;
+}
+
+.web-input-wrapper {
+  flex-grow: 1;
+}
+
+.web-input-wrapper input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  padding: 0.5rem 0;
+}
+
+.web-action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Styles pour les boutons d'action */
+.web-image-button,
+.web-mic-button,
+.web-send-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.web-image-button:hover,
+.web-mic-button:hover,
+.web-send-button:hover {
+  color: #0066ff;
+  border-color: #0066ff;
+  transform: scale(1.05);
+}
+
+.web-send-button {
+  background-color: #000000;
+  color: white;
+  border: none;
+}
+
+/* Bouton micro en mode enregistrement */
+.web-mic-button.recording {
+  color: #ff3b30;
+  animation: pulse-recording 1.5s infinite;
+}
+
+@keyframes pulse-recording {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Zone de l'enregistreur vocal */
+.web-voice-recorder {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f5f5f7;
+  border-radius: 12px;
+  width: 100%;
+}
+
+/* Styles pour la modale d'upload d'image */
+.web-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.web-modal {
+  background-color: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.web-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.web-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.web-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.web-modal-content {
+  padding: 1.5rem;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.web-image-preview {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  overflow: hidden;
+  max-height: 300px;
+  display: flex;
+  justify-content: center;
+  background-color: #f5f5f7;
+}
+
+.web-image-preview img {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.web-modal-textarea {
+  width: 100%;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  resize: none;
+  font-family: inherit;
+}
+
+.web-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e6e6e6;
+  gap: 1rem;
+}
+
+.web-modal-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.web-modal-button.cancel {
+  background: none;
+  border: 1px solid #e6e6e6;
+  color: #666;
+}
+
+.web-modal-button.submit {
+  background-color: #0066ff;
+  border: none;
+  color: white;
+}
+
+/* Media queries pour assurer la cohérence du design responsive */
+@media (max-width: 1200px) {
+  .web-layout {
+    display: flex;
+    height: 100vh;
+  }
+
+  .web-sidebar {
+    width: 250px;
+    min-width: 250px; /* Garantit que la sidebar garde sa taille */
+  }
+
+  .web-main-content {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .web-layout {
+    flex-direction: column;
+  }
+
+  .web-sidebar {
+    width: 100%;
+    height: auto;
+    min-height: 80px;
+    max-height: 80px;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .web-main-content {
+    height: calc(100vh - 80px);
+  }
+
+  /* Masquer tous les éléments de la sidebar sauf le logo sur mobile */
+  .web-search-container,
+  .web-sidebar-section,
+  .web-sidebar-divider,
+  .web-profile-container {
+    display: none;
+  }
+
+  .web-logo-container {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
