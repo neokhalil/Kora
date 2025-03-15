@@ -1,0 +1,138 @@
+/* 
+ * Styles pour corriger l'affichage sur mobile avec clavier virtuel
+ * Le problème : quand le clavier virtuel est ouvert, toute l'interface passe en arrière-plan
+ * Solution : garantir que le header reste visible et que la zone de saisie reste au-dessus du clavier
+ */
+
+/* Variables pour la gestion des hauteurs */
+:root {
+  --keyboard-height: 0px; /* Sera mis à jour dynamiquement via JS */
+  --header-height: 56px;
+  --composer-height: 60px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Force l'utilisation de l'API Visual Viewport pour un meilleur comportement */
+.visual-viewport-supported .composer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9990; /* Valeur élevée pour être au-dessus du contenu */
+  transition: transform 0.1s ease; /* Transition douce pour le repositionnement */
+}
+
+/* Conteneur de messages - zone scrollable */
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: var(--composer-height); /* Espace pour la zone de saisie */
+  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+}
+
+/* S'assurer que la zone de message n'est pas masquée par le clavier */
+body.keyboard-open .messages-container {
+  max-height: calc(var(--app-height) - var(--header-height) - var(--composer-height));
+  padding-bottom: 0; /* Éviter double padding quand le clavier est ouvert */
+}
+
+/* Garantir que le header reste visible lors de l'ouverture du clavier */
+body.keyboard-open #kora-header-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+}
+
+/* Repositionner la zone de saisie quand le clavier est visible - Android */
+.android-device.keyboard-open .composer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+}
+
+/* Repositionner la zone de saisie quand le clavier est visible - iOS */
+.ios-device.keyboard-open .composer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9990;
+}
+
+/* Optimisations pour le Visual Viewport API (iOS principalement) */
+.visual-viewport-active .composer-container {
+  position: fixed;
+  transform: translateY(calc(var(--viewport-height-diff) * -1));
+  bottom: 0;
+  width: 100%;
+  z-index: 9990;
+}
+
+/* Hauteur ajustée en fonction du clavier pour le conteneur de messages */
+body.keyboard-open .messages-wrapper {
+  margin-bottom: var(--composer-height);
+}
+
+/* S'assurer que les messages sont toujours visibles sur iOS */
+.ios-device.keyboard-open .messages-container {
+  padding-bottom: var(--composer-height);
+}
+
+/* Structure du layout général pour adapter le contenu */
+.chat-assistant-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: calc(var(--app-height, 100vh));
+  overflow: hidden;
+  position: relative;
+}
+
+/* Structure de la zone de messages */
+.messages-wrapper {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajout d'espace en haut pour éviter que le header ne masque du contenu */
+.messages-wrapper {
+  padding-top: calc(var(--header-height) + var(--safe-area-top));
+}
+
+/* Ajustements spécifiques pour les petits écrans (téléphones) */
+@media (max-width: 640px) {
+  /* Réduire la hauteur de la zone de saisie */
+  .composer-container {
+    padding: 8px;
+  }
+  
+  /* Optimiser l'espace vertical */
+  .chat-textarea {
+    padding-top: 8px !important;
+    padding-bottom: 8px !important;
+    max-height: 100px !important;
+  }
+}
+
+/* Styles spécifiques quand le clavier est ouvert */
+body.keyboard-open {
+  /* Éviter le rebond/défilement de la page entière */
+  position: fixed;
+  width: 100%;
+  height: var(--app-height);
+  overflow: hidden;
+}
+
+/* Classe helper pour visualiser les problèmes en développement */
+.debug-keyboard-layout {
+  border: 2px solid red;
+}

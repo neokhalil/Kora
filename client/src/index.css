@@ -1,5 +1,7 @@
 /* Import des styles pour les composants mathématiques et code */
 @import './styles/mathCode.css';
+/* Import des styles pour corriger l'affichage du clavier mobile */
+@import './styles/mobileKeyboardFix.css';
 
 @tailwind base;
 @tailwind components;
