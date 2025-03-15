@@ -1,0 +1,95 @@
+/**
+ * Override de thème forcé pour désactiver le mode sombre 
+ * et garder un fond blanc dans toute l'application
+ */
+
+/* Force le mode clair pour tous les éléments */
+.dark,
+[data-theme="dark"],
+html[data-theme="dark"],
+body[data-theme="dark"] {
+  /* Réinitialiser toutes les variables de couleur en mode clair */
+  --foreground: #1a202c !important;
+  --background: #ffffff !important;
+  --muted-foreground: #718096 !important;
+  --muted: #e2e8f0 !important;
+  --border: #e2e8f0 !important;
+  
+  --card-background: #f7fafc !important;
+  --card-background-hover: #edf2f7 !important;
+  --card-foreground: #1a202c !important;
+}
+
+/* S'assurer que tous les éléments ont un fond blanc */
+body,
+#root,
+main,
+.app-container,
+.content-area,
+.message-content,
+.message,
+.web-kora-message,
+.web-user-message,
+.chat-content {
+  background-color: white !important;
+  color: #1a202c !important;
+}
+
+/* Règles spécifiques pour les messages */
+.message-assistant {
+  background-color: white !important;
+  color: #1a202c !important;
+  border: none !important;
+}
+
+/* Correction pour les vues web */
+.web-messages-list {
+  background-color: white !important;
+}
+
+.web-conversation-container {
+  background-color: white !important;
+}
+
+/* Règles pour les conteneurs de messages */
+.messages-list,
+.messages-container {
+  background-color: white !important;
+}
+
+/* S'assurer que tous les textes sont lisibles sur fond blanc */
+p, h1, h2, h3, h4, h5, h6, span, div {
+  color: #1a202c;
+}
+
+/* Correction pour les entrées utilisateur */
+.input-container,
+.web-question-box,
+.chat-input,
+textarea,
+input {
+  background-color: white !important;
+  border: none !important;
+  color: #1a202c !important;
+}
+
+/* Force un fond blanc pour les équations et le code */
+.content-renderer .katex-display,
+.content-renderer pre,
+.content-renderer code {
+  background-color: #f8f9fa !important;
+  color: #1a202c !important;
+}
+
+/* Media query pour s'assurer que le mode sombre est complètement désactivé */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light !important;
+  }
+  
+  /* Force le mode clair pour tous les éléments HTML */
+  html, body {
+    background-color: white !important;
+    color: #1a202c !important;
+  }
+}

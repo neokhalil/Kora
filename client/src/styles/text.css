@@ -119,17 +119,18 @@
   margin: 0.75rem 0;
 }
 
-/* Styles pour le mode sombre */
+/* Styles pour le mode sombre - désactivés pour conserver un fond clair */
 @media (prefers-color-scheme: dark) {
+  /* Mode clair forcé */
   .text-renderer pre,
   .message-content.text-content pre {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: #f5f5f5; /* Conserver le même fond clair */
   }
   
   .text-renderer code,
   .message-content.text-content code {
-    background-color: rgba(0, 0, 0, 0.2);
-    color: #e8e8e8;
+    background-color: #f5f5f5; /* Conserver le même fond clair */
+    color: #333333; /* Conserver le texte foncé */
   }
 }
 

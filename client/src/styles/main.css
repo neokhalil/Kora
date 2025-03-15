@@ -325,9 +325,11 @@ button, input, select, textarea {
    ================================================== */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
+    color-scheme: light; /* Forcer le mode clair pour tous les utilisateurs */
   }
 
+  /* Désactiver le mode sombre automatique basé sur les préférences système */
+  /*
   body:not(.light-mode) {
     --foreground: #f0f5fa;
     --background: #121212;
@@ -339,4 +341,5 @@ button, input, select, textarea {
     --card-background-hover: #2d2d2d;
     --card-foreground: #e2e8f0;
   }
+  */
 }
