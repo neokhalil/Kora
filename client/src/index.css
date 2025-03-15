@@ -1083,7 +1083,7 @@ header:not(#kora-header) {
 
 .user-message {
   align-self: flex-end;
-  background-color: #f0f0f0;
+  background-color: #EAEAEA;
   color: #2d2d2d;
   margin-left: auto;
   border-bottom-right-radius: 0.25rem;
@@ -1179,6 +1179,7 @@ body.menu-open {
   white-space: normal;
   max-width: 85%;
   padding: 0.15rem 0.5rem !important;
+  background-color: #EAEAEA;
 }
 
 /* Styles pour gérer le header fixe */
