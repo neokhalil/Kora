@@ -68,7 +68,6 @@ const ChatAssistant: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const [isRecordingAudio, setIsRecordingAudio] = useState(false);
   const [progressiveText, setProgressiveText] = useState<{id: string, fullText: string, currentText: string, intervalId?: NodeJS.Timeout}>({
     id: '',
     fullText: '',
@@ -446,11 +445,6 @@ const ChatAssistant: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
-  
-  // Fonction pour activer/désactiver l'enregistrement audio
-  const toggleAudioRecording = () => {
-    setIsRecordingAudio(prev => !prev);
   };
   
   const handleSubmitImage = async () => {
