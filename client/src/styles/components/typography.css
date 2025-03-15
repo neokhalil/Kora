@@ -1,0 +1,72 @@
+/**
+ * Styles pour la typographie et les éléments de texte
+ */
+
+/* ==================== TYPOGRAPHIE DE BASE ==================== */
+body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  color: #333333;
+}
+
+/* ==================== TEXTE DANS LES MESSAGES ==================== */
+/* Assurer que tous les textes dans les messages sont de la bonne couleur */
+.web-message-content h1,
+.web-message-content h2,
+.web-message-content h3,
+.web-message-content h4,
+.web-message-content h5,
+.web-message-content h6,
+.web-message-content p,
+.web-message-content span,
+.web-message-content div,
+.web-message-content strong,
+.web-message-content em,
+.web-message-content b,
+.web-message-content i,
+.web-kora-message * {
+  color: #333333 !important; /* Force la couleur noire pour tout texte */
+}
+
+/* Styles pour les paragraphes */
+.web-message-content p {
+  margin-bottom: 0.75em;
+  color: #333333;
+}
+
+/* Styles pour les titres */
+.web-message-content h1 {
+  font-size: 1.8em;
+  font-weight: 700;
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+  color: #333333;
+}
+
+.web-message-content h2 {
+  font-size: 1.5em;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: #333333;
+}
+
+.web-message-content h3 {
+  font-size: 1.3em;
+  font-weight: 600;
+  margin-top: 0.8em;
+  margin-bottom: 0.4em;
+  color: #333333;
+}
+
+/* Style pour le nom d'utilisateur (Hello Ibrahima) */
+.user-greeting, 
+.welcome-text,
+.greeting-text,
+h1.greeting, 
+h2.greeting,
+h3.greeting,
+.web-message-content strong:first-child {
+  color: #333333 !important;
+  font-weight: 600;
+}
