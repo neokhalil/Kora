@@ -96,26 +96,10 @@
   border-radius: 4px;
 }
 
-/* Styles pour le dark mode - désactivé pour conserver un thème clair */
+/* Styles pour le dark mode */
 @media (prefers-color-scheme: dark) {
-  /* Forcer un fond clair pour les équations même en mode sombre */
   .content-renderer .katex-display {
-    background: rgba(0, 0, 0, 0.02); /* Même couleur que le mode clair */
-  }
-  
-  /* Forcer un fond clair pour tous les éléments */
-  .content-renderer {
-    color: #1a202c; /* Couleur de texte claire */
-    background-color: white;
-  }
-  
-  /* S'assurer que le contenu des messages reste en mode clair */
-  .content-renderer pre,
-  .content-renderer code,
-  .content-renderer p,
-  .content-renderer div {
-    color: #1a202c !important;
-    background-color: transparent !important;
+    background: rgba(255, 255, 255, 0.03);
   }
 }
 
@@ -131,16 +115,11 @@
   padding: 0.75rem;
 }
 
-/* Styles pour le dark mode - désactivé pour conserver un fond clair */
+/* Styles pour le dark mode */
 @media (prefers-color-scheme: dark) {
   .content-renderer pre {
-    background: #f8f9fa; /* Même fond que le mode clair */
-    border-color: #e9ecef; /* Même bordure que le mode clair */
-    color: #1a202c;
-  }
-  
-  .content-renderer pre code {
-    color: #1a202c;
+    background: #2d3748;
+    border-color: #4a5568;
   }
 }
 
