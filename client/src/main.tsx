@@ -4,8 +4,19 @@ import { setupMobileViewportFix } from "./lib/mobileViewportFix";
 
 // Import Tailwind CSS
 import "./index.css";
-// Import fichier CSS principal avec architecture ITCSS
-import "./styles/main.css";
+
+// Import des fichiers CSS originaux pour maintenir la compatibilité
+import "./styles/text.css"; // Styles de texte simples
+import "./styles/animations.css"; // Animations pour l'interface utilisateur
+import "./styles/web-home.css"; // Styles spécifiques pour la vue web de la page d'accueil
+import "./styles/mathjax.css"; // Styles pour MathJax et la coloration syntaxique
+import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRenderer
+import "./styles/mobile-fixes.css"; // Corrections spécifiques pour mobile avec maths et code
+import "./styles/header-fix.css"; // Solution définitive pour le header fixe
+
+// Note: La nouvelle architecture CSS est en cours d'implémentation
+// Nous gardons temporairement les anciens fichiers pendant la transition
+// import "./styles/main.css";
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
