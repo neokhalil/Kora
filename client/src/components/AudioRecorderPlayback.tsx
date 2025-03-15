@@ -153,7 +153,7 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Couleur pour les barres en mode enregistrement et pause - noir comme sur l'image de référence
-      ctx.fillStyle = recorderState === 'recording' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(100, 100, 100, 0.7)';
+      ctx.fillStyle = recorderState === 'recording' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(40, 40, 40, 0.7)';
       
       // Calculer le pas pour répartir les fréquences
       const step = Math.ceil(bufferLength / totalBars);
