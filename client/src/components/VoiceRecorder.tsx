@@ -608,7 +608,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   
   // Retourner le composant
   return (
-    <div className="relative flex items-center justify-center" ref={containerRef}>
+    <div 
+      className="relative flex items-center justify-center" 
+      ref={containerRef}
+      style={{ minHeight: '60px' }} // Garantir un espace minimum
+    >
       {/* Version inactive - bouton mic stylisé façon WhatsApp */}
       {recorderState === 'inactive' && (
         <Button
@@ -634,11 +638,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
       )}
       
-      {/* Interface d'enregistrement style WhatsApp */}
+      {/* Interface d'enregistrement style WhatsApp - Adapté pour l'affichage mobile */}
       {recorderState === 'recording' && (
         <div 
           className="relative flex items-center bg-gradient-to-r from-black to-gray-900 text-white rounded-full 
-                      h-12 transition-all duration-300 touch-manipulation shadow-md"
+                      h-12 z-10 transition-all duration-300 touch-manipulation shadow-md"
           style={{ 
             width: isDragging ? `${Math.max(48, 160 - cancelPosition * 1.5)}px` : '160px',
             opacity: isDragging ? 1 - (cancelPosition / 100) * 0.7 : 1,
@@ -683,25 +687,27 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             </div>
           </div>
           
-          {/* Indicateur de "glisser vers le haut pour verrouiller" - uniquement sur mobile */}
+          {/* Indicateur de "glisser vers le haut pour verrouiller" - Repositionné pour mobile */}
           {isMobile && (
             <div 
-              className={`absolute -top-11 left-1/2 transform -translate-x-1/2 
+              className={`absolute -top-10 left-1/2 transform -translate-x-1/2 
                         bg-black text-white text-xs py-1.5 px-3 rounded-full shadow-lg
-                        flex items-center justify-center gap-1.5
+                        flex items-center justify-center gap-1.5 z-20
                         transition-all duration-300 ${isDraggingUp ? 'opacity-100 -translate-y-1' : 'opacity-80'}`}
+              style={{ maxWidth: '90%' }}
             >
               <ChevronUp className={`h-3.5 w-3.5 ${isDraggingUp ? 'animate-bounce' : ''}`} />
               <span>Glisser pour verrouiller</span>
             </div>
           )}
           
-          {/* Visualisation audio - forme d'onde style WhatsApp */}
+          {/* Visualisation audio - forme d'onde style WhatsApp repositionnée */}
           <div 
-            className={`absolute inset-x-0 -bottom-7 h-7 flex items-center justify-center
+            className={`absolute left-0 right-0 bottom-0 h-6 flex items-center justify-center overflow-visible
                        transition-opacity duration-300 ${isDragging ? 'opacity-0' : 'opacity-100'}`}
+            style={{ transform: 'translateY(100%)' }}
           >
-            <div className="flex items-end h-7 space-x-[2px]">
+            <div className="flex items-end h-6 space-x-[2px] mt-1">
               {audioLevels.map((level, index) => (
                 <div
                   key={index}
@@ -721,11 +727,11 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
       )}
       
-      {/* Mode verrouillé (lock) pour enregistrements plus longs - style WhatsApp */}
+      {/* Mode verrouillé (lock) pour enregistrements plus longs - style WhatsApp adapté pour mobile */}
       {recorderState === 'locked' && (
-        <div className="bg-black text-white rounded-lg p-3 flex flex-col items-center gap-2 min-w-[200px] shadow-lg relative">
+        <div className="bg-black text-white rounded-lg p-3 flex flex-col items-center gap-2 max-w-[90%] w-[230px] shadow-lg relative z-10">
           {/* Indicateur verrouillé */}
-          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-black rounded-full p-1 shadow-md">
+          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-black rounded-full p-1 shadow-md z-20">
             <Lock className="h-3.5 w-3.5 text-gray-400" />
           </div>
           
@@ -737,17 +743,17 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             <span className="text-sm font-mono">{formatDuration(recordingDuration)}</span>
           </div>
           
-          {/* Visualisation style WhatsApp - forme d'onde animée */}
-          <div className="w-full mt-2">
-            <div className="flex items-end h-8 space-x-[2px] justify-center">
-              {audioLevels.map((level, index) => (
+          {/* Visualisation style WhatsApp - forme d'onde animée optimisée */}
+          <div className="w-full mt-2 overflow-hidden">
+            <div className="flex items-end h-6 space-x-[2px] justify-center">
+              {audioLevels.slice(0, 20).map((level, index) => ( // Réduire le nombre de barres pour mobile
                 <div
                   key={index}
                   className="w-[3px] bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-full"
                   style={{ 
                     height: `${level}px`, 
                     opacity: 0.9,
-                    transform: `translateY(${Math.sin(index * 0.2) * 2}px)`
+                    transform: `translateY(${Math.sin(index * 0.2) * 1.5}px)`
                   }}
                 ></div>
               ))}
@@ -777,24 +783,34 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
       )}
       
-      {/* État d'erreur style WhatsApp */}
+      {/* État d'erreur style WhatsApp optimisé pour mobile */}
       {recorderState === 'error' && errorMessage && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 
-                       bg-black/90 border border-red-500/20 text-white rounded-lg p-3 
-                       w-72 text-xs shadow-lg backdrop-blur-sm">
+        <div className="fixed bottom-16 left-1/2 transform -translate-x-1/2
+                       bg-black/95 border border-red-500/20 text-white rounded-lg p-3 
+                       max-w-[90%] w-[280px] text-xs shadow-lg backdrop-blur-sm z-50">
           <div className="flex items-start gap-2">
             <X className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium text-sm text-red-300 mb-0.5">Erreur d'enregistrement</p>
               <p className="text-gray-300 leading-tight">{errorMessage}</p>
-              <Button 
-                size="sm"
-                variant="ghost"
-                onClick={() => setRecorderState('inactive')}
-                className="mt-2 h-7 text-xs text-blue-400 hover:text-blue-300 p-0 hover:bg-transparent"
-              >
-                Réessayer
-              </Button>
+              <div className="flex gap-2 mt-2">
+                <Button 
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setRecorderState('inactive')}
+                  className="h-8 text-xs text-blue-400 hover:text-blue-300 px-3 rounded-full bg-blue-900/20"
+                >
+                  Réessayer
+                </Button>
+                <Button 
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setErrorMessage(null)}
+                  className="h-8 text-xs text-gray-400 hover:text-gray-300 px-3 rounded-full"
+                >
+                  Fermer
+                </Button>
+              </div>
             </div>
           </div>
         </div>
