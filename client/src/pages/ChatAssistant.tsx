@@ -1179,12 +1179,12 @@ const ChatAssistant: React.FC = () => {
                         <X className="h-5 w-5" />
                       </button>
                     ) : (
-                      /* Bouton microphone avec fond blanc */
+                      /* Bouton microphone avec fond noir */
                       <button
                         type="button"
                         onClick={handleVoiceButtonClick}
                         disabled={isThinking || isUploadingImage}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-100 shadow-sm disabled:opacity-50 transform transition-transform active:scale-95"
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-black hover:bg-gray-900 text-white border-none shadow-sm disabled:opacity-50 transform transition-transform active:scale-95"
                       >
                         <Mic className="h-5 w-5" />
                       </button>
