@@ -29,10 +29,19 @@
   animation: fade-in 0.3s ease;
 }
 
+/* Supprimer les paddings pour les messages utilisateur en mobile */
+@media (max-width: 768px) {
+  .message-user {
+    padding: 0.5rem 0;
+  }
+}
+
 .message-user {
-  background-color: var(--primary-100);
+  background-color: transparent;
   align-self: flex-end;
   max-width: 80%;
+  border: none;
+  box-shadow: none;
 }
 
 .message-assistant {
