@@ -70,6 +70,20 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       }, 100);
     }
   }, [messages]);
+  
+  // Effet pour ajouter/retirer la classe 'recording' au body pour les styles spécifiques
+  useEffect(() => {
+    if (isRecordingVoice) {
+      document.body.classList.add('recording');
+    } else {
+      document.body.classList.remove('recording');
+    }
+    
+    // Nettoyage à la déconnexion du composant
+    return () => {
+      document.body.classList.remove('recording');
+    };
+  }, [isRecordingVoice]);
 
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
@@ -777,14 +791,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 </div>
               </form>
               
-              {/* Affichage de l'enregistreur vocal quand activé */}
+              {/* Enregistreur vocal - repositionné pour meilleure visibilité sur mobile */}
               {isRecordingVoice && (
-                <div className="web-voice-recorder">
-                  <VoiceRecorder 
-                    onTranscriptionComplete={handleTranscriptionComplete}
-                    maxRecordingTimeMs={30000}
-                    language="fr"
-                  />
+                <div className="web-voice-recorder-container">
+                  <div className="web-voice-recorder">
+                    <VoiceRecorder 
+                      onTranscriptionComplete={handleTranscriptionComplete}
+                      maxRecordingTimeMs={30000}
+                      language="fr"
+                    />
+                  </div>
                 </div>
               )}
               
