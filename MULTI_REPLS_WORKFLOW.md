@@ -354,6 +354,55 @@ Une fois que vous avez validé les changements dans l'environnement de test et q
 
 ---
 
+## Fonctionnement du servage de fichiers statiques
+
+Notre application utilise une architecture qui sépare le serveur (Node.js/Express) du client (React). Lorsque l'application est en production, le serveur est responsable de servir à la fois l'API et les fichiers statiques (JavaScript, CSS, images, etc.). Comprendre comment fonctionne ce mécanisme peut vous aider à résoudre de nombreux problèmes.
+
+### Architecture des fichiers statiques
+
+1. **Pendant le développement** :
+   - Le serveur Vite sert les fichiers client directement
+   - Les modifications sont prises en compte en temps réel grâce au Hot Module Replacement (HMR)
+   - Le serveur Express s'occupe uniquement des API
+
+2. **Après la compilation (build)** :
+   - Vite compile les fichiers client dans `dist/public/`
+   - Le serveur Express est configuré pour servir les fichiers statiques à partir de `server/public/`
+   - Un lien symbolique ou une copie doit exister entre `dist/public/` et `server/public/`
+
+### Gestion du répertoire server/public
+
+Le point crucial à comprendre est que le serveur Express s'attend à trouver les fichiers statiques dans le répertoire `server/public/`, mais Vite les compile dans `dist/public/`. Pour résoudre cette différence, nous utilisons deux approches :
+
+1. **Lien symbolique** (méthode préférée) :
+   ```bash
+   # Crée un lien symbolique de server/public vers dist/public
+   ln -sf ../dist/public server/public
+   ```
+   
+   Cette méthode est propre et efficace car elle ne duplique pas les fichiers. Cependant, elle peut ne pas fonctionner sur certaines configurations.
+
+2. **Copie des fichiers** (méthode alternative) :
+   ```bash
+   # Copie les fichiers de dist/public vers server/public
+   cp -r dist/public/* server/public/
+   ```
+   
+   Cette méthode fonctionne partout mais duplique les fichiers, ce qui prend plus d'espace.
+
+### Scripts automatisés
+
+Pour faciliter ce processus, nous avons créé plusieurs scripts :
+
+1. **scripts/post-build.js** : S'exécute automatiquement après chaque build via le hook `postbuild` dans package.json et crée le lien symbolique.
+2. **scripts/fix-build-directory.sh** : Script qu'on peut exécuter manuellement pour résoudre les problèmes de répertoire de build.
+3. **scripts/build-with-fix.sh** : Script combiné qui gère le build et la correction du répertoire dans une seule commande.
+
+### Différences entre environnements
+
+- **Développement** : Le serveur Vite gère les fichiers statiques, donc ce problème n'apparaît pas.
+- **Test/Production** : Après un build, les fichiers statiques doivent être correctement liés ou copiés vers `server/public/`.
+
 ## Résolution des problèmes courants
 
 ### "Could not find the build directory"

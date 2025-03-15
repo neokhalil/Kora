@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script pour construire l'application et corriger automatiquement le problème de dossier public
-# Version: 2.0 - Mise à jour du 15 mars 2025
+# Script de build optimisé avec correction automatique des répertoires
+# Version: 1.0 - 15 mars 2025
 
 # Couleurs pour une meilleure lisibilité
 GREEN='\033[0;32m'
@@ -10,51 +10,73 @@ RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}=== Construction de l'application avec correction automatique ===${NC}"
+echo -e "${BLUE}=== Début du processus de build optimisé ===${NC}"
 
-# Construction avec le bon environnement
-echo -e "${YELLOW}Démarrage du build...${NC}"
+# 1. Détection de l'environnement
 if [ -z "$NODE_ENV" ]; then
-  echo -e "${YELLOW}NODE_ENV non défini, utilisation de NODE_ENV=production${NC}"
-  NODE_ENV=production npm run build
+  echo -e "${YELLOW}Aucun environnement NODE_ENV défini, utilisation de 'production' par défaut${NC}"
+  export NODE_ENV=production
 else
-  echo -e "${YELLOW}Utilisation de NODE_ENV=$NODE_ENV${NC}"
-  npm run build
+  echo -e "${YELLOW}Environnement détecté: $NODE_ENV${NC}"
 fi
 
-# Vérification du résultat du build
-if [ $? -ne 0 ]; then
-  echo -e "${RED}Erreur lors de la construction. Vérifiez les logs ci-dessus pour plus de détails.${NC}"
+# 2. Construction de l'application
+echo -e "${YELLOW}1. Exécution du build Vite...${NC}"
+npm run build || {
+  echo -e "${RED}Erreur lors du build. Vérifiez les logs ci-dessus.${NC}"
   exit 1
-fi
+}
 
-# Vérification si le script fix-build-directory.sh existe et est exécutable
-if [ -f "./scripts/fix-build-directory.sh" ]; then
-  echo -e "${YELLOW}Exécution du script fix-build-directory.sh pour corriger le dossier public...${NC}"
-  chmod +x ./scripts/fix-build-directory.sh
-  ./scripts/fix-build-directory.sh
-else
-  echo -e "${RED}Erreur: Le script fix-build-directory.sh n'a pas été trouvé.${NC}"
-  echo -e "${YELLOW}Tentative de création du lien symbolique manuellement...${NC}"
+# 3. Vérification et correction du répertoire server/public
+echo -e "${YELLOW}2. Vérification du répertoire server/public...${NC}"
+
+if [ ! -d "server/public" ] || [ -z "$(ls -A server/public 2>/dev/null)" ]; then
+  echo -e "${YELLOW}Le répertoire server/public est absent ou vide. Correction...${NC}"
   
-  if [ -d "dist/public" ] && [ ! -z "$(ls -A dist/public 2>/dev/null)" ]; then
-    echo -e "${GREEN}Build trouvée dans dist/public, création d'un lien symbolique vers server/public...${NC}"
+  # Vérifier si le répertoire dist/public existe et contient des fichiers
+  if [ -d "dist/public" ] && [ -n "$(ls -A dist/public 2>/dev/null)" ]; then
+    echo -e "${YELLOW}Le répertoire dist/public existe avec des fichiers. Création du lien symbolique...${NC}"
     
-    # Supprimer server/public s'il existe déjà
-    rm -rf server/public
+    # Supprimer server/public s'il existe
+    if [ -d "server/public" ]; then
+      echo -e "${YELLOW}Suppression du répertoire server/public existant...${NC}"
+      rm -rf server/public
+    fi
     
-    # Créer le dossier parent si nécessaire
-    mkdir -p server
+    # Création du répertoire server si nécessaire
+    if [ ! -d "server" ]; then
+      echo -e "${YELLOW}Création du répertoire server...${NC}"
+      mkdir -p server
+    fi
     
-    # Créer un lien symbolique de server/public vers dist/public
-    ln -sf $(pwd)/dist/public server/public
-    
-    echo -e "${GREEN}Lien symbolique créé avec succès.${NC}"
+    # Essayer de créer un lien symbolique
+    if ln -sf ../dist/public server/public; then
+      echo -e "${GREEN}Lien symbolique créé avec succès.${NC}"
+    else
+      echo -e "${YELLOW}Impossible de créer le lien symbolique. Copie des fichiers...${NC}"
+      mkdir -p server/public
+      cp -r dist/public/* server/public/
+      echo -e "${GREEN}Fichiers copiés avec succès.${NC}"
+    fi
   else
-    echo -e "${RED}Erreur: Aucun fichier trouvé dans dist/public. Le build semble avoir échoué.${NC}"
+    echo -e "${RED}Le répertoire dist/public n'existe pas ou est vide. Build incorrect.${NC}"
     exit 1
   fi
+else
+  echo -e "${GREEN}Le répertoire server/public existe et contient des fichiers. Aucune correction nécessaire.${NC}"
 fi
 
-echo -e "${BLUE}=== Build terminé ===${NC}"
-echo -e "${GREEN}Vous pouvez maintenant démarrer l'application avec 'npm run dev' ou 'npm run start'${NC}"
+# 4. Vérification de l'état du build
+if [ -d "server/public" ] && [ -n "$(ls -A server/public 2>/dev/null)" ]; then
+  echo -e "${GREEN}Vérification finale: répertoire server/public correctement configuré.${NC}"
+  echo -e "${GREEN}=== Build terminé avec succès ===${NC}"
+  
+  # Si nous sommes en environnement de production, afficher un message supplémentaire
+  if [ "$NODE_ENV" = "production" ]; then
+    echo -e "${BLUE}Pour démarrer l'application en production:${NC}"
+    echo -e "${YELLOW}NODE_ENV=production npm start${NC}"
+  fi
+else
+  echo -e "${RED}Échec de la vérification finale: le répertoire server/public est absent ou vide.${NC}"
+  exit 1
+fi
