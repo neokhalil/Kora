@@ -790,7 +790,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               
               {/* Message d'accueil placé directement dans le container de questions */}
               <p className="web-question-footer">
-                <span className="kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
+                <span className="web-kora-name">KORA</span>, ton assistant IA pour réviser et faire tes exercices.
               </p>
             </div>
             
