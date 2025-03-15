@@ -114,10 +114,11 @@
   display: flex;
   align-items: flex-end;
   width: 100%;
-  background-color: var(--card-background);
+  background-color: #fff; /* Fond blanc fixe */
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 24px; /* Arrondi comme dans la capture d'écran */
   padding: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Légère ombre */
 }
 
 .chat-input {
@@ -149,9 +150,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  border-radius: 8px;
-  background-color: var(--primary);
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background-color: #000;
   color: white;
   border: none;
   cursor: pointer;
@@ -178,11 +181,28 @@
   }
   
   .input-container {
-    padding: 0.5rem;
+    padding: 0.75rem 1rem;
   }
   
   .chat-input {
     font-size: 0.95rem;
     padding: 0.4rem;
+    color: #5c5c5c;
+  }
+  
+  .chat-input::placeholder {
+    color: #9ca3af;
+  }
+  
+  /* Ajustements pour les boutons dans le formulaire mobile */
+  .chat-controls .button-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #f3f4f6;
   }
 }
