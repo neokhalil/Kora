@@ -740,14 +740,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                           maxRecordingTimeMs={30000}
                           language="fr"
                         />
-                        <button 
-                          type="button"
-                          className="web-voice-close-button"
-                          aria-label="Fermer l'enregistrement"
-                          onClick={handleVoiceButtonClick}
-                        >
-                          <X size={20} />
-                        </button>
                       </div>
                     ) : (
                       <>

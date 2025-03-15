@@ -49,13 +49,13 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   
-  // Configuration du visualiseur audio - adapté pour correspondre parfaitement au design de référence
+  // Configuration du visualiseur audio - ajusté pour correspondre parfaitement au screenshot
   const visualizerConfig: AudioVisualizerConfig = {
-    width: 500, // Largeur du canvas augmentée pour un aspect moderne
-    height: 50,  // Hauteur pour permettre des barres plus visibles
-    barWidth: 2,  // Barres légèrement plus épaisses pour une meilleure visibilité
-    barGap: 2,    // Espacement entre les barres pour un meilleur rendu
-    sensitivity: 5 // Sensibilité augmentée pour une visualisation plus dynamique
+    width: 300, // Largeur ajustée pour s'adapter à la zone dans l'interface
+    height: 24,  // Hauteur réduite comme dans le screenshot
+    barWidth: 1,  // Barres fines comme dans le screenshot
+    barGap: 1,    // Espacement minimal
+    sensitivity: 2.5 // Sensibilité ajustée pour avoir un rendu similaire au screenshot
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -152,14 +152,13 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       // Effacer le canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Couleur pour les barres en mode enregistrement et pause - noir comme sur l'image de référence
-      // Couleur noire pour les barres, exactement comme dans l'image de référence
+      // Couleur noire pour les barres, exactement comme dans le screenshot
       ctx.fillStyle = 'rgb(0, 0, 0)';
       
       // Calculer le pas pour répartir les fréquences
       const step = Math.ceil(bufferLength / totalBars);
       
-      // Dessiner chaque barre
+      // Dessiner chaque barre - style très similaire au screenshot
       for (let i = 0; i < totalBars; i++) {
         const dataIndex = Math.min(bufferLength - 1, i * step);
         
@@ -167,22 +166,35 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
         let barHeight = 0;
         
         if (recorderState === 'paused') {
-          // Générer une hauteur statique pour le mode pause
-          barHeight = audioLevels[i % audioLevels.length];
+          // Générer une hauteur statique pour le mode pause, avec une variation légère
+          barHeight = Math.max(2, Math.min(canvas.height, audioLevels[i % audioLevels.length]));
         } else {
           // Utiliser les données audio réelles en mode enregistrement
           const value = dataArray[dataIndex];
-          barHeight = Math.max(3, (value / 255) * canvas.height * visualizerConfig.sensitivity);
+          
+          // Ajuster les valeurs pour qu'elles varient davantage comme dans le screenshot
+          // Les valeurs plus faibles sont augmentées légèrement, les valeurs élevées sont accentuées
+          let normalizedValue = value / 255;
+          
+          // Appliquer une courbe pour accentuer les différences
+          normalizedValue = Math.pow(normalizedValue, 0.7);
+          
+          // Calculer la hauteur avec un minimum plus visible
+          barHeight = Math.max(2, normalizedValue * canvas.height * visualizerConfig.sensitivity);
+          
+          // S'assurer que certaines barres sont plus hautes pour avoir le même effet visuel que le screenshot
+          if (i % 4 === 0 && Math.random() > 0.5) {
+            barHeight = Math.max(barHeight, canvas.height * 0.6 * Math.random());
+          }
         }
         
         // Position X de la barre
         const x = i * (visualizerConfig.barWidth + visualizerConfig.barGap);
         
-        // Dessiner la barre depuis le centre
-        const centerY = canvas.height / 2;
+        // Dessiner la barre depuis le bas (comme dans le screenshot)
         ctx.fillRect(
           x, 
-          centerY - barHeight / 2, 
+          canvas.height - barHeight, 
           visualizerConfig.barWidth, 
           barHeight
         );
@@ -510,90 +522,187 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       {/* Audio element pour la lecture */}
       <audio ref={audioRef} src={audioBlobUrl || undefined} className="hidden" />
       
-      {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
+      {/* Nouveau design de l'interface d'enregistrement selon le screenshot */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md" style={{ height: '50px' }}>
+        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md" style={{ height: '56px' }}>
           {recorderState === 'recording' && (
             <>
-              {/* Icône poubelle à gauche (comme dans le design de référence) */}
-              <div className="flex-shrink-0">
+              {/* Partie gauche - boutons photo et caméra */}
+              <div className="flex items-center gap-3">
                 <button 
-                  onClick={deleteRecording}
-                  className="text-black hover:text-gray-900 transition-colors p-1"
-                  aria-label="Supprimer l'enregistrement"
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Joindre une photo"
                 >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M18.5 6L17.5 19C17.5 20.1046 16.6046 21 15.5 21H8.5C7.39543 21 6.5 20.1046 6.5 19L5.5 6M4 6H20M15 6L14.5 4C14.5 3.44772 14.0523 3 13.5 3H10.5C9.94772 3 9.5 3.44772 9.5 4L9 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="6" width="18" height="12" rx="2" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="#555" strokeWidth="2"/>
+                  </svg>
+                </button>
+                <button 
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Prendre une photo"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9C3 7.89543 3.89543 7 5 7H5.5C6.12951 7 6.72229 6.70361 7.1 6.2L8.9 4.8C9.27771 4.29639 9.87049 4 10.5 4H13.5C14.1295 4 14.7223 4.29639 15.1 4.8L16.9 6.2C17.2777 6.70361 17.8705 7 18.5 7H19C20.1046 7 21 7.89543 21 9V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V9Z" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="13" r="4" stroke="#555" strokeWidth="2"/>
                   </svg>
                 </button>
               </div>
               
-              {/* Compteur de temps */}
-              <div className="text-gray-700 font-medium text-center flex-shrink-0 ml-1 mr-3">
-                {formatDuration(recordingDuration)}
+              {/* Partie centrale - poubelle et compteur de temps */}
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={deleteRecording}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  aria-label="Supprimer l'enregistrement"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 3H15M3 6H21M19 6L18.133 19.142C18.0971 19.6466 17.8713 20.1188 17.5011 20.4636C17.1309 20.8083 16.6439 21 16.138 21H7.862C7.35614 21 6.86907 20.8083 6.49889 20.4636C6.1287 20.1188 5.90288 19.6466 5.867 19.142L5 6M10 10V17M14 10V17" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <div className="text-gray-800 font-medium">
+                  {formatDuration(recordingDuration)}
+                </div>
+              </div>
+              
+              {/* Partie droite - visualiseur audio et bouton pause */}
+              <div className="flex items-center gap-3">
+                {/* Visualiseur audio */}
+                <div className="w-36 h-6">
+                  <canvas 
+                    ref={canvasRef} 
+                    className="w-full h-full"
+                  />
+                </div>
+                
+                {/* Bouton pause rouge */}
+                <Button
+                  onClick={pauseRecording}
+                  className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow-none
+                          h-10 w-10 flex items-center justify-center flex-shrink-0"
+                  aria-label="Mettre en pause l'enregistrement"
+                >
+                  <Pause size={18} />
+                </Button>
               </div>
             </>
           )}
           
-          {/* Visualiseur audio - adapté pour avoir le même visuel que la référence */}
-          <div className="flex-grow flex items-center justify-center">
-            <div className="w-full">
-              <canvas 
-                ref={canvasRef} 
-                className="w-full h-10 my-1"
-              />
-            </div>
-          </div>
-          
-          {/* Bouton pause rouge à droite exactement comme dans le design souhaité */}
-          {recorderState === 'recording' ? (
-            <Button
-              onClick={pauseRecording}
-              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow-none
-                       h-12 w-12 flex items-center justify-center ml-4 flex-shrink-0"
-              aria-label="Mettre en pause l'enregistrement"
-            >
-              <Pause size={20} />
-            </Button>
-          ) : recorderState === 'paused' ? (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={resumeRecording}
-                className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
-                         border-none shadow w-10 h-10 flex items-center justify-center"
-                aria-label="Reprendre l'enregistrement"
-              >
-                <Play size={18} />
-              </Button>
-              <Button
-                onClick={stopRecording}
-                className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
-                         border-none shadow w-10 h-10 flex items-center justify-center"
-                aria-label="Arrêter l'enregistrement"
-              >
-                <Send size={18} />
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={audioRef.current?.paused ? playRecording : pausePlayback}
-                className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
-                         border-none shadow w-10 h-10 flex items-center justify-center"
-                aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
-              >
-                {audioRef.current?.paused ? <Play size={18} /> : <Pause size={18} />}
-              </Button>
+          {recorderState === 'paused' && (
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <button 
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Joindre une photo"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="6" width="18" height="12" rx="2" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="#555" strokeWidth="2"/>
+                  </svg>
+                </button>
+                <button 
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Prendre une photo"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9C3 7.89543 3.89543 7 5 7H5.5C6.12951 7 6.72229 6.70361 7.1 6.2L8.9 4.8C9.27771 4.29639 9.87049 4 10.5 4H13.5C14.1295 4 14.7223 4.29639 15.1 4.8L16.9 6.2C17.2777 6.70361 17.8705 7 18.5 7H19C20.1046 7 21 7.89543 21 9V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V9Z" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="13" r="4" stroke="#555" strokeWidth="2"/>
+                  </svg>
+                </button>
+              </div>
               
-              {/* Bouton envoyer */}
-              <Button
-                onClick={sendRecording}
-                className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
-                         border-none shadow w-10 h-10 flex items-center justify-center"
-                aria-label="Envoyer l'enregistrement"
-              >
-                <Send size={18} />
-              </Button>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={deleteRecording}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  aria-label="Supprimer l'enregistrement"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 3H15M3 6H21M19 6L18.133 19.142C18.0971 19.6466 17.8713 20.1188 17.5011 20.4636C17.1309 20.8083 16.6439 21 16.138 21H7.862C7.35614 21 6.86907 20.8083 6.49889 20.4636C6.1287 20.1188 5.90288 19.6466 5.867 19.142L5 6M10 10V17M14 10V17" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <div className="text-gray-800 font-medium">
+                  {formatDuration(recordingDuration)}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={resumeRecording}
+                  className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
+                           border-none shadow-none w-10 h-10 flex items-center justify-center"
+                  aria-label="Reprendre l'enregistrement"
+                >
+                  <Play size={18} />
+                </Button>
+                <Button
+                  onClick={stopRecording}
+                  className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
+                           border-none shadow-none w-10 h-10 flex items-center justify-center"
+                  aria-label="Arrêter l'enregistrement"
+                >
+                  <Send size={18} />
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {recorderState === 'playback' && (
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <button 
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Joindre une photo"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="6" width="18" height="12" rx="2" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="3" stroke="#555" strokeWidth="2"/>
+                  </svg>
+                </button>
+                <button 
+                  className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200"
+                  aria-label="Prendre une photo"
+                >
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9C3 7.89543 3.89543 7 5 7H5.5C6.12951 7 6.72229 6.70361 7.1 6.2L8.9 4.8C9.27771 4.29639 9.87049 4 10.5 4H13.5C14.1295 4 14.7223 4.29639 15.1 4.8L16.9 6.2C17.2777 6.70361 17.8705 7 18.5 7H19C20.1046 7 21 7.89543 21 9V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V9Z" stroke="#555" strokeWidth="2"/>
+                    <circle cx="12" cy="13" r="4" stroke="#555" strokeWidth="2"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={deleteRecording}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                  aria-label="Supprimer l'enregistrement"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 3H15M3 6H21M19 6L18.133 19.142C18.0971 19.6466 17.8713 20.1188 17.5011 20.4636C17.1309 20.8083 16.6439 21 16.138 21H7.862C7.35614 21 6.86907 20.8083 6.49889 20.4636C6.1287 20.1188 5.90288 19.6466 5.867 19.142L5 6M10 10V17M14 10V17" stroke="#555" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <div className="text-gray-800 font-medium">
+                  {formatDuration(recordingDuration)}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Button
+                  onClick={audioRef.current?.paused ? playRecording : pausePlayback}
+                  className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
+                          border-none shadow-none w-10 h-10 flex items-center justify-center"
+                  aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
+                >
+                  {audioRef.current?.paused ? <Play size={18} /> : <Pause size={18} />}
+                </Button>
+                <Button
+                  onClick={sendRecording}
+                  className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
+                          border-none shadow-none w-10 h-10 flex items-center justify-center"
+                  aria-label="Envoyer l'enregistrement"
+                >
+                  <Send size={18} />
+                </Button>
+              </div>
             </div>
           )}
         </div>
