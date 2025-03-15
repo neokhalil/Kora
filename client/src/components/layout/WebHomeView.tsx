@@ -719,30 +719,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <div className="web-question-container">
               <form onSubmit={handleSubmit} className="web-question-form">
                 <div className="web-question-box">
-                  <div className="web-input-wrapper">
-                    <input 
-                      type="text" 
-                      placeholder="Pose ta question"
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      autoFocus
-                      disabled={isRecordingVoice}
-                    />
-                    
-                    {/* Retiré d'ici pour le placer à côté des boutons d'action */}
-                  </div>
-                  <div className="web-action-buttons">
-                    {/* Affichage de l'enregistreur vocal à côté des boutons d'action */}
-                    {isRecordingVoice ? (
-                      <div className="web-voice-recorder-action">
-                        <AudioRecorderPlayback 
-                          onTranscriptionComplete={handleTranscriptionComplete}
-                          maxRecordingTimeMs={30000}
-                          language="fr"
+                  {isRecordingVoice ? (
+                    <div className="web-voice-recorder-action">
+                      <AudioRecorderPlayback 
+                        onTranscriptionComplete={handleTranscriptionComplete}
+                        maxRecordingTimeMs={30000}
+                        language="fr"
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="web-input-wrapper">
+                        <input 
+                          type="text" 
+                          placeholder="Pose ta question"
+                          value={question}
+                          onChange={(e) => setQuestion(e.target.value)}
+                          autoFocus
                         />
                       </div>
-                    ) : (
-                      <>
+                      <div className="web-action-buttons">
                         <button 
                           type="button"
                           className="web-image-button"
@@ -770,18 +766,18 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                             <Mic size={20} strokeWidth={2.5} />
                           </button>
                         )}
-                      </>
-                    )}
-                    
-                    {/* Input caché pour le téléchargement d'image */}
-                    <input 
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </div>
+                      </div>
+                    </>
+                  )}
+                  
+                  {/* Input caché pour le téléchargement d'image */}
+                  <input 
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
                 </div>
               </form>
               

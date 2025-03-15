@@ -480,33 +480,14 @@
 /* Enregistreur vocal placé à côté des boutons d'action - exactement comme dans le design */
 .web-voice-recorder-action {
   position: absolute;
-  left: -10px;
-  right: 0;
-  top: -35px;
-  width: calc(100% + 60px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
-}
-
-/* Bouton fermer pour l'enregistrement vocal */
-.web-voice-close-button {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #e74c3c;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  cursor: pointer;
-  z-index: 11;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 5;
 }
 
 .web-voice-recorder-action > div {
