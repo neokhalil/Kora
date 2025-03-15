@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, StopCircle, Loader2, X } from 'lucide-react';
+import { Mic, StopCircle, Loader2, X, Lock, ChevronUp, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-type RecorderState = 'inactive' | 'recording' | 'processing' | 'error';
+type RecorderState = 'inactive' | 'recording' | 'locked' | 'processing' | 'error';
 
 interface VoiceRecorderProps {
   onTranscriptionComplete: (text: string) => void;
@@ -25,6 +26,19 @@ interface UsageCounter {
   getCount: () => number;
   resetCount: () => void;
 }
+
+// Vibration pattern helpers for haptic feedback
+const vibrateShort = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(10);
+  }
+};
+
+const vibrateMedium = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(25);
+  }
+};
 
 // Compteur d'utilisation pour limiter l'usage
 const createUsageCounter = (): UsageCounter => {
@@ -416,9 +430,142 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Calculer le pourcentage de progression
   const recordingProgressPercent = Math.min(100, (recordingDuration / maxRecordingTimeMs) * 100);
   
+  // Référence aux éléments et interaction
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cancelPosition, setCancelPosition] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [isDraggingUp, setIsDraggingUp] = useState<boolean>(false);
+  const touchStartYRef = useRef<number | null>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const isMobile = useIsMobile();
+  
+  // Référence aux fonctions et états pour le lock
+  const lockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Handler pour le début du toucher/clic
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    if (recorderState !== 'recording') return;
+    
+    const touch = 'touches' in e ? e.touches[0] : e;
+    touchStartYRef.current = touch.clientY;
+    touchStartXRef.current = touch.clientX;
+    setIsDragging(false);
+    setIsDraggingUp(false);
+    
+    // Configurer un timeout pour le mode lock après un appui long (1.5s)
+    if (isMobile) {
+      lockTimeoutRef.current = setTimeout(() => {
+        if (recorderState === 'recording') {
+          vibrateShort(); // Feedback haptique
+          setRecorderState('locked');
+        }
+      }, 1500);
+    }
+  };
+  
+  // Handler pour le mouvement en cours de toucher/clic
+  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
+    if (recorderState !== 'recording') return;
+    
+    const touch = 'touches' in e ? e.touches[0] : e;
+    
+    if (touchStartYRef.current !== null && touchStartXRef.current !== null) {
+      const deltaY = touchStartYRef.current - touch.clientY;
+      const deltaX = touch.clientX - touchStartXRef.current;
+      
+      // Détection de glissement vertical (vers le haut) pour verrouiller l'enregistrement
+      if (deltaY > 50 && Math.abs(deltaX) < 30) {
+        setIsDraggingUp(true);
+        setIsDragging(false);
+        
+        // Annuler le timeout de verrouillage car l'utilisateur utilise le glissement vers le haut
+        if (lockTimeoutRef.current) {
+          clearTimeout(lockTimeoutRef.current);
+          lockTimeoutRef.current = null;
+        }
+        
+        return;
+      }
+      
+      // Détection de glissement horizontal (vers la gauche) pour annuler
+      if (deltaX < -30 && Math.abs(deltaY) < 50) {
+        setIsDragging(true);
+        setIsDraggingUp(false);
+        
+        // Calculer la position de glissement (0 à 100)
+        // Limiter le mouvement entre 0 et 100
+        const maxSwipeDistance = 150; // Distance pour annuler
+        const swipePercent = Math.min(100, Math.max(0, Math.abs(deltaX) / maxSwipeDistance * 100));
+        setCancelPosition(swipePercent);
+        
+        // Annuler le timeout de verrouillage car l'utilisateur fait glisser pour annuler
+        if (lockTimeoutRef.current) {
+          clearTimeout(lockTimeoutRef.current);
+          lockTimeoutRef.current = null;
+        }
+        
+        // Si l'utilisateur a glissé suffisamment loin, annuler l'enregistrement
+        if (swipePercent >= 70) {
+          // Vibration haptique pour confirmer l'annulation
+          vibrateMedium();
+          
+          // Nettoyer le flux audio sans traiter l'enregistrement
+          if (mediaStreamRef.current) {
+            mediaStreamRef.current.getTracks().forEach(track => track.stop());
+          }
+          
+          // Nettoyer le timer
+          if (recordingTimerRef.current) {
+            clearInterval(recordingTimerRef.current);
+          }
+          
+          // Réinitialiser l'état
+          setRecorderState('inactive');
+          return;
+        }
+      }
+    }
+  };
+  
+  // Handler pour la fin du toucher/clic
+  const handleTouchEnd = (e: React.TouchEvent | React.MouseEvent) => {
+    // Annuler le timeout de verrouillage
+    if (lockTimeoutRef.current) {
+      clearTimeout(lockTimeoutRef.current);
+      lockTimeoutRef.current = null;
+    }
+    
+    // Si en mode enregistrement et que l'utilisateur fait glisser vers le haut assez loin
+    if (recorderState === 'recording' && isDraggingUp) {
+      vibrateShort(); // Feedback haptique
+      setRecorderState('locked');
+      return;
+    }
+    
+    // Réinitialiser les états de glissement
+    setIsDragging(false);
+    setIsDraggingUp(false);
+    setCancelPosition(0);
+    touchStartYRef.current = null;
+    touchStartXRef.current = null;
+    
+    // Si on est en mode enregistrement (pas verrouillé) et qu'on relâche sans glisser, arrêter l'enregistrement
+    if (recorderState === 'recording') {
+      stopRecording();
+    }
+  };
+  
+  // Verrouiller l'enregistrement (passer en mode "locked")
+  const lockRecording = () => {
+    if (recorderState === 'recording') {
+      vibrateShort();
+      setRecorderState('locked');
+    }
+  };
+  
   // Retourner le composant
   return (
-    <div className="relative flex items-center justify-center">
+    <div className="relative flex items-center justify-center" ref={containerRef}>
       {/* Version inactive - bouton mic stylisé */}
       {recorderState === 'inactive' && (
         <Button
@@ -428,7 +575,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
           className="relative bg-black hover:bg-gray-800 text-white transition-colors 
-                     h-10 w-10 rounded-full
+                     h-12 w-12 rounded-full
                      active:scale-95 transform transition-transform
                      touch-manipulation"
         >
@@ -443,36 +590,118 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           variant="ghost"
           disabled={true}
           aria-label="Traitement en cours"
-          className="relative h-10 w-10 rounded-full"
+          className="relative h-12 w-12 rounded-full bg-black text-white"
         >
           <Loader2 className="h-5 w-5 animate-spin" />
         </Button>
       )}
       
-      {/* Version enregistrement - style minimaliste */}
+      {/* Interface d'enregistrement style WhatsApp */}
       {recorderState === 'recording' && (
-        <Button
-          size="icon"
-          variant="ghost"
-          onClick={stopRecording}
-          className="h-10 w-10 bg-black hover:bg-gray-900 text-white rounded-full flex-shrink-0 
-                    relative overflow-hidden active:scale-95 transform transition-transform"
-          aria-label="Terminer l'enregistrement"
+        <div 
+          className="relative flex items-center bg-black text-white rounded-full h-12 transition-all duration-300 touch-manipulation"
+          style={{ 
+            width: isDragging ? `${Math.max(48, 150 - cancelPosition * 1.5)}px` : '150px',
+            opacity: isDragging ? 1 - (cancelPosition / 100) * 0.7 : 1 
+          }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={isMobile ? undefined : handleTouchStart}
+          onMouseMove={isMobile ? undefined : handleTouchMove}
+          onMouseUp={isMobile ? undefined : handleTouchEnd}
+          onMouseLeave={isMobile ? undefined : handleTouchEnd}
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span 
-              className="animate-ping absolute inline-flex h-4 w-4 rounded-full bg-red-300 opacity-75"
-              style={{ 
-                animationDuration: '1.5s',
-                animationIterationCount: 'infinite'
-              }}
-            ></span>
-            <StopCircle className="h-5 w-5 relative" />
+          {/* Indicateur de "glisser pour annuler" */}
+          <div 
+            className={`absolute inset-y-0 left-0 flex items-center justify-start pl-3
+                        transition-opacity duration-300 ${isDragging ? 'opacity-10' : 'opacity-70'}`}
+          >
+            <div className="mr-2 flex-shrink-0">
+              <StopCircle className="h-5 w-5 text-red-500" />
+            </div>
+            <span className="text-xs whitespace-nowrap">
+              {isMobile ? "← Glisser pour annuler" : "Relâcher pour envoyer"}
+            </span>
+          </div>
+          
+          {/* Durée d'enregistrement */}
+          <div className="absolute right-3 text-xs font-mono">
+            {formatDuration(recordingDuration)}
+          </div>
+          
+          {/* Indicateur de "glisser vers le haut pour verrouiller" - uniquement sur mobile */}
+          {isMobile && (
+            <div 
+              className={`absolute -top-10 left-1/2 transform -translate-x-1/2 
+                        bg-gray-900 text-white text-xs py-1 px-3 rounded-full
+                        flex items-center justify-center gap-1
+                        transition-opacity duration-300 ${isDraggingUp ? 'opacity-100' : 'opacity-70'}`}
+            >
+              <ChevronUp className="h-3 w-3" />
+              <span>Glisser pour verrouiller</span>
+            </div>
+          )}
+          
+          {/* Visualisation audio - forme d'onde */}
+          <div 
+            className={`absolute inset-x-0 -bottom-6 h-6 flex items-center justify-center
+                       transition-opacity duration-300 ${isDragging ? 'opacity-0' : 'opacity-100'}`}
+          >
+            <div className="flex items-end h-6 space-x-[1px]">
+              {audioLevels.map((level, index) => (
+                <div
+                  key={index}
+                  className="w-[2px] bg-white rounded-full"
+                  style={{ 
+                    height: `${level}px`,
+                    opacity: isDragging ? 0.5 : 0.8 
+                  }}
+                ></div>
+              ))}
+            </div>
           </div>
           
           {/* Canvas caché pour le traitement audio */}
           <canvas ref={canvasRef} className="hidden" />
-        </Button>
+        </div>
+      )}
+      
+      {/* Mode verrouillé (lock) pour enregistrements plus longs */}
+      {recorderState === 'locked' && (
+        <div className="bg-black text-white rounded-lg p-3 flex flex-col items-center gap-2 min-w-[200px]">
+          <div className="w-full flex justify-between items-center">
+            <Clock className="h-4 w-4" />
+            <span className="text-sm font-mono">{formatDuration(recordingDuration)}</span>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={stopRecording}
+              className="h-7 w-7 rounded-full bg-red-500 p-0 flex items-center justify-center hover:bg-red-600"
+            >
+              <StopCircle className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="w-full mt-1">
+            <div className="flex items-end h-6 space-x-[1px] justify-center">
+              {audioLevels.map((level, index) => (
+                <div
+                  key={index}
+                  className="w-[2px] bg-white rounded-full"
+                  style={{ height: `${level}px`, opacity: 0.8 }}
+                ></div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="w-full bg-gray-800 h-1 rounded-full mt-1 overflow-hidden">
+            <div 
+              className="bg-white h-full rounded-full transition-all"
+              style={{ width: `${recordingProgressPercent}%` }}
+            ></div>
+          </div>
+        </div>
       )}
       
       {/* État d'erreur */}
