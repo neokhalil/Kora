@@ -1,18 +1,212 @@
-# Guide de configuration multi-environnement pour Kora
+# Guide de configuration multi-environnements pour Kora
 
-Ce document explique comment gérer et synchroniser plusieurs environnements Replit pour l'application Kora.
+Ce guide explique en détail comment configurer, synchroniser et gérer les différents environnements de l'application Kora.
 
-## Structure des environnements
+## Table des matières
 
-L'application Kora utilise trois environnements distincts :
+1. [Guide rapide](#guide-rapide)
+2. [Architecture des environnements](#architecture-des-environnements)
+3. [Configuration initiale](#configuration-initiale)
+4. [Workflow de développement et migration](#workflow-de-développement-et-migration)
+5. [Résolution des problèmes courants](#résolution-des-problèmes-courants)
+6. [Bonnes pratiques](#bonnes-pratiques)
+7. [Références détaillées](#références-détaillées)
 
-1. **Développement (dev)** : Pour le développement actif et les tests rapides
-2. **Test (test)** : Pour les tests plus approfondis avant déploiement
-3. **Production (prod)** : Pour l'application en production accessible aux utilisateurs
+---
 
-## Workflow de migration entre environnements
+## Guide rapide
 
-Le processus de migration d'une fonctionnalité entre les différents environnements suit un workflow précis pour garantir la stabilité et la qualité du code.
+### Commandes essentielles
+
+#### Pour migrer de DEV vers TEST
+1. Se connecter à l'environnement TEST
+2. Exécuter : `./scripts/multi-repls-setup/pull-from-dev.sh`
+3. Démarrer l'application : `npm run dev` ou utiliser le workflow Replit "Start application"
+
+#### Pour migrer de TEST vers PROD
+1. Se connecter à l'environnement PROD
+2. Exécuter : `./scripts/multi-repls-setup/pull-from-test.sh`
+3. Démarrer l'application : `npm run start` ou utiliser le workflow Replit "Start application"
+4. Déployer (si nécessaire) en cliquant sur le bouton "Deploy" dans l'interface Replit
+
+### Vue d'ensemble du processus complet
+
+1. **Développement (DEV)**
+   - Développer la fonctionnalité
+   - Tester localement
+   - Commiter les changements
+   - Pousser vers le dépôt GitHub principal : `git push origin main`
+
+2. **Test (TEST)**
+   - Se connecter à l'environnement TEST
+   - Exécuter `./scripts/multi-repls-setup/pull-from-dev.sh`
+   - Tester de manière approfondie
+   - Corriger les problèmes si nécessaire
+
+3. **Production (PROD)**
+   - Se connecter à l'environnement PROD
+   - Exécuter `./scripts/multi-repls-setup/pull-from-test.sh`
+   - Vérifier et surveiller après déploiement
+
+> **Note importante** : Les anciens scripts `sync-to-test.sh` et `sync-to-prod.sh` ne sont plus utilisés. Ils ont été remplacés par les scripts `pull-from-dev.sh` et `pull-from-test.sh` qui sont plus simples et plus robustes.
+
+---
+
+## Architecture des environnements
+
+Nous utilisons une approche basée sur 3 Repls distincts:
+
+1. **Environnement de développement** (`kora-dev`)
+   - Où vous développez et testez initialement vos fonctionnalités
+   - Base de données de développement
+   - URL: `https://kora-dev.VOTRE_USERNAME.repl.co`
+
+2. **Environnement de test** (`kora-test`)
+   - Pour les tests plus approfondis avant mise en production
+   - Base de données de test séparée
+   - URL: `https://kora-test.VOTRE_USERNAME.repl.co`
+
+3. **Environnement de production** (`kora-prod`)
+   - Version stable et publique de l'application
+   - Base de données de production
+   - URL: `https://kora-prod.VOTRE_USERNAME.repl.co` (ou domaine personnalisé)
+
+### Architecture de configuration
+
+La configuration de l'application a été modularisée pour faciliter la gestion multi-environnement :
+
+```
+server/config/
+├── environments.ts       # Point d'entrée principal qui charge la configuration appropriée
+├── env.common.ts         # Configuration commune à tous les environnements
+├── env.development.ts    # Configuration spécifique à l'environnement de développement
+├── env.test.ts           # Configuration spécifique à l'environnement de test
+└── env.production.ts     # Configuration spécifique à l'environnement de production
+```
+
+#### Fonctionnement
+
+- `environments.ts` charge la configuration appropriée en fonction de la variable d'environnement `NODE_ENV`
+- Les variables sensibles sont stockées dans des fichiers `.env` et ne sont jamais versionnées
+- Chaque environnement peut avoir ses propres valeurs pour les paramètres comme le niveau de journalisation, le SSL, etc.
+
+### Scripts disponibles
+
+#### Configuration
+- `configure-git-auth.sh` - Configure l'authentification Git pour accéder à GitHub
+
+#### Synchronisation Dev → Test
+- `pull-from-dev.sh` - À exécuter dans l'environnement de test pour récupérer les changements de développement
+
+#### Synchronisation Test → Production
+- `pull-from-test.sh` - À exécuter dans l'environnement de production pour récupérer les changements de test
+
+#### Gestion des données
+- `export-data.sh` - Exporte les données d'une table spécifique
+- `import-data.sh` - Importe des données dans un environnement
+
+---
+
+## Configuration initiale
+
+### Prérequis
+
+Avant de commencer, assurez-vous de disposer :
+- D'un compte GitHub pour l'hébergement de votre dépôt
+- D'un compte Replit avec accès à la création de nouveaux Repls
+- Des droits d'administrateur sur vos Repls pour configurer les variables d'environnement et les workflows
+
+### Création et initialisation du dépôt Git
+
+1. **Créez un dépôt GitHub** pour votre projet Kora :
+   ```bash
+   # Dans votre Repl de développement actuel
+   git init
+   git add .
+   git commit -m "État initial de l'application Kora"
+   
+   # Créez un nouveau dépôt sur GitHub et suivez les instructions pour pousser un dépôt existant
+   # Exemple :
+   git remote add origin https://github.com/votre-username/Kora.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+2. **Configurez Git** dans votre Repl de développement actuel :
+   ```bash
+   # Configurez vos informations Git
+   git config --global user.name "Votre Nom"
+   git config --global user.email "votre.email@exemple.com"
+   
+   # Configurez l'authentification Git (via un token personnel GitHub)
+   ./scripts/multi-repls-setup/configure-git-auth.sh
+   ```
+   
+   Pour plus de détails, consultez le [guide de configuration Git](./scripts/multi-repls-setup/git-setup.md).
+
+### Création des Repls de test et production
+
+1. **Créez un Repl de test** (`kora-test`) :
+   - Connectez-vous à votre compte Replit
+   - Cliquez sur "+ Create Repl"
+   - Sélectionnez "Node.js" comme template
+   - Nommez votre Repl "kora-test"
+   - Cliquez sur "Create Repl"
+
+2. **Configurez le Repl de test** :
+   ```bash
+   # Dans le Repl de test nouvellement créé, ouvrez le shell et clonez votre dépôt
+   git clone https://github.com/votre-username/Kora.git .
+   
+   # Installez les dépendances
+   npm install
+   
+   # Rendez les scripts exécutables
+   chmod +x scripts/multi-repls-setup/*.sh
+   
+   # Configurez l'authentification Git (si nécessaire pour les migrations futures)
+   ./scripts/multi-repls-setup/configure-git-auth.sh
+   ```
+
+3. **Créez un Repl de production** (`kora-prod`) :
+   - Suivez les mêmes étapes que pour le Repl de test, mais nommez-le "kora-prod"
+   
+4. **Configurez le Repl de production** :
+   ```bash
+   # Dans le Repl de production nouvellement créé, ouvrez le shell et clonez votre dépôt
+   git clone https://github.com/votre-username/Kora.git .
+   
+   # Installez les dépendances
+   npm install
+   
+   # Rendez les scripts exécutables
+   chmod +x scripts/multi-repls-setup/*.sh
+   
+   # Configurez l'authentification Git (si nécessaire pour les migrations futures)
+   ./scripts/multi-repls-setup/configure-git-auth.sh
+   ```
+
+5. **Configurez les variables d'environnement** pour chaque Repl :
+   - Créez un fichier `.env` dans chaque environnement avec les valeurs adaptées
+   - Assurez-vous que `NODE_ENV` est correctement défini (development, test, production)
+   - Configurez les informations de connexion à la base de données appropriées
+
+Pour des instructions plus détaillées, consultez le [guide de configuration des Repls](./scripts/multi-repls-setup/repl-setup.md).
+
+### Configuration des workflows Replit
+
+Dans chaque environnement (dev, test, prod), configurez les workflows Replit pour faciliter le démarrage de l'application :
+
+1. Cliquez sur l'icône "Outils" dans la barre latérale de Replit
+2. Sélectionnez "Workflows"
+3. Créez un workflow "Start application" avec la commande `npm run dev`
+4. Enregistrez le workflow
+
+Pour l'environnement de production, vous pouvez créer un workflow supplémentaire "Start Production" avec la commande `npm run start` qui démarre l'application en mode production.
+
+---
+
+## Workflow de développement et migration
 
 ### 1. Développement et validation en environnement DEV
 
@@ -63,27 +257,6 @@ Avant de migrer vers l'environnement de test, suivez ces étapes dans l'environn
    git push origin main
    ```
 
-## Architecture de configuration
-
-La configuration de l'application a été modularisée pour faciliter la gestion multi-environnement :
-
-```
-server/config/
-├── environments.ts       # Point d'entrée principal qui charge la configuration appropriée
-├── env.common.ts         # Configuration commune à tous les environnements
-├── env.development.ts    # Configuration spécifique à l'environnement de développement
-├── env.test.ts           # Configuration spécifique à l'environnement de test
-└── env.production.ts     # Configuration spécifique à l'environnement de production
-```
-
-### Fonctionnement
-
-- `environments.ts` charge la configuration appropriée en fonction de la variable d'environnement `NODE_ENV`
-- Les variables sensibles sont stockées dans des fichiers `.env` et ne sont jamais versionnées
-- Chaque environnement peut avoir ses propres valeurs pour les paramètres comme le niveau de journalisation, le SSL, etc.
-
-## Procédure de synchronisation
-
 ### 3. Migration vers l'environnement TEST
 
 Une fois que les changements sont validés en environnement de développement et que vous avez effectué un commit, suivez ces étapes simplifiées pour migrer vers l'environnement de test :
@@ -103,12 +276,21 @@ Une fois que les changements sont validés en environnement de développement et
    - Construction de l'application
    - Application des migrations de base de données
 
-3. **Testez les nouvelles fonctionnalités** dans l'environnement de test:
+3. **Démarrez l'application** pour vérifier son bon fonctionnement :
+   ```bash
+   # Option 1 : Utiliser le workflow Replit (recommandé)
+   # Cliquez sur le bouton "Run" ou sélectionnez le workflow "Start application"
+   
+   # Option 2 : Démarrer manuellement depuis le terminal
+   npm run dev
+   ```
+
+4. **Testez les nouvelles fonctionnalités** dans l'environnement de test:
    - Vérifiez que toutes les fonctionnalités migrées fonctionnent correctement
    - Réalisez des tests approfondis de régression
    - Documentez tout problème identifié
 
-4. **En cas de problème** :
+5. **En cas de problème** :
    - Si des problèmes sont identifiés, retournez en environnement DEV, corrigez-les et répétez le processus de migration
 
 ### 4. Migration vers l'environnement PRODUCTION
@@ -130,12 +312,31 @@ Une fois que vous avez validé les changements dans l'environnement de test et q
    - Construction de l'application
    - Application des migrations de base de données
 
-3. **Vérifiez que l'application fonctionne correctement** :
+3. **Démarrez l'application en mode production** :
+   ```bash
+   # Option 1 : Utiliser le workflow Replit (recommandé)
+   # Sélectionnez le workflow "Start Production" ou "Start application"
+   
+   # Option 2 : Démarrer manuellement depuis le terminal
+   # Pour une exécution en mode production
+   npm run start
+   
+   # OU pour une exécution en mode développement (pour débogage)
+   npm run dev
+   ```
+
+4. **Vérifiez que l'application fonctionne correctement** :
    - Testez les principales fonctionnalités
    - Vérifiez les journaux pour détecter d'éventuelles erreurs
    - Surveillez les performances pendant quelques minutes
+   
+5. **Déployez l'application** (si nécessaire) :
+   - Cliquez sur le bouton "Deploy" dans l'interface Replit
+   - Confirmez le déploiement
+   - Attendez la fin du processus de déploiement
+   - Vérifiez que l'application est accessible via l'URL de production
 
-4. **En cas de problème** :
+6. **En cas de problème** :
    Si des problèmes critiques sont détectés en production, vous pouvez revenir à l'état précédent en exécutant :
    
    ```bash
@@ -151,7 +352,11 @@ Une fois que vous avez validé les changements dans l'environnement de test et q
    npm run start
    ```
 
-### Résolution de l'erreur "Could not find the build directory"
+---
+
+## Résolution des problèmes courants
+
+### "Could not find the build directory"
 
 Si vous rencontrez cette erreur dans l'environnement de test après une synchronisation :
 ```
@@ -185,7 +390,7 @@ C'est généralement parce que les fichiers client n'ont pas été compilés. Su
    npm run dev
    ```
 
-### Résolution de l'erreur "drizzle-kit: command not found"
+### "drizzle-kit: command not found"
 
 Si vous rencontrez cette erreur lors de l'exécution de `npm run db:push` :
 ```
@@ -258,7 +463,7 @@ Lors de la migration entre environnements, les fichiers de configuration spécif
    - Les scripts de migration (`pull-from-dev.sh` et `pull-from-test.sh`) doivent sauvegarder et restaurer automatiquement ces fichiers
    - Surveillez les messages d'erreur indiquant des problèmes avec ces fichiers
 
-### Résolution des conflits
+### Résolution des conflits Git
 
 Si des conflits surviennent pendant la synchronisation :
 
@@ -273,7 +478,22 @@ Si des conflits surviennent pendant la synchronisation :
    - Décidez quelles modifications conserver en fonction des besoins de l'environnement actuel
    - Mettez à jour les fichiers manuellement
 
-## Bonnes pratiques pour les migrations entre environnements
+---
+
+## Bonnes pratiques
+
+### Utilisation des environnements
+
+- Pour forcer l'utilisation d'un environnement spécifique, définissez `NODE_ENV` :
+  ```bash
+  # En ligne de commande :
+  NODE_ENV=test npm run dev
+  
+  # Ou dans le fichier .env :
+  NODE_ENV=test
+  ```
+
+- Par défaut, si aucun environnement n'est spécifié, l'application utilise l'environnement de développement
 
 ### Planification et communication
 
@@ -317,6 +537,14 @@ Si des conflits surviennent pendant la synchronisation :
    - Standardisez le processus de déploiement
    - Utilisez des listes de contrôle pour ne rien oublier
 
+### Gestion des environnements
+
+- **Variables d'environnement**: Utilisez différentes valeurs pour chaque environnement
+- **Debugging**: Activez les logs détaillés en dev/test, désactivez-les en production
+- **Base de données**: Ne partagez jamais les bases de données entre environnements
+- **API Keys**: Utilisez des clés API différentes pour chaque environnement si possible
+- **Branches Git**: Envisagez d'utiliser des branches différentes pour isoler les fonctionnalités en développement
+
 ### Sécurité et récupération
 
 1. **Effectuez toujours des sauvegardes avant migration** :
@@ -334,43 +562,7 @@ Si des conflits surviennent pendant la synchronisation :
    - Surveillez les performances de l'application
    - Configurez des alertes pour les problèmes critiques
 
-## Utilisation des environnements lors du développement
-
-- Pour forcer l'utilisation d'un environnement spécifique, définissez `NODE_ENV` :
-  ```bash
-  # En ligne de commande :
-  NODE_ENV=test npm run dev
-  
-  # Ou dans le fichier .env :
-  NODE_ENV=test
-  ```
-
-- Par défaut, si aucun environnement n'est spécifié, l'application utilise l'environnement de développement
-
-## Résumé du workflow complet de migration
-
-### Vue d'ensemble du processus
-
-Pour synchroniser entre les environnements, il n'y a qu'une seule commande à exécuter sur chaque environnement cible :
-
-1. **Développement (DEV)**
-   - Développer la fonctionnalité
-   - Tester localement
-   - Commiter les changements
-   - Pousser vers le dépôt GitHub principal : `git push origin main`
-
-2. **Test (TEST)**
-   - Se connecter à l'environnement TEST
-   - Exécuter `./scripts/multi-repls-setup/pull-from-dev.sh`
-   - Tester de manière approfondie
-   - Corriger les problèmes si nécessaire
-
-3. **Production (PROD)**
-   - Se connecter à l'environnement PROD
-   - Exécuter `./scripts/multi-repls-setup/pull-from-test.sh`
-   - Vérifier et surveiller après déploiement
-
-### Conseil spécifiques à Replit
+### Conseils spécifiques à Replit
 
 1. **Gestion des Secrets**
    - Utilisez la fonction Secrets de Replit pour stocker les variables d'environnement sensibles
@@ -390,5 +582,16 @@ Pour synchroniser entre les environnements, il n'y a qu'une seule commande à ex
    - Configurez des sauvegardes automatiques dans Replit
    - Utilisez la fonctionnalité de versionnage pour revenir à des états précédents
    - Documentez clairement les URL et accès pour chaque environnement
+
+---
+
+## Références détaillées
+
+### Guides complémentaires
+
+- [Guide de configuration Git](./scripts/multi-repls-setup/git-setup.md) - Comment configurer Git pour la synchronisation entre environnements
+- [Guide de configuration des Repls](./scripts/multi-repls-setup/repl-setup.md) - Comment configurer chaque Repl pour les différents environnements
+
+---
 
 En suivant ce workflow structuré et ces bonnes pratiques, vous pourrez maintenir efficacement les différents environnements de l'application Kora tout en minimisant les risques lors des migrations et déploiements.
