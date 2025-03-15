@@ -120,112 +120,155 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
-  // Visualiseur audio optimisé avec détection active du volume
+  // Visualiseur audio optimisé pour une expérience WhatsApp-like
   const setupAudioVisualizer = (stream: MediaStream) => {
     if (!canvasRef.current) return;
     
-    // Créer le contexte audio avec la méthode moderne
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    audioContextRef.current = audioContext;
-    
-    // Créer un analyser avec une taille FFT plus grande pour une meilleure précision
-    const analyser = audioContext.createAnalyser();
-    analyserRef.current = analyser;
-    analyser.fftSize = 512; // Plus précis pour la détection vocale
-    analyser.smoothingTimeConstant = 0.2; // Réduire le lissage pour une réactivité maximale
-    
-    // Connecter le flux audio à l'analyser
-    const source = audioContext.createMediaStreamSource(stream);
-    source.connect(analyser);
-    
-    // Préparer les données pour l'analyse
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    
-    // Configuration du canvas pour le débogage si nécessaire
-    const canvas = canvasRef.current;
-    canvas.width = visualizerConfig.width;
-    canvas.height = visualizerConfig.height;
-    
-    // Nombre de barres à afficher
-    const totalBars = 44; // Correspond au nombre dans le rendu
-    
-    // Fonction pour mettre à jour les niveaux audio en temps réel
-    const updateAudioLevels = () => {
-      // Vérifier si nous sommes toujours en enregistrement
-      if (recorderState !== 'recording') {
-        if (animationFrameRef.current) {
-          cancelAnimationFrame(animationFrameRef.current);
+    try {
+      // Créer le contexte audio avec la méthode moderne
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = audioContext;
+      
+      // Créer un analyser avec une taille FFT optimisée pour le style WhatsApp
+      const analyser = audioContext.createAnalyser();
+      analyserRef.current = analyser;
+      analyser.fftSize = 256; // Valeur plus faible pour de meilleures performances et suffisante pour visualiser la voix
+      analyser.smoothingTimeConstant = 0.4; // Lissage moyen pour un effet visuel agréable comme WhatsApp
+      
+      // Connecter le flux audio à l'analyser
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(analyser);
+      
+      // Préparer les données pour l'analyse
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+      
+      // Configuration du canvas pour le débogage si nécessaire
+      const canvas = canvasRef.current;
+      canvas.width = visualizerConfig.width;
+      canvas.height = visualizerConfig.height;
+      
+      // Nombre de barres à afficher (moins de barres, style WhatsApp)
+      const totalBars = 28; // Style WhatsApp avec moins de barres mais plus d'espace
+      
+      // Variables pour l'animation fluide
+      let prevLevels = Array(totalBars).fill(1);
+      
+      // Fonction pour mettre à jour les niveaux audio en temps réel
+      const updateAudioLevels = () => {
+        // Vérifier si nous sommes toujours en enregistrement ou en mode verrouillé
+        if (recorderState !== 'recording' && recorderState !== 'locked') {
+          if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+          }
+          return;
         }
-        return;
-      }
-      
-      // Planifier la prochaine frame d'animation 
-      animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
-      
-      // Obtenir les données de fréquence audio avec une meilleure sensibilité aux variations
-      analyser.getByteFrequencyData(dataArray);
-      
-      // Simuler un peu de bruit aléatoire pour un effet plus vivant quand il n'y a pas de son
-      let hasSound = false;
-      for (let i = 0; i < bufferLength; i++) {
-        if (dataArray[i] > 10) { // Détection de son au-dessus du seuil de bruit
-          hasSound = true;
-          break;
+        
+        // Planifier la prochaine frame d'animation 
+        animationFrameRef.current = requestAnimationFrame(updateAudioLevels);
+        
+        // Obtenir les données de fréquence audio
+        analyser.getByteFrequencyData(dataArray);
+        
+        // Détection de silence pour animation idle
+        let isSilent = true;
+        const silenceThreshold = 5;
+        for (let i = 0; i < bufferLength; i++) {
+          if (dataArray[i] > silenceThreshold) {
+            isSilent = false;
+            break;
+          }
         }
-      }
-      
-      // Calculer le pas pour répartir les fréquences sur toutes les barres
-      // Se concentrer sur les fréquences vocales (200-3500 Hz)
-      const vocalRange = Math.floor(bufferLength * 0.7); // Approximation des fréquences vocales
-      const step = Math.max(1, Math.floor(vocalRange / totalBars));
-      
-      // Nouvelle approche - récupérer les niveaux d'amplitude pour chaque barre
-      const newLevels = Array(totalBars).fill(0);
-      
-      // Parcourir les données de fréquence pour calculer les hauteurs des barres
-      for (let i = 0; i < totalBars; i++) {
-        // Trouver la plage de fréquences pour cette barre
-        const startIdx = Math.min(bufferLength - 1, i * step);
-        const endIdx = Math.min(bufferLength - 1, startIdx + step - 1);
         
-        // Calculer la valeur moyenne pour cette plage
-        let sum = 0;
-        for (let j = startIdx; j <= endIdx; j++) {
-          sum += dataArray[j];
+        // Nouvelle approche - récupérer les niveaux d'amplitude pour chaque barre
+        const newLevels = Array(totalBars).fill(0);
+        
+        // Style WhatsApp: Concentrons-nous sur les fréquences basses et moyennes (voix humaine)
+        // Plage approximative des fréquences vocales dans le spectre
+        const voiceStartIdx = Math.floor(bufferLength * 0.05); // ~100Hz
+        const voiceEndIdx = Math.floor(bufferLength * 0.6);    // ~3000Hz
+        const voiceRange = voiceEndIdx - voiceStartIdx;
+        
+        // Calculer le pas pour répartir les fréquences sur toutes les barres
+        const step = Math.max(1, Math.floor(voiceRange / totalBars));
+        
+        // Parcourir les données de fréquence pour calculer les hauteurs des barres
+        for (let i = 0; i < totalBars; i++) {
+          // Trouver la plage de fréquences pour cette barre
+          const startIdx = Math.min(bufferLength - 1, voiceStartIdx + (i * step));
+          const endIdx = Math.min(bufferLength - 1, startIdx + step - 1);
+          
+          // Calculer la valeur moyenne pour cette plage
+          let sum = 0;
+          for (let j = startIdx; j <= endIdx; j++) {
+            sum += dataArray[j];
+          }
+          const avgValue = sum / (endIdx - startIdx + 1);
+          
+          // Appliquer une courbe de réponse pour privilégier les fréquences vocales
+          // et avoir un rendu plus naturel
+          let amplifiedValue = avgValue;
+          
+          // Facteur de sensibilité variable selon la position dans le spectre
+          // Plus de sensibilité dans les fréquences vocales
+          const positionFactor = 1 - Math.abs(i - totalBars / 2) / (totalBars / 2);
+          const frequencySensitivity = visualizerConfig.sensitivity * (0.7 + 0.5 * positionFactor);
+          
+          amplifiedValue *= frequencySensitivity;
+          
+          // Si silence détecté, ajouter un léger mouvement aléatoire pour éviter l'aspect figé
+          if (isSilent) {
+            // Animation subtile de type "idle" inspirée de WhatsApp
+            amplifiedValue = Math.max(amplifiedValue, Math.random() * 15);
+          }
+          
+          // Convertir en hauteur de barre avec une valeur minimum et maximum
+          // Style WhatsApp: des barres plus hautes au centre
+          const minHeight = 2; // Hauteur minimum légèrement plus grande que WhatsApp
+          const maxHeight = 18; // Hauteur maximum
+          
+          // Appliquer une distribution en cloche pour obtenir l'effet WhatsApp (plus haut au centre)
+          const centerEffect = 0.5 + 0.5 * Math.cos(((i / totalBars) * 2 - 1) * Math.PI);
+          const maxPossibleHeight = minHeight + (maxHeight - minHeight) * centerEffect;
+          
+          const barHeight = minHeight + Math.min(
+            maxPossibleHeight - minHeight,
+            Math.floor((amplifiedValue / 255.0) * (maxPossibleHeight - minHeight))
+          );
+          
+          newLevels[i] = barHeight;
         }
-        const avgValue = sum / (endIdx - startIdx + 1);
         
-        // Appliquer une sensibilité beaucoup plus élevée pour mieux voir les variations
-        const sensitivity = visualizerConfig.sensitivity;
-        const amplifiedValue = avgValue * sensitivity;
+        // Animation fluide: interpolation entre les valeurs précédentes et nouvelles
+        // Style WhatsApp: transition douce entre les niveaux
+        const smoothedLevels = newLevels.map((height, i) => {
+          // Facteur de lissage entre les frames (0.3 = 30% nouvelle valeur, 70% ancienne)
+          const smoothFactor = 0.3;
+          const smoothedHeight = prevLevels[i] * (1 - smoothFactor) + height * smoothFactor;
+          
+          // Ajouter un effet de vague subtil
+          const time = Date.now() / 1000;
+          const waveOffset = Math.sin(time * 2 + i * 0.2) * 0.5;
+          
+          // Combiner l'effet de vague avec la hauteur lissée
+          return Math.max(1, Math.round(smoothedHeight + waveOffset));
+        });
         
-        // Convertir en hauteur de barre avec une valeur minimum et maximum
-        const minHeight = 1;  // Hauteur minimum (jamais à zéro)
-        const maxHeight = 14; // Hauteur maximum
+        // Mise à jour des niveaux précédents pour la prochaine frame
+        prevLevels = [...smoothedLevels];
         
-        const barHeight = minHeight + Math.min(
-          maxHeight - minHeight, 
-          Math.floor((amplifiedValue / 255.0) * (maxHeight - minHeight))
-        );
-        
-        newLevels[i] = barHeight;
-      }
+        // Mettre à jour l'état avec les nouvelles hauteurs
+        setAudioLevels(smoothedLevels);
+      };
       
-      // Modifier légèrement la distribution pour obtenir un effet plus naturel
-      // Appliquer une légère courbe sinusoïdale pour éviter l'aspect trop uniforme
-      const finalLevels = newLevels.map((height, i) => {
-        // Ajouter un effet d'onde pour un aspect plus naturel
-        const waveFactor = 1 + 0.15 * Math.sin(i * 0.3);
-        return Math.max(1, Math.round(height * waveFactor));
-      });
+      // Démarrer la mise à jour des niveaux audio immédiatement
+      updateAudioLevels();
       
-      // Mettre à jour l'état avec les nouvelles hauteurs
-      setAudioLevels(finalLevels);
-    };
-    
-    // Démarrer la mise à jour des niveaux audio immédiatement
-    updateAudioLevels();
+    } catch (error) {
+      console.error("Erreur lors de l'initialisation du visualiseur audio:", error);
+      // En cas d'erreur, on met des barres statiques pour un rendu minimal
+      setAudioLevels(Array(28).fill(5).map(() => 2 + Math.floor(Math.random() * 5)));
+    }
   };
   
   // Fonction pour démarrer l'enregistrement
@@ -566,7 +609,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Retourner le composant
   return (
     <div className="relative flex items-center justify-center" ref={containerRef}>
-      {/* Version inactive - bouton mic stylisé */}
+      {/* Version inactive - bouton mic stylisé façon WhatsApp */}
       {recorderState === 'inactive' && (
         <Button
           size="icon"
@@ -574,35 +617,32 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative bg-black hover:bg-gray-800 text-white transition-colors 
+          className="relative bg-black hover:bg-gray-800 text-white transition-all duration-200
                      h-12 w-12 rounded-full
-                     active:scale-95 transform transition-transform
-                     touch-manipulation"
+                     active:scale-95 transform hover:shadow-md
+                     touch-manipulation outline-none border-none focus:ring-2 focus:ring-blue-400"
         >
           <Mic className="h-5 w-5" />
         </Button>
       )}
       
-      {/* Version en cours de traitement - spinner */}
+      {/* Version en cours de traitement - spinner style WhatsApp */}
       {recorderState === 'processing' && (
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={true}
-          aria-label="Traitement en cours"
-          className="relative h-12 w-12 rounded-full bg-black text-white"
-        >
+        <div className="relative h-12 w-12 rounded-full bg-black text-white flex items-center justify-center shadow-md">
+          <div className="absolute inset-0 bg-blue-500 opacity-10 rounded-full animate-pulse"></div>
           <Loader2 className="h-5 w-5 animate-spin" />
-        </Button>
+        </div>
       )}
       
       {/* Interface d'enregistrement style WhatsApp */}
       {recorderState === 'recording' && (
         <div 
-          className="relative flex items-center bg-black text-white rounded-full h-12 transition-all duration-300 touch-manipulation"
+          className="relative flex items-center bg-gradient-to-r from-black to-gray-900 text-white rounded-full 
+                      h-12 transition-all duration-300 touch-manipulation shadow-md"
           style={{ 
-            width: isDragging ? `${Math.max(48, 150 - cancelPosition * 1.5)}px` : '150px',
-            opacity: isDragging ? 1 - (cancelPosition / 100) * 0.7 : 1 
+            width: isDragging ? `${Math.max(48, 160 - cancelPosition * 1.5)}px` : '160px',
+            opacity: isDragging ? 1 - (cancelPosition / 100) * 0.7 : 1,
+            transform: isDraggingUp ? 'translateY(-8px)' : 'translateY(0)'
           }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
@@ -612,50 +652,64 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           onMouseUp={isMobile ? undefined : handleTouchEnd}
           onMouseLeave={isMobile ? undefined : handleTouchEnd}
         >
+          {/* Fond animé pour le mode enregistrement */}
+          <div className="absolute inset-0 rounded-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-blue-400/10"></div>
+            <div
+              className="absolute h-full w-1/3 bg-gradient-to-r from-transparent via-blue-400/20 to-transparent 
+                        animate-shimmer" 
+              style={{ animationDuration: '2s' }}
+            ></div>
+          </div>
+          
           {/* Indicateur de "glisser pour annuler" */}
           <div 
             className={`absolute inset-y-0 left-0 flex items-center justify-start pl-3
-                        transition-opacity duration-300 ${isDragging ? 'opacity-10' : 'opacity-70'}`}
+                        transition-opacity duration-300 ${isDragging ? 'opacity-10' : 'opacity-100'}`}
           >
             <div className="mr-2 flex-shrink-0">
-              <StopCircle className="h-5 w-5 text-red-500" />
+              <StopCircle className="h-5 w-5 text-red-400" />
             </div>
-            <span className="text-xs whitespace-nowrap">
+            <span className="text-xs whitespace-nowrap font-medium">
               {isMobile ? "← Glisser pour annuler" : "Relâcher pour envoyer"}
             </span>
           </div>
           
-          {/* Durée d'enregistrement */}
-          <div className="absolute right-3 text-xs font-mono">
-            {formatDuration(recordingDuration)}
+          {/* Durée d'enregistrement avec effet de pulse */}
+          <div className="absolute right-3 text-xs font-mono bg-black/30 px-1.5 py-0.5 rounded-full">
+            <div className="flex items-center gap-1">
+              <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></div>
+              {formatDuration(recordingDuration)}
+            </div>
           </div>
           
           {/* Indicateur de "glisser vers le haut pour verrouiller" - uniquement sur mobile */}
           {isMobile && (
             <div 
-              className={`absolute -top-10 left-1/2 transform -translate-x-1/2 
-                        bg-gray-900 text-white text-xs py-1 px-3 rounded-full
-                        flex items-center justify-center gap-1
-                        transition-opacity duration-300 ${isDraggingUp ? 'opacity-100' : 'opacity-70'}`}
+              className={`absolute -top-11 left-1/2 transform -translate-x-1/2 
+                        bg-black text-white text-xs py-1.5 px-3 rounded-full shadow-lg
+                        flex items-center justify-center gap-1.5
+                        transition-all duration-300 ${isDraggingUp ? 'opacity-100 -translate-y-1' : 'opacity-80'}`}
             >
-              <ChevronUp className="h-3 w-3" />
+              <ChevronUp className={`h-3.5 w-3.5 ${isDraggingUp ? 'animate-bounce' : ''}`} />
               <span>Glisser pour verrouiller</span>
             </div>
           )}
           
-          {/* Visualisation audio - forme d'onde */}
+          {/* Visualisation audio - forme d'onde style WhatsApp */}
           <div 
-            className={`absolute inset-x-0 -bottom-6 h-6 flex items-center justify-center
+            className={`absolute inset-x-0 -bottom-7 h-7 flex items-center justify-center
                        transition-opacity duration-300 ${isDragging ? 'opacity-0' : 'opacity-100'}`}
           >
-            <div className="flex items-end h-6 space-x-[1px]">
+            <div className="flex items-end h-7 space-x-[2px]">
               {audioLevels.map((level, index) => (
                 <div
                   key={index}
-                  className="w-[2px] bg-white rounded-full"
+                  className="w-[3px] bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-full"
                   style={{ 
                     height: `${level}px`,
-                    opacity: isDragging ? 0.5 : 0.8 
+                    opacity: isDragging ? 0.5 : 0.85,
+                    transform: `translateY(${Math.sin(index * 0.2) * 1.5}px)`
                   }}
                 ></div>
               ))}
@@ -667,48 +721,82 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         </div>
       )}
       
-      {/* Mode verrouillé (lock) pour enregistrements plus longs */}
+      {/* Mode verrouillé (lock) pour enregistrements plus longs - style WhatsApp */}
       {recorderState === 'locked' && (
-        <div className="bg-black text-white rounded-lg p-3 flex flex-col items-center gap-2 min-w-[200px]">
-          <div className="w-full flex justify-between items-center">
-            <Clock className="h-4 w-4" />
-            <span className="text-sm font-mono">{formatDuration(recordingDuration)}</span>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              onClick={stopRecording}
-              className="h-7 w-7 rounded-full bg-red-500 p-0 flex items-center justify-center hover:bg-red-600"
-            >
-              <StopCircle className="h-4 w-4" />
-            </Button>
+        <div className="bg-black text-white rounded-lg p-3 flex flex-col items-center gap-2 min-w-[200px] shadow-lg relative">
+          {/* Indicateur verrouillé */}
+          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-black rounded-full p-1 shadow-md">
+            <Lock className="h-3.5 w-3.5 text-gray-400" />
           </div>
           
-          <div className="w-full mt-1">
-            <div className="flex items-end h-6 space-x-[1px] justify-center">
+          <div className="w-full flex justify-between items-center mt-1.5">
+            <div className="flex items-center gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse"></div>
+              <span className="text-xs text-gray-300">ENREGISTREMENT</span>
+            </div>
+            <span className="text-sm font-mono">{formatDuration(recordingDuration)}</span>
+          </div>
+          
+          {/* Visualisation style WhatsApp - forme d'onde animée */}
+          <div className="w-full mt-2">
+            <div className="flex items-end h-8 space-x-[2px] justify-center">
               {audioLevels.map((level, index) => (
                 <div
                   key={index}
-                  className="w-[2px] bg-white rounded-full"
-                  style={{ height: `${level}px`, opacity: 0.8 }}
+                  className="w-[3px] bg-gradient-to-t from-blue-500 to-blue-300 rounded-t-full"
+                  style={{ 
+                    height: `${level}px`, 
+                    opacity: 0.9,
+                    transform: `translateY(${Math.sin(index * 0.2) * 2}px)`
+                  }}
                 ></div>
               ))}
             </div>
           </div>
           
-          <div className="w-full bg-gray-800 h-1 rounded-full mt-1 overflow-hidden">
+          {/* Barre de progression avec animation de pulsation */}
+          <div className="w-full bg-gray-800 h-1.5 rounded-full mt-2 overflow-hidden">
             <div 
-              className="bg-white h-full rounded-full transition-all"
+              className="bg-gradient-to-r from-blue-500 to-blue-400 h-full rounded-full transition-all"
               style={{ width: `${recordingProgressPercent}%` }}
             ></div>
           </div>
+          
+          {/* Bouton d'arrêt d'enregistrement style WhatsApp */}
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            onClick={stopRecording}
+            className="h-10 w-10 rounded-full bg-red-500 p-0 flex items-center justify-center 
+                      hover:bg-red-600 mt-1.5 transform hover:scale-105 transition-all
+                      shadow-md"
+            aria-label="Arrêter l'enregistrement"
+          >
+            <StopCircle className="h-5 w-5" />
+          </Button>
         </div>
       )}
       
-      {/* État d'erreur */}
+      {/* État d'erreur style WhatsApp */}
       {recorderState === 'error' && errorMessage && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-2 w-64 text-xs">
-          <p className="font-medium">Erreur d'enregistrement</p>
-          <p>{errorMessage}</p>
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-3 
+                       bg-black/90 border border-red-500/20 text-white rounded-lg p-3 
+                       w-72 text-xs shadow-lg backdrop-blur-sm">
+          <div className="flex items-start gap-2">
+            <X className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium text-sm text-red-300 mb-0.5">Erreur d'enregistrement</p>
+              <p className="text-gray-300 leading-tight">{errorMessage}</p>
+              <Button 
+                size="sm"
+                variant="ghost"
+                onClick={() => setRecorderState('inactive')}
+                className="mt-2 h-7 text-xs text-blue-400 hover:text-blue-300 p-0 hover:bg-transparent"
+              >
+                Réessayer
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
