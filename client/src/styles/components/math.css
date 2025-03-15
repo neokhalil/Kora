@@ -3,6 +3,24 @@
  * Combinaison des styles de mathJax.css et du rendu avec KaTeX
  */
 
+/* ContentRenderer styles */
+.content-renderer {
+  line-height: 1.5;
+  font-size: 15px;
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Styles spécifiques pour les différentes vues */
+.content-renderer.web-content {
+  font-size: 15px;
+}
+
+.content-renderer.chat-content {
+  font-size: 15px;
+}
+
 /* KaTeX wrapper styles */
 .katex-inline-wrapper {
   display: inline-flex;
@@ -76,11 +94,12 @@
 }
 
 /* Amélioration pour les formules KaTeX */
-.math-content .katex {
+.math-content .katex, .content-renderer .katex {
   font-size: 1.15em;
+  line-height: 1.2;
 }
 
-.math-content .katex-display {
+.math-content .katex-display, .content-renderer .katex-display {
   margin: 1.2em 0;
   overflow-x: auto;
   overflow-y: hidden;
@@ -88,15 +107,94 @@
   will-change: contents;
   transform: translateZ(0);
   contain: layout style paint;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+}
+
+/* Amélioration des formules mathématiques */
+.content-renderer .katex-display > .katex {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1px; /* Permet le défilement correct sur certains navigateurs */
+}
+
+/* Styles pour les titres dans le ContentRenderer */
+.content-renderer h1, 
+.content-renderer h2, 
+.content-renderer h3, 
+.content-renderer h4, 
+.content-renderer h5, 
+.content-renderer h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.content-renderer h1 { font-size: 1.8em; }
+.content-renderer h2 { font-size: 1.5em; }
+.content-renderer h3 { font-size: 1.3em; }
+.content-renderer h4 { font-size: 1.1em; }
+.content-renderer h5, .content-renderer h6 { font-size: 1em; }
+
+/* Styles pour les paragraphes */
+.content-renderer p {
+  margin: 0.75em 0;
+}
+
+/* Correction pour les espaces indésirables */
+.web-message-content {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* Correction du problème d'espacement sur la vue desktop */
+.web-messages-list {
+  position: relative;
+}
+
+/* Ajustement spécifique pour les messages de Kora */
+.web-kora-message .content-renderer {
+  margin: 0;
+  padding: 0;
 }
 
 /* Mobile styles */
 @media (max-width: 768px) {
-  .math-content {
+  .math-content, .content-renderer {
     font-size: 0.95rem;
   }
   
-  .math-content .katex-display {
+  .math-content .katex-display, .content-renderer .katex-display {
     font-size: 0.9em;
+    padding: 0.25em 0;
+    margin: 0.5em 0;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
+  }
+  
+  /* Forcer le bon positionnement des conteneurs */
+  .prose .content-renderer,
+  .chat-content,
+  .web-content {
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: visible;
+  }
+  
+  /* Correction pour l'interface ChatAssistant spécifiquement */
+  .prose .content-renderer {
+    transform: translateZ(0); /* Forcer le rendu hardware pour éviter les sauts */
+    contain: content; /* Aide à isoler le contenu pour la performance */
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Ajuster la largeur des mathématiques inline pour éviter le débordement */
+  .content-renderer .katex {
+    max-width: 100%;
   }
 }

@@ -14,9 +14,8 @@ import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRendere
 import "./styles/mobile-fixes.css"; // Corrections spécifiques pour mobile avec maths et code
 import "./styles/header-fix.css"; // Solution définitive pour le header fixe
 
-// Note: La nouvelle architecture CSS est en cours d'implémentation
-// Nous gardons temporairement les anciens fichiers pendant la transition
-// import "./styles/main.css";
+// Début d'intégration de la nouvelle architecture CSS (tests progressifs)
+import "./styles/components/math.css"; // ITCSS: Styles pour le rendu mathématique
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
