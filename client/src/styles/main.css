@@ -1,31 +1,92 @@
 /**
- * Application principale CSS utilisant la méthodologie ITCSS
- * (Inverted Triangle CSS)
+ * Fichier principal CSS
+ * Implémentation méthodologie ITCSS (Inverted Triangle CSS)
+ * Organisation du CSS par ordre croissant de spécificité et décroissant de portée
  */
 
-/* 1. Settings - Variables, config */
+/**
+ * SETTINGS
+ * Variables globales, configuration
+ */
 @import './settings/variables.css';
 
-/* 2. Tools - Mixins, functions */
-/* Note: en CSS pur, nous n'avons pas beaucoup d'outils, 
-   ils seraient plus pertinents avec SASS/LESS */
-
-/* 3. Generic - Reset, normalize */
-@tailwind base;
-
-/* 4. Elements - HTML elements styling (h1, p, a, etc.) */
+/**
+ * ELEMENTS
+ * Styles pour les éléments HTML de base
+ */
 @import './elements/typography.css';
 @import './elements/layout.css';
 
-/* 5. Objects - Non-cosmetic design patterns, layout */
-@tailwind components;
-
-/* 6. Components - UI components */
+/**
+ * COMPONENTS
+ * Styles pour les composants réutilisables
+ */
+@import './components/forms.css';
+@import './components/header.css';
+@import './components/sidebar.css';
+@import './components/chat.css';
 @import './components/math.css';
 @import './components/code.css';
-@import './components/sidebar.css';
-@import './components/content.css';
 
-/* 7. Utilities - Override, helper classes */
-@tailwind utilities;
-@import './utilities/fixes.css';
+/**
+ * UTILITIES
+ * Classes utilitaires hautement spécifiques
+ */
+@import './utilities/animations.css';
+
+/**
+ * Resets et normalisation
+ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+/**
+ * Utilitaires d'accessibilité
+ */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus-visible:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Classes d'accessibilité pour le contraste et la motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Ajuster les variables pour le mode sombre si nécessaire */
+  }
+}
