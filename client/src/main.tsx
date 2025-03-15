@@ -21,6 +21,7 @@ import "./styles/components/code.css"; // ITCSS: Styles pour les blocs de code
 import "./styles/components/layout.css"; // ITCSS: Styles pour le layout (header, sidebar)
 import "./styles/components/chat.css"; // ITCSS: Styles pour l'interface de chat
 import "./styles/components/forms.css"; // ITCSS: Styles pour les formulaires
+import "./styles/components/messages.css"; // ITCSS: Styles pour les messages et conversations
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
