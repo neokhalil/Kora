@@ -68,6 +68,7 @@ const ChatAssistant: React.FC = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageSubject, setImageSubject] = useState<string>('general');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const [progressiveText, setProgressiveText] = useState<{id: string, fullText: string, currentText: string, intervalId?: NodeJS.Timeout}>({
     id: '',
     fullText: '',
@@ -423,6 +424,79 @@ const ChatAssistant: React.FC = () => {
       const textareaElement = e.target as HTMLTextAreaElement;
       textareaElement.style.height = '40px'; // Réinitialiser la hauteur
       handleSendMessage();
+    }
+  };
+  
+  const handleVoiceButtonClick = () => {
+    setIsRecordingVoice(!isRecordingVoice);
+  };
+  
+  const handleTranscriptionComplete = async (text: string) => {
+    setIsRecordingVoice(false);
+    setInputValue('');
+    
+    if (text.trim().length > 0) {
+      // Créer et ajouter le message de l'utilisateur
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        content: text,
+        sender: 'user',
+      };
+      
+      setMessages(prev => [...prev, userMessage]);
+      setIsThinking(true);
+      
+      try {
+        // Préparer les messages précédents pour le contexte
+        const messageHistory = messages.map(msg => ({
+          content: msg.content,
+          sender: msg.sender
+        }));
+        
+        // Appel API à OpenAI via notre serveur
+        const response = await fetch('/api/tutoring/ask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            question: text,
+            messages: messageHistory
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erreur lors de la requête API');
+        }
+        
+        const data = await response.json();
+        
+        // Ajouter la réponse de l'IA aux messages
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          content: data.content,
+          sender: 'kora',
+          allowActions: true,
+        }]);
+      } catch (error) {
+        console.error('Erreur lors de la communication avec le serveur:', error);
+        
+        // Message d'erreur à l'utilisateur
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
+          sender: 'kora',
+        }]);
+      } finally {
+        setIsThinking(false);
+        
+        // Faire défiler vers le bas 
+        setTimeout(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      }
     }
   };
   
@@ -957,40 +1031,53 @@ const ChatAssistant: React.FC = () => {
                 
                 {/* Champ de saisie en haut */}
                 <div className="w-full input-container">
-                  <Textarea
-                    value={inputValue}
-                    onChange={(e) => {
-                      setInputValue(e.target.value);
-                      
-                      // Auto-ajustement de la hauteur du textarea
-                      e.target.style.height = '40px'; // Hauteur de base
-                      const newHeight = Math.min(120, e.target.scrollHeight); // Maximum de 120px
-                      e.target.style.height = `${newHeight}px`;
-                    }}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Pose ta question"
-                    className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-2 overflow-y-auto"
-                    disabled={isThinking || isUploadingImage}
-                    onFocus={() => {
-                      // Marquer que le clavier est ouvert
-                      document.body.classList.add('keyboard-open');
-                      
-                      // S'assurer que le header fixe est visible
-                      const headerContainer = document.getElementById('kora-header-container');
-                      if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
-                        headerContainer.style.top = '0';
-                        headerContainer.style.zIndex = '9999';
-                      }
-                      
-                      // Scroll vers le bas après l'ouverture du clavier
-                      setTimeout(() => {
-                        if (messagesEndRef.current) {
-                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                  <div className="relative w-full">
+                    <Textarea
+                      value={inputValue}
+                      onChange={(e) => {
+                        setInputValue(e.target.value);
+                        
+                        // Auto-ajustement de la hauteur du textarea
+                        e.target.style.height = '40px'; // Hauteur de base
+                        const newHeight = Math.min(120, e.target.scrollHeight); // Maximum de 120px
+                        e.target.style.height = `${newHeight}px`;
+                      }}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Pose ta question"
+                      className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-2 overflow-y-auto"
+                      disabled={isThinking || isUploadingImage || isRecordingVoice}
+                      onFocus={() => {
+                        // Marquer que le clavier est ouvert
+                        document.body.classList.add('keyboard-open');
+                        
+                        // S'assurer que le header fixe est visible
+                        const headerContainer = document.getElementById('kora-header-container');
+                        if (headerContainer) {
+                          headerContainer.style.position = 'absolute';
+                          headerContainer.style.top = '0';
+                          headerContainer.style.zIndex = '9999';
                         }
-                      }, 100);
-                    }}
-                  />
+                        
+                        // Scroll vers le bas après l'ouverture du clavier
+                        setTimeout(() => {
+                          if (messagesEndRef.current) {
+                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 100);
+                      }}
+                    />
+                    
+                    {/* Affichage de l'enregistreur vocal quand activé, directement dans le champ de saisie */}
+                    {isRecordingVoice && (
+                      <div className="voice-recorder-inline absolute top-0 left-0 right-0 bottom-0 bg-gray-50/95 dark:bg-gray-800/95 rounded-md flex items-center justify-center z-10 px-2">
+                        <AudioRecorderPlayback 
+                          onTranscriptionComplete={handleTranscriptionComplete}
+                          maxRecordingTimeMs={30000}
+                          language="fr"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Boutons d'action en bas */}
@@ -1081,81 +1168,26 @@ const ChatAssistant: React.FC = () => {
                           />
                         </svg>
                       </button>
+                    ) : isRecordingVoice ? (
+                      /* Bouton pour arrêter l'enregistrement */
+                      <button
+                        type="button"
+                        onClick={handleVoiceButtonClick}
+                        disabled={isThinking || isUploadingImage}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
                     ) : (
                       /* Bouton microphone */
-                      <div className="w-10 h-10 flex items-center justify-center">
-                        <AudioRecorderPlayback 
-                          onTranscriptionComplete={async (text) => {
-                            setInputValue('');
-                            
-                            if (text.trim().length > 0) {
-                              // Créer et ajouter le message de l'utilisateur
-                              const userMessage: Message = {
-                                id: Date.now().toString(),
-                                content: text,
-                                sender: 'user',
-                              };
-                              
-                              setMessages(prev => [...prev, userMessage]);
-                              setIsThinking(true);
-                              
-                              try {
-                                // Préparer les messages précédents pour le contexte
-                                const messageHistory = messages.map(msg => ({
-                                  content: msg.content,
-                                  sender: msg.sender
-                                }));
-                                
-                                // Appel API à OpenAI via notre serveur
-                                const response = await fetch('/api/tutoring/ask', {
-                                  method: 'POST',
-                                  headers: {
-                                    'Content-Type': 'application/json',
-                                  },
-                                  body: JSON.stringify({
-                                    question: text,
-                                    messages: messageHistory
-                                  }),
-                                });
-                                
-                                if (!response.ok) {
-                                  throw new Error('Erreur lors de la requête API');
-                                }
-                                
-                                const data = await response.json();
-                                
-                                // Ajouter la réponse de l'IA aux messages
-                                setMessages(prev => [...prev, {
-                                  id: Date.now().toString(),
-                                  content: data.content,
-                                  sender: 'kora',
-                                }]);
-                              } catch (error) {
-                                console.error('Erreur lors de la communication avec le serveur:', error);
-                                
-                                // Message d'erreur à l'utilisateur
-                                setMessages(prev => [...prev, {
-                                  id: Date.now().toString(),
-                                  content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
-                                  sender: 'kora',
-                                }]);
-                              } finally {
-                                setIsThinking(false);
-                                
-                                // Faire défiler vers le bas 
-                                setTimeout(() => {
-                                  if (messagesEndRef.current) {
-                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                                  }
-                                }, 100);
-                              }
-                            }
-                          }}
-                          disabled={isThinking || isUploadingImage}
-                          maxRecordingTimeMs={30000}
-                          language="fr"
-                        />
-                      </div>
+                      <button
+                        type="button"
+                        onClick={handleVoiceButtonClick}
+                        disabled={isThinking || isUploadingImage}
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                      >
+                        <Mic className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                      </button>
                     )}
                   </div>
                 </div>
