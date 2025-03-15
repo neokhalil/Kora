@@ -121,6 +121,17 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Légère ombre */
 }
 
+/* Pas de bordure ni d'ombre sur mobile pour la vue web */
+@media (max-width: 640px) {
+  .web-home-view .input-container {
+    border: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .chat-input {
   flex: 1;
   min-height: 2.5rem;
