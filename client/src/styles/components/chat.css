@@ -138,6 +138,8 @@
   outline: none;
 }
 
+/* Surcharge supprimée - consolidée dans la section Mobile Adjustments */
+
 .chat-controls {
   display: flex;
   align-items: center;
@@ -179,10 +181,19 @@
   
   .input-container {
     padding: 0.5rem;
+    background-color: white;
+    border: none;
+    box-shadow: none;
   }
   
   .chat-input {
     font-size: 0.95rem;
     padding: 0.4rem;
+  }
+  
+  /* Placeholder spécial pour distinguer le champ sans bordure ni fond */
+  .chat-input::placeholder {
+    color: var(--muted-foreground);
+    font-style: italic;
   }
 }
