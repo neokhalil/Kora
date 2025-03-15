@@ -49,13 +49,13 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
   const [audioBlobUrl, setAudioBlobUrl] = useState<string | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   
-  // Configuration du visualiseur audio
+  // Configuration du visualiseur audio - adapté pour correspondre parfaitement au design de référence
   const visualizerConfig: AudioVisualizerConfig = {
-    width: 300, // Largeur du canvas augmentée pour un aspect moderne
-    height: 40,  // Hauteur pour permettre des barres plus visibles
-    barWidth: 1,  // Barres très fines comme dans l'image de référence
-    barGap: 1,    // Espacement minimal entre les barres
-    sensitivity: 4 // Sensibilité augmentée pour une meilleure visualisation
+    width: 500, // Largeur du canvas augmentée pour un aspect moderne
+    height: 50,  // Hauteur pour permettre des barres plus visibles
+    barWidth: 2,  // Barres légèrement plus épaisses pour une meilleure visibilité
+    barGap: 2,    // Espacement entre les barres pour un meilleur rendu
+    sensitivity: 5 // Sensibilité augmentée pour une visualisation plus dynamique
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -512,40 +512,48 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
         <div className="bg-white flex items-center justify-between w-full p-3 px-4 rounded-full shadow-md">
-          {/* Bouton supprimer à gauche */}
-          <button 
-            onClick={deleteRecording}
-            className="p-2 text-gray-600 hover:text-red-500 transition-colors bg-gray-100 rounded-full w-10 h-10 flex items-center justify-center"
-            aria-label="Supprimer l'enregistrement"
-          >
-            <X size={18} />
-          </button>
+          {recorderState === 'recording' && (
+            <>
+              {/* Icône poubelle à gauche */}
+              <div className="flex-shrink-0">
+                <button 
+                  onClick={deleteRecording}
+                  className="text-gray-500 hover:text-red-500 transition-colors p-1"
+                  aria-label="Supprimer l'enregistrement"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Compteur de temps */}
+              <div className="text-gray-700 font-medium text-center flex-shrink-0 ml-2 mr-4">
+                {formatDuration(recordingDuration)}
+              </div>
+            </>
+          )}
           
-          {/* Compteur de temps et visualiseur audio */}
-          <div className="flex-grow flex items-center mx-2">
-            {/* Compteur de temps */}
-            <div className="text-gray-700 font-medium min-w-16 text-center">
-              {formatDuration(recordingDuration)}
-            </div>
-            
-            {/* Visualiseur audio */}
-            <div className="flex-grow flex items-center justify-center mx-2">
+          {/* Visualiseur audio - adapté pour avoir le même visuel que la référence */}
+          <div className="flex-grow flex items-center justify-center">
+            <div className="w-full">
               <canvas 
                 ref={canvasRef} 
-                className="w-full h-6"
+                className="w-full h-10 my-1"
               />
             </div>
           </div>
           
-          {/* Boutons d'action selon l'état */}
+          {/* Bouton pause rouge à droite */}
           {recorderState === 'recording' ? (
             <Button
               onClick={pauseRecording}
-              className="p-2 rounded-full bg-red-600 hover:bg-red-700 text-white border-none shadow-md
-                       h-12 w-12 flex items-center justify-center"
+              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow-sm
+                       h-14 w-14 flex items-center justify-center ml-4 flex-shrink-0"
               aria-label="Mettre en pause l'enregistrement"
             >
-              <Pause size={20} />
+              <Pause size={22} />
             </Button>
           ) : recorderState === 'paused' ? (
             <div className="flex items-center gap-2">
