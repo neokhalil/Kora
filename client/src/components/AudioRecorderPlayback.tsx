@@ -51,11 +51,11 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
   
   // Configuration du visualiseur audio
   const visualizerConfig: AudioVisualizerConfig = {
-    width: 200, // Largeur du canvas ajustable
-    height: 30,  // Hauteur des barres réduite pour une meilleure intégration
-    barWidth: 2,  // Barres fines
-    barGap: 2,    // Espace entre les barres
-    sensitivity: 2.5 // Sensibilité pour la visualisation
+    width: 300, // Largeur du canvas augmentée pour un aspect moderne
+    height: 40,  // Hauteur pour permettre des barres plus visibles
+    barWidth: 1,  // Barres très fines comme dans l'image de référence
+    barGap: 1,    // Espacement minimal entre les barres
+    sensitivity: 4 // Sensibilité augmentée pour une meilleure visualisation
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -511,28 +511,28 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white dark:bg-gray-800 flex items-center justify-between w-full p-2 rounded-lg shadow-sm border border-gray-100">
-          {/* Bouton supprimer */}
+        <div className="bg-white flex items-center justify-between w-full p-2 rounded-2xl shadow-sm">
+          {/* Bouton supprimer à gauche */}
           <button 
             onClick={deleteRecording}
-            className="p-1 text-gray-500 hover:text-red-500 transition-colors"
+            className="p-2 text-gray-500 hover:text-red-500 transition-colors bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"
             aria-label="Supprimer l'enregistrement"
           >
-            <Trash2 size={20} />
+            <Trash2 size={18} />
           </button>
           
           {/* Compteur de temps et visualiseur audio */}
-          <div className="flex-grow flex items-center">
+          <div className="flex-grow flex items-center mx-2">
             {/* Compteur de temps */}
-            <div className="text-gray-700 dark:text-gray-300 font-medium mx-2 min-w-16 text-center">
+            <div className="text-gray-700 font-medium min-w-16 text-center">
               {formatDuration(recordingDuration)}
             </div>
             
             {/* Visualiseur audio */}
-            <div className="flex-grow flex items-center justify-center">
+            <div className="flex-grow flex items-center justify-center mx-2">
               <canvas 
                 ref={canvasRef} 
-                className="w-full h-8"
+                className="w-full h-6"
               />
             </div>
           </div>
@@ -540,28 +540,28 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
           {/* Boutons d'action selon l'état */}
           {recorderState === 'recording' ? (
             <Button
-              onClick={stopRecording}
-              className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 border-gray-200 shadow
-                       h-12 w-12 flex items-center justify-center"
-              aria-label="Arrêter et envoyer l'enregistrement"
+              onClick={pauseRecording}
+              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow
+                       h-10 w-10 flex items-center justify-center"
+              aria-label="Mettre en pause l'enregistrement"
             >
-              <Send size={18} />
+              <Pause size={18} />
             </Button>
           ) : recorderState === 'paused' ? (
             <div className="flex items-center gap-2">
               <Button
                 onClick={resumeRecording}
-                className="p-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 
-                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
+                         border-none shadow w-10 h-10 flex items-center justify-center"
                 aria-label="Reprendre l'enregistrement"
               >
                 <Play size={18} />
               </Button>
               <Button
-                onClick={sendRecording}
-                className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 
-                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
-                aria-label="Envoyer l'enregistrement"
+                onClick={stopRecording}
+                className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
+                         border-none shadow w-10 h-10 flex items-center justify-center"
+                aria-label="Arrêter l'enregistrement"
               >
                 <Send size={18} />
               </Button>
@@ -570,8 +570,8 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
             <div className="flex items-center gap-2">
               <Button
                 onClick={audioRef.current?.paused ? playRecording : pausePlayback}
-                className="p-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 
-                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                className="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 
+                         border-none shadow w-10 h-10 flex items-center justify-center"
                 aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
               >
                 {audioRef.current?.paused ? <Play size={18} /> : <Pause size={18} />}
@@ -580,8 +580,8 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
               {/* Bouton envoyer */}
               <Button
                 onClick={sendRecording}
-                className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 
-                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white 
+                         border-none shadow w-10 h-10 flex items-center justify-center"
                 aria-label="Envoyer l'enregistrement"
               >
                 <Send size={18} />
@@ -591,7 +591,7 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
         </div>
       )}
       
-      {/* Bouton d'enregistrement initial (microphone avec fond blanc) */}
+      {/* Bouton d'enregistrement initial (microphone avec fond noir) */}
       {recorderState === 'inactive' && (
         <Button
           size="icon"
@@ -599,7 +599,7 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative bg-white hover:bg-gray-50 text-gray-700 border-gray-200
+          className="relative bg-black hover:bg-gray-900 text-white border-none
                    h-12 w-12 rounded-full
                    active:scale-95 transform transition-transform shadow
                    flex items-center justify-center"
