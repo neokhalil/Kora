@@ -86,8 +86,8 @@ export function setupMobileViewportFix() {
   }
   
   /**
-   * Fonction pour garantir que la zone de saisie reste visible
-   * au-dessus du clavier mobile
+   * Fonction optimisée pour garantir que la zone de saisie reste visible
+   * au-dessus du clavier mobile, sans espace blanc
    */
   function ensureComposerVisible() {
     const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
@@ -97,10 +97,10 @@ export function setupMobileViewportFix() {
     
     const vv = window.visualViewport;
     
-    // Détection plus précise de l'ouverture du clavier
+    // Détection optimisée de l'ouverture du clavier
     const isKeyboardOpen = vv 
-      ? vv.height < window.innerHeight * 0.7  // On estime que le clavier est ouvert si le viewport est réduit significativement
-      : window.innerHeight < window.outerHeight * 0.7;
+      ? vv.height < window.innerHeight * 0.8  // Seuil augmenté pour une détection plus sensible
+      : window.innerHeight < window.outerHeight * 0.8;
     
     if (isKeyboardOpen) {
       document.body.classList.add('keyboard-open');
@@ -114,28 +114,38 @@ export function setupMobileViewportFix() {
         document.documentElement.style.setProperty('--viewport-height-diff', `${viewportHeightDiff}px`);
         document.documentElement.style.setProperty('--keyboard-height', `${viewportHeightDiff}px`);
         
-        // Position absolue au lieu de fixed pour éviter les problèmes sur certains navigateurs
+        // Approche plus agressive pour coller au clavier sans espace blanc
         composerContainer.style.position = 'fixed';
         composerContainer.style.bottom = '0px';
         composerContainer.style.left = '0';
         composerContainer.style.right = '0';
         composerContainer.style.width = '100%';
         composerContainer.style.zIndex = '9990';
+        composerContainer.style.margin = '0';
+        composerContainer.style.paddingBottom = '0';
         
-        // Utiliser la transformation directement au-dessus du clavier
-        composerContainer.style.transform = `translateY(-${viewportHeightDiff}px)`;
+        // Transformation précise avec un pixel supplémentaire pour être sûr qu'il n'y a pas d'espace
+        composerContainer.style.transform = `translate3d(0, calc(-${viewportHeightDiff}px - 1px), 0)`;
         
         // Ajuster la hauteur maximale de la zone de messages pour qu'elle soit scrollable
         const headerHeight = 56; // Hauteur fixe du header
         const composerHeight = composerContainer.offsetHeight || 60;
         
         // Calculer la hauteur maximale de façon plus précise
-        // On s'assure qu'il n'y a pas d'espace entre le composer et le clavier
         const maxHeight = vv.height - headerHeight;
         
         messagesContainer.style.maxHeight = `${maxHeight}px`;
         messagesContainer.style.overflowY = 'auto';
         messagesContainer.style.paddingBottom = `${composerHeight}px`;
+        
+        // Forcer une mise à jour du rendu
+        setTimeout(() => {
+          if (composerContainer) {
+            // Assurer que l'élément est toujours collé au clavier après le rendu
+            const updatedDiff = window.innerHeight - vv.height;
+            composerContainer.style.transform = `translate3d(0, calc(-${updatedDiff}px - 1px), 0)`;
+          }
+        }, 50);
       } else {
         // Fallback pour les navigateurs sans VisualViewport API
         // Estimation de la hauteur du clavier basée sur le rapport de taille d'écran
@@ -145,6 +155,8 @@ export function setupMobileViewportFix() {
         composerContainer.style.bottom = `${estimatedKeyboardHeight}px`;
         composerContainer.style.left = '0';
         composerContainer.style.right = '0';
+        composerContainer.style.margin = '0';
+        composerContainer.style.paddingBottom = '0';
         composerContainer.style.zIndex = '9990';
       }
     } else {
