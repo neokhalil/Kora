@@ -1,192 +1,180 @@
 /* 
  * Styles pour corriger l'affichage sur mobile avec clavier virtuel
- * Le problème : quand le clavier virtuel est ouvert, toute l'interface passe en arrière-plan
- * Solution : garantir que le header reste visible et que la zone de saisie reste au-dessus du clavier
+ * Problème: Quand le clavier s'ouvre, un espace blanc apparaît entre le clavier et la zone de saisie.
+ * Solution: Position précise de la zone de saisie directement au-dessus du clavier.
  */
 
 /* Variables pour la gestion des hauteurs */
 :root {
-  --keyboard-height: 0px; /* Sera mis à jour dynamiquement via JS */
-  --header-height: 56px;
-  --composer-height: 60px;
+  --keyboard-height: 0px; /* Hauteur du clavier virtuel */
+  --header-height: 56px; /* Hauteur fixe du header */
+  --composer-height: 60px; /* Hauteur de la zone de saisie */
   --viewport-height-diff: 0px; /* Différence de hauteur quand le clavier est ouvert */
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Force l'utilisation de l'API Visual Viewport pour un meilleur comportement */
-.visual-viewport-supported .composer-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 9990; /* Valeur élevée pour être au-dessus du contenu */
-  transition: transform 0.1s ease; /* Transition douce pour le repositionnement */
+/* Structure de base */
+html, body {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
 }
 
-/* Conteneur de messages - zone scrollable */
-.messages-container {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: var(--composer-height); /* Espace pour la zone de saisie */
-  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
-  position: relative;
-}
-
-/* S'assurer que la zone de message n'est pas masquée par le clavier */
-body.keyboard-open .messages-container {
-  max-height: calc(var(--app-height) - var(--header-height));
-  height: calc(var(--app-height) - var(--header-height));
-  overflow-y: auto;
-  padding-bottom: var(--composer-height); /* Espace pour le composer */
-}
-
-/* Garantir que le header reste visible lors de l'ouverture du clavier */
-body.keyboard-open #kora-header-container {
+/* Header toujours visible au sommet */
+#kora-header-container {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 10000 !important;
-  transform: none !important;
+  height: var(--header-height) !important;
 }
 
-/* Repositionner la zone de saisie quand le clavier est visible - Android */
-.android-device.keyboard-open .composer-container {
+/* Zone de message scrollable */
+.messages-container {
   position: fixed;
-  bottom: 0;
+  top: var(--header-height);
+  bottom: var(--composer-height);
   left: 0;
   right: 0;
-  z-index: 9990;
-  transform: translateY(calc(var(--keyboard-height) * -1));
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* Défilement fluide sur iOS */
+  padding-bottom: 16px; /* Petit espacement au bas des messages */
 }
 
-/* Repositionner la zone de saisie quand le clavier est visible - iOS */
-.ios-device.keyboard-open .composer-container {
+/* Zone de saisie fixée en bas */
+.composer-container {
   position: fixed !important;
   bottom: 0 !important;
   left: 0 !important;
   right: 0 !important;
   z-index: 9990 !important;
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
+  background-color: var(--background, #ffffff) !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px !important;
 }
 
-/* Optimisations pour le Visual Viewport API (iOS principalement) */
-.visual-viewport-active .composer-container {
-  position: fixed;
-  transform: translateY(calc(var(--viewport-height-diff) * -1));
-  bottom: 0;
-  width: 100%;
-  z-index: 9990;
+/* ÉTAT: Clavier ouvert - ajustements pour les dispositifs avec Visual Viewport API */
+.visual-viewport-supported.keyboard-open .composer-container {
+  transform: translateY(calc(var(--viewport-height-diff) * -1)) !important;
+  transition: transform 0.1s ease-out !important;
 }
 
-/* Styles spécifiques quand le clavier est ouvert */
-body.keyboard-open {
-  /* Éviter le rebond/défilement de la page entière */
-  position: relative;
-  width: 100%;
-  height: var(--app-height);
-  overflow: hidden;
-}
-
-/* Styles pour l'interface principale */
-.flex-1.overflow-y-auto.p-4.chat-messages-container.messages-container {
-  padding-bottom: calc(var(--composer-height) + 20px);
-}
-
-/* Ajustements pour les conteneurs principaux */
-body.keyboard-open .flex-1.overflow-hidden.flex.flex-col {
-  height: var(--app-height) !important;
-  max-height: var(--app-height) !important;
-  overflow: hidden !important;
-}
-
-/* Quand le clavier est ouvert, masquer tous les éléments non essentiels */
+/* ÉTAT: Clavier ouvert - ajustements généraux */
 body.keyboard-open .messages-container {
-  position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  bottom: var(--composer-height);
+  bottom: 0; /* Permettre le défilement complet de la zone de message */
+  padding-bottom: calc(var(--composer-height) + var(--keyboard-height)); /* Espace pour la zone de saisie + clavier */
 }
 
-/* Ajustements spécifiques pour les petits écrans (téléphones) */
-@media (max-width: 640px) {
-  /* Réduire la hauteur de la zone de saisie */
-  .composer-container {
-    padding: 8px;
-  }
-  
-  /* Optimiser l'espace vertical */
-  .chat-textarea {
-    padding-top: 8px !important;
-    padding-bottom: 8px !important;
-    max-height: 100px !important;
-  }
-  
-  /* Améliorer le comportement du header sur mobile */
-  #kora-header-container {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 10000 !important;
-  }
-  
-  /* S'assurer que la zone de saisie reste visible */
-  .composer-container {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background-color: var(--background, #ffffff) !important;
-    z-index: 9990 !important;
-  }
-  
-  /* Assurer l'espace entre les messages et la zone de saisie */
-  .messages-container {
-    padding-bottom: 70px;
-  }
+/* ÉTAT: Clavier ouvert sur Android */
+.android-device.keyboard-open .composer-container {
+  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
+  transition: transform 0.1s ease-out !important;
 }
 
-/* Support pour les navigateurs spécifiques */
+/* ÉTAT: Clavier ouvert sur iOS */
+.ios-device.keyboard-open .composer-container {
+  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
+  transition: transform 0.1s ease-out !important;
+}
+
+/* Ajustements pour les navigateurs spécifiques */
 .chrome-browser.android-device.keyboard-open .composer-container {
   transform: translateY(calc(var(--keyboard-height) * -1)) !important;
 }
 
 .samsung-browser.android-device.keyboard-open .composer-container {
-  bottom: var(--keyboard-height) !important;
-  transform: none !important;
+  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
 }
 
-/* Support pour les navigateurs iOS */
 .safari-browser.ios-device.keyboard-open .composer-container {
   transform: translateY(calc(var(--keyboard-height) * -1)) !important;
 }
 
-/* Support spécifique pour les appareils iOS avec notch */
-.ios-notch.keyboard-open #kora-header-container {
-  padding-top: var(--safe-area-top) !important;
-}
-
-/* Assurer que lorsque le clavier est fermé, tout revient à la normale */
-body:not(.keyboard-open) .composer-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  transform: none !important;
-}
-
-/* Support pour le Visual Viewport API - la meilleure solution quand disponible */
-.visual-viewport-supported.visual-viewport-active .composer-container {
-  transform: translateY(calc(var(--viewport-height-diff) * -1)) !important;
-}
-
-/* Ajustement pour le champ de saisie texte lui-même */
+/* Optimisation pour les formulaires et champs de saisie */
 .chat-textarea {
   resize: none !important;
   overflow-y: auto !important;
   min-height: 40px !important;
+  max-height: 120px !important;
+  padding: 8px !important;
+  width: 100% !important;
+}
+
+/* État d'ouverture du clavier - désactive le scroll du body */
+body.keyboard-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: none !important;
+}
+
+/* Optimisation Visual Viewport */
+@supports (height: 100dvh) {
+  body.keyboard-open .messages-container {
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* Support pour les modèles avec notch */
+.ios-notch.keyboard-open #kora-header-container {
+  padding-top: var(--safe-area-top) !important;
+}
+
+/* Correction pour éviter l'espace blanc */
+body.keyboard-open .composer-container {
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05) !important; /* Ombre subtile pour démarquer */
+  backface-visibility: hidden !important; /* Optimisation de rendu */
+  will-change: transform !important; /* Optimisation des performances */
+  margin-bottom: 0 !important; /* Supprime toute marge qui pourrait créer un espace */
+  padding-bottom: 0 !important; /* Supprime tout padding qui pourrait créer un espace */
+  transform-style: preserve-3d !important; /* Force le rendu hardware pour éviter les glitches */
+}
+
+/* Styles de fixation avancés pour éliminer l'espace blanc sur différents appareils */
+@supports (transform: translate3d(0,0,0)) {
+  body.keyboard-open .composer-container {
+    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
+  }
+  
+  /* Cas spécifique Android */
+  .android-device.keyboard-open .composer-container {
+    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
+  }
+  
+  /* Cas spécifique iOS */
+  .ios-device.keyboard-open .composer-container {
+    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
+  }
+}
+
+/* Fix pour s'assurer que la zone de saisie est directement accolée au clavier */
+body.keyboard-open .chat-textarea {
+  margin-bottom: 0 !important;
+  padding-bottom: 8px !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Transitions fluides pour améliorer l'expérience utilisateur */
+.composer-container {
+  transition: transform 0.15s ease-out !important;
+}
+
+/* Support pour les appareils plus anciens */
+@media (max-width: 640px) {
+  .composer-container, 
+  body.keyboard-open .composer-container {
+    padding: 6px !important;
+  }
+  
+  .chat-textarea {
+    min-height: 36px !important;
+    padding: 6px !important;
+  }
 }
