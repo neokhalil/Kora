@@ -304,7 +304,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     if (text) {
       setQuestion(text);
       setIsRecordingVoice(false);
+    } else {
+      setIsRecordingVoice(false);
     }
+  };
+  
+  // Fonction pour annuler l'enregistrement vocal
+  const handleCancelRecording = () => {
+    setIsRecordingVoice(false);
   };
   
   // Demande une ré-explication

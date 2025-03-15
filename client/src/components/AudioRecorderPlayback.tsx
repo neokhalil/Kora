@@ -8,6 +8,7 @@ type RecorderState = 'inactive' | 'recording' | 'paused' | 'playback' | 'process
 interface AudioRecorderPlaybackProps {
   onTranscriptionComplete: (text: string) => void;
   onAudioSend?: (audioBlob: Blob) => Promise<void>;
+  onCancel?: () => void; // Callback pour annuler l'enregistrement
   disabled?: boolean;
   maxRecordingTimeMs?: number; // Durée maximale d'enregistrement en ms (défaut: 60 secondes)
   language?: string; // Langue pour la transcription (défaut: fr)
@@ -524,7 +525,7 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Nouveau design de l'interface d'enregistrement selon le screenshot */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-2 px-3 rounded-full" style={{ height: '50px' }}>
+        <div className="bg-white flex items-center justify-between w-full p-2 px-3 rounded-full shadow-sm" style={{ height: '52px' }}>
           {recorderState === 'recording' && (
             <>
               {/* Partie gauche - boutons photo et caméra */}
