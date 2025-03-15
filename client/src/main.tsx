@@ -16,6 +16,7 @@ import "./styles/header-fix.css"; // Solution définitive pour le header fixe
 
 // Début d'intégration de la nouvelle architecture CSS (tests progressifs)
 import "./styles/components/math.css"; // ITCSS: Styles pour le rendu mathématique
+import "./styles/components/code.css"; // ITCSS: Styles pour les blocs de code
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {

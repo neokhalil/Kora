@@ -75,6 +75,18 @@
   white-space: inherit;
 }
 
+/* ContentRenderer styles for code blocks */
+.content-renderer pre {
+  margin: 1em 0;
+  border-radius: 6px;
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  padding: 0.75rem;
+}
+
 /* Language specific styling */
 .language-python {
   background-color: #3572A5 !important;
@@ -133,6 +145,17 @@
   color: #333;
   border: 1px solid rgba(88, 116, 211, 0.3);
   font-weight: 500;
+}
+
+/* Style pour le code inline dans ContentRenderer */
+.content-renderer .inline-code {
+  font-family: var(--font-code); 
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 3px;
+  font-size: 0.9em;
+  padding: 0.15em 0.3em;
+  white-space: nowrap;
+  margin: 0 2px;
 }
 
 /* Line numbers for code blocks */
@@ -209,12 +232,47 @@
   font-style: italic;
 }
 
+/* Styles pour différents langages */
+.language-python .hljs-comment {
+  color: #408080;
+  font-style: italic;
+}
+
+.language-python .hljs-string {
+  color: #219161;
+}
+
+.language-python .hljs-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+
+.language-javascript .hljs-keyword {
+  color: #0033b3;
+  font-weight: bold;
+}
+
+.language-javascript .hljs-string {
+  color: #067d17;
+}
+
+.language-java .hljs-comment {
+  color: #808080;
+  font-style: italic;
+}
+
+.language-java .hljs-keyword {
+  color: #0033b3;
+  font-weight: bold;
+}
+
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
-  .code-block {
+  .code-block, .content-renderer pre {
     font-size: 0.85rem;
     padding: 0.75rem;
     white-space: pre-wrap;
+    margin: 0.5em 0;
   }
   
   .code-block code {
@@ -222,7 +280,7 @@
     word-break: break-word;
   }
   
-  .inline-code {
+  .inline-code, .content-renderer .inline-code {
     font-size: 0.85em;
     padding: 0.15rem 0.3rem;
     display: inline-block;
@@ -231,5 +289,17 @@
     word-break: break-word;
     background-color: rgba(88, 116, 211, 0.1);
     border: 1px solid rgba(88, 116, 211, 0.2);
+  }
+  
+  /* Style spécial pour le code dans les explications */
+  .mobile-friendly-code {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #333;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.1rem 0.3rem;
+    font-family: var(--font-code);
+    font-size: 0.9em;
+    white-space: normal !important;
+    word-break: break-word !important;
   }
 }
