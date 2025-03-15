@@ -518,13 +518,13 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
 
   // Rendu du composant
   return (
-    <div className="relative">
+    <div className="w-full">
       {/* Audio element pour la lecture */}
       <audio ref={audioRef} src={audioBlobUrl || undefined} className="hidden" />
       
       {/* Nouveau design de l'interface d'enregistrement selon le screenshot */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md" style={{ height: '56px' }}>
+        <div className="bg-white flex items-center justify-between w-full p-2 px-3 rounded-full" style={{ height: '50px' }}>
           {recorderState === 'recording' && (
             <>
               {/* Partie gauche - boutons photo et caméra */}
