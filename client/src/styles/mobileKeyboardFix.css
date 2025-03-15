@@ -57,41 +57,23 @@ html, body {
   padding: 8px !important;
 }
 
-/* ÉTAT: Clavier ouvert - ajustements pour les dispositifs avec Visual Viewport API */
-.visual-viewport-supported.keyboard-open .composer-container {
-  transform: translateY(calc(var(--viewport-height-diff) * -1)) !important;
-  transition: transform 0.1s ease-out !important;
+/* ÉTAT: Clavier ouvert - ajustements universels pour tous les appareils */
+body.keyboard-open .composer-container {
+  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
+  transition: transform 0.15s ease-out !important;
+  /* Évite le saut d'animation */
+  will-change: transform;
 }
 
-/* ÉTAT: Clavier ouvert - ajustements généraux */
+/* ÉTAT: Clavier ouvert - ajustements généraux pour la zone de messages */
 body.keyboard-open .messages-container {
   bottom: 0; /* Permettre le défilement complet de la zone de message */
   padding-bottom: calc(var(--composer-height) + var(--keyboard-height)); /* Espace pour la zone de saisie + clavier */
 }
 
-/* ÉTAT: Clavier ouvert sur Android */
-.android-device.keyboard-open .composer-container {
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
-  transition: transform 0.1s ease-out !important;
-}
-
-/* ÉTAT: Clavier ouvert sur iOS */
-.ios-device.keyboard-open .composer-container {
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
-  transition: transform 0.1s ease-out !important;
-}
-
-/* Ajustements pour les navigateurs spécifiques */
-.chrome-browser.android-device.keyboard-open .composer-container {
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
-}
-
-.samsung-browser.android-device.keyboard-open .composer-container {
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
-}
-
-.safari-browser.ios-device.keyboard-open .composer-container {
-  transform: translateY(calc(var(--keyboard-height) * -1)) !important;
+/* ÉTAT: Clavier ouvert avec Visual Viewport API */
+.visual-viewport-supported.keyboard-open .composer-container {
+  transform: translateY(calc(var(--viewport-height-diff) * -1)) !important;
 }
 
 /* Optimisation pour les formulaires et champs de saisie */
@@ -136,19 +118,9 @@ body.keyboard-open .composer-container {
   transform-style: preserve-3d !important; /* Force le rendu hardware pour éviter les glitches */
 }
 
-/* Styles de fixation avancés pour éliminer l'espace blanc sur différents appareils */
+/* Style optimal unifié pour tous les appareils supportant translate3d */
 @supports (transform: translate3d(0,0,0)) {
   body.keyboard-open .composer-container {
-    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
-  }
-  
-  /* Cas spécifique Android */
-  .android-device.keyboard-open .composer-container {
-    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
-  }
-  
-  /* Cas spécifique iOS */
-  .ios-device.keyboard-open .composer-container {
     transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
   }
 }

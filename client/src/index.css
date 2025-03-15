@@ -1006,22 +1006,8 @@ h3.section-heading,
   padding-bottom: 0.4rem;
 }
 
-/* Style du conteneur de saisie en bas */
-.composer-container {
-  background-color: white;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  padding-top: 8px;
-}
-
-/* Ajustements pour iOS */
-.ios-device .composer-container {
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
-}
+/* Note: Les styles principaux du conteneur de saisie sont maintenant dans mobileKeyboardFix.css 
+   pour centraliser toute la logique d'affichage mobile */
 
 /* S'assurer que les inputs ont la bonne taille de police */
 input, textarea, select, button {
