@@ -15,6 +15,8 @@ import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
+// Ajout du plugin pour les numéros de ligne
+import 'prismjs/plugins/line-numbers/prism-line-numbers';
 
 interface CodeBlockProps {
   code: string;
@@ -22,6 +24,15 @@ interface CodeBlockProps {
   showLineNumbers?: boolean;
   showCopyButton?: boolean;
   className?: string;
+}
+
+// Assurer la compatibilité des types avec window.Prism
+declare global {
+  interface Window {
+    Prism: typeof Prism & {
+      manual?: boolean;
+    };
+  }
 }
 
 /**
@@ -67,7 +78,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 
   const prismLanguage = languageMap[supportedLanguage] || supportedLanguage;
 
-  // Suppression des effets de surexposition
+  // Initialisation de Prism et suppression des effets de surexposition
 useEffect(() => {
     // Cette fonction s'exécute une seule fois au montage du composant
     const style = document.createElement('style');
@@ -82,6 +93,11 @@ useEffect(() => {
       }
     `;
     document.head.appendChild(style);
+    
+    // Force le rechargement de Prism pour appliquer les styles
+    if (typeof window !== 'undefined' && 'Prism' in window) {
+      (window as any).Prism.manual = true;
+    }
     
     // Nettoyage lors du démontage
     return () => {
