@@ -223,24 +223,7 @@
 
 /* Ajoute une marge en bas pour que le dernier message soit visible */
 .web-messages-list {
-  padding-bottom: 200px; /* Espace pour que les derniers messages soient visibles */
-}
-
-/* Amélioration pour la visibilité des messages sur mobile */
-@media (max-width: 768px) {
-  .web-messages-list {
-    padding-bottom: 250px; /* Plus d'espace en bas sur mobile */
-  }
-  
-  /* Ajustement de la largeur maximale des messages sur petit écran */
-  .web-message {
-    max-width: 90%;
-  }
-  
-  /* S'assurer que la conversation est bien alignée avec l'espace pour l'enregistreur */
-  .web-conversation-container {
-    padding-bottom: 80px; /* Espace supplémentaire pour l'enregistreur vocal */
-  }
+  padding-bottom: 200px; /* Espace doublé comme demandé */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -316,31 +299,11 @@
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
-  padding: 0.5rem 1rem 0.75rem 1rem; /* Ajout d'un peu d'espace en bas */
-  box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05); /* Légère ombre pour la séparation */
-  border-top: 1px solid rgba(0, 0, 0, 0.05); /* Bordure très subtile */
-}
-
-/* Ajustements spécifiques pour mobile */
-@media (max-width: 768px) {
-  .web-question-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 0.75rem;
-    background-color: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    height: auto;
-    min-height: 60px;
-    z-index: 140; /* Garantir qu'il est au-dessus de la conversation mais en-dessous de l'enregistreur */
-  }
-  
-  /* Assurer que l'enregistreur vocal est toujours visible au-dessus */
-  body.recording .web-question-container {
-    padding-bottom: env(safe-area-inset-bottom, 0.75rem); /* Support des téléphones avec notch */
-  }
+  padding: 0.5rem 1rem 0 1rem; /* Padding sans espace en bas */
+  box-shadow: none; /* Suppression de l'ombre */
+  border-top: none; /* Suppression de la bordure */
+  position: relative;
+  margin-bottom: -0.5rem; /* Compense tout espacement résiduel en bas */
 }
 
 /* Style pour le texte d'information en bas */
@@ -470,12 +433,6 @@
   }
 }
 
-/* Conteneur pour l'enregistreur vocal */
-.web-voice-recorder-container {
-  position: relative;
-  width: 100%;
-}
-
 /* Zone de l'enregistreur vocal */
 .web-voice-recorder {
   margin-top: 1rem;
@@ -483,43 +440,6 @@
   background-color: #f5f5f7;
   border-radius: 12px;
   width: 100%;
-  position: relative;
-  min-height: 80px; /* Garantir l'espace pour l'enregistreur */
-  z-index: 110; /* Plus élevé que le conteneur de questions */
-}
-
-/* Ajustements pour mobile - s'assurer que l'enregistreur est visible */
-@media (max-width: 768px) {
-  .web-voice-recorder-container {
-    position: fixed;
-    bottom: 80px; /* Au-dessus de la zone de saisie */
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 150; /* Plus élevé que d'autres éléments pour être au premier plan */
-    transform: translateZ(0); /* Force hardware acceleration */
-  }
-  
-  .web-voice-recorder {
-    position: relative;
-    margin: 0;
-    border-radius: 0;
-    padding: 0.75rem;
-    background-color: rgba(245, 245, 247, 0.95);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    /* Animation d'entrée */
-    animation: slideUp 0.3s ease-out forwards;
-  }
-  
-  @keyframes slideUp {
-    from {
-      transform: translateY(100%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
 }
 
 /* Styles pour la modale d'upload d'image */
