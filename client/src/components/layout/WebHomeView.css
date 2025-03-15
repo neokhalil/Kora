@@ -405,8 +405,35 @@
   transition: all 0.2s;
 }
 
+/* Bouton microphone avec fond blanc - nouvelle version moderne */
+.web-mic-button-white {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.2s;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* Bouton microphone pour l'interface mobile - style spécifique */
+@media (max-width: 768px) {
+  .web-mic-button-white {
+    background-color: #ffffff;
+    width: 48px; /* légèrement plus grand sur mobile */
+    height: 48px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .web-image-button:hover,
 .web-mic-button:hover,
+.web-mic-button-white:hover,
 .web-send-button:hover {
   color: #0066ff;
   border-color: #0066ff;
@@ -450,11 +477,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(245, 245, 247, 0.96);
+  background-color: white;
   border-radius: 24px;
   padding: 0 0.5rem;
   display: flex;
   align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
   justify-content: center;
   z-index: 2;
 }

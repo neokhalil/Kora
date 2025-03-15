@@ -292,9 +292,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     setImagePreviewUrl(null);
   };
   
-  // Gestion de l'enregistrement vocal
+  // Gestion de l'enregistrement vocal - lance directement l'enregistrement quand on clique sur le micro
   const handleVoiceButtonClick = () => {
     setIsRecordingVoice(!isRecordingVoice);
+    // Si on active l'enregistrement, démarrer immédiatement l'enregistrement sans attendre un autre clic
+    // Le composant AudioRecorderPlayback sera activé par isRecordingVoice
   };
   
   // Fonction appelée lorsque la transcription audio est terminée
@@ -768,7 +770,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     ) : (
                       <button 
                         type="button"
-                        className="web-mic-button"
+                        className="web-mic-button-white"
                         aria-label="Enregistrer audio"
                         onClick={handleVoiceButtonClick}
                       >

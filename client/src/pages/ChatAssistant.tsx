@@ -1069,7 +1069,7 @@ const ChatAssistant: React.FC = () => {
                     
                     {/* Affichage de l'enregistreur vocal quand activé, directement dans le champ de saisie */}
                     {isRecordingVoice && (
-                      <div className="voice-recorder-inline absolute top-0 left-0 right-0 bottom-0 bg-gray-50/95 dark:bg-gray-800/95 rounded-md flex items-center justify-center z-10 px-2">
+                      <div className="voice-recorder-inline absolute top-0 left-0 right-0 bottom-0 bg-white dark:bg-gray-800/95 rounded-md flex items-center justify-center z-10 px-2 shadow-sm">
                         <AudioRecorderPlayback 
                           onTranscriptionComplete={handleTranscriptionComplete}
                           maxRecordingTimeMs={30000}
@@ -1179,14 +1179,14 @@ const ChatAssistant: React.FC = () => {
                         <X className="h-5 w-5" />
                       </button>
                     ) : (
-                      /* Bouton microphone */
+                      /* Bouton microphone avec fond blanc */
                       <button
                         type="button"
                         onClick={handleVoiceButtonClick}
                         disabled={isThinking || isUploadingImage}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 disabled:opacity-50"
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-100 shadow-sm disabled:opacity-50 transform transition-transform active:scale-95"
                       >
-                        <Mic className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                        <Mic className="h-5 w-5" />
                       </button>
                     )}
                   </div>

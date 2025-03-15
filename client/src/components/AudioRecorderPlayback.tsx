@@ -152,8 +152,8 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       // Effacer le canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Couleur pour les barres en mode enregistrement et pause
-      ctx.fillStyle = recorderState === 'recording' ? 'rgba(180, 180, 180, 0.7)' : 'rgba(150, 150, 150, 0.5)';
+      // Couleur pour les barres en mode enregistrement et pause - gris clair comme demandé
+      ctx.fillStyle = recorderState === 'recording' ? 'rgba(220, 220, 220, 0.95)' : 'rgba(200, 200, 200, 0.7)';
       
       // Calculer le pas pour répartir les fréquences
       const step = Math.ceil(bufferLength / totalBars);
@@ -490,6 +490,19 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
     };
   }, [audioRef.current]);
   
+  // Démarrer automatiquement l'enregistrement
+  useEffect(() => {
+    // Lorsque le composant est monté, démarrer immédiatement l'enregistrement
+    if (recorderState === 'inactive') {
+      startRecording();
+    }
+    
+    // Nettoyer lors du démontage
+    return () => {
+      cleanupResources();
+    };
+  }, []); // Exécuté une seule fois au montage
+
   // Rendu du composant
   return (
     <div className="relative">
@@ -498,80 +511,98 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-transparent flex items-center justify-between w-full max-w-md">
+        <div className="bg-white dark:bg-gray-800 flex items-center justify-between w-full p-2 rounded-lg shadow-sm border border-gray-100">
           {/* Bouton supprimer */}
           <button 
             onClick={deleteRecording}
-            className="p-1 text-gray-600 hover:text-red-500 transition-colors"
+            className="p-1 text-gray-500 hover:text-red-500 transition-colors"
             aria-label="Supprimer l'enregistrement"
           >
-            <Trash2 size={18} />
+            <Trash2 size={20} />
           </button>
           
-          {/* Compteur de temps */}
-          <div className="text-gray-700 font-medium mx-1 min-w-12 text-center text-sm">
-            {formatDuration(recordingDuration)}
+          {/* Compteur de temps et visualiseur audio */}
+          <div className="flex-grow flex items-center">
+            {/* Compteur de temps */}
+            <div className="text-gray-700 dark:text-gray-300 font-medium mx-2 min-w-16 text-center">
+              {formatDuration(recordingDuration)}
+            </div>
+            
+            {/* Visualiseur audio */}
+            <div className="flex-grow flex items-center justify-center">
+              <canvas 
+                ref={canvasRef} 
+                className="w-full h-8"
+              />
+            </div>
           </div>
           
-          {/* Visualiseur audio */}
-          <div className="flex-grow mx-2 flex items-center justify-center">
-            <canvas 
-              ref={canvasRef} 
-              className="w-full h-8"
-            />
-          </div>
-          
-          {/* Bouton pause/play */}
+          {/* Boutons d'action selon l'état */}
           {recorderState === 'recording' ? (
-            <button 
-              onClick={pauseRecording}
-              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-              aria-label="Mettre en pause l'enregistrement"
+            <Button
+              onClick={stopRecording}
+              className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 border-gray-200 shadow
+                       h-12 w-12 flex items-center justify-center"
+              aria-label="Arrêter et envoyer l'enregistrement"
             >
-              <Pause size={16} />
-            </button>
+              <Send size={18} />
+            </Button>
           ) : recorderState === 'paused' ? (
-            <button 
-              onClick={resumeRecording}
-              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-              aria-label="Reprendre l'enregistrement"
-            >
-              <Play size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={resumeRecording}
+                className="p-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 
+                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                aria-label="Reprendre l'enregistrement"
+              >
+                <Play size={18} />
+              </Button>
+              <Button
+                onClick={sendRecording}
+                className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 
+                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                aria-label="Envoyer l'enregistrement"
+              >
+                <Send size={18} />
+              </Button>
+            </div>
           ) : (
-            <button 
-              onClick={audioRef.current?.paused ? playRecording : pausePlayback}
-              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
-              aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
-            >
-              {audioRef.current?.paused ? <Play size={16} /> : <Pause size={16} />}
-            </button>
-          )}
-          
-          {/* Bouton envoyer (uniquement en mode playback) */}
-          {recorderState === 'playback' && (
-            <button 
-              onClick={sendRecording}
-              className="p-1.5 ml-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
-              aria-label="Envoyer l'enregistrement"
-            >
-              <Send size={16} />
-            </button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={audioRef.current?.paused ? playRecording : pausePlayback}
+                className="p-2 rounded-full bg-white text-gray-700 hover:bg-gray-50 
+                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
+              >
+                {audioRef.current?.paused ? <Play size={18} /> : <Pause size={18} />}
+              </Button>
+              
+              {/* Bouton envoyer */}
+              <Button
+                onClick={sendRecording}
+                className="p-2 rounded-full bg-white hover:bg-gray-50 text-gray-700 
+                         border-gray-200 shadow w-12 h-12 flex items-center justify-center"
+                aria-label="Envoyer l'enregistrement"
+              >
+                <Send size={18} />
+              </Button>
+            </div>
           )}
         </div>
       )}
       
-      {/* Bouton d'enregistrement initial */}
+      {/* Bouton d'enregistrement initial (microphone avec fond blanc) */}
       {recorderState === 'inactive' && (
         <Button
           size="icon"
-          variant="ghost"
+          variant="outline" 
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative bg-black hover:bg-gray-800 text-white transition-colors 
-                   h-10 w-10 rounded-full
-                   active:scale-95 transform transition-transform"
+          className="relative bg-white hover:bg-gray-50 text-gray-700 border-gray-200
+                   h-12 w-12 rounded-full
+                   active:scale-95 transform transition-transform shadow
+                   flex items-center justify-center"
         >
           <Mic className="h-5 w-5" />
         </Button>
