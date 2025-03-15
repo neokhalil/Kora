@@ -726,6 +726,17 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       autoFocus
                       disabled={isRecordingVoice}
                     />
+                    
+                    {/* Affichage de l'enregistreur vocal quand activé, directement dans le champ de saisie */}
+                    {isRecordingVoice && (
+                      <div className="web-voice-recorder-inline">
+                        <AudioRecorderPlayback 
+                          onTranscriptionComplete={handleTranscriptionComplete}
+                          maxRecordingTimeMs={30000}
+                          language="fr"
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="web-action-buttons">
                     <button 
@@ -777,16 +788,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 </div>
               </form>
               
-              {/* Affichage de l'enregistreur vocal quand activé */}
-              {isRecordingVoice && (
-                <div className="web-voice-recorder">
-                  <AudioRecorderPlayback 
-                    onTranscriptionComplete={handleTranscriptionComplete}
-                    maxRecordingTimeMs={30000}
-                    language="fr"
-                  />
-                </div>
-              )}
+              {/* L'enregistreur vocal est maintenant intégré au formulaire */}
               
               {/* Message d'accueil placé directement dans le container de questions */}
               <p className="web-question-footer">
