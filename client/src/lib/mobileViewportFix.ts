@@ -224,8 +224,8 @@ export function setupMobileViewportFix() {
   
   // Gestion spécifique du clavier mobile via Visual Viewport API
   /**
-   * Fonction supplémentaire pour éviter l'espace blanc entre le clavier et la zone de saisie
-   * En répétant la vérification après un court délai pour s'adapter aux animations natives
+   * Fonction optimisée pour éviter l'espace blanc entre le clavier et la zone de saisie
+   * Utilise plusieurs méthodes complémentaires pour assurer une position parfaite
    */
   function ensureNoGapWithKeyboard() {
     const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
@@ -234,12 +234,17 @@ export function setupMobileViewportFix() {
     const vv = window.visualViewport;
     if (!vv) return;
     
-    // Vérifier si le clavier est ouvert
-    if (vv.height < window.innerHeight * 0.7) {
+    // Vérifier si le clavier est ouvert avec un seuil plus permissif
+    if (vv.height < window.innerHeight * 0.85) {
       const viewportHeightDiff = window.innerHeight - vv.height;
       
-      // Appliquer la transformation avec une légère marge pour s'assurer qu'il n'y a pas d'espace
-      composerContainer.style.transform = `translateY(calc(-${viewportHeightDiff}px - 1px))`;
+      // Supprimer tout padding et marge qui pourrait créer un espace
+      composerContainer.style.margin = '0';
+      composerContainer.style.paddingBottom = '0';
+      
+      // Appliquer la transformation avec une marge supplémentaire pour s'assurer qu'il n'y a pas d'espace
+      // Utilisation de translate3d pour forcer le rendu hardware qui est plus précis
+      composerContainer.style.transform = `translate3d(0, calc(-${viewportHeightDiff}px - 2px), 0)`;
       
       // Forcer une réinitialisation de rendu pour que la transformation soit correctement appliquée
       composerContainer.style.zIndex = '9990';
@@ -249,17 +254,29 @@ export function setupMobileViewportFix() {
         if (composerContainer) {
           // Vérifier à nouveau les dimensions au cas où le clavier aurait changé de taille
           const updatedDiff = window.innerHeight - vv.height;
-          composerContainer.style.transform = `translateY(calc(-${updatedDiff}px - 1px))`;
+          composerContainer.style.transform = `translate3d(0, calc(-${updatedDiff}px - 2px), 0)`;
+          
+          // Forcer le positionnement sans espace
+          composerContainer.style.bottom = '0px';
+          composerContainer.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.1)';
         }
-      }, 50);
+      }, 30); // Délai réduit pour réagir plus rapidement
       
-      // Un second délai plus long pour s'adapter aux animations plus lentes sur certains appareils
+      // Un second délai pour s'adapter aux animations du clavier
       setTimeout(() => {
         if (composerContainer) {
           const finalDiff = window.innerHeight - vv.height;
-          composerContainer.style.transform = `translateY(calc(-${finalDiff}px - 1px))`;
+          composerContainer.style.transform = `translate3d(0, calc(-${finalDiff}px - 2px), 0)`;
         }
-      }, 300);
+      }, 150);
+      
+      // Un dernier ajustement pour les cas où le clavier a une animation lente
+      setTimeout(() => {
+        if (composerContainer) {
+          const latestDiff = window.innerHeight - vv.height;
+          composerContainer.style.transform = `translate3d(0, calc(-${latestDiff}px - 2px), 0)`;
+        }
+      }, 350);
     }
   }
   

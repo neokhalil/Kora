@@ -125,7 +125,11 @@ body.keyboard-open .composer-container {
 /* Style optimal unifié pour tous les appareils supportant translate3d */
 @supports (transform: translate3d(0,0,0)) {
   body.keyboard-open .composer-container {
-    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 1px), 0) !important;
+    transform: translate3d(0, calc(var(--keyboard-height) * -1 - 2px), 0) !important;
+    margin: 0 !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1) !important;
   }
 }
 

@@ -87,6 +87,7 @@ const ChatAssistant: React.FC = () => {
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Initialiser les ajustements pour le clavier mobile
       setupMobileViewportFix();
       
       // Forcer le repositionnement dès le chargement pour éviter l'espace blanc initial
@@ -97,6 +98,20 @@ const ChatAssistant: React.FC = () => {
         // Forcer le rendu de la page complète
         window.scrollTo(0, 1);
         window.scrollTo(0, 0);
+        
+        // S'assurer que la zone d'input est correctement positionnée même sans interaction
+        const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
+        if (composerContainer) {
+          // Appliquer une transformation minimale pour assurer un rendu correct dès le début
+          composerContainer.style.transform = 'translate3d(0, -1px, 0)';
+          
+          // Petit délai pour permettre le rendu avant de réinitialiser
+          setTimeout(() => {
+            // Revenir à l'état normal une fois l'initialisation terminée
+            document.body.classList.remove('keyboard-open');
+            composerContainer.style.transform = '';
+          }, 500);
+        }
       }, 100);
       
       // S'assurer que la hauteur initiale du textarea est correcte au chargement
