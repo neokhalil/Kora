@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash2, Play, Pause, Send, Mic } from 'lucide-react';
+import { Trash2, Play, Pause, Send, Mic, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
@@ -152,8 +152,8 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       // Effacer le canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Couleur pour les barres en mode enregistrement et pause - gris clair comme demandé
-      ctx.fillStyle = recorderState === 'recording' ? 'rgba(220, 220, 220, 0.95)' : 'rgba(200, 200, 200, 0.7)';
+      // Couleur pour les barres en mode enregistrement et pause - noir comme sur l'image de référence
+      ctx.fillStyle = recorderState === 'recording' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(100, 100, 100, 0.7)';
       
       // Calculer le pas pour répartir les fréquences
       const step = Math.ceil(bufferLength / totalBars);
@@ -511,14 +511,14 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-2 rounded-2xl shadow-sm">
+        <div className="bg-white flex items-center justify-between w-full p-3 px-4 rounded-full shadow-md">
           {/* Bouton supprimer à gauche */}
           <button 
             onClick={deleteRecording}
-            className="p-2 text-gray-500 hover:text-red-500 transition-colors bg-gray-50 rounded-full w-10 h-10 flex items-center justify-center"
+            className="p-2 text-gray-600 hover:text-red-500 transition-colors bg-gray-100 rounded-full w-10 h-10 flex items-center justify-center"
             aria-label="Supprimer l'enregistrement"
           >
-            <Trash2 size={18} />
+            <X size={18} />
           </button>
           
           {/* Compteur de temps et visualiseur audio */}
@@ -541,11 +541,11 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
           {recorderState === 'recording' ? (
             <Button
               onClick={pauseRecording}
-              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow
-                       h-10 w-10 flex items-center justify-center"
+              className="p-2 rounded-full bg-red-600 hover:bg-red-700 text-white border-none shadow-md
+                       h-12 w-12 flex items-center justify-center"
               aria-label="Mettre en pause l'enregistrement"
             >
-              <Pause size={18} />
+              <Pause size={20} />
             </Button>
           ) : recorderState === 'paused' ? (
             <div className="flex items-center gap-2">
