@@ -29,13 +29,22 @@ npm ci
 
 # 5. Construction de l'application pour la production
 echo "5. Construction de l'application..."
-npm run build
 
-# 6. Vérification du répertoire de build
-echo "6. Vérification du répertoire de build..."
-if [ ! -d "server/public" ] || [ -z "$(ls -A server/public 2>/dev/null)" ]; then
-  echo "Le répertoire de build est vide, exécution du script de correction..."
-  ./scripts/fix-build-directory.sh
+# Vérification de l'existence du script de build amélioré
+if [ -f "scripts/build-with-fix.sh" ]; then
+  echo "Utilisation du script build-with-fix.sh pour une meilleure gestion des dossiers..."
+  chmod +x scripts/build-with-fix.sh
+  NODE_ENV=production ./scripts/build-with-fix.sh
+else
+  # Méthode traditionnelle
+  NODE_ENV=production npm run build
+  
+  # 6. Vérification du répertoire de build
+  echo "6. Vérification du répertoire de build..."
+  if [ ! -d "server/public" ] || [ -z "$(ls -A server/public 2>/dev/null)" ]; then
+    echo "Le répertoire de build est vide, exécution du script de correction..."
+    ./scripts/fix-build-directory.sh
+  fi
 fi
 
 # 7. Application des migrations de base de données si nécessaire

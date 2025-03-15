@@ -46,8 +46,18 @@ Cette étape est **essentielle** pour permettre la synchronisation entre les env
    - Mettez à jour le fichier `.env` avec l'URL de connexion dans DATABASE_URL
    - Vous pouvez également définir TEST_DATABASE_URL qui sera prioritaire sur DATABASE_URL
 
-5. Initialisez la base de données:
+5. Préparez l'environnement de build et initialisez la base de données:
    ```bash
+   # Créer le dossier public requis par Vite
+   mkdir -p server/public
+   
+   # Installer les dépendances
+   npm install
+   
+   # Construire le client
+   npm run build
+   
+   # Initialiser la base de données
    npm run db:push
    ```
 
@@ -74,8 +84,18 @@ Cette étape est **essentielle** pour permettre la synchronisation entre les env
    - Mettez à jour le fichier `.env` avec l'URL de connexion dans DATABASE_URL
    - Vous pouvez également définir PROD_DATABASE_URL qui sera prioritaire sur DATABASE_URL
 
-5. Initialisez la base de données:
+5. Préparez l'environnement de build et initialisez la base de données:
    ```bash
+   # Créer le dossier public requis par Vite
+   mkdir -p server/public
+   
+   # Installer les dépendances
+   npm install
+   
+   # Construire le client
+   npm run build
+   
+   # Initialiser la base de données
    npm run db:push
    ```
 
@@ -95,11 +115,39 @@ Kora dispose de scripts pour synchroniser le code entre les environnements:
      ./scripts/multi-repls-setup/pull-from-test.sh
      ```
 
-Ces scripts vont:
+Ces scripts vont automatiquement:
 - Sauvegarder les fichiers de configuration locaux
 - Tirer les dernières modifications du dépôt Git
 - Restaurer les fichiers de configuration locaux
-- Redémarrer l'application
+- Installer les dépendances
+- Construire l'application
+- Vérifier et réparer le répertoire de build si nécessaire
+- Appliquer les migrations de base de données
+- Préparer l'application pour le démarrage
+
+## Gestion des erreurs courantes
+
+Si vous rencontrez l'erreur "Could not find the build directory", le script de synchronisation lancera automatiquement la correction. Vous pouvez également exécuter manuellement:
+
+```bash
+./scripts/fix-build-directory.sh
+```
+
+Ce script:
+- Crée le répertoire `server/public` s'il n'existe pas
+- Ajoute des fichiers minimaux pour permettre au serveur de démarrer
+- Configure les permissions appropriées
+
+Pour les erreurs TypeScript lors du build, essayez ces solutions:
+1. Nettoyez le cache de build:
+   ```bash
+   rm -rf node_modules/.vite
+   ```
+
+2. Si l'erreur persiste, essayez de reconstruire avec:
+   ```bash
+   NODE_ENV=production npm run build
+   ```
 
 ## Gestion des schémas de base de données
 

@@ -363,29 +363,46 @@ Si vous rencontrez cette erreur dans l'environnement de test après une synchron
 Error: Could not find the build directory: /home/runner/workspace/server/public, make sure to build the client first
 ```
 
-C'est généralement parce que les fichiers client n'ont pas été compilés. Suivez ces étapes :
+C'est généralement parce que les fichiers client n'ont pas été compilés correctement ou qu'il y a un décalage entre le dossier de build (dist/public) et le dossier attendu par le serveur (server/public). Suivez ces étapes :
 
-1. Assurez-vous que le dossier existe :
+1. Utilisez notre script de correction automatique (recommandé) :
    ```bash
+   # Exécutez notre script qui gère automatiquement la création du lien symbolique
+   ./scripts/fix-build-directory.sh
+   ```
+
+2. Si vous préférez résoudre manuellement :
+   ```bash
+   # Assurez-vous que le dossier server/public existe
    mkdir -p server/public
-   ```
-
-2. Construisez explicitement le client :
-   ```bash
-   npm run build
-   ```
-
-3. Si l'erreur persiste, vous pouvez forcer la génération des fichiers statiques :
-   ```bash
-   # Option 1: Copier depuis l'environnement de développement si disponible
-   cp -r ../dev-environment/server/public/* server/public/
    
-   # Option 2: Créer un fichier minimal pour que le serveur démarre
+   # Construire avec NODE_ENV=production pour s'assurer que tout est correctement configuré
+   NODE_ENV=production npm run build
+   
+   # Créer un lien symbolique de server/public vers dist/public
+   # (Cela résout le problème de façon permanente)
+   rm -rf server/public  # Supprimez l'ancien dossier s'il existe
+   ln -sf $(pwd)/dist/public server/public
+   ```
+
+3. Si l'erreur persiste après avoir créé un lien symbolique, c'est que vous n'avez peut-être pas de fichiers de build :
+   ```bash
+   # Vérifiez si dist/public existe et contient des fichiers
+   ls -la dist/public
+   
+   # Si le dossier est vide ou n'existe pas, forcez une reconstruction complète
+   NODE_ENV=production npm run build
+   ```
+
+4. En dernier recours, vous pouvez créer des fichiers temporaires :
+   ```bash   
+   # Créer un fichier minimal pour que le serveur démarre
    echo "console.log('Client loading...');" > server/public/index.js
    echo "<html><body>Loading...</body></html>" > server/public/index.html
+   chmod 755 server/public/index.js server/public/index.html
    ```
 
-4. Redémarrez ensuite le serveur :
+5. Redémarrez ensuite le serveur :
    ```bash
    npm run dev
    ```
