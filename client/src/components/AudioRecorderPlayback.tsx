@@ -512,14 +512,14 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md">
+        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md" style={{ height: '50px' }}>
           {recorderState === 'recording' && (
             <>
               {/* Icône poubelle à gauche (comme dans le design de référence) */}
               <div className="flex-shrink-0">
                 <button 
                   onClick={deleteRecording}
-                  className="text-gray-500 hover:text-gray-700 transition-colors p-1"
+                  className="text-black hover:text-gray-900 transition-colors p-1"
                   aria-label="Supprimer l'enregistrement"
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

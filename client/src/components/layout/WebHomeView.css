@@ -477,22 +477,39 @@
   width: 100%;
 }
 
-/* Enregistreur vocal intégré dans le champ de saisie - ajusté pour correspondre au design souhaité */
-.web-voice-recorder-inline {
+/* Enregistreur vocal placé à côté des boutons d'action - exactement comme dans le design */
+.web-voice-recorder-action {
   position: absolute;
-  top: 0;
-  left: 0;
+  left: -10px;
   right: 0;
-  bottom: 0;
-  background-color: white;
-  border-radius: 24px;
-  padding: 0 0.25rem;
+  top: -35px;
+  width: calc(100% + 60px);
   display: flex;
   align-items: center;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
-  border: 1px solid #f0f0f0;
   justify-content: center;
-  z-index: 2;
+  z-index: 10;
+}
+
+/* Bouton fermer pour l'enregistrement vocal */
+.web-voice-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e74c3c;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  z-index: 11;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.web-voice-recorder-action > div {
   width: 100%;
 }
 

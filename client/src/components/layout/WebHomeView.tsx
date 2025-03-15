@@ -729,53 +729,56 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                       disabled={isRecordingVoice}
                     />
                     
-                    {/* Affichage de l'enregistreur vocal quand activé, directement dans le champ de saisie */}
-                    {isRecordingVoice && (
-                      <div className="web-voice-recorder-inline w-full">
+                    {/* Retiré d'ici pour le placer à côté des boutons d'action */}
+                  </div>
+                  <div className="web-action-buttons">
+                    {/* Affichage de l'enregistreur vocal à côté des boutons d'action */}
+                    {isRecordingVoice ? (
+                      <div className="web-voice-recorder-action">
                         <AudioRecorderPlayback 
                           onTranscriptionComplete={handleTranscriptionComplete}
                           maxRecordingTimeMs={30000}
                           language="fr"
                         />
+                        <button 
+                          type="button"
+                          className="web-voice-close-button"
+                          aria-label="Fermer l'enregistrement"
+                          onClick={handleVoiceButtonClick}
+                        >
+                          <X size={20} />
+                        </button>
                       </div>
-                    )}
-                  </div>
-                  <div className="web-action-buttons">
-                    <button 
-                      type="button"
-                      className="web-image-button"
-                      aria-label="Télécharger une image"
-                      onClick={handleImageClick}
-                    >
-                      <Image size={20} strokeWidth={2} />
-                    </button>
-                    
-                    {question.trim() ? (
-                      <button 
-                        type="submit"
-                        className="web-send-button"
-                        aria-label="Envoyer"
-                      >
-                        <Send size={20} strokeWidth={2} />
-                      </button>
-                    ) : isRecordingVoice ? (
-                      <button 
-                        type="button"
-                        className="web-mic-button recording"
-                        aria-label="Arrêter l'enregistrement"
-                        onClick={handleVoiceButtonClick}
-                      >
-                        <X size={20} strokeWidth={2.5} />
-                      </button>
                     ) : (
-                      <button 
-                        type="button"
-                        className="web-mic-button-white"
-                        aria-label="Enregistrer audio"
-                        onClick={handleVoiceButtonClick}
-                      >
-                        <Mic size={20} strokeWidth={2.5} />
-                      </button>
+                      <>
+                        <button 
+                          type="button"
+                          className="web-image-button"
+                          aria-label="Télécharger une image"
+                          onClick={handleImageClick}
+                        >
+                          <Image size={20} strokeWidth={2} />
+                        </button>
+                        
+                        {question.trim() ? (
+                          <button 
+                            type="submit"
+                            className="web-send-button"
+                            aria-label="Envoyer"
+                          >
+                            <Send size={20} strokeWidth={2} />
+                          </button>
+                        ) : (
+                          <button 
+                            type="button"
+                            className="web-mic-button-white"
+                            aria-label="Enregistrer audio"
+                            onClick={handleVoiceButtonClick}
+                          >
+                            <Mic size={20} strokeWidth={2.5} />
+                          </button>
+                        )}
+                      </>
                     )}
                     
                     {/* Input caché pour le téléchargement d'image */}
