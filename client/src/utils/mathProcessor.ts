@@ -1,6 +1,7 @@
 /**
  * Utilitaires pour le traitement des expressions mathématiques
- * Remplace l'ancien mathJaxFormatter.ts avec des fonctions plus robustes et plus simples
+ * Version refactorisée qui combine toutes les fonctionnalités des fichiers mathJaxFormatter.ts
+ * et mathProcessor.ts pour éliminer la redondance
  */
 
 export interface MathSegment {
@@ -250,4 +251,65 @@ export function isCompleteMathFormula(text: string): boolean {
     (openParen === closeParen) && 
     (openBracket === closeBracket)
   );
+}
+
+/**
+ * Corrige les délimiteurs mathématiques pour garantir une bonne reconnaissance par MathJax ou KaTeX
+ * 
+ * Consolidé depuis l'ancien mathJaxFormatter.ts
+ */
+export function formatMathContent(content: string): string {
+  if (!content) return content;
+  
+  // Protéger les blocs de code
+  const codeBlocks: string[] = [];
+  let processedContent = content.replace(/```[\s\S]*?```/g, (match) => {
+    codeBlocks.push(match);
+    return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+  });
+  
+  // 1. Correction - supprimer tous les "\\displaystyle 1" qui peuvent causer des problèmes
+  processedContent = processedContent.replace(/\\displaystyle\s+1/g, '');
+  
+  // 2. Remplacer les délimiteurs LaTeX alternatifs par leur équivalent standard
+  processedContent = processedContent
+    .replace(/\\\[([\s\S]*?)\\\]/g, '$$$$1$$')
+    .replace(/\\\(([\s\S]*?)\\\)/g, '$$$1$');
+  
+  // 3. Correction des commandes LaTeX courantes
+  processedContent = processedContent
+    .replace(/\\frac([a-zA-Z0-9])([a-zA-Z0-9])/g, '\\frac{$1}{$2}')
+    .replace(/\\sqrt([a-zA-Z0-9])/g, '\\sqrt{$1}')
+    .replace(/\_([a-zA-Z0-9])/g, '_{$1}')
+    .replace(/\^([a-zA-Z0-9])/g, '^{$1}');
+  
+  // 4. Correction des symboles qui peuvent apparaître en double
+  // Transformer les séquences "∆∆" en "∆"
+  processedContent = processedContent.replace(/∆\s*∆/g, '∆');
+  // Similairement pour "Δ > 0Δ > 0" -> "Δ > 0"
+  processedContent = processedContent.replace(/([Δ∆]\s*[<>=]\s*\d+)\s*([Δ∆]\s*[<>=]\s*\d+)/g, '$1');
+  // Corriger "Δ = 0Δ = 0" -> "Δ = 0"
+  processedContent = processedContent.replace(/([Δ∆]\s*=\s*\d+)\s*([Δ∆]\s*=\s*\d+)/g, '$1');
+    
+  // 5. Restaurer les blocs de code
+  processedContent = processedContent.replace(/__CODE_BLOCK_(\d+)__/g, (match, index) => {
+    return codeBlocks[parseInt(index)];
+  });
+  
+  // 6. Corriger les entrées "$\displaystyle 1$" qui apparaissent en texte brut
+  processedContent = processedContent.replace(/\$\\displaystyle 1\$/g, '');
+  
+  // 7. Corriger les doublons de lignes qui apparaissent parfois
+  const lines = processedContent.split('\n');
+  const uniqueLines: string[] = [];
+  let prevLine = '';
+  
+  for (const line of lines) {
+    if (line.trim() !== prevLine.trim()) {
+      uniqueLines.push(line);
+      prevLine = line;
+    }
+  }
+  
+  return uniqueLines.join('\n');
 }

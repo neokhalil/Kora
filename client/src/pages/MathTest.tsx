@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MathJaxRenderer from '../components/ui/MathJaxRenderer';
+import ContentRenderer from '../components/ui/ContentRenderer';
 import { Button } from '../components/ui/button';
 import { Textarea } from '../components/ui/textarea';
 
@@ -230,9 +230,9 @@ export default function MathTest() {
       )}
       
       <div className="p-6 border rounded-lg shadow-lg bg-white">
-        <h3 className="text-xl font-semibold mb-4">Rendu MathJax</h3>
+        <h3 className="text-xl font-semibold mb-4">Rendu Mathématique</h3>
         <div className="prose max-w-none">
-          <MathJaxRenderer content={showCustom ? customInput : selectedExample.content} />
+          <ContentRenderer content={showCustom ? customInput : selectedExample.content} />
         </div>
       </div>
     </div>
