@@ -87,7 +87,6 @@ const ChatAssistant: React.FC = () => {
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Initialiser les ajustements pour le clavier mobile
       setupMobileViewportFix();
       
       // Forcer le repositionnement dès le chargement pour éviter l'espace blanc initial
@@ -98,20 +97,6 @@ const ChatAssistant: React.FC = () => {
         // Forcer le rendu de la page complète
         window.scrollTo(0, 1);
         window.scrollTo(0, 0);
-        
-        // S'assurer que la zone d'input est correctement positionnée même sans interaction
-        const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
-        if (composerContainer) {
-          // Appliquer une transformation minimale pour assurer un rendu correct dès le début
-          composerContainer.style.transform = 'translate3d(0, -1px, 0)';
-          
-          // Petit délai pour permettre le rendu avant de réinitialiser
-          setTimeout(() => {
-            // Revenir à l'état normal une fois l'initialisation terminée
-            document.body.classList.remove('keyboard-open');
-            composerContainer.style.transform = '';
-          }, 500);
-        }
       }, 100);
       
       // S'assurer que la hauteur initiale du textarea est correcte au chargement
@@ -906,8 +891,8 @@ const ChatAssistant: React.FC = () => {
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas sans bordure */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load border-none">
+          {/* Zone de saisie fixe en bas */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
@@ -944,7 +929,7 @@ const ChatAssistant: React.FC = () => {
               
               {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border-0 flex flex-col gap-1 mb-2"
+                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
                 ref={composerRef}
                 onFocus={() => {
                   // Déclenche la classe keyboard-open pour adapter l'UI

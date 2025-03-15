@@ -1,7 +1,6 @@
 /**
  * Script optimisé pour la gestion du viewport mobile
  * Garantit que le header reste visible même quand le clavier est ouvert
- * Et que la zone de saisie reste au-dessus du clavier
  */
 
 export function setupMobileViewportFix() {
@@ -60,16 +59,24 @@ export function setupMobileViewportFix() {
     const supportsSafeArea = typeof CSS !== 'undefined' && CSS.supports('top: env(safe-area-inset-top)');
     const safeAreaTop = supportsSafeArea ? 'env(safe-area-inset-top, 0)' : '0';
     
-    // S'assurer que le z-index est toujours élevé pour rester au-dessus du contenu
-    header.style.zIndex = '10000';
-    header.style.position = 'fixed';
-    header.style.top = '0';
-    header.style.left = '0';
-    header.style.right = '0';
+    // S'assurer que le z-index est toujours élevé
+    header.style.zIndex = '9999';
     header.style.borderBottom = 'none';
     
     // Ajustements spécifiques selon la plateforme
     if (isAndroid) {
+      // Vérifier si le clavier est ouvert (hauteur réduite significativement)
+      const isKeyboardOpen = window.innerHeight < window.outerHeight * 0.75;
+      
+      if (isKeyboardOpen) {
+        // Si le clavier est ouvert sur Android, s'assurer que le header reste visible
+        header.style.position = 'absolute';
+      } else {
+        // Sinon, revenir à l'état normal
+        header.style.position = 'fixed';
+        header.style.top = '0';
+      }
+      
       // Ajustements spécifiques selon la version Android
       if (androidVersion < 10) {
         // Android versions antérieures peuvent nécessiter des ajustements supplémentaires
@@ -86,107 +93,12 @@ export function setupMobileViewportFix() {
   }
   
   /**
-   * Fonction optimisée pour garantir que la zone de saisie reste visible
-   * au-dessus du clavier mobile, sans espace blanc
-   */
-  function ensureComposerVisible() {
-    const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
-    const messagesContainer = document.querySelector('.messages-container') as HTMLElement | null;
-    
-    if (!composerContainer || !messagesContainer) return;
-    
-    const vv = window.visualViewport;
-    
-    // Détection optimisée de l'ouverture du clavier
-    const isKeyboardOpen = vv 
-      ? vv.height < window.innerHeight * 0.8  // Seuil augmenté pour une détection plus sensible
-      : window.innerHeight < window.outerHeight * 0.8;
-    
-    if (isKeyboardOpen) {
-      document.body.classList.add('keyboard-open');
-      
-      // Si VisualViewport API est disponible (iOS et Android récent)
-      if (vv) {
-        // Calculer la différence de hauteur entre le viewport et la fenêtre
-        const viewportHeightDiff = window.innerHeight - vv.height;
-        
-        // Stocker ces valeurs comme propriétés CSS pour les utiliser dans les styles
-        document.documentElement.style.setProperty('--viewport-height-diff', `${viewportHeightDiff}px`);
-        document.documentElement.style.setProperty('--keyboard-height', `${viewportHeightDiff}px`);
-        
-        // Approche plus agressive pour coller au clavier sans espace blanc
-        composerContainer.style.position = 'fixed';
-        composerContainer.style.bottom = '0px';
-        composerContainer.style.left = '0';
-        composerContainer.style.right = '0';
-        composerContainer.style.width = '100%';
-        composerContainer.style.zIndex = '9990';
-        composerContainer.style.margin = '0';
-        composerContainer.style.paddingBottom = '0';
-        
-        // Transformation précise avec un pixel supplémentaire pour être sûr qu'il n'y a pas d'espace
-        composerContainer.style.transform = `translate3d(0, calc(-${viewportHeightDiff}px - 1px), 0)`;
-        
-        // Ajuster la hauteur maximale de la zone de messages pour qu'elle soit scrollable
-        const headerHeight = 56; // Hauteur fixe du header
-        const composerHeight = composerContainer.offsetHeight || 60;
-        
-        // Calculer la hauteur maximale de façon plus précise
-        const maxHeight = vv.height - headerHeight;
-        
-        messagesContainer.style.maxHeight = `${maxHeight}px`;
-        messagesContainer.style.overflowY = 'auto';
-        messagesContainer.style.paddingBottom = `${composerHeight}px`;
-        
-        // Forcer une mise à jour du rendu
-        setTimeout(() => {
-          if (composerContainer) {
-            // Assurer que l'élément est toujours collé au clavier après le rendu
-            const updatedDiff = window.innerHeight - vv.height;
-            composerContainer.style.transform = `translate3d(0, calc(-${updatedDiff}px - 1px), 0)`;
-          }
-        }, 50);
-      } else {
-        // Fallback pour les navigateurs sans VisualViewport API
-        // Estimation de la hauteur du clavier basée sur le rapport de taille d'écran
-        const estimatedKeyboardHeight = window.innerHeight * 0.4; // ~40% de l'écran
-        
-        composerContainer.style.position = 'fixed';
-        composerContainer.style.bottom = `${estimatedKeyboardHeight}px`;
-        composerContainer.style.left = '0';
-        composerContainer.style.right = '0';
-        composerContainer.style.margin = '0';
-        composerContainer.style.paddingBottom = '0';
-        composerContainer.style.zIndex = '9990';
-      }
-    } else {
-      // Réinitialiser quand le clavier est fermé
-      document.body.classList.remove('keyboard-open');
-      document.documentElement.style.setProperty('--viewport-height-diff', '0px');
-      document.documentElement.style.setProperty('--keyboard-height', '0px');
-      
-      // Réinitialiser les styles du composer
-      composerContainer.style.transform = '';
-      composerContainer.style.position = 'fixed';
-      composerContainer.style.bottom = '0';
-      composerContainer.style.left = '0';
-      composerContainer.style.right = '0';
-      composerContainer.style.zIndex = '50';
-      
-      // Réinitialiser les styles de la zone de messages
-      messagesContainer.style.maxHeight = '';
-      messagesContainer.style.paddingBottom = '';
-    }
-  }
-  
-  /**
    * Mise à jour de la hauteur de l'application
    * Cette variable CSS est utilisée pour les calculs de hauteur dynamique
    */
   function setAppHeight() {
     document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     ensureHeaderPosition();
-    ensureComposerVisible();
   }
   
   // Initialisation
@@ -194,10 +106,7 @@ export function setupMobileViewportFix() {
   
   // Écouteurs d'événements standard
   window.addEventListener('resize', setAppHeight);
-  window.addEventListener('scroll', () => {
-    ensureHeaderPosition();
-    ensureComposerVisible();
-  });
+  window.addEventListener('scroll', ensureHeaderPosition);
   
   // Gestion améliorée de l'orientation
   window.addEventListener('orientationchange', () => {
@@ -210,7 +119,6 @@ export function setupMobileViewportFix() {
       setTimeout(() => {
         setAppHeight();
         ensureHeaderPosition();
-        ensureComposerVisible();
         
         // Forcer un petit défilement pour déclencher les recalculs du navigateur
         window.scrollTo(0, 1);
@@ -223,244 +131,29 @@ export function setupMobileViewportFix() {
   });
   
   // Gestion spécifique du clavier mobile via Visual Viewport API
-  /**
-   * Fonction optimisée pour éviter l'espace blanc entre le clavier et la zone de saisie
-   * Utilise plusieurs méthodes complémentaires pour assurer une position parfaite
-   */
-  function ensureNoGapWithKeyboard() {
-    const composerContainer = document.querySelector('.composer-container') as HTMLElement | null;
-    if (!composerContainer) return;
-    
-    const vv = window.visualViewport;
-    if (!vv) return;
-    
-    // Vérifier si le clavier est ouvert avec un seuil plus permissif
-    if (vv.height < window.innerHeight * 0.85) {
-      const viewportHeightDiff = window.innerHeight - vv.height;
-      
-      // Supprimer tout padding et marge qui pourrait créer un espace
-      composerContainer.style.margin = '0';
-      composerContainer.style.paddingBottom = '0';
-      
-      // Appliquer la transformation avec une marge supplémentaire pour s'assurer qu'il n'y a pas d'espace
-      // Utilisation de translate3d pour forcer le rendu hardware qui est plus précis
-      composerContainer.style.transform = `translate3d(0, calc(-${viewportHeightDiff}px - 2px), 0)`;
-      
-      // Forcer une réinitialisation de rendu pour que la transformation soit correctement appliquée
-      composerContainer.style.zIndex = '9990';
-      
-      // Appliquer à nouveau après un court délai pour s'adapter aux animations du clavier
-      setTimeout(() => {
-        if (composerContainer) {
-          // Vérifier à nouveau les dimensions au cas où le clavier aurait changé de taille
-          const updatedDiff = window.innerHeight - vv.height;
-          composerContainer.style.transform = `translate3d(0, calc(-${updatedDiff}px - 2px), 0)`;
-          
-          // Forcer le positionnement sans espace
-          composerContainer.style.bottom = '0px';
-          composerContainer.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.1)';
-        }
-      }, 30); // Délai réduit pour réagir plus rapidement
-      
-      // Un second délai pour s'adapter aux animations du clavier
-      setTimeout(() => {
-        if (composerContainer) {
-          const finalDiff = window.innerHeight - vv.height;
-          composerContainer.style.transform = `translate3d(0, calc(-${finalDiff}px - 2px), 0)`;
-        }
-      }, 150);
-      
-      // Un dernier ajustement pour les cas où le clavier a une animation lente
-      setTimeout(() => {
-        if (composerContainer) {
-          const latestDiff = window.innerHeight - vv.height;
-          composerContainer.style.transform = `translate3d(0, calc(-${latestDiff}px - 2px), 0)`;
-        }
-      }, 350);
-    }
-  }
-  
   const visualViewport = window.visualViewport;
   if (visualViewport) {
-    // Indiquer que Visual Viewport API est supporté
-    document.body.classList.add('visual-viewport-supported');
+    visualViewport.addEventListener('resize', setAppHeight);
+    visualViewport.addEventListener('scroll', ensureHeaderPosition);
     
+    // Event supplémentaire pour détecter les changements de taille plus précisément
     visualViewport.addEventListener('resize', () => {
       // Mettre à jour le --app-height immédiatement
       document.documentElement.style.setProperty('--app-height', `${visualViewport.height}px`);
-      
-      // Mettre à jour la position du composer et du header
       ensureHeaderPosition();
-      ensureComposerVisible();
-      
-      // Appeler la fonction supplémentaire pour éviter l'espace blanc
-      ensureNoGapWithKeyboard();
-      
-      // Détecter l'ouverture du clavier en fonction de la hauteur
-      if (visualViewport.height < window.innerHeight * 0.7) {
-        document.body.classList.add('keyboard-open');
-        document.body.classList.add('visual-viewport-active');
-      } else {
-        document.body.classList.remove('keyboard-open');
-        document.body.classList.remove('visual-viewport-active');
-      }
-    });
-    
-    visualViewport.addEventListener('scroll', () => {
-      ensureHeaderPosition();
-      ensureComposerVisible();
-      ensureNoGapWithKeyboard();
     });
   }
   
   // Détection de focus sur les champs de saisie (pour le clavier)
   document.addEventListener('focusin', (e) => {
-    const target = e.target as HTMLElement;
+    ensureHeaderPosition();
     
-    // Uniquement réagir aux inputs, textareas et éléments de formulaire
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || 
-        target.hasAttribute('contenteditable')) {
-      document.body.classList.add('keyboard-open');
-      ensureHeaderPosition();
-      ensureComposerVisible();
-      ensureNoGapWithKeyboard();
-      
-      // Sur Android, ajouter un délai pour s'assurer que tout est bien positionné
-      // après que le clavier est complètement ouvert
-      if (isAndroid) {
-        setTimeout(() => {
-          ensureHeaderPosition();
-          ensureComposerVisible();
-          ensureNoGapWithKeyboard();
-        }, 300);
-      }
-      
-      // Forcer un scroll minime pour déclencher le recalcul de position sur iOS
-      if (isIOS) {
-        setTimeout(() => {
-          window.scrollTo(0, 1);
-          window.scrollTo(0, 0);
-          ensureNoGapWithKeyboard();
-        }, 100);
-        
-        // Un deuxième délai plus long pour s'adapter à l'animation du clavier iOS
-        setTimeout(() => {
-          ensureNoGapWithKeyboard();
-        }, 500);
-      }
+    // Sur Android, ajouter un délai pour s'assurer que le header reste visible
+    // après que le clavier est complètement ouvert
+    if (isAndroid) {
+      setTimeout(ensureHeaderPosition, 300);
     }
   });
   
-  document.addEventListener('focusout', () => {
-    // Délai pour s'assurer que l'animation du clavier est terminée
-    setTimeout(() => {
-      // Vérifier si un autre élément a reçu le focus
-      const activeElement = document.activeElement as HTMLElement;
-      // Vérifier si l'élément qui a le focus est un champ de saisie
-      const isFocusInForm = activeElement && (
-        activeElement.tagName === 'INPUT' || 
-        activeElement.tagName === 'TEXTAREA' || 
-        activeElement.hasAttribute('contenteditable')
-      );
-      
-      // Ne retirer la classe que si aucun élément de formulaire n'a le focus
-      if (!isFocusInForm) {
-        document.body.classList.remove('keyboard-open');
-        document.body.classList.remove('visual-viewport-active');
-      }
-      
-      ensureHeaderPosition();
-      ensureComposerVisible();
-      
-      // S'assurer qu'il n'y a pas d'espace blanc quand un autre élément reçoit le focus
-      if (document.body.classList.contains('keyboard-open')) {
-        ensureNoGapWithKeyboard();
-      }
-    }, 300);
-  });
-  
-  // Gestion spécifique des textarea qui peuvent agrandir dynamiquement
-  const adjustTextareaHeight = (e: Event) => {
-    const textarea = e.target as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    // Réinitialiser la hauteur pour recalculer correctement
-    textarea.style.height = '40px';
-    
-    // Ajouter 2px pour éviter la scrollbar
-    const newHeight = Math.min(textarea.scrollHeight + 2, 120);
-    textarea.style.height = `${newHeight}px`;
-    
-    // Indication visuelle que la hauteur maximale est atteinte (scrollbar)
-    if (newHeight >= 120) {
-      textarea.classList.add('max-height-reached');
-    } else {
-      textarea.classList.remove('max-height-reached');
-    }
-    
-    // Mettre à jour la hauteur du composer dans les variables CSS
-    const composerContainer = textarea.closest('.composer-container');
-    if (composerContainer) {
-      document.documentElement.style.setProperty('--composer-height', `${composerContainer.clientHeight}px`);
-      
-      // Re-calculer la position du composer
-      ensureComposerVisible();
-      
-      // S'assurer qu'il n'y a pas d'espace blanc entre le clavier et la zone de saisie
-      if (document.body.classList.contains('keyboard-open')) {
-        ensureNoGapWithKeyboard();
-      }
-    }
-  };
-  
-  // Appliquer aux textareas existants et à venir
-  document.querySelectorAll('textarea.chat-textarea').forEach(el => {
-    el.addEventListener('input', adjustTextareaHeight);
-  });
-  
-  // Observer les nouveaux textareas ajoutés au DOM pour y attacher l'event
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      if (mutation.addedNodes.length) {
-        mutation.addedNodes.forEach(node => {
-          if (node.nodeType === 1) {
-            const element = node as HTMLElement;
-            const textareas = element.querySelectorAll('textarea.chat-textarea');
-            textareas.forEach(el => {
-              el.addEventListener('input', adjustTextareaHeight);
-            });
-          }
-        });
-      }
-    });
-  });
-  
-  // Configurer et démarrer l'observateur
-  observer.observe(document.body, { childList: true, subtree: true });
-  
-  // Ajouter des écouteurs d'événements tactiles pour optimiser l'expérience mobile
-  
-  // 1. Après un toucher, le clavier peut parfois changer de taille
-  document.addEventListener('touchstart', () => {
-    // Si le clavier est actuellement ouvert, vérifier sa position
-    if (document.body.classList.contains('keyboard-open')) {
-      setTimeout(ensureNoGapWithKeyboard, 10);
-    }
-  });
-  
-  // 2. Après la fin d'un toucher, s'assurer que la position est correcte
-  document.addEventListener('touchend', () => {
-    // Si le clavier est ouvert, s'assurer qu'il n'y a pas d'espace blanc
-    if (document.body.classList.contains('keyboard-open')) {
-      setTimeout(ensureNoGapWithKeyboard, 100);
-    }
-  });
-  
-  // 3. Parfois, un tapotement sur l'écran peut faire bouger le clavier
-  document.addEventListener('click', () => {
-    // Si le clavier est ouvert, s'assurer qu'il n'y a pas d'espace blanc
-    if (document.body.classList.contains('keyboard-open')) {
-      setTimeout(ensureNoGapWithKeyboard, 50);
-    }
-  });
+  document.addEventListener('focusout', ensureHeaderPosition);
 }
