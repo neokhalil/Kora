@@ -153,7 +153,8 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Couleur pour les barres en mode enregistrement et pause - noir comme sur l'image de référence
-      ctx.fillStyle = recorderState === 'recording' ? 'rgba(0, 0, 0, 0.9)' : 'rgba(40, 40, 40, 0.7)';
+      // Couleur noire pour les barres, exactement comme dans l'image de référence
+      ctx.fillStyle = 'rgb(0, 0, 0)';
       
       // Calculer le pas pour répartir les fréquences
       const step = Math.ceil(bufferLength / totalBars);
@@ -511,25 +512,24 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-white flex items-center justify-between w-full p-3 px-4 rounded-full shadow-md">
+        <div className="bg-white flex items-center justify-between w-full p-2 px-4 rounded-full shadow-md">
           {recorderState === 'recording' && (
             <>
-              {/* Icône poubelle à gauche */}
+              {/* Icône poubelle à gauche (comme dans le design de référence) */}
               <div className="flex-shrink-0">
                 <button 
                   onClick={deleteRecording}
-                  className="text-gray-500 hover:text-red-500 transition-colors p-1"
+                  className="text-gray-500 hover:text-gray-700 transition-colors p-1"
                   aria-label="Supprimer l'enregistrement"
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3 6H5H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M18.5 6L17.5 19C17.5 20.1046 16.6046 21 15.5 21H8.5C7.39543 21 6.5 20.1046 6.5 19L5.5 6M4 6H20M15 6L14.5 4C14.5 3.44772 14.0523 3 13.5 3H10.5C9.94772 3 9.5 3.44772 9.5 4L9 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </button>
               </div>
               
               {/* Compteur de temps */}
-              <div className="text-gray-700 font-medium text-center flex-shrink-0 ml-2 mr-4">
+              <div className="text-gray-700 font-medium text-center flex-shrink-0 ml-1 mr-3">
                 {formatDuration(recordingDuration)}
               </div>
             </>
@@ -545,15 +545,15 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
             </div>
           </div>
           
-          {/* Bouton pause rouge à droite */}
+          {/* Bouton pause rouge à droite exactement comme dans le design souhaité */}
           {recorderState === 'recording' ? (
             <Button
               onClick={pauseRecording}
-              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow-sm
-                       h-14 w-14 flex items-center justify-center ml-4 flex-shrink-0"
+              className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white border-none shadow-none
+                       h-12 w-12 flex items-center justify-center ml-4 flex-shrink-0"
               aria-label="Mettre en pause l'enregistrement"
             >
-              <Pause size={22} />
+              <Pause size={20} />
             </Button>
           ) : recorderState === 'paused' ? (
             <div className="flex items-center gap-2">

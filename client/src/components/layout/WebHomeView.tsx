@@ -731,7 +731,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     
                     {/* Affichage de l'enregistreur vocal quand activé, directement dans le champ de saisie */}
                     {isRecordingVoice && (
-                      <div className="web-voice-recorder-inline">
+                      <div className="web-voice-recorder-inline w-full">
                         <AudioRecorderPlayback 
                           onTranscriptionComplete={handleTranscriptionComplete}
                           maxRecordingTimeMs={30000}
