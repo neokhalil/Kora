@@ -24,7 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import VoiceRecorder from '@/components/VoiceRecorder';
+import AudioRecorderPlayback from '@/components/AudioRecorderPlayback';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
@@ -1084,7 +1084,7 @@ const ChatAssistant: React.FC = () => {
                     ) : (
                       /* Bouton microphone */
                       <div className="w-10 h-10 flex items-center justify-center">
-                        <VoiceRecorder 
+                        <AudioRecorderPlayback 
                           onTranscriptionComplete={async (text) => {
                             setInputValue('');
                             

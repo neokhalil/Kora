@@ -5,7 +5,7 @@ import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, Refre
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
-import VoiceRecorder from '@/components/VoiceRecorder';
+import AudioRecorderPlayback from '@/components/AudioRecorderPlayback';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -780,7 +780,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               {/* Affichage de l'enregistreur vocal quand activé */}
               {isRecordingVoice && (
                 <div className="web-voice-recorder">
-                  <VoiceRecorder 
+                  <AudioRecorderPlayback 
                     onTranscriptionComplete={handleTranscriptionComplete}
                     maxRecordingTimeMs={30000}
                     language="fr"
