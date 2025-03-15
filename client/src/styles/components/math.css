@@ -1,0 +1,102 @@
+/**
+ * Styles pour le rendu de formules mathématiques
+ * Combinaison des styles de mathJax.css et du rendu avec KaTeX
+ */
+
+/* KaTeX wrapper styles */
+.katex-inline-wrapper {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0.15em;
+  vertical-align: middle;
+}
+
+.katex-block-wrapper {
+  display: block;
+  margin: 1em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* Error display for KaTeX */
+.katex-error {
+  color: #f44336;
+  background-color: rgba(244, 67, 54, 0.1);
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-family: monospace;
+}
+
+/* Style pour améliorer le rendu des formules mathématiques */
+.math-content {
+  transition: none; /* Supprime la transition pour éviter les tremblements */
+  will-change: contents;
+  overflow-wrap: break-word;
+  transform: translateZ(0); /* Force GPU acceleration */
+  backface-visibility: hidden; /* Reduce flickering */
+  font-feature-settings: "tnum";
+  min-height: 20px; /* Hauteur minimale pour stabiliser le contenu */
+  position: relative;
+  line-height: 1.5;
+  contain: style;
+}
+
+/* Style pour le symbole delta */
+.math-content .delta-symbol {
+  font-family: var(--font-math);
+  font-weight: normal;
+}
+
+/* Style pour les exposants */
+.math-content sup, 
+.math-content .superscript {
+  vertical-align: super;
+  font-size: 0.8em;
+  line-height: 0;
+}
+
+/* Style pour les conditions mathématiques (delta > 0, etc.) */
+.math-content .math-condition {
+  font-weight: 500;
+  font-family: var(--font-math);
+  white-space: nowrap;
+}
+
+/* Améliorer l'espacement des messages en liste */
+.math-content p {
+  margin-bottom: 0.75em;
+  line-height: 1.6;
+}
+
+.math-content-inner {
+  transform: translateZ(0);
+  position: relative;
+  contain: layout style;
+  line-height: 1.7;
+}
+
+/* Amélioration pour les formules KaTeX */
+.math-content .katex {
+  font-size: 1.15em;
+}
+
+.math-content .katex-display {
+  margin: 1.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.4em 0;
+  will-change: contents;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .math-content {
+    font-size: 0.95rem;
+  }
+  
+  .math-content .katex-display {
+    font-size: 0.9em;
+  }
+}
