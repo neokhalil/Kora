@@ -5,7 +5,7 @@ import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, Refre
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
-import AudioRecorderPlayback from '@/components/AudioRecorderPlayback';
+import VoiceRecorder from '@/components/VoiceRecorder';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -292,11 +292,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     setImagePreviewUrl(null);
   };
   
-  // Gestion de l'enregistrement vocal - lance directement l'enregistrement quand on clique sur le micro
+  // Gestion de l'enregistrement vocal
   const handleVoiceButtonClick = () => {
     setIsRecordingVoice(!isRecordingVoice);
-    // Si on active l'enregistrement, démarrer immédiatement l'enregistrement sans attendre un autre clic
-    // Le composant AudioRecorderPlayback sera activé par isRecordingVoice
   };
   
   // Fonction appelée lorsque la transcription audio est terminée
@@ -304,14 +302,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     if (text) {
       setQuestion(text);
       setIsRecordingVoice(false);
-    } else {
-      setIsRecordingVoice(false);
     }
-  };
-  
-  // Fonction pour annuler l'enregistrement vocal
-  const handleCancelRecording = () => {
-    setIsRecordingVoice(false);
   };
   
   // Demande une ré-explication
@@ -726,69 +717,76 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <div className="web-question-container">
               <form onSubmit={handleSubmit} className="web-question-form">
                 <div className="web-question-box">
-                  {isRecordingVoice ? (
-                    <div className="web-voice-recorder-action">
-                      <AudioRecorderPlayback 
-                        onTranscriptionComplete={handleTranscriptionComplete}
-                        maxRecordingTimeMs={30000}
-                        language="fr"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="web-input-wrapper">
-                        <input 
-                          type="text" 
-                          placeholder="Pose ta question"
-                          value={question}
-                          onChange={(e) => setQuestion(e.target.value)}
-                          autoFocus
-                        />
-                      </div>
-                      <div className="web-action-buttons">
-                        <button 
-                          type="button"
-                          className="web-image-button"
-                          aria-label="Télécharger une image"
-                          onClick={handleImageClick}
-                        >
-                          <Image size={20} strokeWidth={2} />
-                        </button>
-                        
-                        {question.trim() ? (
-                          <button 
-                            type="submit"
-                            className="web-send-button"
-                            aria-label="Envoyer"
-                          >
-                            <Send size={20} strokeWidth={2} />
-                          </button>
-                        ) : (
-                          <button 
-                            type="button"
-                            className="web-mic-button-white"
-                            aria-label="Enregistrer audio"
-                            onClick={handleVoiceButtonClick}
-                          >
-                            <Mic size={20} strokeWidth={2.5} />
-                          </button>
-                        )}
-                      </div>
-                    </>
-                  )}
-                  
-                  {/* Input caché pour le téléchargement d'image */}
-                  <input 
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
+                  <div className="web-input-wrapper">
+                    <input 
+                      type="text" 
+                      placeholder="Pose ta question"
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      autoFocus
+                      disabled={isRecordingVoice}
+                    />
+                  </div>
+                  <div className="web-action-buttons">
+                    <button 
+                      type="button"
+                      className="web-image-button"
+                      aria-label="Télécharger une image"
+                      onClick={handleImageClick}
+                    >
+                      <Image size={20} strokeWidth={2} />
+                    </button>
+                    
+                    {question.trim() ? (
+                      <button 
+                        type="submit"
+                        className="web-send-button"
+                        aria-label="Envoyer"
+                      >
+                        <Send size={20} strokeWidth={2} />
+                      </button>
+                    ) : isRecordingVoice ? (
+                      <button 
+                        type="button"
+                        className="web-mic-button recording"
+                        aria-label="Arrêter l'enregistrement"
+                        onClick={handleVoiceButtonClick}
+                      >
+                        <X size={20} strokeWidth={2.5} />
+                      </button>
+                    ) : (
+                      <button 
+                        type="button"
+                        className="web-mic-button"
+                        aria-label="Enregistrer audio"
+                        onClick={handleVoiceButtonClick}
+                      >
+                        <Mic size={20} strokeWidth={2.5} />
+                      </button>
+                    )}
+                    
+                    {/* Input caché pour le téléchargement d'image */}
+                    <input 
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: 'none' }}
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </div>
                 </div>
               </form>
               
-              {/* L'enregistreur vocal est maintenant intégré au formulaire */}
+              {/* Affichage de l'enregistreur vocal quand activé */}
+              {isRecordingVoice && (
+                <div className="web-voice-recorder">
+                  <VoiceRecorder 
+                    onTranscriptionComplete={handleTranscriptionComplete}
+                    maxRecordingTimeMs={30000}
+                    language="fr"
+                  />
+                </div>
+              )}
               
               {/* Message d'accueil placé directement dans le container de questions */}
               <p className="web-question-footer">

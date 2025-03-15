@@ -423,14 +423,14 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       {recorderState === 'inactive' && (
         <Button
           size="icon"
-          variant="outline"
+          variant="ghost"
           disabled={disabled}
           onClick={startRecording}
           aria-label="Enregistrer votre voix"
-          className="relative bg-black hover:bg-gray-900 text-white border-none
-                     h-12 w-12 rounded-full
+          className="relative bg-black hover:bg-gray-800 text-white transition-colors 
+                     h-10 w-10 rounded-full
                      active:scale-95 transform transition-transform
-                     shadow-md"
+                     touch-manipulation"
         >
           <Mic className="h-5 w-5" />
         </Button>
@@ -455,7 +455,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           size="icon"
           variant="ghost"
           onClick={stopRecording}
-          className="h-10 w-10 bg-red-600 hover:bg-red-700 text-white rounded-full flex-shrink-0 
+          className="h-10 w-10 bg-black hover:bg-gray-900 text-white rounded-full flex-shrink-0 
                     relative overflow-hidden active:scale-95 transform transition-transform"
           aria-label="Terminer l'enregistrement"
         >
