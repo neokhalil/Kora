@@ -52,10 +52,10 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
   // Configuration du visualiseur audio
   const visualizerConfig: AudioVisualizerConfig = {
     width: 200, // Largeur du canvas ajustable
-    height: 40,  // Hauteur des barres
+    height: 30,  // Hauteur des barres réduite pour une meilleure intégration
     barWidth: 2,  // Barres fines
     barGap: 2,    // Espace entre les barres
-    sensitivity: 3.0 // Sensibilité pour la visualisation
+    sensitivity: 2.5 // Sensibilité pour la visualisation
   };
   
   // Nettoyer les ressources lors du démontage du composant
@@ -498,26 +498,26 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
       
       {/* Afficher le contrôleur d'enregistrement complet quand on enregistre ou lit */}
       {(recorderState === 'recording' || recorderState === 'paused' || recorderState === 'playback') && (
-        <div className="bg-gray-100 rounded-lg p-2 flex items-center justify-between w-full max-w-md">
+        <div className="bg-transparent flex items-center justify-between w-full max-w-md">
           {/* Bouton supprimer */}
           <button 
             onClick={deleteRecording}
-            className="p-2 text-gray-600 hover:text-red-500 transition-colors"
+            className="p-1 text-gray-600 hover:text-red-500 transition-colors"
             aria-label="Supprimer l'enregistrement"
           >
-            <Trash2 size={20} />
+            <Trash2 size={18} />
           </button>
           
           {/* Compteur de temps */}
-          <div className="text-gray-700 font-medium mx-2 min-w-14 text-center">
+          <div className="text-gray-700 font-medium mx-1 min-w-12 text-center text-sm">
             {formatDuration(recordingDuration)}
           </div>
           
           {/* Visualiseur audio */}
-          <div className="flex-grow mx-3 flex items-center justify-center">
+          <div className="flex-grow mx-2 flex items-center justify-center">
             <canvas 
               ref={canvasRef} 
-              className="w-full h-10"
+              className="w-full h-8"
             />
           </div>
           
@@ -525,26 +525,26 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
           {recorderState === 'recording' ? (
             <button 
               onClick={pauseRecording}
-              className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
               aria-label="Mettre en pause l'enregistrement"
             >
-              <Pause size={20} />
+              <Pause size={16} />
             </button>
           ) : recorderState === 'paused' ? (
             <button 
               onClick={resumeRecording}
-              className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
               aria-label="Reprendre l'enregistrement"
             >
-              <Play size={20} />
+              <Play size={16} />
             </button>
           ) : (
             <button 
               onClick={audioRef.current?.paused ? playRecording : pausePlayback}
-              className="p-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
+              className="p-1.5 rounded-full bg-red-500 text-white hover:bg-red-600 transition-colors"
               aria-label={audioRef.current?.paused ? "Lire l'enregistrement" : "Mettre en pause la lecture"}
             >
-              {audioRef.current?.paused ? <Play size={20} /> : <Pause size={20} />}
+              {audioRef.current?.paused ? <Play size={16} /> : <Pause size={16} />}
             </button>
           )}
           
@@ -552,10 +552,10 @@ const AudioRecorderPlayback: React.FC<AudioRecorderPlaybackProps> = ({
           {recorderState === 'playback' && (
             <button 
               onClick={sendRecording}
-              className="p-2 ml-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
+              className="p-1.5 ml-1 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
               aria-label="Envoyer l'enregistrement"
             >
-              <Send size={20} />
+              <Send size={16} />
             </button>
           )}
         </div>
