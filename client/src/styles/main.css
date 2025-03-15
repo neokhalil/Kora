@@ -1,64 +1,238 @@
 /**
- * Fichier principal CSS
- * Implémentation méthodologie ITCSS (Inverted Triangle CSS)
- * Organisation du CSS par ordre croissant de spécificité et décroissant de portée
+ * Fichier principal de styles ITCSS pour l'application Kora
+ * 
+ * Architecture ITCSS (Inverted Triangle CSS) :
+ * 1. Settings - Variables, configuration
+ * 2. Tools - Mixins, fonctions (pas utilisés en CSS pur)
+ * 3. Generic - Reset, normalize
+ * 4. Elements - Styling pour les éléments HTML de base
+ * 5. Objects - Classes de structure non-décoratives (OOCSS)
+ * 6. Components - Composants d'interface spécifiques
+ * 7. Utilities - Classes utilitaires et overrides
  */
 
-/**
- * SETTINGS
- * Variables globales, configuration
- */
-@import './settings/variables.css';
+/* ==================================================
+   #SETTINGS
+   ================================================== */
+:root {
+  /* Couleurs de base */
+  --primary: #5874d3;
+  --primary-rgb: 88, 116, 211;
+  --primary-dark: #4664c3;
+  --primary-light: #7893e5;
+  --primary-100: rgba(88, 116, 211, 0.1);
+  
+  --secondary: #38b2ac;
+  --secondary-rgb: 56, 178, 172;
+  --secondary-dark: #2c9a95;
+  --secondary-light: #4fd1ca;
+  
+  --success: #48bb78;
+  --success-rgb: 72, 187, 120;
+  --success-dark: #38a169;
+  
+  --warning: #ecc94b;
+  --warning-rgb: 236, 201, 75;
+  --warning-dark: #d69e2e;
+  
+  --error: #e53e3e;
+  --error-rgb: 229, 62, 62;
+  --error-dark: #c53030;
+  
+  /* Interface */
+  --foreground: #1a202c;
+  --background: #ffffff;
+  --muted-foreground: #718096;
+  --muted: #e2e8f0;
+  --border: #e2e8f0;
+  
+  --card-background: #f7fafc;
+  --card-background-hover: #edf2f7;
+  --card-foreground: #1a202c;
+  
+  /* Typographie */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-math: "STIX Two Text", "STIX Two Math", "Latin Modern Math", "Cambria Math", "Noto Serif", serif;
 
-/**
- * ELEMENTS
- * Styles pour les éléments HTML de base
- */
-@import './elements/typography.css';
-@import './elements/layout.css';
+  /* Misc */
+  --radius: 6px;
+  --content-width: 1200px;
+}
 
-/**
- * COMPONENTS
- * Styles pour les composants réutilisables
- */
-@import './components/forms.css';
-@import './components/header.css';
-@import './components/sidebar.css';
-@import './components/chat.css';
-@import './components/math.css';
-@import './components/code.css';
+/* Dark mode */
+.dark {
+  --foreground: #f0f5fa;
+  --background: #121212;
+  --muted-foreground: #a0aec0;
+  --muted: #2d3748;
+  --border: #2d3748;
+  
+  --card-background: #1a1a1a;
+  --card-background-hover: #2d2d2d;
+  --card-foreground: #e2e8f0;
+}
 
-/**
- * UTILITIES
- * Classes utilitaires hautement spécifiques
- */
-@import './utilities/animations.css';
-
-/**
- * Resets et normalisation
- */
-*, *::before, *::after {
+/* ==================================================
+   #GENERIC
+   ================================================== */
+* {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
-  -webkit-text-size-adjust: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 16px;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
-  margin: 0;
-  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.5;
+  overflow-x: hidden;
+  padding-top: 60px; /* Pour le header fixe */
   min-height: 100vh;
-  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/**
- * Utilitaires d'accessibilité
- */
-.visually-hidden {
+::selection {
+  background-color: var(--primary-100);
+  color: var(--primary-dark);
+}
+
+/* ==================================================
+   #ELEMENTS
+   ================================================== */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+/* Base typography */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+p {
+  margin-bottom: 1em;
+}
+
+ul, ol {
+  margin: 0 0 1em 1.25em;
+}
+
+blockquote {
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  border-left: 4px solid var(--primary);
+  background-color: var(--card-background);
+  color: var(--card-foreground);
+}
+
+/* Forms */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+}
+
+/* ==================================================
+   #OBJECTS
+   ================================================== */
+.container {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ================================================== 
+   #COMPONENTS
+   Import tous les fichiers de composants ici - ils sont chargés séparément via main.tsx
+   ================================================== */
+
+/* ==================================================
+   #UTILITIES
+   ================================================== */
+.sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -70,23 +244,99 @@ body {
   border-width: 0;
 }
 
-.focus-visible:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.hidden {
+  display: none;
 }
 
-/* Classes d'accessibilité pour le contraste et la motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+.visible {
+  display: block;
+}
+
+.rounded {
+  border-radius: var(--radius);
+}
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.h-full {
+  height: 100%;
+}
+
+/* Spacing utilities */
+.m-0 { margin: 0; }
+.m-1 { margin: 0.25rem; }
+.m-2 { margin: 0.5rem; }
+.m-4 { margin: 1rem; }
+.m-8 { margin: 2rem; }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+.my-1 { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+.my-2 { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.my-4 { margin-top: 1rem; margin-bottom: 1rem; }
+.my-8 { margin-top: 2rem; margin-bottom: 2rem; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 0.25rem; }
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.p-8 { padding: 2rem; }
+
+/* Animations */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* ==================================================
+   #DARK MODE
+   ================================================== */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Ajuster les variables pour le mode sombre si nécessaire */
+    color-scheme: dark;
+  }
+
+  body:not(.light-mode) {
+    --foreground: #f0f5fa;
+    --background: #121212;
+    --muted-foreground: #a0aec0;
+    --muted: #2d3748;
+    --border: #2d3748;
+    
+    --card-background: #1a1a1a;
+    --card-background-hover: #2d2d2d;
+    --card-foreground: #e2e8f0;
   }
 }

@@ -1,207 +1,268 @@
 /**
- * Styles pour les formulaires et éléments d'entrée
+ * Styles pour les formulaires et contrôles
  */
 
-/* Champs d'entrée */
-.form-control {
+/* ==================== FORMULAIRES ==================== */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+.form-label {
+  font-weight: 500;
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  margin-top: 0.25rem;
+}
+
+.form-error {
+  font-size: 0.75rem;
+  color: var(--error);
+  margin-top: 0.25rem;
+}
+
+/* ==================== INPUTS ==================== */
+.input {
   display: block;
   width: 100%;
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--font-size-base);
-  line-height: 1.5;
-  color: var(--color-text);
-  background-color: white;
-  background-clip: padding-box;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-default);
-  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+  color: var(--foreground);
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-control:focus {
-  color: var(--color-text);
-  background-color: white;
-  border-color: var(--color-primary);
-  outline: 0;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
 }
 
-.form-control::placeholder {
-  color: var(--color-text-secondary);
-  opacity: 0.7;
+.input-error {
+  border-color: var(--error);
 }
 
-.form-control:disabled {
-  background-color: var(--color-background-alt);
-  opacity: 0.7;
+.input-error:focus {
+  box-shadow: 0 0 0 2px rgba(var(--error-rgb), 0.25);
+}
+
+.input:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Étiquettes de formulaire */
-.form-label {
-  display: inline-block;
-  margin-bottom: var(--space-1);
-  font-weight: 500;
-  color: var(--color-text);
-}
-
-/* Groupes de formulaire */
-.form-group {
-  margin-bottom: var(--space-4);
-}
-
-/* Validation des formulaires */
-.form-control.is-valid {
-  border-color: #10b981;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.form-control.is-invalid {
-  border-color: #ef4444;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ef4444' stroke='none'/%3e%3c/svg%3e");
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.valid-feedback {
-  display: none;
-  width: 100%;
-  margin-top: 0.25rem;
-  font-size: var(--font-size-sm);
-  color: #10b981;
-}
-
-.invalid-feedback {
-  display: none;
-  width: 100%;
-  margin-top: 0.25rem;
-  font-size: var(--font-size-sm);
-  color: #ef4444;
-}
-
-.was-validated .form-control:valid ~ .valid-feedback,
-.form-control.is-valid ~ .valid-feedback {
-  display: block;
-}
-
-.was-validated .form-control:invalid ~ .invalid-feedback,
-.form-control.is-invalid ~ .invalid-feedback {
-  display: block;
-}
-
-/* Cases à cocher et boutons radio */
-.form-check {
-  display: block;
-  min-height: 1.5rem;
-  padding-left: 1.5em;
-  margin-bottom: 0.125rem;
-}
-
-.form-check-input {
-  float: left;
-  margin-left: -1.5em;
-  width: 1em;
-  height: 1em;
-  margin-top: 0.25em;
-  vertical-align: top;
-  background-color: #fff;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  border: 1px solid rgba(0, 0, 0, 0.25);
-  appearance: none;
-}
-
-.form-check-input[type="checkbox"] {
-  border-radius: 0.25em;
-}
-
-.form-check-input[type="radio"] {
-  border-radius: 50%;
-}
-
-.form-check-input:checked {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-.form-check-input:checked[type="checkbox"] {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
-}
-
-.form-check-input:checked[type="radio"] {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2' fill='%23fff'/%3e%3c/svg%3e");
-}
-
-.form-check-label {
-  color: var(--color-text);
-  margin-bottom: 0;
-}
-
-/* Zone de texte */
-textarea.form-control {
-  min-height: 100px;
+.textarea {
+  min-height: 6rem;
   resize: vertical;
 }
 
-/* Sélection */
-select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+/* ==================== SELECT ==================== */
+.select {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  color: var(--foreground);
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 16px 12px;
-  padding-right: 2.5rem;
+  background-position: right 0.5rem center;
+  background-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* Boutons de formulaire */
-.form-btn {
-  display: inline-block;
-  font-weight: 500;
-  line-height: 1.5;
-  text-align: center;
-  text-decoration: none;
-  vertical-align: middle;
+.select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
+}
+
+/* ==================== CHECKBOXES & RADIOS ==================== */
+.checkbox-group, .radio-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.checkbox-item, .radio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox, .radio {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s;
+  position: relative;
   cursor: pointer;
-  user-select: none;
+}
+
+.checkbox {
+  border-radius: 4px;
+}
+
+.radio {
+  border-radius: 50%;
+}
+
+.checkbox:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.checkbox:checked::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  transform: rotate(45deg);
+  border-bottom: 2px solid white;
+  border-right: 2px solid white;
+  position: absolute;
+  top: 1px;
+}
+
+.radio:checked {
+  border-color: var(--primary);
+}
+
+.radio:checked::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  position: absolute;
+}
+
+.checkbox:focus, .radio:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
+}
+
+/* ==================== BUTTONS ==================== */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
   border: 1px solid transparent;
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-base);
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-default);
 }
 
-.form-btn-primary {
+.button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-primary {
+  background-color: var(--primary);
   color: white;
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
 }
 
-.form-btn-primary:hover {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+.button-primary:hover {
+  background-color: var(--primary-dark);
 }
 
-.form-btn-secondary {
-  color: var(--color-text);
-  background-color: white;
-  border-color: var(--color-border);
+.button-secondary {
+  background-color: var(--secondary);
+  color: white;
 }
 
-.form-btn-secondary:hover {
-  color: var(--color-text);
-  background-color: var(--color-background-alt);
-  border-color: var(--color-text-secondary);
+.button-secondary:hover {
+  background-color: var(--secondary-dark);
 }
 
-/* Bouton réactif à largeur complète sur mobile */
-@media (max-width: 768px) {
-  .form-btn-mobile-full {
-    display: block;
-    width: 100%;
-  }
+.button-outline {
+  background-color: transparent;
+  border-color: var(--border);
+  color: var(--foreground);
+}
+
+.button-outline:hover {
+  background-color: var(--card-background-hover);
+}
+
+.button-ghost {
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.button-ghost:hover {
+  background-color: var(--card-background-hover);
+}
+
+.button-danger {
+  background-color: var(--error);
+  color: white;
+}
+
+.button-danger:hover {
+  background-color: var(--error-dark);
+}
+
+.button-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.button-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.button-icon {
+  padding: 0.5rem;
+}
+
+.button-icon svg {
+  width: 1rem;
+  height: 1rem;
 }

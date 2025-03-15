@@ -14,9 +14,13 @@ import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRendere
 import "./styles/mobile-fixes.css"; // Corrections spécifiques pour mobile avec maths et code
 import "./styles/header-fix.css"; // Solution définitive pour le header fixe
 
-// Début d'intégration de la nouvelle architecture CSS (tests progressifs)
+// Nouvelle architecture ITCSS (coexistence avec les anciens styles pendant la migration)
+import "./styles/main.css"; // Fichier principal avec settings, generic, elements, objects et utilities
 import "./styles/components/math.css"; // ITCSS: Styles pour le rendu mathématique
 import "./styles/components/code.css"; // ITCSS: Styles pour les blocs de code
+import "./styles/components/layout.css"; // ITCSS: Styles pour le layout (header, sidebar)
+import "./styles/components/chat.css"; // ITCSS: Styles pour l'interface de chat
+import "./styles/components/forms.css"; // ITCSS: Styles pour les formulaires
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
