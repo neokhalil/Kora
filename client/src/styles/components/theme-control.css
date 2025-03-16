@@ -1,0 +1,66 @@
+/**
+ * Contrôle des thèmes et gestion de la préférence de mode sombre/clair
+ * Ce fichier est conçu pour avoir priorité sur les préférences système
+ */
+
+/* Force le mode clair quelle que soit la préférence système */
+:root {
+  color-scheme: light !important;
+}
+
+/* Désactive la détection automatique du mode sombre pour le texte */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: light !important;
+  }
+  
+  body {
+    background-color: white !important;
+    color: #333333 !important;
+  }
+  
+  /* Rétablir tous les headings en noir */
+  h1, h2, h3, h4, h5, h6 {
+    color: #333333 !important;
+  }
+
+  /* Forcer les variables CSS du thème clair */
+  :root, body {
+    --foreground: #1a202c !important;
+    --background: #ffffff !important;
+    --muted-foreground: #718096 !important;
+    --muted: #e2e8f0 !important;
+    --border: #e2e8f0 !important;
+    --card-background: #f7fafc !important;
+    --card-foreground: #1a202c !important;
+  }
+}
+
+/* Classe pour forcer un texte noir, indépendamment du thème */
+.text-black-force {
+  color: #333333 !important;
+  -webkit-text-fill-color: #333333 !important;
+}
+
+/* Spécifiquement pour le titre de bienvenue */
+.web-welcome-title {
+  /* Variables CSS spécifiques pour ce composant */
+  --welcome-title-color: #333333;
+  
+  /* Styles avec priorité élevée */
+  color: var(--welcome-title-color) !important;
+  -webkit-text-fill-color: var(--welcome-title-color) !important;
+  text-fill-color: var(--welcome-title-color) !important;
+}
+
+/* Classe utilitaire pour les textes d'en-tête */
+.heading-text {
+  color: #333333 !important;
+  -webkit-text-fill-color: #333333 !important;
+}
+
+/* Réinitialisation des variables pour le corps de texte */
+body {
+  --body-text-color: #333333;
+  color: var(--body-text-color);
+}

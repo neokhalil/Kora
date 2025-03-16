@@ -5,6 +5,9 @@ import { setupMobileViewportFix } from "./lib/mobileViewportFix";
 // Import Tailwind CSS
 import "./index.css";
 
+// Contrôle des thèmes (clair/sombre) - doit être importé en premier pour priorité maximale
+import "./styles/components/theme-control.css"; // Contrôle du thème et désactivation du mode sombre auto
+
 // Import des fichiers CSS originaux pour maintenir la compatibilité
 import "./styles/text.css"; // Styles de texte simples
 import "./styles/animations.css"; // Animations pour l'interface utilisateur
@@ -13,7 +16,6 @@ import "./styles/mathjax.css"; // Styles pour MathJax et la coloration syntaxiqu
 import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRenderer
 import "./styles/mobile-fixes.css"; // Corrections spécifiques pour mobile avec maths et code
 import "./styles/header-fix.css"; // Solution définitive pour le header fixe
-import "./styles/fix-welcome-title.css"; // Fix spécifique pour le titre "Hello Ibrahima"
 
 // Nouvelle architecture ITCSS (coexistence avec les anciens styles pendant la migration)
 import "./styles/main.css"; // Fichier principal avec settings, generic, elements, objects et utilities
