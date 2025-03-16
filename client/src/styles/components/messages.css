@@ -25,7 +25,7 @@
 }
 
 .web-user-message .web-message-content {
-  background-color: #f0f7fe;
+  background-color: #f2f2f2; /* Gris clair au lieu de bleu */
   border-radius: 16px 16px 0 16px;
   color: #333333;
   /* Largeur adaptative au contenu, avec une limite maximale */
@@ -45,7 +45,7 @@
 .web-kora-message .web-message-content {
   background-color: #ffffff;
   /* Pas de bordure pour les messages Kora */
-  border: none;
+  border: none !important; /* Important pour s'assurer qu'aucun style ne surcharge */
   border-radius: 16px 16px 16px 0;
   color: #333333;
   max-width: 75%;
@@ -123,8 +123,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: white;
-  border: 1px solid #e2e8f0;
+  background-color: #e6f2ff; /* Bleu très clair au lieu de blanc */
+  border: 1px solid #d1e5ff; /* Bordure légèrement plus foncée */
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;
@@ -136,8 +136,8 @@
 }
 
 .web-action-button:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: #d1e5ff; /* Bleu plus foncé au survol */
+  border-color: #b3d4ff;
   transform: translateY(-1px);
 }
 
@@ -164,7 +164,7 @@
   }
   
   .web-user-message .web-message-content {
-    background-color: #f0f7fe !important;
+    background-color: #f2f2f2 !important; /* Même gris que sur desktop */
     color: #333333 !important;
     border: none !important;
   }
