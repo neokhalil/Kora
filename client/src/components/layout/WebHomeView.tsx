@@ -30,6 +30,9 @@ interface WebHomeViewProps {
 }
 
 const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
+  // État d'authentification
+  const { user, isAuthenticated } = useAuth();
+  
   // États pour le formulaire et la recherche
   const [question, setQuestion] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -717,11 +720,18 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     textShadow: "0 0 0 #333333"
                   } as React.CSSProperties}
                 >
-                  Hello Ibrahima
+                  {isAuthenticated && user?.name 
+                    ? `Bonjour ${user.name.split(' ')[0]}` 
+                    : 'Bienvenue sur Kora'}
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div>Comment puis t'aider</div>
+                  <div>Comment puis-je t'aider</div>
                   <div>aujourd'hui?</div>
+                  {!isAuthenticated && (
+                    <div className="web-welcome-auth-note">
+                      Connecte-toi pour un accès illimité
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (

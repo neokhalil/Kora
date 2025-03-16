@@ -481,3 +481,30 @@
     justify-content: center;
   }
 }
+
+/* Styles pour le conteneur d'authentification */
+.web-profile-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.web-auth-container {
+  flex: 1;
+  padding: 0.5rem;
+}
+
+.web-settings-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: #333;
+  transition: background-color 0.2s;
+}
+
+.web-settings-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
