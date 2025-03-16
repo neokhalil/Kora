@@ -22,12 +22,15 @@
 .web-question-box {
   display: flex;
   align-items: center;
-  width: 100%;
+  width: 92%;
+  max-width: 940px;
+  margin: 0 auto;
   background-color: white;
   border: 1px solid var(--border, #e2e8f0);
   border-radius: 20px;
   overflow: hidden;
   transition: border-color 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
 }
 
 .web-question-box:focus-within {
@@ -39,23 +42,30 @@
 .web-input-wrapper {
   flex: 1;
   position: relative;
+  padding: 16px 20px;
 }
 
 .web-input-wrapper input {
   width: 100%;
-  padding: 10px 16px;
+  padding: 4px 0;
   border: none;
   background: transparent;
-  font-size: 16px;
+  font-size: 1.05rem;
   color: var(--foreground, #1a202c);
   outline: none;
+}
+
+.web-input-wrapper input::placeholder {
+  color: #9ca3af;
+  font-size: 1.05rem;
 }
 
 /* Boutons d'action dans la zone de question */
 .web-action-buttons {
   display: flex;
-  align-items: center;
-  padding: 0 10px 0 0;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 0;
 }
 
 .web-image-button,
@@ -64,16 +74,25 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  margin-left: 4px;
   border: none;
   border-radius: 50%;
-  background-color: transparent;
-  color: var(--muted-foreground, #718096);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+}
+
+.web-image-button {
+  background-color: #f5f5f5;
+  color: #6b7280;
+  margin-left: 20px;
+}
+
+.web-mic-button {
+  background-color: #000000;
+  color: white;
+  margin-right: 20px;
 }
 
 .web-send-button {
