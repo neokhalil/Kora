@@ -3,6 +3,19 @@
  * Composant: forms.css - Partie de l'architecture ITCSS
  */
 
+/* Variables CSS pour les couleurs communes - ITCSS: settings */
+:root {
+  --input-border-color: #e0e0e0;
+  --button-primary-bg: #1a1a1a;
+  --button-primary-hover: #333333;
+  --button-recording-bg: #ef4444;
+  --button-recording-hover: #dc2626;
+  --background-light: #f9fafb;
+  --background-white: #ffffff;
+  --text-dark: #1a202c;
+  --text-muted: #718096;
+}
+
 /* Zone de question principale - style unifié entre mobile et desktop */
 .web-question-container {
   position: fixed;
@@ -39,8 +52,8 @@
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: white;
-  border: 1px solid #e0e0e0; /* Bordure fine et légère */
+  background-color: var(--background-white);
+  border: 1px solid var(--input-border-color); /* Bordure fine et légère */
   border-radius: 20px;
   overflow: hidden;
   transition: all 0.2s;
@@ -106,8 +119,9 @@
 }
 
 .web-mic-button.recording {
-  background-color: #ef4444;
+  background-color: #ef4444; /* Rouge pour le mode enregistrement */
   color: white;
+  /* L'animation est définie dans WebHomeView.css */
 }
 
 .web-image-button:hover {
@@ -123,7 +137,7 @@
 }
 
 .web-mic-button.recording:hover {
-  background-color: #dc2626;
+  background-color: #dc2626; /* Rouge légèrement plus foncé au survol */
 }
 
 /* Styles pour l'enregistreur vocal */

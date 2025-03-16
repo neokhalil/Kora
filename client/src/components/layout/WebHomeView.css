@@ -287,54 +287,16 @@
 
 /* Styles pour les boutons d'action des messages de Kora désactivés - déplacés dans messages.css (ITCSS) */
 
-/* Style pour le formulaire de question */
-.web-question-form {
-  width: 100%;
-}
+/* Suppression du style .web-question-form - Maintenant géré dans forms.css (ITCSS) */
 
 /* Suppression du style .web-question-box - Maintenant géré dans forms.css (ITCSS) */
 
 /* Suppression des styles .web-input-wrapper et .web-input-wrapper input - Maintenant gérés dans forms.css (ITCSS) */
 
-.web-action-buttons {
-  display: flex;
-  gap: 0.75rem;
-}
+/* Suppression des styles redondants pour les boutons d'action - Styles gérés dans forms.css (ITCSS) */
 
-/* Styles pour les boutons d'action */
-.web-image-button,
-.web-mic-button,
-.web-send-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background-color: #ffffff;
-  border: 1px solid #e6e6e6;
-  cursor: pointer;
-  color: #666;
-  transition: all 0.2s;
-}
-
-.web-image-button:hover,
-.web-mic-button:hover,
-.web-send-button:hover {
-  color: #0066ff;
-  border-color: #0066ff;
-  transform: scale(1.05);
-}
-
-.web-send-button {
-  background-color: #000000;
-  color: white;
-  border: none;
-}
-
-/* Bouton micro en mode enregistrement */
+/* Styles d'animation pour le bouton micro en mode enregistrement */
 .web-mic-button.recording {
-  color: #ff3b30;
   animation: pulse-recording 1.5s infinite;
 }
 
