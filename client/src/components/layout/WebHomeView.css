@@ -508,3 +508,36 @@
 .web-settings-link:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }
+
+/* Styles pour le message de bienvenue */
+.web-welcome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  height: calc(100vh - 220px);
+}
+
+.web-welcome-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.web-welcome-subtitle {
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin-bottom: 2rem;
+  line-height: 1.3;
+  color: #666;
+}
+
+.web-welcome-auth-note {
+  font-size: 1rem;
+  color: #0066ff;
+  margin-top: 1rem;
+  font-weight: 500;
+}
