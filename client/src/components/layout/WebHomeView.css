@@ -268,13 +268,13 @@
 
 /* Style pour le texte d'information en bas */
 .web-question-footer {
-  margin: 0; /* Suppression de toutes les marges */
+  margin: 0; /* Suppression des marges horizontales */
+  margin-top: 8px; /* Plus d'espace au-dessus du texte */
   padding: 0; /* Suppression de tout padding */
-  font-size: 0.7rem; /* Texte plus petit */
+  font-size: 0.8rem; /* Texte légèrement plus grand */
   color: #666;
   text-align: center;
-  line-height: 1; /* Ligne normale */
-  margin-top: 0.2rem; /* Petit espace au-dessus du texte */
+  line-height: 1.2; /* Ligne légèrement plus haute */
 }
 
 /* Style pour le nom KORA dans le footer */
