@@ -123,10 +123,30 @@ export const insertLessonSchema = createInsertSchema(lessons).pick({
   topicId: true,
 });
 
+// Conversations table - stores groups of interactions for history
+export const conversations = pgTable("conversations", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id),
+  title: text("title").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  summary: text("summary"),
+  isArchived: boolean("is_archived").default(false),
+  lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
+});
+
+export const insertConversationSchema = createInsertSchema(conversations).pick({
+  userId: true,
+  title: true,
+  summary: true,
+  isArchived: true,
+});
+
 // Interactions table - stores user-AI conversations
 export const interactions = pgTable("interactions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id),
+  conversationId: integer("conversation_id").references(() => conversations.id),
   topicId: integer("topic_id").references(() => topics.id),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
@@ -140,6 +160,7 @@ export const interactions = pgTable("interactions", {
 
 export const insertInteractionSchema = createInsertSchema(interactions).pick({
   userId: true,
+  conversationId: true,
   topicId: true,
   question: true,
   answer: true,
@@ -178,6 +199,15 @@ export const insertInteractionTagSchema = createInsertSchema(interactionTags).pi
 export const usersRelations = relations(users, ({ many }) => ({
   interactions: many(interactions),
   questions: many(questions),
+  conversations: many(conversations),
+}));
+
+export const conversationsRelations = relations(conversations, ({ one, many }) => ({
+  user: one(users, {
+    fields: [conversations.userId],
+    references: [users.id],
+  }),
+  interactions: many(interactions),
 }));
 
 export const topicsRelations = relations(topics, ({ one, many }) => ({
@@ -197,6 +227,10 @@ export const interactionsRelations = relations(interactions, ({ one, many }) => 
   user: one(users, {
     fields: [interactions.userId],
     references: [users.id],
+  }),
+  conversation: one(conversations, {
+    fields: [interactions.conversationId],
+    references: [conversations.id],
   }),
   topic: one(topics, {
     fields: [interactions.topicId],
@@ -235,6 +269,9 @@ export type Lesson = typeof lessons.$inferSelect;
 
 export type InsertField = z.infer<typeof insertFieldSchema>;
 export type Field = typeof fields.$inferSelect;
+
+export type InsertConversation = z.infer<typeof insertConversationSchema>;
+export type Conversation = typeof conversations.$inferSelect;
 
 export type InsertInteraction = z.infer<typeof insertInteractionSchema>;
 export type Interaction = typeof interactions.$inferSelect;
