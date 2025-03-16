@@ -6,6 +6,8 @@ import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
+import AuthButton from '@/components/auth/AuthButton';
+import { useAuth } from '@/hooks/use-auth';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -688,13 +690,12 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               )}
             </div>
 
-            {/* Profil utilisateur en bas */}
+            {/* Section d'authentification en bas */}
             <div className="web-profile-container">
               <div className="web-profile-wrapper">
-                <Link href="/profile" className="web-profile-link">
-                  <User size={16} strokeWidth={2} />
-                  <span>Mon profil</span>
-                </Link>
+                <div className="web-auth-container">
+                  <AuthButton />
+                </div>
                 <Link href="/settings" className="web-settings-link">
                   <Settings size={16} strokeWidth={2} />
                 </Link>
