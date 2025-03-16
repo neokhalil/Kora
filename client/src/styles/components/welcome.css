@@ -1,0 +1,39 @@
+/**
+ * Styles pour la page d'accueil (le message de bienvenue)
+ */
+
+/* Container de bienvenue */
+.web-welcome-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  text-align: center;
+  height: 100%;
+}
+
+/* Titre de bienvenue (Hello Ibrahima) */
+.web-welcome-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333333 !important; /* Forcer la couleur en noir */
+}
+
+/* Sous-titre de bienvenue */
+.web-welcome-subtitle {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #555555;
+}
+
+/* Styles mobiles spécifiques */
+@media (max-width: 640px) {
+  .web-welcome-title {
+    color: #333333 !important; /* Force la couleur noire sur mobile */
+    opacity: 1 !important; /* S'assurer que le texte est complètement opaque */
+    font-weight: 700 !important;
+  }
+}

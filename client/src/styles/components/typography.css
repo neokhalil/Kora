@@ -66,7 +66,8 @@ body {
 h1.greeting, 
 h2.greeting,
 h3.greeting,
-.web-message-content strong:first-child {
+.web-message-content strong:first-child,
+.web-welcome-title {
   color: #333333 !important;
   font-weight: 600;
 }
