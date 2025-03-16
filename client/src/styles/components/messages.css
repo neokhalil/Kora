@@ -25,11 +25,16 @@
 }
 
 .web-user-message .web-message-content {
-  background-color: #f0f5ff;
+  background-color: #f0f7fe;
   border-radius: 16px 16px 0 16px;
   color: #333333;
-  max-width: 75%;
-  padding: 12px 16px;
+  /* Largeur adaptative au contenu, avec une limite maximale */
+  display: inline-block;
+  max-width: max-content;
+  padding: 10px 14px;
+  /* Pas de bordure pour le message utilisateur */
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 /* Messages de KORA */
@@ -39,11 +44,14 @@
 
 .web-kora-message .web-message-content {
   background-color: #ffffff;
-  border: 1px solid #e8e8e8;
+  /* Pas de bordure pour les messages Kora */
+  border: none;
   border-radius: 16px 16px 16px 0;
   color: #333333;
   max-width: 75%;
-  padding: 12px 16px;
+  padding: 14px 18px;
+  /* Légère ombre pour contraste sans bordure */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Animation de réflexion (3 points) */
@@ -101,6 +109,44 @@
   object-fit: contain;
 }
 
+/* Boutons d'action sous les messages de Kora */
+.web-message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-bottom: 16px;
+  margin-left: 16px; /* Aligner avec le message */
+}
+
+.web-action-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.web-action-button:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.web-action-button svg {
+  width: 16px;
+  height: 16px;
+  color: #6b7280;
+}
+
 /* Adaptations pour les différentes tailles d'écran */
 @media screen and (max-width: 768px) {
   .web-user-message .web-message-content,
@@ -113,12 +159,25 @@
   .web-kora-message .web-message-content {
     background-color: #ffffff !important;
     color: #333333 !important;
-    border: 1px solid #e8e8e8 !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   }
   
   .web-user-message .web-message-content {
-    background-color: #f0f5ff !important;
+    background-color: #f0f7fe !important;
     color: #333333 !important;
+    border: none !important;
+  }
+  
+  .web-message-actions {
+    margin-top: 8px;
+    padding-bottom: 12px;
+    margin-left: 8px;
+  }
+  
+  .web-action-button {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }
 
