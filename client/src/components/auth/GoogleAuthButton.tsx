@@ -89,7 +89,7 @@ export default function GoogleAuthButton({
     if (window.google && window.google.accounts && buttonRef.current) {
       // Configuration Google Sign-In
       window.google.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '',
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
         callback: handleCredentialResponse,
         auto_select: false,
         cancel_on_tap_outside: true,

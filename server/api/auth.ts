@@ -143,6 +143,13 @@ export const handleGoogleLogin = async (req: Request, res: Response) => {
   try {
     const { credential } = req.body;
     
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(500).json({ 
+        error: 'Configuration Google manquante sur le serveur',
+        missingConfig: true
+      });
+    }
+    
     // Vérifier le jeton d'identité Google
     const ticket = await client.verifyIdToken({
       idToken: credential,
@@ -178,10 +185,10 @@ export const handleGoogleLogin = async (req: Request, res: Response) => {
     // Générer un token JWT pour l'utilisateur
     const token = generateToken(user.id as string);
     
-    // Effacer le compteur d'utilisation anonyme
-    if (req.session) {
-      req.session.anonymousUsage = 0;
-    }
+    // Effacer le compteur d'utilisation anonyme de cette IP
+    const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown-ip';
+    const ipKey = typeof clientIp === 'string' ? clientIp : Array.isArray(clientIp) ? clientIp[0] : 'unknown-ip';
+    anonymousUsageStore.delete(ipKey);
     
     // Renvoyer le jeton et les informations utilisateur
     res.json({
@@ -202,46 +209,66 @@ export const handleGoogleLogin = async (req: Request, res: Response) => {
 // Obtenir l'utilisateur actuel
 export const getCurrentUser = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).userId;
+    const authHeader = req.headers.authorization;
     
-    if (!userId) {
-      return res.status(401).json({ error: 'Non authentifié' });
+    if (!authHeader) {
+      return res.status(401).json({ 
+        error: 'Non authentifié',
+        isAuthenticated: false
+      });
+    }
+    
+    const token = authHeader.split(' ')[1];
+    const payload = verifyToken(token);
+    
+    if (!payload || typeof payload !== 'object' || !('sub' in payload)) {
+      return res.status(401).json({ 
+        error: 'Token invalide',
+        isAuthenticated: false
+      });
     }
     
     // Récupérer l'utilisateur depuis la base de données
     const user = await db.query.users.findFirst({
-      where: eq(users.id, userId as string),
+      where: eq(users.id, payload.sub as string),
     });
     
     if (!user) {
-      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+      return res.status(404).json({ 
+        error: 'Utilisateur non trouvé',
+        isAuthenticated: false
+      });
     }
     
-    // Renvoyer les informations de l'utilisateur (sans le mot de passe)
+    // Renvoyer les informations de l'utilisateur
     res.json({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      image: user.image,
+      isAuthenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+      }
     });
   } catch (error) {
     console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ 
+      error: 'Erreur serveur',
+      isAuthenticated: false
+    });
   }
 };
 
 // Déconnexion
 export const handleLogout = (req: Request, res: Response) => {
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Erreur lors de la déconnexion' });
-      }
-      
-      res.clearCookie('connect.sid');
-      res.json({ message: 'Déconnecté avec succès' });
-    });
-  } else {
-    res.json({ message: 'Déconnecté avec succès' });
-  }
+  // La déconnexion avec JWT est gérée côté client en supprimant le token
+  // Le serveur n'a pas besoin de conserver une liste de jetons invalidés pour cette implémentation simple
+  
+  // On pourrait implémenter une liste noire de jetons JWT si nécessaire
+  // Pour l'instant, nous nous contentons de confirmer la déconnexion
+  
+  res.json({ 
+    message: 'Déconnecté avec succès',
+    success: true
+  });
 };

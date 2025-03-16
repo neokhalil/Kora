@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Save to database
           const interaction = await dbStorage.createInteraction({
-            userId: parseInt(userId as string, 10),
+            userId: Number(userId), // Conversion en number
             topicId: null, // Could be set based on subject detection
             question: query || "Analyse d'image",
             answer: response,
@@ -1117,7 +1117,8 @@ L'indice doit être subtil, instructif et faire réfléchir l'étudiant.`;
       
       // Get conversations for the user
       // Example implementation - to be completed with actual storage calls
-      const conversations = []; // await dbStorage.getConversationsByUser(userId);
+      const conversations: Array<{id: string; title: string; createdAt: string}> = []; 
+      // conversations = await dbStorage.getConversationsByUser(userId);
       
       res.json(conversations);
     } catch (error) {
