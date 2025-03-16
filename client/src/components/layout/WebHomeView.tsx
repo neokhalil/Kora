@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, PlusCircle, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
@@ -497,6 +497,19 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   };
 
+  // Fonction pour démarrer une nouvelle conversation
+  const startNewConversation = () => {
+    // Réinitialiser les messages et l'état de la conversation
+    setMessages([]);
+    setConversationStarted(false);
+    setIsThinking(false);
+    setQuestion('');
+    setUploadedImage(null);
+    setImagePreviewUrl(null);
+    setIsRecordingVoice(false);
+    setIsImageUploadModalOpen(false);
+  };
+
   // Fonction pour afficher les messages de la conversation
   const renderMessage = (message: Message) => {
     const isUserMessage = message.sender === 'user';
@@ -616,17 +629,24 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   onChange={handleSearchChange}
                 />
               </form>
-              <button className="web-new-chat-button" aria-label="Nouvelle conversation">
-                <PenLine size={16} strokeWidth={2} />
+              <button 
+                className="web-new-chat-button" 
+                aria-label="Nouvelle conversation"
+                onClick={startNewConversation}
+              >
+                <PlusCircle size={16} strokeWidth={2} />
               </button>
             </div>
 
-            {/* Section Aide aux études */}
+            {/* Section Nouvelle discussion */}
             <div className="web-sidebar-section">
-              <a href="/" className="web-sidebar-link aide-etudes">
-                <BookIcon className="web-icon-book" />
-                <span>Aide aux études</span>
-              </a>
+              <button 
+                onClick={startNewConversation} 
+                className="web-sidebar-link nouvelle-discussion"
+              >
+                <PlusCircle className="web-icon-plus" size={18} strokeWidth={2} />
+                <span>Nouvelle discussion</span>
+              </button>
             </div>
 
             {/* Séparateur */}
