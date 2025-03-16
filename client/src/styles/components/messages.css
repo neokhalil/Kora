@@ -50,8 +50,8 @@
   color: #333333;
   max-width: 75%;
   padding: 14px 18px;
-  /* Légère ombre pour contraste sans bordure */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  /* Aucune ombre */
+  box-shadow: none !important;
 }
 
 /* Animation de réflexion (3 points) */
@@ -123,8 +123,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #e6f2ff; /* Bleu très clair au lieu de blanc */
-  border: 1px solid #d1e5ff; /* Bordure légèrement plus foncée */
+  background-color: #f0f9ff; /* Bleu encore plus clair */
+  border: 1px solid #e1f0ff; /* Bordure plus claire */
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;

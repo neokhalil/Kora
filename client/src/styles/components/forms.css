@@ -14,7 +14,7 @@
   right: 0;
   padding: 12px 16px 16px;
   background-color: white;
-  border-top: 1px solid var(--border, #e2e8f0);
+  border-top: none; /* Suppression de la bordure supérieure */
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.03);
   z-index: 100;
 }
@@ -47,8 +47,9 @@
 }
 
 .web-question-box:focus-within {
-  border-color: var(--primary, #2563eb);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  border-color: var(--border, #e2e8f0);
+  /* Suppression de l'effet bleu au focus */
+  box-shadow: none;
 }
 
 /* Wrapper d'input pour maintenir l'apparence appropriée */
@@ -93,7 +94,12 @@
 }
 
 .web-send-button {
-  background-color: var(--primary, #2563eb);
+  background-color: #1a1a1a; /* Fond noir pour le bouton d'envoi */
+  color: white;
+}
+
+.web-mic-button {
+  background-color: #1a1a1a; /* Fond noir pour le bouton micro */
   color: white;
 }
 
@@ -102,13 +108,16 @@
   color: white;
 }
 
-.web-mic-button:hover,
 .web-image-button:hover {
   background-color: var(--muted, #e2e8f0);
 }
 
+.web-mic-button:hover {
+  background-color: #333333; /* Effet de survol plus clair que le noir */
+}
+
 .web-send-button:hover {
-  background-color: #1d4ed8;
+  background-color: #333333; /* Effet de survol plus clair que le noir */
 }
 
 .web-mic-button.recording:hover {
