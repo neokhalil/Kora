@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Menu, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import SideMenu from './SideMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
+import HamburgerIcon from '../ui/HamburgerIcon';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -97,7 +98,7 @@ const Header: React.FC = () => {
                 {isMenuOpen ? (
                   <X size={24} className="text-gray-800 animate-to-x" />
                 ) : (
-                  <Menu size={24} className="text-gray-800 animate-to-menu" />
+                  <HamburgerIcon size={24} className="text-gray-800 animate-to-menu" />
                 )}
               </div>
             </button>
