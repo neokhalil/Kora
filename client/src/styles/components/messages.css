@@ -8,8 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0;
+  padding: 16px 0 120px; /* Ajout d'un padding-bottom important pour éviter que la zone de texte ne cache les messages */
   width: 100%;
+  margin-bottom: 20px; /* Marge supplémentaire au bas de la liste */
 }
 
 /* Styles communs pour tous les messages */
@@ -113,10 +114,11 @@
 .web-message-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-  padding-bottom: 16px;
+  gap: 10px;
+  margin-top: 14px;
+  padding-bottom: 20px;
   margin-left: 16px; /* Aligner avec le message */
+  z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
 }
 
 .web-action-button {
@@ -171,9 +173,10 @@
   }
   
   .web-message-actions {
-    margin-top: 8px;
-    padding-bottom: 12px;
+    margin-top: 10px;
+    padding-bottom: 16px;
     margin-left: 8px;
+    gap: 8px; /* Espacement réduit entre les boutons sur mobile */
   }
   
   .web-action-button {
@@ -190,6 +193,6 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0;
+    padding: 12px 0 100px; /* Espacement inférieur adapté pour les petits écrans */
   }
 }
