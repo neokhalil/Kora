@@ -26,7 +26,7 @@
   left: 0;
   right: 0;
   padding: 12px 16px 16px;
-  background-color: white;
+  background-color: var(--background-white);
   border-top: none; /* Suppression de la bordure supérieure */
   box-shadow: none; /* Suppression de l'ombre */
   z-index: 100;
@@ -109,18 +109,18 @@
 }
 
 .web-send-button {
-  background-color: #1a1a1a; /* Fond noir pour le bouton d'envoi */
-  color: white;
+  background-color: var(--button-primary-bg); /* Fond noir pour le bouton d'envoi */
+  color: var(--background-white);
 }
 
 .web-mic-button {
-  background-color: #1a1a1a; /* Fond noir pour le bouton micro */
-  color: white;
+  background-color: var(--button-primary-bg); /* Fond noir pour le bouton micro */
+  color: var(--background-white);
 }
 
 .web-mic-button.recording {
-  background-color: #ef4444; /* Rouge pour le mode enregistrement */
-  color: white;
+  background-color: var(--button-recording-bg); /* Rouge pour le mode enregistrement */
+  color: var(--background-white);
   /* L'animation est définie dans WebHomeView.css */
 }
 
@@ -129,15 +129,15 @@
 }
 
 .web-mic-button:hover {
-  background-color: #333333; /* Effet de survol plus clair que le noir */
+  background-color: var(--button-primary-hover); /* Effet de survol plus clair que le noir */
 }
 
 .web-send-button:hover {
-  background-color: #333333; /* Effet de survol plus clair que le noir */
+  background-color: var(--button-primary-hover); /* Effet de survol plus clair que le noir */
 }
 
 .web-mic-button.recording:hover {
-  background-color: #dc2626; /* Rouge légèrement plus foncé au survol */
+  background-color: var(--button-recording-hover); /* Rouge légèrement plus foncé au survol */
 }
 
 /* Styles pour l'enregistreur vocal */
@@ -164,7 +164,7 @@
 }
 
 .web-modal {
-  background-color: white;
+  background-color: var(--background-white);
   border-radius: 12px;
   width: 100%;
   max-width: 500px;
@@ -263,7 +263,7 @@
 .web-modal-button.submit {
   background-color: var(--primary, #2563eb);
   border: 1px solid var(--primary, #2563eb);
-  color: white;
+  color: var(--background-white);
 }
 
 .web-modal-button.cancel:hover {
@@ -284,7 +284,7 @@
   .web-question-box {
     border-radius: 18px;
     border: none; /* Suppression de la bordure sur mobile également */
-    background-color: #f9fafb;
+    background-color: var(--background-light);
     /* Suppression de l'effet d'ombre sur mobile */
   }
   
@@ -319,7 +319,7 @@
   .web-question-box {
     /* Suppression des bordures sur très petits écrans */
     border: none;
-    background-color: #f9fafb;
+    background-color: var(--background-light);
     border-radius: 16px;
     /* Suppression de l'effet d'ombre sur très petits écrans */
   }
