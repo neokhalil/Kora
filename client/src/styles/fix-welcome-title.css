@@ -1,0 +1,37 @@
+/**
+ * Fix spécifique pour le titre Hello Ibrahima
+ * Ce fichier est conçu pour être chargé en dernier pour garantir qu'il écrase tous les autres styles
+ */
+
+/* Style important qui doit écraser tous les autres */
+.web-welcome-title {
+  color: #333333 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  -webkit-text-fill-color: #333333 !important;
+  text-fill-color: #333333 !important;
+}
+
+/* Ciblage extrêmement spécifique pour augmenter la priorité */
+body .web-home-container .web-layout .web-main-content .web-welcome-container .web-welcome-title {
+  color: #333333 !important;
+}
+
+/* Fix spécifique pour mobile */
+@media (max-width: 640px) {
+  .web-welcome-title, 
+  h1.web-welcome-title,
+  .web-welcome-container h1,
+  .web-welcome-container .web-welcome-title {
+    color: #333333 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    -webkit-text-fill-color: #333333 !important;
+    text-fill-color: #333333 !important;
+  }
+  
+  /* Test de couleur de fond pour voir s'il y a un problème de transparence */
+  .web-welcome-container {
+    background-color: transparent !important;
+  }
+}

@@ -13,6 +13,7 @@ import "./styles/mathjax.css"; // Styles pour MathJax et la coloration syntaxiqu
 import "./styles/content-renderer.css"; // Styles pour le nouveau ContentRenderer
 import "./styles/mobile-fixes.css"; // Corrections spécifiques pour mobile avec maths et code
 import "./styles/header-fix.css"; // Solution définitive pour le header fixe
+import "./styles/fix-welcome-title.css"; // Fix spécifique pour le titre "Hello Ibrahima"
 
 // Nouvelle architecture ITCSS (coexistence avec les anciens styles pendant la migration)
 import "./styles/main.css"; // Fichier principal avec settings, generic, elements, objects et utilities
