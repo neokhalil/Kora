@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { BrainCircuit, BookOpen, FileQuestion, History, Settings, Sparkles } from 'lucide-react';
+import { BrainCircuit, PlusCircle, FileQuestion, History, Settings, Sparkles } from 'lucide-react';
 import { NavItem, DiscussionTopic } from './types';
 
 export const navItems: NavItem[] = [
   {
-    label: 'Aide aux devoirs',
+    label: 'Nouvelle discussion',
     path: '/',
-    icon: <BookOpen className="h-5 w-5" />
+    icon: <PlusCircle className="h-5 w-5" />
   }
 ];
 

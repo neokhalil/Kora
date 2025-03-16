@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search, PlusCircle } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import BookIcon from '@/components/ui/BookIcon';
 
@@ -30,12 +30,12 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [readOnly, setReadOnly] = useState(true);
   
-  // Éléments fixes du menu (aide aux études)
+  // Éléments fixes du menu (nouvelle discussion)
   const menuItems: MenuItem[] = [
     { 
-      id: 'studies-help', 
-      title: 'Aide aux études', 
-      icon: <BookIcon className="h-5 w-5 mr-2" />, 
+      id: 'new-discussion', 
+      title: 'Nouvelle discussion', 
+      icon: <PlusCircle className="h-5 w-5 mr-2" />, 
       href: '/chat-assistant' 
     }
   ];
@@ -178,7 +178,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
           
-          {/* Section Aide aux devoirs - filtrée par recherche */}
+          {/* Section Nouvelle discussion - filtrée par recherche */}
           <div className="mt-2 px-4">
             {filteredMenuItems.map((item) => (
               <Link
