@@ -44,7 +44,7 @@
   border-radius: 20px;
   overflow: hidden;
   transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Légère ombre pour remplacer la bordure */
+  /* Suppression de l'effet d'ombre */
 }
 
 .web-question-box:focus-within {
@@ -269,7 +269,7 @@
     border-radius: 18px;
     border: none; /* Suppression de la bordure sur mobile également */
     background-color: #f9fafb;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); /* Légère ombre cohérente sur mobile */
+    /* Suppression de l'effet d'ombre sur mobile */
   }
   
   .web-input-wrapper input {
@@ -305,7 +305,7 @@
     border: none;
     background-color: #f9fafb;
     border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); /* Ombre cohérente sur tous les appareils */
+    /* Suppression de l'effet d'ombre sur très petits écrans */
   }
   
   .web-input-wrapper input {
