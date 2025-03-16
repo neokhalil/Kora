@@ -3,18 +3,18 @@
   "name": "Kora - Plateforme Éducative",
   "icons": [
     {
-      "src": "assets/brain-icon.svg",
+      "src": "icons/kora-icon.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/svg+xml"
+      "type": "image/png"
     },
     {
-      "src": "assets/brain-icon.svg",
-      "type": "image/svg+xml",
+      "src": "icons/kora-icon.png",
+      "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "assets/brain-icon.svg",
-      "type": "image/svg+xml",
+      "src": "icons/kora-icon.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ],
