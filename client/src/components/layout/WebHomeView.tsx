@@ -502,27 +502,26 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const isUserMessage = message.sender === 'user';
     
     return (
-      <div 
-        key={message.id}
-        className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}
-      >
-        {/* Image de l'utilisateur si présente */}
-        {message.imageUrl && (
-          <div className="web-message-image-container">
-            <img 
-              src={message.imageUrl} 
-              alt="Uploaded content" 
-              className="web-message-image"
-            />
+      <div key={message.id}>
+        <div className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}>
+          {/* Image de l'utilisateur si présente */}
+          {message.imageUrl && (
+            <div className="web-message-image-container">
+              <img 
+                src={message.imageUrl} 
+                alt="Uploaded content" 
+                className="web-message-image"
+              />
+            </div>
+          )}
+          
+          {/* Contenu du message avec formatage mathématique et code */}
+          <div className="web-message-content">
+            <ContentRenderer content={message.content} className="web-content" />
           </div>
-        )}
-        
-        {/* Contenu du message avec formatage mathématique et code */}
-        <div className="web-message-content">
-          <ContentRenderer content={message.content} className="web-content" />
         </div>
         
-        {/* Boutons d'action standards pour les messages de Kora */}
+        {/* Boutons d'action standards pour les messages de Kora - maintenant à l'extérieur du div message */}
         {!isUserMessage && message.allowActions && (
           <div className="web-message-actions">
             <button 
@@ -569,7 +568,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           </div>
         )}
         
-        {/* Bouton d'indice pour les exercices */}
+        {/* Bouton d'indice pour les exercices - également à l'extérieur du div message */}
         {!isUserMessage && message.isChallenge && message.challengeId && (
           <div className="web-message-actions web-challenge-actions">
             <button 
