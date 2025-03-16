@@ -40,16 +40,16 @@
   align-items: center;
   width: 100%;
   background-color: white;
-  border: 1px solid var(--border, #e2e8f0);
+  border: none; /* Suppression de la bordure */
   border-radius: 20px;
   overflow: hidden;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Légère ombre pour remplacer la bordure */
 }
 
 .web-question-box:focus-within {
-  border-color: var(--border, #e2e8f0);
-  /* Suppression de l'effet bleu au focus */
-  box-shadow: none;
+  /* Léger effet de surbrillance au focus, sans bordure bleue */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
 }
 
 /* Wrapper d'input pour maintenir l'apparence appropriée */
@@ -267,9 +267,9 @@
   
   .web-question-box {
     border-radius: 18px;
-    /* Pour mobile, on peut réduire/supprimer les bordures */
-    border-width: 1px;
+    border: none; /* Suppression de la bordure sur mobile également */
     background-color: #f9fafb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); /* Légère ombre cohérente sur mobile */
   }
   
   .web-input-wrapper input {
@@ -305,6 +305,7 @@
     border: none;
     background-color: #f9fafb;
     border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); /* Ombre cohérente sur tous les appareils */
   }
   
   .web-input-wrapper input {

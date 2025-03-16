@@ -125,8 +125,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #f0f9ff; /* Bleu encore plus clair */
-  border: 1px solid #e1f0ff; /* Bordure plus claire */
+  background-color: #f9fafb; /* Même couleur que sur mobile */
+  border: 1px solid #f0f0f0; /* Bordure plus légère */
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;
@@ -138,8 +138,8 @@
 }
 
 .web-action-button:hover {
-  background-color: #d1e5ff; /* Bleu plus foncé au survol */
-  border-color: #b3d4ff;
+  background-color: #f0f0f0; /* Gris légèrement plus foncé au survol */
+  border-color: #e5e5e5;
   transform: translateY(-1px);
 }
 
