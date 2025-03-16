@@ -28,6 +28,7 @@ import VoiceRecorder from '@/components/VoiceRecorder';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
+import { useAuth } from '@/hooks/use-auth';
 
 // Define the message types
 interface ChallengeData {
@@ -74,6 +75,12 @@ const ChatAssistant: React.FC = () => {
     currentText: ''
   });
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  // État pour la limitation d'utilisation
+  const [anonymousQuestionCount, setAnonymousQuestionCount] = useState(0);
+  const MAX_ANONYMOUS_QUESTIONS = 3; // Limite de questions pour les utilisateurs non authentifiés
+  
+  // État d'authentification
+  const { user, isAuthenticated } = useAuth();
   
   // Vérifier si c'est un appareil mobile
   const isMobile = useIsMobile();
