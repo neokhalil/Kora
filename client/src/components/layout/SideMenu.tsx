@@ -35,7 +35,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
     { 
       id: 'new-discussion', 
       title: 'Nouvelle discussion', 
-      icon: <PlusCircle className="h-5 w-5 mr-2" />, 
+      icon: <PlusCircle className="h-5 w-5 mr-2 web-icon-plus" />, 
       href: '/chat-assistant' 
     }
   ];
@@ -185,7 +185,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
                 key={item.id}
                 href={item.href}
                 onClick={() => onClose()}
-                className="flex items-center py-3 hover:bg-gray-100 transition-colors"
+                className="flex items-center py-3 hover:bg-gray-100 transition-colors nouvelle-discussion"
                 role="button"
               >
                 {item.icon}
