@@ -1,39 +1,80 @@
 /**
- * Styles pour la page d'accueil (le message de bienvenue)
+ * Styles pour l'écran de bienvenue de l'application Kora
+ * Composant: welcome.css - Partie de l'architecture ITCSS
  */
 
-/* Container de bienvenue */
+/* Container principal pour l'écran de bienvenue */
 .web-welcome-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  padding: 2rem 1rem;
+  justify-content: center;
   text-align: center;
-  height: 100%;
+  padding: 2rem 1rem;
+  min-height: 50vh;
+  width: 100%;
 }
 
-/* Titre de bienvenue (Hello Ibrahima) */
+/* Titre de bienvenue avec des règles de priorité élevée */
 .web-welcome-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
-  margin-bottom: 1rem;
-  color: #333333 !important; /* Forcer la couleur en noir */
+  color: #333333 !important;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 0 #333333;
+  -webkit-text-fill-color: #333333 !important;
 }
 
 /* Sous-titre de bienvenue */
 .web-welcome-subtitle {
-  font-size: 1.5rem;
-  font-weight: 400;
-  line-height: 1.4;
-  color: #555555;
+  font-size: 1.25rem;
+  color: var(--muted-foreground, #718096);
+  margin-top: 0.5rem;
 }
 
-/* Styles mobiles spécifiques */
-@media (max-width: 640px) {
-  .web-welcome-title {
-    color: #333333 !important; /* Force la couleur noire sur mobile */
-    opacity: 1 !important; /* S'assurer que le texte est complètement opaque */
-    font-weight: 700 !important;
+/* Adaptations pour mobile */
+@media screen and (max-width: 768px) {
+  .web-welcome-container {
+    padding: 1.5rem 1rem;
+    min-height: 40vh;
   }
+  
+  .web-welcome-title {
+    font-size: 1.75rem;
+    color: #333333 !important;
+    text-shadow: none;
+  }
+  
+  .web-welcome-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Adaptations pour les très petits écrans */
+@media screen and (max-width: 480px) {
+  .web-welcome-container {
+    padding: 1rem 0.75rem;
+    min-height: 35vh;
+  }
+  
+  .web-welcome-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation d'entrée pour l'écran de bienvenue */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.web-welcome-container {
+  animation: fadeIn 0.5s ease-out;
 }

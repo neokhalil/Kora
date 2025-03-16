@@ -1,73 +1,125 @@
 /**
- * Styles pour la typographie et les éléments de texte
+ * Styles de typographie pour l'application Kora
+ * Composant: typography.css - Partie de l'architecture ITCSS
  */
 
-/* ==================== TYPOGRAPHIE DE BASE ==================== */
+/* Styles de base pour tous les textes */
 body {
-  font-family: var(--font-sans);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
   line-height: 1.5;
-  color: #333333;
-}
-
-/* ==================== TEXTE DANS LES MESSAGES ==================== */
-/* Assurer que tous les textes dans les messages sont de la bonne couleur */
-.web-message-content h1,
-.web-message-content h2,
-.web-message-content h3,
-.web-message-content h4,
-.web-message-content h5,
-.web-message-content h6,
-.web-message-content p,
-.web-message-content span,
-.web-message-content div,
-.web-message-content strong,
-.web-message-content em,
-.web-message-content b,
-.web-message-content i,
-.web-kora-message * {
-  color: #333333 !important; /* Force la couleur noire pour tout texte */
-}
-
-/* Styles pour les paragraphes */
-.web-message-content p {
-  margin-bottom: 0.75em;
-  color: #333333;
+  color: var(--foreground, #333333);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Styles pour les titres */
-.web-message-content h1 {
-  font-size: 1.8em;
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--foreground, #333333);
+}
+
+h1 {
+  font-size: 2rem;
   font-weight: 700;
-  margin-top: 1.2em;
-  margin-bottom: 0.6em;
-  color: #333333;
 }
 
-.web-message-content h2 {
-  font-size: 1.5em;
+h2 {
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  color: #333333;
 }
 
-.web-message-content h3 {
-  font-size: 1.3em;
+h3 {
+  font-size: 1.25rem;
   font-weight: 600;
-  margin-top: 0.8em;
-  margin-bottom: 0.4em;
-  color: #333333;
 }
 
-/* Style pour le nom d'utilisateur (Hello Ibrahima) */
-.user-greeting, 
-.welcome-text,
-.greeting-text,
-h1.greeting, 
-h2.greeting,
-h3.greeting,
-.web-message-content strong:first-child,
+/* Styles pour les paragraphes */
+p {
+  margin: 0 0 1rem 0;
+  line-height: 1.6;
+}
+
+/* Styles spécifiques pour l'écran de bienvenue */
+.web-welcome-subtitle {
+  font-size: 1.25rem;
+  color: var(--muted-foreground, #718096);
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.web-question-footer {
+  font-size: 0.875rem;
+  color: var(--muted-foreground, #718096);
+  text-align: center;
+  margin: 0.75rem 0 0;
+}
+
+.kora-name {
+  font-weight: 700;
+  color: var(--foreground, #333333);
+}
+
+/* Classe spécifique pour le titre de bienvenue avec priorité */
 .web-welcome-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 0.5rem;
   color: #333333 !important;
-  font-weight: 600;
+}
+
+/* Styles pour le texte dans les entrées et boutons */
+input, textarea, button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted-foreground, #718096);
+  opacity: 0.7;
+}
+
+/* Adaptations pour mobile */
+@media screen and (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+  
+  .web-welcome-title {
+    font-size: 1.75rem;
+    color: #333333 !important; 
+    font-weight: 700;
+  }
+  
+  .web-welcome-subtitle {
+    font-size: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1.15rem;
+  }
+}
+
+/* Override pour petit mobile */
+@media screen and (max-width: 480px) {
+  .web-welcome-title {
+    font-size: 1.5rem;
+    color: #333333 !important;
+  }
+  
+  p, .web-question-footer {
+    font-size: 0.8125rem;
+  }
 }

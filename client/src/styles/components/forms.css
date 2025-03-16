@@ -1,268 +1,300 @@
 /**
- * Styles pour les formulaires et contrôles
+ * Styles pour les formulaires dans l'application Kora
+ * Composant: forms.css - Partie de l'architecture ITCSS
  */
 
-/* ==================== FORMULAIRES ==================== */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+/* Zone de question principale */
+.web-question-container {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  padding: 12px 16px 16px;
+  background-color: white;
+  border-top: 1px solid var(--border, #e2e8f0);
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.03);
+  z-index: 10;
+}
+
+.web-question-form {
   width: 100%;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-start;
-}
-
-@media (max-width: 640px) {
-  .form-row {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-}
-
-.form-label {
-  font-weight: 500;
-  color: var(--foreground);
-  font-size: 0.875rem;
-}
-
-.form-hint {
-  font-size: 0.75rem;
-  color: var(--muted-foreground);
-  margin-top: 0.25rem;
-}
-
-.form-error {
-  font-size: 0.75rem;
-  color: var(--error);
-  margin-top: 0.25rem;
-}
-
-/* ==================== INPUTS ==================== */
-.input {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  color: var(--foreground);
-  background-color: var(--background);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
-}
-
-.input-error {
-  border-color: var(--error);
-}
-
-.input-error:focus {
-  box-shadow: 0 0 0 2px rgba(var(--error-rgb), 0.25);
-}
-
-.input:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.textarea {
-  min-height: 6rem;
-  resize: vertical;
-}
-
-/* ==================== SELECT ==================== */
-.select {
-  width: 100%;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
-  color: var(--foreground);
-  background-color: var(--background);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  appearance: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.select:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
-}
-
-/* ==================== CHECKBOXES & RADIOS ==================== */
-.checkbox-group, .radio-group {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.checkbox-item, .radio-item {
+.web-question-box {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  width: 100%;
+  background-color: white;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
 
-.checkbox, .radio {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 16px;
-  height: 16px;
-  border: 1px solid var(--border);
-  background-color: var(--background);
+.web-question-box:focus-within {
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+/* Wrapper d'input pour maintenir l'apparence appropriée */
+.web-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.web-input-wrapper input {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--foreground, #1a202c);
+  outline: none;
+}
+
+/* Boutons d'action dans la zone de question */
+.web-action-buttons {
+  display: flex;
+  align-items: center;
+  padding: 0 10px 0 0;
+}
+
+.web-image-button,
+.web-send-button,
+.web-mic-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, border-color 0.2s;
-  position: relative;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-left: 4px;
+  border: none;
+  border-radius: 50%;
+  background-color: transparent;
+  color: var(--muted-foreground, #718096);
   cursor: pointer;
+  transition: all 0.2s;
 }
 
-.checkbox {
+.web-send-button {
+  background-color: var(--primary, #2563eb);
+  color: white;
+}
+
+.web-mic-button.recording {
+  background-color: #ef4444;
+  color: white;
+}
+
+.web-mic-button:hover,
+.web-image-button:hover {
+  background-color: var(--muted, #e2e8f0);
+}
+
+.web-send-button:hover {
+  background-color: #1d4ed8;
+}
+
+.web-mic-button.recording:hover {
+  background-color: #dc2626;
+}
+
+/* Styles pour l'enregistreur vocal */
+.web-voice-recorder {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 12px;
+  background-color: #f7fafc;
+}
+
+/* Styles pour le modal de téléchargement d'image */
+.web-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.web-modal {
+  background-color: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.web-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.web-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.web-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground, #718096);
+  cursor: pointer;
+  padding: 4px;
   border-radius: 4px;
 }
 
-.radio {
-  border-radius: 50%;
+.web-modal-close:hover {
+  background-color: var(--muted, #e2e8f0);
 }
 
-.checkbox:checked {
-  background-color: var(--primary);
-  border-color: var(--primary);
+.web-modal-content {
+  padding: 20px;
 }
 
-.checkbox:checked::after {
-  content: "";
-  width: 8px;
-  height: 8px;
-  transform: rotate(45deg);
-  border-bottom: 2px solid white;
-  border-right: 2px solid white;
-  position: absolute;
-  top: 1px;
+.web-image-preview {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border, #e2e8f0);
 }
 
-.radio:checked {
-  border-color: var(--primary);
+.web-image-preview img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
 }
 
-.radio:checked::after {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--primary);
-  position: absolute;
+.web-modal-form {
+  margin-bottom: 16px;
 }
 
-.checkbox:focus, .radio:focus {
+.web-modal-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 16px;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
+  transition: border-color 0.2s;
 }
 
-/* ==================== BUTTONS ==================== */
-.button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+.web-modal-textarea:focus {
+  border-color: var(--primary, #2563eb);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.web-modal-footer {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border, #e2e8f0);
+}
+
+.web-modal-button {
+  padding: 8px 16px;
   border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  border: 1px solid transparent;
+  transition: all 0.2s;
 }
 
-.button:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.25);
-}
-
-.button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.button-primary {
-  background-color: var(--primary);
-  color: white;
-}
-
-.button-primary:hover {
-  background-color: var(--primary-dark);
-}
-
-.button-secondary {
-  background-color: var(--secondary);
-  color: white;
-}
-
-.button-secondary:hover {
-  background-color: var(--secondary-dark);
-}
-
-.button-outline {
+.web-modal-button.cancel {
   background-color: transparent;
-  border-color: var(--border);
-  color: var(--foreground);
+  border: 1px solid var(--border, #e2e8f0);
+  color: var(--foreground, #1a202c);
 }
 
-.button-outline:hover {
-  background-color: var(--card-background-hover);
-}
-
-.button-ghost {
-  background-color: transparent;
-  color: var(--foreground);
-}
-
-.button-ghost:hover {
-  background-color: var(--card-background-hover);
-}
-
-.button-danger {
-  background-color: var(--error);
+.web-modal-button.submit {
+  background-color: var(--primary, #2563eb);
+  border: 1px solid var(--primary, #2563eb);
   color: white;
 }
 
-.button-danger:hover {
-  background-color: var(--error-dark);
+.web-modal-button.cancel:hover {
+  background-color: var(--muted, #e2e8f0);
 }
 
-.button-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.75rem;
+.web-modal-button.submit:hover {
+  background-color: #1d4ed8;
+  border-color: #1d4ed8;
 }
 
-.button-lg {
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+/* Adaptations pour mobile */
+@media screen and (max-width: 768px) {
+  .web-question-container {
+    padding: 8px 12px 12px;
+  }
+  
+  .web-question-box {
+    border-radius: 18px;
+    /* Pour mobile, on peut réduire/supprimer les bordures */
+    border-width: 1px;
+    background-color: #f9fafb;
+  }
+  
+  .web-input-wrapper input {
+    padding: 9px 14px;
+    font-size: 15px;
+  }
+  
+  .web-action-buttons {
+    padding: 0 8px 0 0;
+  }
+  
+  .web-image-button,
+  .web-send-button,
+  .web-mic-button {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .web-modal {
+    max-width: 100%;
+    margin: 0 8px;
+  }
 }
 
-.button-icon {
-  padding: 0.5rem;
-}
-
-.button-icon svg {
-  width: 1rem;
-  height: 1rem;
+/* Styles pour les très petits écrans */
+@media screen and (max-width: 480px) {
+  .web-question-container {
+    padding: 8px 10px 10px;
+  }
+  
+  .web-question-box {
+    /* Suppression des bordures sur très petits écrans */
+    border: none;
+    background-color: #f9fafb;
+    border-radius: 16px;
+  }
+  
+  .web-input-wrapper input {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .web-action-buttons {
+    padding: 0 6px 0 0;
+  }
+  
+  .web-image-button,
+  .web-send-button,
+  .web-mic-button {
+    width: 30px;
+    height: 30px;
+  }
 }
