@@ -291,20 +291,7 @@
 }
 
 /* Ajustements pour le conteneur de questions en mode conversation */
-.web-question-container {
-  position: sticky;
-  bottom: 0;
-  background-color: white;
-  z-index: 100; /* Z-index élevé pour être toujours au-dessus des messages */
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 0.5rem 1rem 0 1rem; /* Padding sans espace en bas */
-  box-shadow: none; /* Suppression de l'ombre */
-  border-top: none; /* Suppression de la bordure */
-  position: relative;
-  margin-bottom: -0.5rem; /* Compense tout espacement résiduel en bas */
-}
+/* Le style pour .web-question-container est maintenant géré dans forms.css */
 
 /* Style pour le texte d'information en bas */
 .web-question-footer {

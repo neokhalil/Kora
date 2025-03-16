@@ -22,8 +22,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: calc(80vh - 100px); /* même hauteur que web-welcome-container */
+  height: calc(100vh - 180px); /* Tient compte de la hauteur pour le champ de saisie */
   overflow-y: auto;
+  padding-bottom: 80px; /* Espace supplémentaire pour éviter que le contenu soit caché par le champ de saisie fixe */
 }
 
 /* Titre de bienvenue avec des règles de priorité élevée */
