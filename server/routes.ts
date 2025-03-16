@@ -1103,6 +1103,13 @@ L'indice doit être subtil, instructif et faire réfléchir l'étudiant.`;
   // Authentication routes
   app.post('/api/auth/google', handleGoogleLogin);
   app.get('/api/auth/me', getCurrentUser);
+  
+  // API route pour obtenir les configurations d'authentification
+  app.get('/api/auth/config', (req: Request, res: Response) => {
+    res.json({
+      googleClientId: process.env.GOOGLE_CLIENT_ID || ''
+    });
+  });
   app.post('/api/auth/logout', handleLogout);
 
   // Protected routes with authentication middleware examples

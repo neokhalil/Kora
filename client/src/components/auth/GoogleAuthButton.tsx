@@ -85,26 +85,44 @@ export default function GoogleAuthButton({
   }, []);
 
   // Fonction d'initialisation du bouton Google Sign-In
-  const initializeGoogleSignIn = () => {
+  const initializeGoogleSignIn = async () => {
     if (window.google && window.google.accounts && buttonRef.current) {
-      // Configuration Google Sign-In
-      window.google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-        callback: handleCredentialResponse,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      
-      // Rendu du bouton Google Sign-In
-      window.google.accounts.id.renderButton(buttonRef.current, {
-        type: 'standard',
-        theme,
-        size,
-        text,
-        shape,
-        width,
-        locale,
-      });
+      try {
+        // Récupérer le client ID depuis le serveur
+        const response = await fetch('/api/auth/config');
+        if (!response.ok) {
+          throw new Error('Impossible de récupérer la configuration d\'authentification');
+        }
+        
+        const config = await response.json();
+        const clientId = config.googleClientId;
+        
+        if (!clientId) {
+          console.error('Google Client ID manquant dans la configuration');
+          return;
+        }
+        
+        // Configuration Google Sign-In
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleCredentialResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+        });
+        
+        // Rendu du bouton Google Sign-In
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          type: 'standard',
+          theme,
+          size,
+          text,
+          shape,
+          width,
+          locale,
+        });
+      } catch (error) {
+        console.error('Erreur lors de l\'initialisation de Google Sign-In:', error);
+      }
     }
   };
 
