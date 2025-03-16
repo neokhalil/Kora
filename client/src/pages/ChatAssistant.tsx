@@ -28,8 +28,6 @@ import VoiceRecorder from '@/components/VoiceRecorder';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
-import { useAuth } from '@/hooks/use-auth';
-import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 // Define the message types
 interface ChallengeData {
@@ -76,12 +74,6 @@ const ChatAssistant: React.FC = () => {
     currentText: ''
   });
   const [isMobileDevice, setIsMobileDevice] = useState(false);
-  // État pour la limitation d'utilisation
-  const [anonymousQuestionCount, setAnonymousQuestionCount] = useState(0);
-  const MAX_ANONYMOUS_QUESTIONS = 3; // Limite de questions pour les utilisateurs non authentifiés
-  
-  // État d'authentification
-  const { user, isAuthenticated } = useAuth();
   
   // Vérifier si c'est un appareil mobile
   const isMobile = useIsMobile();
@@ -122,21 +114,6 @@ const ChatAssistant: React.FC = () => {
   useEffect(() => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
-  
-  // Ajouter un message de bienvenue initial
-  useEffect(() => {
-    // Message de bienvenue différent selon que l'utilisateur est authentifié ou non
-    setTimeout(() => {
-      setMessages([{
-        id: Date.now().toString(),
-        content: isAuthenticated 
-          ? `Bonjour${user?.name ? ` ${user.name}` : ''}! Je suis Kora, votre tuteur personnel. Comment puis-je vous aider aujourd'hui?`
-          : `Bonjour! Je suis Kora, votre tuteur personnel. Vous pouvez me poser ${MAX_ANONYMOUS_QUESTIONS} questions en mode anonyme. Pour un accès illimité, connectez-vous avec votre compte Google.`,
-        sender: 'kora',
-        allowActions: false,
-      }]);
-    }, 300);
-  }, [isAuthenticated, user?.name]);
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
@@ -356,35 +333,6 @@ const ChatAssistant: React.FC = () => {
   const handleSendMessage = async () => {
     if (inputValue.trim() === '' || isThinking) return;
     
-    // Vérifier si l'utilisateur a atteint sa limite de questions anonymes
-    if (!isAuthenticated && anonymousQuestionCount >= MAX_ANONYMOUS_QUESTIONS) {
-      // Ajouter un message demandant à l'utilisateur de se connecter pour continuer
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: inputValue,
-        sender: 'user',
-      }]);
-      
-      // Vider le champ d'entrée
-      setInputValue('');
-      
-      // Ajouter le message de limitation
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: "Vous avez atteint la limite d'utilisation gratuite. Pour continuer à utiliser Kora, veuillez vous connecter avec votre compte Google.",
-        sender: 'kora',
-      }]);
-      
-      // Faire défiler vers le bas après l'ajout du message
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-      
-      return;
-    }
-    
     const userMessage: Message = {
       id: Date.now().toString(),
       content: inputValue,
@@ -410,11 +358,8 @@ const ChatAssistant: React.FC = () => {
         sender: msg.sender
       }));
       
-      // Endpoint API différent selon que l'utilisateur est authentifié ou non
-      const endpoint = isAuthenticated ? '/api/tutoring/ask' : '/api/tutoring/limited';
-      
       // Appel API à OpenAI via notre serveur
-      const response = await fetch(endpoint, {
+      const response = await fetch('/api/tutoring/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -430,11 +375,6 @@ const ChatAssistant: React.FC = () => {
       }
       
       const data = await response.json();
-      
-      // Si l'utilisateur n'est pas authentifié, incrémenter le compteur de questions
-      if (!isAuthenticated) {
-        setAnonymousQuestionCount(prev => prev + 1);
-      }
       
       // Générer un ID unique pour ce message
       const messageId = Date.now().toString();
@@ -510,40 +450,6 @@ const ChatAssistant: React.FC = () => {
   const handleSubmitImage = async () => {
     if (!selectedImage || isUploadingImage) return;
     
-    // Vérifier si l'utilisateur a atteint sa limite de questions anonymes
-    if (!isAuthenticated && anonymousQuestionCount >= MAX_ANONYMOUS_QUESTIONS) {
-      // Ajouter un message utilisateur avec l'image
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: inputValue || "Analyse cette image s'il te plaît",
-        sender: 'user',
-        imageUrl: imagePreview || undefined,
-      }]);
-      
-      // Vider le champ d'entrée
-      setInputValue('');
-      
-      // Nettoyage de l'image
-      setSelectedImage(null);
-      setImagePreview(null);
-      
-      // Ajouter le message de limitation
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        content: "Vous avez atteint la limite d'utilisation gratuite. Pour continuer à utiliser Kora, veuillez vous connecter avec votre compte Google.",
-        sender: 'kora',
-      }]);
-      
-      // Faire défiler vers le bas après l'ajout du message
-      setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
-      
-      return;
-    }
-    
     setIsUploadingImage(true);
     
     try {
@@ -587,11 +493,6 @@ const ChatAssistant: React.FC = () => {
       }
       
       const data = await response.json();
-      
-      // Si l'utilisateur n'est pas authentifié, incrémenter le compteur de questions
-      if (!isAuthenticated) {
-        setAnonymousQuestionCount(prev => prev + 1);
-      }
       
       // Ajouter la réponse de l'IA aux messages
       setMessages(prev => [...prev, {
@@ -781,8 +682,6 @@ const ChatAssistant: React.FC = () => {
 
   const renderMessage = (message: Message) => {
     const isKora = message.sender === 'kora';
-    // Vérifier si c'est un message spécial de limitation d'utilisation
-    const isLimitMessage = isKora && message.content.includes("Vous avez atteint la limite d'utilisation gratuite");
     
     return (
       <div key={message.id} className="px-4 py-2 mb-4">
@@ -811,21 +710,6 @@ const ChatAssistant: React.FC = () => {
             <div className="prose dark:prose-invert text-base leading-relaxed px-1">
               <ContentRenderer content={message.content} className="chat-content" />
             </div>
-            
-            {/* Bouton de connexion Google si c'est un message de limitation */}
-            {isLimitMessage && (
-              <div className="mt-4 flex justify-center">
-                <GoogleAuthButton 
-                  text="signin_with"
-                  shape="pill"
-                  theme="filled_blue"
-                  size="large"
-                  onSuccess={() => {
-                    window.location.reload(); // Rafraîchir la page après connexion
-                  }}
-                />
-              </div>
-            )}
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (

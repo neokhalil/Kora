@@ -10,7 +10,6 @@ import { handleAudioTranscription } from './whisper';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { handleGoogleLogin, getCurrentUser, handleLogout, authMiddleware, limitUsageMiddleware } from './api/auth';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure file upload storage
@@ -157,7 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Save to database
           const interaction = await dbStorage.createInteraction({
-            userId: Number(userId), // Conversion en number
+            userId: parseInt(userId as string, 10),
             topicId: null, // Could be set based on subject detection
             question: query || "Analyse d'image",
             answer: response,
@@ -1097,64 +1096,6 @@ L'indice doit être subtil, instructif et faire réfléchir l'étudiant.`;
     } catch (error) {
       console.error('Error searching interactions:', error);
       res.status(500).json({ message: 'Failed to search interactions' });
-    }
-  });
-
-  // Authentication routes
-  app.post('/api/auth/google', handleGoogleLogin);
-  app.get('/api/auth/me', getCurrentUser);
-  
-  // API route pour obtenir les configurations d'authentification
-  app.get('/api/auth/config', (req: Request, res: Response) => {
-    res.json({
-      googleClientId: process.env.GOOGLE_CLIENT_ID || ''
-    });
-  });
-  app.post('/api/auth/logout', handleLogout);
-
-  // Protected routes with authentication middleware examples
-  // These routes require authentication
-  app.get('/api/user/conversations', authMiddleware, async (req: Request, res: Response) => {
-    try {
-      // The user ID is available from the authMiddleware
-      const userId = req.user?.id;
-      if (!userId) {
-        return res.status(401).json({ message: 'User not authenticated' });
-      }
-      
-      // Get conversations for the user
-      // Example implementation - to be completed with actual storage calls
-      const conversations: Array<{id: string; title: string; createdAt: string}> = []; 
-      // conversations = await dbStorage.getConversationsByUser(userId);
-      
-      res.json(conversations);
-    } catch (error) {
-      console.error('Error fetching user conversations:', error);
-      res.status(500).json({ message: 'Failed to fetch conversations' });
-    }
-  });
-
-  // Limited usage routes - users can access a limited number of times before auth
-  app.post('/api/tutoring/limited', limitUsageMiddleware, async (req: Request, res: Response) => {
-    try {
-      const { question } = req.body;
-      
-      if (!question) {
-        return res.status(400).json({ message: 'Question is required' });
-      }
-      
-      // Process the question (this is a simplified example)
-      const response = await generateTutoringResponse(question, []);
-      
-      res.json({ 
-        content: response,
-        timestamp: new Date().toISOString(),
-        // Include remaining usage quota in the response
-        remainingUsage: req.remainingUsage || 0
-      });
-    } catch (error) {
-      console.error('Error in limited tutoring request:', error);
-      res.status(500).json({ message: 'Failed to generate tutoring response' });
     }
   });
 

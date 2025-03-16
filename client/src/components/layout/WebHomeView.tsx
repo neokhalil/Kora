@@ -6,8 +6,6 @@ import BookIcon from '@/components/ui/BookIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
-import AuthButton from '@/components/auth/AuthButton';
-import { useAuth } from '@/hooks/use-auth';
 import './WebHomeView.css';
 
 // Configuration pour le texte simple (sans formatage mathématique)
@@ -30,9 +28,6 @@ interface WebHomeViewProps {
 }
 
 const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
-  // État d'authentification
-  const { user, isAuthenticated } = useAuth();
-  
   // États pour le formulaire et la recherche
   const [question, setQuestion] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -76,32 +71,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     }
   }, [messages]);
 
-  // État local pour compter les questions d'un utilisateur non authentifié
-  const [anonymousQuestionCount, setAnonymousQuestionCount] = useState(0);
-  // Constante pour le nombre maximum de questions autorisées sans compte
-  const MAX_ANONYMOUS_QUESTIONS = 3;
-
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question.trim()) return;
-    
-    // Si l'utilisateur n'est pas authentifié, vérifier la limite d'utilisation
-    if (!isAuthenticated) {
-      // Vérifier si l'utilisateur a atteint la limite de questions
-      if (anonymousQuestionCount >= MAX_ANONYMOUS_QUESTIONS) {
-        // Ajouter un message expliquant qu'il doit se connecter
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          content: "Pour continuer à utiliser Kora, merci de te connecter avec ton compte Google. C'est rapide et gratuit !",
-          sender: 'kora',
-          allowActions: false,
-        }]);
-        return;
-      }
-      // Incrémenter le compteur de questions pour les utilisateurs non authentifiés
-      setAnonymousQuestionCount(prev => prev + 1);
-    }
     
     // Démarrage de la conversation si ce n'est pas déjà fait
     if (!conversationStarted) {
@@ -131,11 +104,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         sender: msg.sender
       }));
       
-      // Déterminer quelle API utiliser en fonction de l'état d'authentification
-      const apiEndpoint = isAuthenticated ? '/api/tutoring/ask' : '/api/tutoring/limited';
-      
       // Appel API à OpenAI via notre serveur
-      const response = await fetch(apiEndpoint, {
+      const response = await fetch('/api/tutoring/ask', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -147,17 +117,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       });
       
       if (!response.ok) {
-        // Si l'erreur est due à une limitation d'utilisation (status 429)
-        if (response.status === 429) {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: "Tu as atteint ta limite de questions. Connecte-toi pour continuer à utiliser Kora sans limitations !",
-            sender: 'kora',
-            allowActions: false,
-          }]);
-          setIsThinking(false);
-          return;
-        }
         throw new Error('Erreur lors de la requête API');
       }
       
@@ -168,21 +127,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
-        allowActions: true,
+        allowActions: true, // Assurons-nous que cette propriété est correctement définie
         messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
-      
-      // Si l'utilisateur non authentifié a utilisé son avant-dernière question, l'avertir
-      if (!isAuthenticated && anonymousQuestionCount === MAX_ANONYMOUS_QUESTIONS - 1) {
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: "Il te reste une seule question. Connecte-toi pour un accès illimité à Kora !",
-            sender: 'kora',
-            allowActions: false,
-          }]);
-        }, 1000);
-      }
     } catch (error) {
       console.error('Erreur lors de la communication avec le serveur:', error);
       
@@ -191,7 +138,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         id: Date.now().toString(),
         content: "Désolé, j'ai rencontré un problème en essayant de répondre. Pourriez-vous reformuler votre question?",
         sender: 'kora',
-        allowActions: true,
+        allowActions: true, // Assurons-nous que cette propriété est définie
       }]);
     } finally {
       // Arrêter l'animation de réflexion
@@ -268,28 +215,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const handleImageSubmit = async (imageText: string = '') => {
     if (!uploadedImage || !imagePreviewUrl) return;
     
-    // Si l'utilisateur n'est pas authentifié, vérifier la limite d'utilisation
-    if (!isAuthenticated) {
-      // Vérifier si l'utilisateur a atteint la limite de questions
-      if (anonymousQuestionCount >= MAX_ANONYMOUS_QUESTIONS) {
-        // Fermer la modale
-        setIsImageUploadModalOpen(false);
-        setUploadedImage(null);
-        setImagePreviewUrl(null);
-        
-        // Ajouter un message expliquant qu'il doit se connecter
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          content: "Pour continuer à utiliser Kora, merci de te connecter avec ton compte Google. C'est rapide et gratuit !",
-          sender: 'kora',
-          allowActions: false,
-        }]);
-        return;
-      }
-      // Incrémenter le compteur de questions pour les utilisateurs non authentifiés
-      setAnonymousQuestionCount(prev => prev + 1);
-    }
-    
     // Démarrage de la conversation si ce n'est pas déjà fait
     if (!conversationStarted) {
       setConversationStarted(true);
@@ -322,9 +247,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         formData.append('text_query', imageText);
       }
       
-      // Ajouter un champ pour spécifier si l'utilisateur est authentifié
-      formData.append('is_authenticated', isAuthenticated ? 'true' : 'false');
-      
       // Appel API pour l'analyse d'image
       const response = await fetch('/api/image-analysis', {
         method: 'POST',
@@ -332,19 +254,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       });
       
       if (!response.ok) {
-        // Si l'erreur est due à une limitation d'utilisation (status 429)
-        if (response.status === 429) {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: "Tu as atteint ta limite de questions. Connecte-toi pour continuer à utiliser Kora sans limitations !",
-            sender: 'kora',
-            allowActions: false,
-          }]);
-          setIsThinking(false);
-          setUploadedImage(null);
-          setImagePreviewUrl(null);
-          return;
-        }
         throw new Error('Erreur lors de la requête API');
       }
       
@@ -359,18 +268,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         isImageAnalysis: true,
         messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
-      
-      // Si l'utilisateur non authentifié a utilisé son avant-dernière question, l'avertir
-      if (!isAuthenticated && anonymousQuestionCount === MAX_ANONYMOUS_QUESTIONS - 1) {
-        setTimeout(() => {
-          setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            content: "Il te reste une seule question. Connecte-toi pour un accès illimité à Kora !",
-            sender: 'kora',
-            allowActions: false,
-          }]);
-        }, 1000);
-      }
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
       
@@ -791,12 +688,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               )}
             </div>
 
-            {/* Section d'authentification en bas */}
+            {/* Profil utilisateur en bas */}
             <div className="web-profile-container">
               <div className="web-profile-wrapper">
-                <div className="web-auth-container">
-                  <AuthButton />
-                </div>
+                <Link href="/profile" className="web-profile-link">
+                  <User size={16} strokeWidth={2} />
+                  <span>Mon profil</span>
+                </Link>
                 <Link href="/settings" className="web-settings-link">
                   <Settings size={16} strokeWidth={2} />
                 </Link>
@@ -818,18 +716,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     textShadow: "0 0 0 #333333"
                   } as React.CSSProperties}
                 >
-                  {isAuthenticated && user?.name 
-                    ? `Bonjour ${user.name.split(' ')[0]}` 
-                    : 'Bienvenue sur Kora'}
+                  Hello Ibrahima
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div>Comment puis-je t'aider</div>
+                  <div>Comment puis t'aider</div>
                   <div>aujourd'hui?</div>
-                  {!isAuthenticated && (
-                    <div className="web-welcome-auth-note">
-                      Connecte-toi pour un accès illimité
-                    </div>
-                  )}
                 </div>
               </div>
             ) : (

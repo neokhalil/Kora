@@ -3,7 +3,6 @@ import { X } from 'lucide-react';
 import SideMenu from './SideMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import HamburgerIcon from '../ui/HamburgerIcon';
-import AuthButton from '@/components/auth/AuthButton';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -108,10 +107,8 @@ const Header: React.FC = () => {
             <h1 id="kora-header-title" className="kora-name">KORA</h1>
           </div>
           
-          {/* Zone de droite pour le bouton d'authentification */}
-          <div className="header-right-group">
-            <AuthButton />
-          </div>
+          {/* Empty div to balance the layout - style déplacé vers le CSS */}
+          <div></div>
         </div>
       </div>
       

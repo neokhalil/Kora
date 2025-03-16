@@ -65,17 +65,9 @@
   flex: 1;
 }
 
-/* Groupe droit du header pour l'authentification */
-.header-right-group {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 120px;
-}
-
-/* Élément de balancement pour l'équilibre du layout - plus utilisé mais gardé pour compatibilité */
+/* Élément de balancement pour l'équilibre du layout */
 #kora-header > div:last-child {
-  width: auto;
+  width: 40px;
 }
 
 /* Ajouter un espace pour compenser le header fixed */
@@ -99,17 +91,6 @@ input, textarea, select, button {
 @media screen and (max-width: 767px) {
   body {
     overscroll-behavior: none;
-  }
-  
-  /* Ajustements pour le bouton d'authentification sur mobile */
-  .header-right-group {
-    transform: scale(0.85);
-    transform-origin: right center;
-  }
-  
-  /* Cacher le texte des boutons sur mobile pour optimiser l'espace */
-  .header-right-group button span.ml-1.hidden {
-    display: none !important;
   }
 }
 

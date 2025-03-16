@@ -9,7 +9,6 @@ import ChatAssistant from "@/pages/ChatAssistant";
 import Home from "@/pages/Home";
 import MathTest from "@/pages/MathTest";
 import MathCodeTest from "@/pages/MathCodeTest";
-import { AuthProvider } from "@/hooks/use-auth";
 
 // Configuration des routes
 const routes = [
@@ -50,10 +49,8 @@ const AppContainer = () => {
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContainer />
-        <Toaster />
-      </AuthProvider>
+      <AppContainer />
+      <Toaster />
     </QueryClientProvider>
   );
 };

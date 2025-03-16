@@ -1,64 +1,22 @@
-import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb, uuid, primaryKey } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, varchar, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-// Users table (modifié pour NextAuth)
+// Users table
 export const users = pgTable("users", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name"),
-  email: text("email").unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
-  image: text("image"),
-  username: text("username").unique(),
-  displayName: text("display_name"),
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  displayName: text("display_name").notNull(),
+  avatar: text("avatar"),
 });
-
-// Authentification (NextAuth.js/Auth.js)
-export const accounts = pgTable(
-  "account",
-  {
-    userId: uuid("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
-    scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
-  },
-  (account) => ({
-    compoundKey: primaryKey(account.provider, account.providerAccountId),
-  })
-);
-
-export const sessions = pgTable("session", {
-  sessionToken: text("sessionToken").primaryKey(),
-  userId: uuid("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-});
-
-export const verificationTokens = pgTable(
-  "verificationToken",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
-  },
-  (vt) => ({
-    compoundKey: primaryKey(vt.identifier, vt.token),
-  })
-);
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  name: true,
-  email: true,
-  image: true,
   username: true,
+  password: true,
   displayName: true,
+  avatar: true,
 });
 
 // Questions table
@@ -123,30 +81,10 @@ export const insertLessonSchema = createInsertSchema(lessons).pick({
   topicId: true,
 });
 
-// Conversations table - stores groups of interactions for history
-export const conversations = pgTable("conversations", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => users.id),
-  title: text("title").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-  summary: text("summary"),
-  isArchived: boolean("is_archived").default(false),
-  lastMessageAt: timestamp("last_message_at").defaultNow().notNull(),
-});
-
-export const insertConversationSchema = createInsertSchema(conversations).pick({
-  userId: true,
-  title: true,
-  summary: true,
-  isArchived: true,
-});
-
 // Interactions table - stores user-AI conversations
 export const interactions = pgTable("interactions", {
   id: serial("id").primaryKey(),
-  userId: uuid("user_id").references(() => users.id),
-  conversationId: integer("conversation_id").references(() => conversations.id),
+  userId: integer("user_id").references(() => users.id),
   topicId: integer("topic_id").references(() => topics.id),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
@@ -160,7 +98,6 @@ export const interactions = pgTable("interactions", {
 
 export const insertInteractionSchema = createInsertSchema(interactions).pick({
   userId: true,
-  conversationId: true,
   topicId: true,
   question: true,
   answer: true,
@@ -199,15 +136,6 @@ export const insertInteractionTagSchema = createInsertSchema(interactionTags).pi
 export const usersRelations = relations(users, ({ many }) => ({
   interactions: many(interactions),
   questions: many(questions),
-  conversations: many(conversations),
-}));
-
-export const conversationsRelations = relations(conversations, ({ one, many }) => ({
-  user: one(users, {
-    fields: [conversations.userId],
-    references: [users.id],
-  }),
-  interactions: many(interactions),
 }));
 
 export const topicsRelations = relations(topics, ({ one, many }) => ({
@@ -227,10 +155,6 @@ export const interactionsRelations = relations(interactions, ({ one, many }) => 
   user: one(users, {
     fields: [interactions.userId],
     references: [users.id],
-  }),
-  conversation: one(conversations, {
-    fields: [interactions.conversationId],
-    references: [conversations.id],
   }),
   topic: one(topics, {
     fields: [interactions.topicId],
@@ -269,9 +193,6 @@ export type Lesson = typeof lessons.$inferSelect;
 
 export type InsertField = z.infer<typeof insertFieldSchema>;
 export type Field = typeof fields.$inferSelect;
-
-export type InsertConversation = z.infer<typeof insertConversationSchema>;
-export type Conversation = typeof conversations.$inferSelect;
 
 export type InsertInteraction = z.infer<typeof insertInteractionSchema>;
 export type Interaction = typeof interactions.$inferSelect;
