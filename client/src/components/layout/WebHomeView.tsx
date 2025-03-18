@@ -699,12 +699,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   {messages.map(renderMessage)}
                   {isThinking && (
                     <div className="web-message web-kora-message">
-                      <div className="web-message-content-wrapper">
-                        <div className="web-message-content web-thinking">
-                          <span className="web-dot"></span>
-                          <span className="web-dot"></span>
-                          <span className="web-dot"></span>
-                        </div>
+                      <div className="web-message-content web-thinking">
+                        <span className="web-dot"></span>
+                        <span className="web-dot"></span>
+                        <span className="web-dot"></span>
                       </div>
                     </div>
                   )}
