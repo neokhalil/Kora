@@ -201,34 +201,36 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, onClose }) => {
             )}
           </div>
           
-          {/* Section Conversations récentes - filtrée par recherche */}
-          <div className="mt-6 px-4">
-            {/* N'afficher l'en-tête que s'il y a des résultats ou pas de recherche */}
-            {(filteredConversations.length > 0 || !searchQuery) && (
-              <div className="uppercase text-sm font-semibold text-gray-600 mb-3">
-                CONVERSATIONS RÉCENTES
-              </div>
-            )}
-            
-            {filteredConversations.map((convo) => (
-              <Link
-                key={convo.id}
-                href={`/chat/${convo.id}`}
-                onClick={() => onClose()}
-                className="block py-3 hover:bg-gray-100 transition-colors"
-                role="button"
-              >
-                <span className="text-sm">{convo.title}</span>
-              </Link>
-            ))}
-            
-            {/* Message si aucune conversation ne correspond à la recherche */}
-            {searchQuery && filteredConversations.length === 0 && (
-              <div className="py-3 text-gray-500 text-sm">
-                Aucune conversation ne correspond à votre recherche
-              </div>
-            )}
-          </div>
+          {/* Section Conversations récentes - uniquement quand il y en a */}
+          {filteredConversations.length > 0 && (
+            <div className="mt-6 px-4">
+              {/* N'afficher l'en-tête que s'il y a des résultats ou pas de recherche */}
+              {(filteredConversations.length > 0 || !searchQuery) && (
+                <div className="uppercase text-sm font-semibold text-gray-600 mb-3">
+                  CONVERSATIONS RÉCENTES
+                </div>
+              )}
+              
+              {filteredConversations.map((convo) => (
+                <Link
+                  key={convo.id}
+                  href={`/chat/${convo.id}`}
+                  onClick={() => onClose()}
+                  className="block py-3 hover:bg-gray-100 transition-colors"
+                  role="button"
+                >
+                  <span className="text-sm">{convo.title}</span>
+                </Link>
+              ))}
+              
+              {/* Message si aucune conversation ne correspond à la recherche */}
+              {searchQuery && filteredConversations.length === 0 && (
+                <div className="py-3 text-gray-500 text-sm">
+                  Aucune conversation ne correspond à votre recherche
+                </div>
+              )}
+            </div>
+          )}
           
           {/* Pied de menu avec bouton de retour ou lien vers les paramètres */}
           <div className="mt-auto p-4">

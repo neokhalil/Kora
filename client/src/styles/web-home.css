@@ -324,10 +324,10 @@ body, html {
   padding-bottom: 30px;
 }
 
-/* Styles pour le titre et le sous-titre de bienvenue - Alignés sur la version mobile */
+/* Styles pour le titre et le sous-titre de bienvenue - Taille augmentée pour desktop */
 .web-welcome-title {
-  font-size: 1.75rem; /* Aligné sur mobile */
-  font-weight: 700; /* Aligné sur mobile */
+  font-size: 2.25rem; /* Augmenté de deux crans pour desktop */
+  font-weight: 700;
   text-align: center;
   margin-bottom: 10px;
   margin-top: 0;
@@ -337,7 +337,7 @@ body, html {
 
 .web-welcome-subtitle {
   color: #6e7280;
-  font-size: 1rem; /* Aligné sur mobile */
+  font-size: 1.25rem; /* Augmenté pour maintenir l'équilibre */
   text-align: center;
   margin-top: 0;
   margin-bottom: 40px;
