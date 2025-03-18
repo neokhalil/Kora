@@ -205,7 +205,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreviewUrl(reader.result as string);
-        setIsImageUploadModalOpen(true);
+        // Sur mobile, on affiche la modale. Sur desktop, on affiche directement l'image dans la zone de saisie
+        if (window.innerWidth <= 768) {
+          setIsImageUploadModalOpen(true);
+        } else {
+          // Focus sur le champ de saisie pour permettre à l'utilisateur d'ajouter du texte
+          setTimeout(() => document.querySelector('.web-input')?.focus(), 100);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -700,16 +706,46 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             <div className="web-question-container">
               <form onSubmit={handleSubmit} className="web-question-form">
                 <div className="web-question-box">
-                  <div className="web-input-wrapper">
-                    <input 
-                      type="text" 
-                      placeholder="Pose ta question"
-                      value={question}
-                      onChange={(e) => setQuestion(e.target.value)}
-                      autoFocus
-                      disabled={isRecordingVoice}
-                    />
-                  </div>
+                  {window.innerWidth > 768 && imagePreviewUrl && !isImageUploadModalOpen ? (
+                    <div className="web-input-with-image">
+                      <div className="web-input-image-preview">
+                        <img 
+                          src={imagePreviewUrl} 
+                          alt="Aperçu de l'image" 
+                          className="web-input-image"
+                        />
+                        <button 
+                          type="button"
+                          className="web-remove-image-button"
+                          onClick={handleCancelImageUpload}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                      <div className="web-input-wrapper">
+                        <input 
+                          type="text" 
+                          placeholder="Ajoute un commentaire sur cette image (optionnel)"
+                          value={question}
+                          onChange={(e) => setQuestion(e.target.value)}
+                          className="web-input"
+                          disabled={isRecordingVoice}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="web-input-wrapper">
+                      <input 
+                        type="text" 
+                        placeholder="Pose ta question"
+                        value={question}
+                        onChange={(e) => setQuestion(e.target.value)}
+                        className="web-input"
+                        autoFocus
+                        disabled={isRecordingVoice}
+                      />
+                    </div>
+                  )}
                   <div className="web-action-buttons">
                     <button 
                       type="button"
