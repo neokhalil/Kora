@@ -28,6 +28,9 @@ import "./styles/components/messages.css"; // ITCSS: Styles pour les messages et
 import "./styles/components/typography.css"; // ITCSS: Styles pour la typographie et les textes
 import "./styles/components/welcome.css"; // ITCSS: Styles pour l'écran de bienvenue
 
+// Fix spécifique pour desktop (doit être importé en dernier pour priorité maximale)
+import "./styles/components/welcome-desktop-fix.css"; // Solution pour l'écran de bienvenue en version desktop
+
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
   setupMobileViewportFix();

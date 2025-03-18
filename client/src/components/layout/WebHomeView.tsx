@@ -674,7 +674,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   Hello Ibrahima
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div className="web-welcome-question">Comment puis-je t'aider aujourd'hui?</div>
+                  <div className="web-welcome-question">Comment puis-je t'aider<br />aujourd'hui?</div>
                 </div>
               </div>
             ) : (

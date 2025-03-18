@@ -1,0 +1,58 @@
+/**
+ * Fix spécifique pour l'écran de bienvenue en version desktop
+ * Ce fichier doit être chargé en dernier pour s'assurer qu'il écrase tous les autres styles
+ * 
+ * Suivant la méthodologie ITCSS:
+ * - Ce fichier représente une couche de "Trumps" (priorité maximale)
+ * - Il contient uniquement des styles spécifiques pour desktop
+ * - Utilisation de !important justifiée pour garantir la priorité
+ */
+
+/* Style pour les écrans desktop uniquement */
+@media screen and (min-width: 769px) {
+  /* Titre principal avec spécificité maximale */
+  .web-welcome-container .web-welcome-title,
+  h1.web-welcome-title,
+  body .web-welcome-container .web-welcome-title {
+    font-size: 60px !important;
+    font-weight: 900 !important;
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    text-fill-color: #000000 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    letter-spacing: -0.02em !important;
+    text-shadow: none !important;
+    text-rendering: optimizeLegibility !important;
+    line-height: 1.2 !important;
+    margin-bottom: 24px !important;
+  }
+  
+  /* Question d'aide avec spécificité maximale */
+  .web-welcome-container .web-welcome-subtitle .web-welcome-question,
+  .web-welcome-question,
+  body .web-welcome-container .web-welcome-subtitle .web-welcome-question {
+    font-size: 30px !important;
+    font-weight: 400 !important;
+    color: #6b7280 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-width: 400px !important;
+    margin: 0 auto !important;
+    line-height: 1.3 !important;
+    text-align: center !important;
+  }
+  
+  /* Espacement entre les lignes du sous-titre */
+  .web-welcome-question br {
+    display: block !important;
+    content: "" !important;
+    margin-top: 5px !important;
+  }
+  
+  /* Amélioration du conteneur */
+  .web-welcome-container {
+    margin-top: 20px !important;
+    padding-top: 0 !important;
+  }
+}
