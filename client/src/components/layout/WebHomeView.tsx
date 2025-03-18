@@ -70,6 +70,22 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       }, 100);
     }
   }, [messages]);
+  
+  // Effet spécifique pour s'assurer que la fermeture de la modale nettoie toujours l'état des images
+  useEffect(() => {
+    // Si la modale est fermée, s'assurer que l'image est nettoyée après un court délai
+    if (!isImageUploadModalOpen) {
+      const timer = setTimeout(() => {
+        if (!isImageUploadModalOpen) {
+          // Double vérification pour éviter les conflits avec d'autres actions
+          setUploadedImage(null);
+          setImagePreviewUrl(null);
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isImageUploadModalOpen]);
 
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
@@ -599,13 +615,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             >
               <Lightbulb size={15} />
               <span>Exercice</span>
-            </button>
-            <button 
-              type="button"
-              className="web-action-button"
-            >
-              <BookOpen size={15} />
-              <span>Cours</span>
             </button>
           </div>
         )}
