@@ -544,6 +544,52 @@
     height: calc(100vh - 80px);
   }
 
+  /* Amélioration de l'affichage des images sur mobile */
+  .web-message-image-container {
+    margin: 0.5rem 0;
+    width: 100%;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .web-message-image {
+    max-width: 100%;
+    width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .web-message-bubble {
+    max-width: 95%;
+    padding: 10px 12px;
+  }
+
+  .web-messages-container {
+    padding: 10px;
+  }
+  
+  /* Ajustement des boutons d'action sur mobile */
+  .web-message-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .web-message-action-button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    min-height: 32px;
+  }
+  
+  /* Ajustement de la zone de saisie sur mobile */
+  .web-input-container {
+    padding: 10px;
+  }
+  
+  .web-input-wrapper {
+    padding: 8px;
+  }
+
   /* Masquer tous les éléments de la sidebar sauf le logo sur mobile */
   .web-search-container,
   .web-sidebar-section,
