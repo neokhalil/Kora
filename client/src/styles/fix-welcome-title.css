@@ -10,11 +10,14 @@
   visibility: visible !important;
   -webkit-text-fill-color: #333333 !important;
   text-fill-color: #333333 !important;
+  font-size: 3.75rem !important; /* Force une taille absolue */
+  font-weight: 700 !important;
 }
 
 /* Ciblage extrêmement spécifique pour augmenter la priorité */
 body .web-home-container .web-layout .web-main-content .web-welcome-container .web-welcome-title {
   color: #333333 !important;
+  font-size: 3.75rem !important; /* Force une taille absolue */
 }
 
 /* Fix spécifique pour mobile */

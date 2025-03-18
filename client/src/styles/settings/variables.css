@@ -23,6 +23,10 @@
   --font-size-5xl: 3rem;
   --font-size-6xl: 3.75rem;
   
+  /* Tailles personnalisées pour titres desktop */
+  --desktop-welcome-title-size: 3.75rem;
+  --desktop-welcome-question-size: 1.875rem;
+  
   /* Couleurs */
   --color-primary: #6366f1;
   --color-primary-hover: #4f46e5;

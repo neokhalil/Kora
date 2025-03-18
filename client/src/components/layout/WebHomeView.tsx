@@ -670,24 +670,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             {!conversationStarted ? (
               // Affichage du message de bienvenue lorsqu'aucune conversation n'est démarrée
               <div className="web-welcome-container">
-                <h1 
-                  className="web-welcome-title text-black-force heading-text" 
-                  style={{
-                    color: "#333333", 
-                    opacity: 1, 
-                    fontWeight: 700,
-                    textShadow: "0 0 0 #333333",
-                    fontSize: "var(--font-size-6xl)" // Police plus importante de 6 crans
-                  } as React.CSSProperties}
-                >
+                <h1 className="web-welcome-title">
                   Hello Ibrahima
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div style={{ 
-                    fontSize: "var(--font-size-3xl)", 
-                    color: "#6b7280", 
-                    fontWeight: 400 
-                  }}>Comment puis-je t'aider aujourd'hui?</div>
+                  <div className="web-welcome-question">Comment puis-je t'aider aujourd'hui?</div>
                 </div>
               </div>
             ) : (
