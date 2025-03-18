@@ -291,7 +291,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         sender: 'kora',
       }]);
     } finally {
-      // Réinitialiser les états
+      // Réinitialiser les états pour revenir à une zone de saisie normale
       setIsThinking(false);
       setUploadedImage(null);
       setImagePreviewUrl(null);
@@ -530,20 +530,22 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     return (
       <div key={message.id}>
         <div className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}>
-          {/* Image de l'utilisateur si présente */}
-          {message.imageUrl && (
-            <div className="web-message-image-container">
-              <img 
-                src={message.imageUrl} 
-                alt="Uploaded content" 
-                className="web-message-image"
-              />
+          <div className="web-message-content-wrapper">
+            {/* Image de l'utilisateur si présente - maintenant à l'intérieur de la bulle */}
+            {message.imageUrl && (
+              <div className="web-message-image-container">
+                <img 
+                  src={message.imageUrl} 
+                  alt="Uploaded content" 
+                  className="web-message-image"
+                />
+              </div>
+            )}
+            
+            {/* Contenu du message avec formatage mathématique et code */}
+            <div className="web-message-content">
+              <ContentRenderer content={message.content} className="web-content" />
             </div>
-          )}
-          
-          {/* Contenu du message avec formatage mathématique et code */}
-          <div className="web-message-content">
-            <ContentRenderer content={message.content} className="web-content" />
           </div>
         </div>
         

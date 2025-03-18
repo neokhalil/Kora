@@ -56,6 +56,13 @@
 /* Style commun pour tous les messages */
 /* Styles désactivés car déplacés dans messages.css (architecture ITCSS) */
 
+/* Wrapper du contenu du message pour garder l'image et le texte ensemble */
+.web-message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* Image dans les messages */
 .web-message-image-container {
   margin-bottom: 0.75rem;
