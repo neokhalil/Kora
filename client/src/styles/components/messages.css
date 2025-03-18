@@ -98,16 +98,21 @@
 }
 
 .web-message-image-container {
-  margin-top: 8px;
+  margin-bottom: 10px; /* Espace sous l'image avant le texte */
   border-radius: 8px;
   overflow: hidden;
   max-width: 100%;
+  width: 100%; /* Prend toute la largeur disponible */
+  display: flex; /* Pour centrer l'image */
+  justify-content: center; /* Centrage horizontal */
 }
 
 .web-message-image {
   max-width: 100%;
+  max-height: 250px; /* Hauteur maximale pour l'image */
   height: auto;
   object-fit: contain;
+  border-radius: 8px; /* S'assure que les bords sont arrondis */
 }
 
 /* Boutons d'action sous les messages de Kora */

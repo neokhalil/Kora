@@ -561,7 +561,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       <div key={message.id}>
         <div className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}>
           <div className="web-message-content-wrapper">
-            {/* Image de l'utilisateur si présente - maintenant à l'intérieur de la bulle */}
+            {/* Image de l'utilisateur si présente - positionnée au-dessus du contenu texte */}
             {message.imageUrl && (
               <div className="web-message-image-container">
                 <img 
@@ -572,7 +572,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               </div>
             )}
             
-            {/* Contenu du message avec formatage mathématique et code */}
+            {/* Contenu du message avec formatage mathématique et code - toujours affiché sous l'image */}
             <div className="web-message-content">
               <ContentRenderer content={message.content} className="web-content" />
             </div>
