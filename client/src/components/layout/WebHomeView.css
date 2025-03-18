@@ -529,7 +529,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   /* Styles de base pour le layout */
   .web-layout {
     flex-direction: column;
