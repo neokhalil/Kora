@@ -44,7 +44,20 @@
   font-size: 1.25rem; /* Également augmenté pour maintenir l'équilibre */
   color: var(--muted-foreground, #718096);
   margin-top: 0.5rem;
+  margin-bottom: 2rem;
   font-family: 'Tenon', 'Inter', sans-serif; /* Même police que le titre */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Style pour les div enfants du sous-titre */
+.web-welcome-subtitle div {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2px;
 }
 
 /* Adaptations pour mobile */

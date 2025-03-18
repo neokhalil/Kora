@@ -310,50 +310,18 @@ body, html {
   position: relative;
 }
 
-/* Conteneur de bienvenue */
+/* Conteneur de bienvenue - Styles de positionnement uniquement
+   Les styles visuels sont dans components/welcome.css */
 .web-welcome-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -65%);
   padding-bottom: 30px;
+  /* Les autres styles (flex, width, etc.) sont dans components/welcome.css */
 }
 
-/* Styles pour le titre et le sous-titre de bienvenue - Taille augmentée pour desktop */
-.web-welcome-title {
-  font-size: 2.25rem; /* Augmenté de deux crans pour desktop */
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 10px;
-  margin-top: 0;
-  color: #333333 !important;
-  font-family: 'Tenon', 'Inter', sans-serif;
-}
-
-.web-welcome-subtitle {
-  color: #6e7280;
-  font-size: 1.25rem; /* Augmenté pour maintenir l'équilibre */
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 40px;
-  font-weight: 400;
-  line-height: 1.1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.web-welcome-subtitle div {
-  display: block;
-  width: 100%;
-  text-align: center;
-  margin-bottom: 2px;
-}
+/* Le style pour .web-welcome-subtitle div a été déplacé vers components/welcome.css */
 
 /* Conteneur pour la zone de question */
 .web-question-container {
