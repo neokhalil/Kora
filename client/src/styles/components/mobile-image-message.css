@@ -8,75 +8,110 @@
 
 /* Ces styles s'appliquent uniquement sur les écrans mobiles */
 @media screen and (max-width: 768px) {
+  /* Structure de base du message améliorée */
+  .web-message-with-image {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    margin-bottom: 16px !important; /* Espacement entre les messages avec images */
+  }
+  
   /* Container pour le contenu du message, assure une bonne organisation verticale */
   .web-message-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: stretch; /* Assure que les enfants remplissent la largeur */
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    align-items: flex-start !important; /* Aligne les contenus à gauche par défaut */
+  }
+  
+  /* Pour les messages utilisateur */
+  .web-user-message .web-message-content-wrapper {
+    align-items: flex-end !important; /* Aligne les contenus à droite */
   }
 
   /* Conteneur spécifique pour l'image, optimisé pour mobile */
-  .web-message-content-wrapper .web-message-image-container {
-    display: flex;
-    justify-content: center;
+  .web-message-image-container {
+    display: flex !important;
+    justify-content: center !important;
     margin-bottom: 12px !important; /* Espace obligatoire sous l'image */
     width: 100% !important; /* Force la largeur complète */
     max-width: 100% !important; /* Garantit que l'image ne dépasse pas */
+    border-radius: 8px !important; /* Coins arrondis pour la zone d'image */
+    overflow: hidden !important; /* Assure que l'image respecte les coins arrondis */
   }
 
   /* Style de l'image elle-même, optimisé pour l'affichage mobile */
-  .web-message-content-wrapper .web-message-image {
+  .web-message-image {
     max-height: 220px !important; /* Hauteur réduite pour mobile */
-    border-radius: 8px !important;
-    object-fit: contain !important; /* Préserve les proportions de l'image */
     max-width: 100% !important; /* Garantit que l'image ne dépasse pas */
+    object-fit: contain !important; /* Préserve les proportions de l'image */
+    border-radius: 8px !important; /* Coins arrondis pour l'image */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Légère ombre pour détacher l'image */
   }
 
-  /* Conteneur du message avec image - s'assure que le contenu est bien aligné */
-  .web-message-with-image {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
+  /* Style du conteneur de contenu pour les messages avec image */
+  .web-message-content-with-image {
+    width: 100% !important; /* Prend toute la largeur disponible */
+    margin-top: 4px !important; /* Espace réduit après l'image */
+    box-sizing: border-box !important; /* S'assure que les paddings sont inclus dans la largeur */
   }
 
-  /* Les messages de l'utilisateur avec image ont besoin d'ajustements spécifiques */
-  .web-user-message .web-message-content-wrapper .web-message-image-container {
-    align-items: flex-end; /* Aligne l'image du côté droit pour les messages utilisateur */
-  }
-
-  /* Application d'un style cohérent pour tous les messages Kora sur mobile */
+  /* Pour les messages Kora */
+  .web-kora-message .web-message-content-with-image,
   .web-kora-message .web-message-content {
     background-color: #ffffff !important;
     color: #333333 !important;
     border: none !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     border-radius: 16px 16px 16px 0 !important;
     max-width: 100% !important;
+    width: 100% !important;
   }
 
-  /* Style uniforme pour les messages utilisateur sur mobile */
+  /* Pour les messages utilisateur */
+  .web-user-message .web-message-content-with-image,
   .web-user-message .web-message-content {
     background-color: #f2f2f2 !important;
     color: #333333 !important;
     border: none !important;
     box-shadow: none !important;
-    padding: 12px 16px !important;
+    padding: 14px 16px !important;
     border-radius: 16px 16px 0 16px !important;
-    max-width: 85% !important;
+    max-width: 90% !important; /* Légèrement plus large pour contenir le texte */
+    align-self: flex-end !important; /* Assure l'alignement à droite */
+  }
+  
+  /* Pour les messages utilisateur avec image qui ont besoin d'un traitement spécial */
+  .web-user-message.web-message-with-image {
+    align-items: flex-end !important; /* Aligne tout à droite pour les messages utilisateur */
+  }
+  
+  /* Assure que le contenu du message est bien positionné sous l'image et occupe la bonne largeur */
+  .web-message-with-image .web-message-content-wrapper {
+    align-items: stretch !important; /* Étire les enfants à la largeur du parent */
+  }
+  
+  /* Spécifiquement pour les images dans les messages utilisateur */
+  .web-user-message .web-message-image-container {
+    justify-content: flex-end !important; /* Aligne les images à droite pour les messages utilisateur */
   }
 }
 
 /* Styles spécifiques pour les très petits écrans */
 @media screen and (max-width: 480px) {
-  .web-message-content-wrapper .web-message-image {
+  .web-message-image {
     max-height: 180px !important; /* Hauteur encore plus réduite pour les très petits écrans */
   }
   
-  .web-user-message .web-message-content {
+  .web-user-message .web-message-content,
+  .web-user-message .web-message-content-with-image {
     max-width: 90% !important; /* Un peu plus large sur les petits écrans */
+    padding: 12px 14px !important; /* Padding légèrement réduit */
+  }
+  
+  .web-kora-message .web-message-content,
+  .web-kora-message .web-message-content-with-image {
+    padding: 12px 14px !important; /* Padding légèrement réduit */
   }
 }
