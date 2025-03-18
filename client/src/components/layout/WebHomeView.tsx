@@ -84,6 +84,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     // Si on a une image, on utilise la fonction d'envoi d'image
     if (uploadedImage && imagePreviewUrl) {
       await handleImageSubmit(question);
+      // Réinitialiser les états liés à l'image immédiatement après l'envoi
+      setUploadedImage(null);
+      setImagePreviewUrl(null);
       return;
     }
     
@@ -233,16 +236,24 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setConversationStarted(true);
     }
     
-    // Fermer la modale et réinitialiser la question
+    // Fermer la modale et réinitialiser la question et l'image dans l'interface utilisateur
     setIsImageUploadModalOpen(false);
     setQuestion('');
+    
+    // On sauvegarde une copie de l'image avant de l'effacer, pour pouvoir l'envoyer
+    const imageToSend = uploadedImage;
+    const imageUrlToSend = imagePreviewUrl;
+    
+    // Effacer l'image immédiatement pour la zone de saisie
+    setUploadedImage(null);
+    setImagePreviewUrl(null);
     
     // Créer un message utilisateur avec l'image
     const userMessage: Message = {
       id: Date.now().toString(),
       content: imageText || 'Analyse cette image s\'il te plaît',
       sender: 'user',
-      imageUrl: imagePreviewUrl,
+      imageUrl: imageUrlToSend,
     };
     
     // Ajouter le message utilisateur à la conversation
@@ -254,7 +265,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     try {
       // Préparer le formulaire pour l'envoi de l'image
       const formData = new FormData();
-      formData.append('image', uploadedImage);
+      formData.append('image', imageToSend);
       
       if (imageText) {
         formData.append('text_query', imageText);
@@ -291,10 +302,10 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         sender: 'kora',
       }]);
     } finally {
-      // Réinitialiser les états pour revenir à une zone de saisie normale
+      // Arrêter l'animation de réflexion
       setIsThinking(false);
-      setUploadedImage(null);
-      setImagePreviewUrl(null);
+      // Pas besoin de réinitialiser setUploadedImage et setImagePreviewUrl ici
+      // car ils ont déjà été réinitialisés au début de la fonction
     }
   };
   
