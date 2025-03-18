@@ -75,13 +75,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   useEffect(() => {
     // Si la modale est fermée, s'assurer que l'image est nettoyée après un court délai
     if (!isImageUploadModalOpen) {
+      // Réduire le délai à 150ms pour une meilleure réactivité tout en maintenant
+      // la fluidité de l'interface lors de la fermeture de la modale
       const timer = setTimeout(() => {
         if (!isImageUploadModalOpen) {
           // Double vérification pour éviter les conflits avec d'autres actions
           setUploadedImage(null);
           setImagePreviewUrl(null);
         }
-      }, 300);
+      }, 150);
       
       return () => clearTimeout(timer);
     }
@@ -328,11 +330,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     // Fermer la modale avant de réinitialiser l'image pour éviter des flashs de l'interface
     setIsImageUploadModalOpen(false);
     
-    // Nettoyer complètement l'état de l'image
-    setTimeout(() => {
-      setUploadedImage(null);
-      setImagePreviewUrl(null);
-    }, 100); // Petit délai pour s'assurer que la modale se ferme d'abord
+    // Le nettoyage des états d'image se fera automatiquement via le useEffect
+    // qui surveille isImageUploadModalOpen, pour assurer la cohérence
+    // Note: l'effet utilise un délai de 150ms pour nettoyer l'état
   };
   
   // Gestion de l'enregistrement vocal
