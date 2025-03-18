@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 120px; /* Ajout d'un padding-bottom important pour éviter que la zone de texte ne cache les messages */
+  padding: 16px 0 160px; /* Augmenté pour laisser plus d'espace pour la zone de texte et les boutons d'action */
   width: 100%;
   margin-bottom: 20px; /* Marge supplémentaire au bas de la liste */
 }
@@ -149,6 +149,12 @@
   color: #6b7280;
 }
 
+/* Style spécifique pour les actions des défis */
+.web-challenge-actions {
+  /* Hérite de web-message-actions mais on peut ajouter des styles spécifiques ici */
+  margin-bottom: 8px; /* Espacement supplémentaire si plusieurs boutons d'action se suivent */
+}
+
 /* Adaptations pour les différentes tailles d'écran */
 @media screen and (max-width: 768px) {
   .web-user-message .web-message-content {
@@ -178,7 +184,7 @@
   
   .web-message-actions {
     margin-top: 10px;
-    padding-bottom: 16px;
+    padding-bottom: 36px; /* Augmenté de 16px à 36px pour plus d'espace sur mobile */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
   }
@@ -197,6 +203,6 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 100px; /* Espacement inférieur adapté pour les petits écrans */
+    padding: 12px 0 140px; /* Augmenté de 100px à 140px pour plus d'espace sur petits écrans */
   }
 }
