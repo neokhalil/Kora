@@ -15,10 +15,10 @@
   h1.web-welcome-title,
   body .web-welcome-container .web-welcome-title {
     font-size: 48px !important; /* Réduit de deux crans (60px → 48px) */
-    font-weight: 900 !important;
-    color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-    text-fill-color: #000000 !important;
+    font-weight: 700 !important; /* Reduced from 900 to 700 to match mobile */
+    color: #333333 !important;
+    -webkit-text-fill-color: #333333 !important;
+    text-fill-color: #333333 !important;
     opacity: 1 !important;
     visibility: visible !important;
     letter-spacing: -0.02em !important;
