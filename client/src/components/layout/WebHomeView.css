@@ -318,6 +318,51 @@
   width: 100%;
 }
 
+/* Styles pour l'aperçu d'image dans la zone de saisie sur desktop */
+.web-input-with-image {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.web-input-image-preview {
+  position: relative;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f5f5f7;
+  max-height: 200px;
+  display: flex;
+  justify-content: center;
+}
+
+.web-input-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+}
+
+.web-remove-image-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.web-remove-image-button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
 /* Styles pour la modale d'upload d'image */
 .web-modal-overlay {
   position: fixed;

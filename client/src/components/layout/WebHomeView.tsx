@@ -74,13 +74,20 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question.trim()) return;
+    if (!question.trim() && !uploadedImage) return; // Vérifier qu'il y a au moins une question ou une image
     
     // Démarrage de la conversation si ce n'est pas déjà fait
     if (!conversationStarted) {
       setConversationStarted(true);
     }
     
+    // Si on a une image, on utilise la fonction d'envoi d'image
+    if (uploadedImage && imagePreviewUrl) {
+      await handleImageSubmit(question);
+      return;
+    }
+    
+    // Si on n'a pas d'image, on procède comme avant
     // Créer un message utilisateur
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -209,8 +216,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         if (window.innerWidth <= 768) {
           setIsImageUploadModalOpen(true);
         } else {
-          // Focus sur le champ de saisie pour permettre à l'utilisateur d'ajouter du texte
-          setTimeout(() => document.querySelector('.web-input')?.focus(), 100);
+          // Sur desktop, on n'ouvre pas de modale
+          // On pourrait ajouter un focus sur l'input, mais on le laisse naturel
         }
       };
       reader.readAsDataURL(file);
