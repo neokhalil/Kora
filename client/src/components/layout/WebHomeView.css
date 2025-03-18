@@ -63,6 +63,32 @@
   width: 100%;
 }
 
+/* S'assurer que les messages utilisateurs s'alignent à droite */
+.web-user-message {
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.web-user-message .web-message-content-wrapper {
+  align-items: flex-end;
+  max-width: 75%;
+  margin-left: auto;
+}
+
+/* S'assurer que les messages de KORA s'alignent à gauche */
+.web-kora-message {
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-right: auto;
+}
+
+.web-kora-message .web-message-content-wrapper {
+  align-items: flex-start;
+  max-width: 75%;
+  margin-right: auto;
+}
+
 /* Image dans les messages */
 .web-message-image-container {
   margin-bottom: 0.75rem;

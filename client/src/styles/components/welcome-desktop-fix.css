@@ -35,7 +35,7 @@
   body .web-welcome-container .web-welcome-subtitle .web-welcome-question {
     font-size: 30px !important;
     font-weight: 400 !important;
-    color: var(--color-text-secondary) !important;
+    color: #888d96 !important; /* Couleur spécifiée par le client */
     opacity: 1 !important;
     visibility: visible !important;
     max-width: 400px !important;
