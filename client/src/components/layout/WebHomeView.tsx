@@ -236,15 +236,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setConversationStarted(true);
     }
     
-    // Fermer la modale et réinitialiser la question et l'image dans l'interface utilisateur
-    setIsImageUploadModalOpen(false);
-    setQuestion('');
-    
     // On sauvegarde une copie de l'image avant de l'effacer, pour pouvoir l'envoyer
     const imageToSend = uploadedImage;
     const imageUrlToSend = imagePreviewUrl;
     
-    // Effacer l'image immédiatement pour la zone de saisie
+    // Fermer la modale et réinitialiser les états immédiatement
+    setIsImageUploadModalOpen(false);
+    setQuestion('');
     setUploadedImage(null);
     setImagePreviewUrl(null);
     
@@ -311,9 +309,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   
   // Annuler le téléchargement d'image
   const handleCancelImageUpload = () => {
+    // Fermer la modale avant de réinitialiser l'image pour éviter des flashs de l'interface
     setIsImageUploadModalOpen(false);
-    setUploadedImage(null);
-    setImagePreviewUrl(null);
+    
+    // Nettoyer complètement l'état de l'image
+    setTimeout(() => {
+      setUploadedImage(null);
+      setImagePreviewUrl(null);
+    }, 100); // Petit délai pour s'assurer que la modale se ferme d'abord
   };
   
   // Gestion de l'enregistrement vocal
