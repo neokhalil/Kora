@@ -88,6 +88,32 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       return () => clearTimeout(timer);
     }
   }, [isImageUploadModalOpen]);
+  
+  // Effet supplémentaire pour les petits écrans, pour résoudre les problèmes de persistance d'image
+  useEffect(() => {
+    // Vérifier si nous sommes sur mobile
+    const isMobileDevice = window.innerWidth <= 768;
+    if (!isMobileDevice) return; // Ne s'exécute que sur mobile
+    
+    // Observer les changements dans la liste des messages
+    // Si un nouveau message avec une image est ajouté, forcer le nettoyage des états d'image
+    const messageCount = messages.length;
+    
+    // Vérifier si le dernier message contient une image
+    if (messageCount > 0) {
+      const lastMessage = messages[messageCount - 1];
+      if (lastMessage.sender === 'user' && lastMessage.imageUrl) {
+        // Forcer un nettoyage supplémentaire des états d'image sur mobile
+        setUploadedImage(null);
+        setImagePreviewUrl(null);
+        
+        // Forcer le blur sur tout élément actif (pour libérer le focus des inputs)
+        if (document.activeElement instanceof HTMLElement) {
+          document.activeElement.blur();
+        }
+      }
+    }
+  }, [messages]);
 
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
@@ -258,11 +284,24 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     const imageToSend = uploadedImage;
     const imageUrlToSend = imagePreviewUrl;
     
+    // Force le focus sur un élément neutre pour aider à résoudre les problèmes de persistance sur mobile
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    
     // Fermer la modale et réinitialiser les états immédiatement
     setIsImageUploadModalOpen(false);
     setQuestion('');
+    
+    // Double nettoyage des états d'image pour résoudre les problèmes de persistance sur mobile
     setUploadedImage(null);
     setImagePreviewUrl(null);
+    
+    // Nettoyage supplémentaire avec un délai court pour s'assurer que l'état est bien réinitialisé
+    setTimeout(() => {
+      setUploadedImage(null);
+      setImagePreviewUrl(null);
+    }, 100);
     
     // Créer un message utilisateur avec l'image
     const userMessage: Message = {

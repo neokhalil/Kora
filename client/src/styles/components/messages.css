@@ -181,6 +181,28 @@
     box-shadow: none !important; /* S'assurer qu'il n'y a pas d'ombres non plus */
   }
   
+  /* Ajustements spécifiques pour les messages avec images sur mobile */
+  .web-message-image-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px !important; /* Force une marge sous l'image */
+    width: 100% !important; /* Force la largeur complète */
+  }
+  
+  .web-message-image {
+    max-height: 220px !important; /* Hauteur légèrement réduite sur mobile */
+    border-radius: 8px !important;
+    object-fit: contain !important; /* Garantit que l'image s'affiche correctement */
+  }
+  
+  /* Assure que le contenu du message est bien positionné sous l'image */
+  .web-message-with-image {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+  
   .web-message-actions {
     margin-top: 10px;
     padding-bottom: 16px;
