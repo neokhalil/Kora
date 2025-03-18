@@ -683,8 +683,11 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   Hello Ibrahima
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div style={{ fontSize: "var(--font-size-3xl)", marginBottom: "0.75rem" }}>Comment puis-je t'aider</div>
-                  <div style={{ fontSize: "var(--font-size-3xl)" }}>aujourd'hui ?</div>
+                  <div style={{ 
+                    fontSize: "var(--font-size-3xl)", 
+                    color: "#6b7280", 
+                    fontWeight: 400 
+                  }}>Comment puis-je t'aider aujourd'hui?</div>
                 </div>
               </div>
             ) : (
