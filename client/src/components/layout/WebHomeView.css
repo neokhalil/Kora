@@ -85,7 +85,7 @@
 
 .web-kora-message .web-message-content-wrapper {
   align-items: flex-start;
-  max-width: 75%;
+  max-width: 100%; /* Permet d'utiliser toute la largeur disponible */
   margin-right: auto;
 }
 

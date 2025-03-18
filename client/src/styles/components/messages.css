@@ -49,7 +49,7 @@
   border: none !important; /* Important pour s'assurer qu'aucun style ne surcharge */
   border-radius: 16px 16px 16px 0;
   color: #333333;
-  max-width: 75%;
+  max-width: 100%; /* Permet d'utiliser toute la largeur disponible */
   padding: 14px 18px;
   /* Aucune ombre */
   box-shadow: none !important;
@@ -151,9 +151,13 @@
 
 /* Adaptations pour les différentes tailles d'écran */
 @media screen and (max-width: 768px) {
-  .web-user-message .web-message-content,
-  .web-kora-message .web-message-content {
+  .web-user-message .web-message-content {
     max-width: 85%;
+    padding: 10px 14px;
+  }
+  
+  .web-kora-message .web-message-content {
+    max-width: 100%;
     padding: 10px 14px;
   }
   
