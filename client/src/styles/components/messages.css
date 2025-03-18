@@ -116,7 +116,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
-  padding-bottom: 20px;
+  padding-bottom: 40px; /* Augmenté de 20px à 40px pour créer plus d'espace avec la zone de saisie */
   margin-left: 16px; /* Aligner avec le message */
   z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
 }
