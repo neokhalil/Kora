@@ -25,7 +25,7 @@
     text-shadow: none !important;
     text-rendering: optimizeLegibility !important;
     line-height: 1.2 !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 10px !important; /* Reduced from 24px to 10px to remove the large gap */
     font-family: var(--font-main) !important; /* Assure la cohérence de la police avec mobile */
   }
   
@@ -35,7 +35,7 @@
   body .web-welcome-container .web-welcome-subtitle .web-welcome-question {
     font-size: 30px !important;
     font-weight: 400 !important;
-    color: #6b7280 !important;
+    color: var(--color-text-secondary) !important;
     opacity: 1 !important;
     visibility: visible !important;
     max-width: 400px !important;
