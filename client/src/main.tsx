@@ -27,6 +27,7 @@ import "./styles/components/forms.css"; // ITCSS: Styles pour les formulaires
 import "./styles/components/messages.css"; // ITCSS: Styles pour les messages et conversations
 import "./styles/components/typography.css"; // ITCSS: Styles pour la typographie et les textes
 import "./styles/components/welcome.css"; // ITCSS: Styles pour l'écran de bienvenue
+import "./styles/components/mobile-image-message.css"; // ITCSS: Styles spécifiques pour les messages avec images sur mobile
 
 // Fix spécifique pour desktop (doit être importé en dernier pour priorité maximale)
 import "./styles/components/welcome-desktop-fix.css"; // Solution pour l'écran de bienvenue en version desktop
