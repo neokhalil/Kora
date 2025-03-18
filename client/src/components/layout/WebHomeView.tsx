@@ -649,44 +649,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               </button>
             </div>
 
-            {/* Séparateur */}
-            <div className="web-sidebar-divider"></div>
-
-            {/* Section Hier */}
-            <div className="web-sidebar-section">
-              <h2>Hier</h2>
-              {filteredRecentTopics.length === 0 ? (
-                <p className="text-gray-500 text-sm pl-3 pr-3 py-2">Aucun résultat trouvé</p>
-              ) : (
-                <ul>
-                  {filteredRecentTopics.map(topic => (
-                    <li key={topic.id}>
-                      <Link href={`/topics/${topic.id}`}>
-                        {topic.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            
-            {/* Section Il y a 7 jours */}
-            <div className="web-sidebar-section">
-              <h2>Il y a 7 jours</h2>
-              {filteredOlderTopics.length === 0 ? (
-                <p className="text-gray-500 text-sm pl-3 pr-3 py-2">Aucun résultat trouvé</p>
-              ) : (
-                <ul>
-                  {filteredOlderTopics.map(topic => (
-                    <li key={topic.id}>
-                      <Link href={`/topics/${topic.id}`}>
-                        {topic.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            {/* Contenu de la sidebar nettoyé selon les instructions */}
 
             {/* Profil utilisateur en bas */}
             <div className="web-profile-container">
@@ -713,14 +676,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     color: "#333333", 
                     opacity: 1, 
                     fontWeight: 700,
-                    textShadow: "0 0 0 #333333"
+                    textShadow: "0 0 0 #333333",
+                    fontSize: "var(--font-size-6xl)" // Police plus importante de 6 crans
                   } as React.CSSProperties}
                 >
                   Hello Ibrahima
                 </h1>
                 <div className="web-welcome-subtitle">
-                  <div>Comment puis t'aider</div>
-                  <div>aujourd'hui?</div>
+                  <div style={{ fontSize: "var(--font-size-3xl)", marginBottom: "0.75rem" }}>Comment puis-je t'aider</div>
+                  <div style={{ fontSize: "var(--font-size-3xl)" }}>aujourd'hui ?</div>
                 </div>
               </div>
             ) : (
