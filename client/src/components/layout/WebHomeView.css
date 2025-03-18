@@ -557,10 +557,11 @@
     margin-bottom: 12px !important;
   }
   
-  /* Changement de couleur pour les messages utilisateur sur mobile */
-  .web-message.web-user-message .web-message-content {
+  /* Changement de couleur pour les messages utilisateur sur mobile - avec spécificité élevée pour surcharger */
+  body .web-layout .web-main-content .web-messages-list .web-message.web-user-message .web-message-content {
     background-color: #ff3333 !important; /* Rouge vif */
     color: white !important;
+    border: none !important;
   }
   
   .web-message-content {
