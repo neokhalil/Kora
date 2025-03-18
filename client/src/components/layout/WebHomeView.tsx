@@ -70,50 +70,6 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       }, 100);
     }
   }, [messages]);
-  
-  // Effet spécifique pour s'assurer que la fermeture de la modale nettoie toujours l'état des images
-  useEffect(() => {
-    // Si la modale est fermée, s'assurer que l'image est nettoyée après un court délai
-    if (!isImageUploadModalOpen) {
-      // Réduire le délai à 150ms pour une meilleure réactivité tout en maintenant
-      // la fluidité de l'interface lors de la fermeture de la modale
-      const timer = setTimeout(() => {
-        if (!isImageUploadModalOpen) {
-          // Double vérification pour éviter les conflits avec d'autres actions
-          setUploadedImage(null);
-          setImagePreviewUrl(null);
-        }
-      }, 150);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isImageUploadModalOpen]);
-  
-  // Effet supplémentaire pour les petits écrans, pour résoudre les problèmes de persistance d'image
-  useEffect(() => {
-    // Vérifier si nous sommes sur mobile
-    const isMobileDevice = window.innerWidth <= 768;
-    if (!isMobileDevice) return; // Ne s'exécute que sur mobile
-    
-    // Observer les changements dans la liste des messages
-    // Si un nouveau message avec une image est ajouté, forcer le nettoyage des états d'image
-    const messageCount = messages.length;
-    
-    // Vérifier si le dernier message contient une image
-    if (messageCount > 0) {
-      const lastMessage = messages[messageCount - 1];
-      if (lastMessage.sender === 'user' && lastMessage.imageUrl) {
-        // Forcer un nettoyage supplémentaire des états d'image sur mobile
-        setUploadedImage(null);
-        setImagePreviewUrl(null);
-        
-        // Forcer le blur sur tout élément actif (pour libérer le focus des inputs)
-        if (document.activeElement instanceof HTMLElement) {
-          document.activeElement.blur();
-        }
-      }
-    }
-  }, [messages]);
 
   // Fonction pour gérer la soumission du formulaire de question
   const handleSubmit = async (e: React.FormEvent) => {
@@ -280,28 +236,17 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       setConversationStarted(true);
     }
     
+    // Fermer la modale et réinitialiser la question et l'image dans l'interface utilisateur
+    setIsImageUploadModalOpen(false);
+    setQuestion('');
+    
     // On sauvegarde une copie de l'image avant de l'effacer, pour pouvoir l'envoyer
     const imageToSend = uploadedImage;
     const imageUrlToSend = imagePreviewUrl;
     
-    // Force le focus sur un élément neutre pour aider à résoudre les problèmes de persistance sur mobile
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
-    }
-    
-    // Fermer la modale et réinitialiser les états immédiatement
-    setIsImageUploadModalOpen(false);
-    setQuestion('');
-    
-    // Double nettoyage des états d'image pour résoudre les problèmes de persistance sur mobile
+    // Effacer l'image immédiatement pour la zone de saisie
     setUploadedImage(null);
     setImagePreviewUrl(null);
-    
-    // Nettoyage supplémentaire avec un délai court pour s'assurer que l'état est bien réinitialisé
-    setTimeout(() => {
-      setUploadedImage(null);
-      setImagePreviewUrl(null);
-    }, 100);
     
     // Créer un message utilisateur avec l'image
     const userMessage: Message = {
@@ -366,12 +311,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   
   // Annuler le téléchargement d'image
   const handleCancelImageUpload = () => {
-    // Fermer la modale avant de réinitialiser l'image pour éviter des flashs de l'interface
     setIsImageUploadModalOpen(false);
-    
-    // Le nettoyage des états d'image se fera automatiquement via le useEffect
-    // qui surveille isImageUploadModalOpen, pour assurer la cohérence
-    // Note: l'effet utilise un délai de 150ms pour nettoyer l'état
+    setUploadedImage(null);
+    setImagePreviewUrl(null);
   };
   
   // Gestion de l'enregistrement vocal
@@ -598,9 +540,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     
     return (
       <div key={message.id}>
-        <div className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'} ${message.imageUrl ? 'web-message-with-image' : ''}`}>
+        <div className={`web-message ${isUserMessage ? 'web-user-message' : 'web-kora-message'}`}>
           <div className="web-message-content-wrapper">
-            {/* Image de l'utilisateur si présente - positionnée au-dessus du contenu texte */}
+            {/* Image de l'utilisateur si présente - maintenant à l'intérieur de la bulle */}
             {message.imageUrl && (
               <div className="web-message-image-container">
                 <img 
@@ -611,8 +553,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               </div>
             )}
             
-            {/* Contenu du message avec formatage mathématique et code - toujours affiché sous l'image */}
-            <div className={`web-message-content ${message.imageUrl ? 'web-message-content-with-image' : ''}`}>
+            {/* Contenu du message avec formatage mathématique et code */}
+            <div className="web-message-content">
               <ContentRenderer content={message.content} className="web-content" />
             </div>
           </div>
@@ -654,6 +596,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             >
               <Lightbulb size={15} />
               <span>Exercice</span>
+            </button>
+            <button 
+              type="button"
+              className="web-action-button"
+            >
+              <BookOpen size={15} />
+              <span>Cours</span>
             </button>
           </div>
         )}

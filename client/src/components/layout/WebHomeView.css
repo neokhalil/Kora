@@ -94,8 +94,6 @@
   margin-bottom: 0.75rem;
   border-radius: 8px;
   overflow: hidden;
-  max-width: 100%;
-  width: auto;
 }
 
 .web-message-image {
@@ -103,7 +101,6 @@
   max-height: 300px;
   display: block;
   object-fit: contain;
-  border-radius: 8px;
 }
 
 /* Contenu du message */
@@ -529,8 +526,7 @@
   }
 }
 
-@media (max-width: 900px) {
-  /* Styles de base pour le layout */
+@media (max-width: 768px) {
   .web-layout {
     flex-direction: column;
   }
@@ -547,75 +543,6 @@
   .web-main-content {
     height: calc(100vh - 80px);
   }
-  
-  /* Ajustements pour les conteneurs de messages sur mobile */
-  .web-messages-container {
-    padding: 8px !important;
-  }
-  
-  .web-message {
-    margin-bottom: 12px !important;
-  }
-  
-  /* Changement de couleur pour les messages utilisateur sur mobile - avec spécificité élevée pour surcharger */
-  body .web-layout .web-main-content .web-messages-list .web-message.web-user-message .web-message-content {
-    background-color: #ff3333 !important; /* Rouge vif */
-    color: white !important;
-    border: none !important;
-  }
-  
-  .web-message-content {
-    max-width: 100% !important;
-    padding: 8px 12px !important;
-  }
-  
-  /* Styles d'image adaptés pour le mobile */
-  .web-message-image-container {
-    margin: 0 0 8px 0 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border-radius: 8px !important;
-    background-color: #f9f9f9 !important;
-    overflow: hidden !important;
-  }
-  
-  .web-message-image {
-    width: 100% !important;
-    max-width: 100% !important;
-    max-height: 200px !important;
-    object-fit: contain !important;
-    border-radius: 0 !important;
-  }
-  
-  /* Ajustements pour les actions des messages sur mobile */
-  .web-message-actions {
-    flex-wrap: wrap !important;
-    gap: 6px !important;
-    margin-top: 8px !important;
-  }
-  
-  .web-message-action-button {
-    padding: 6px 10px !important;
-    font-size: 13px !important;
-    min-height: 32px !important;
-  }
-  
-  /* Ajustements pour la zone de saisie sur mobile */
-  .web-input-container {
-    padding: 8px !important;
-  }
-  
-  .web-input-wrapper {
-    padding: 8px !important;
-  }
-  
-  .web-input {
-    font-size: 14px !important;
-  }
-  
-  .web-action-buttons {
-    gap: 8px !important;
-  }
 
   /* Masquer tous les éléments de la sidebar sauf le logo sur mobile */
   .web-search-container,
@@ -630,17 +557,5 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  /* Modale d'upload d'image pour mobile */
-  .web-modal {
-    width: 95% !important;
-    max-height: 80vh !important;
-  }
-  
-  .web-modal-header, 
-  .web-modal-content, 
-  .web-modal-footer {
-    padding: 12px !important;
   }
 }
