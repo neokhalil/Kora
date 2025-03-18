@@ -597,13 +597,16 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               <Lightbulb size={15} />
               <span>Exercice</span>
             </button>
-            <button 
-              type="button"
-              className="web-action-button"
-            >
-              <BookOpen size={15} />
-              <span>Cours</span>
-            </button>
+            {/* Le bouton Cours est affiché uniquement sur mobile */}
+            {window.innerWidth <= 768 && (
+              <button 
+                type="button"
+                className="web-action-button"
+              >
+                <BookOpen size={15} />
+                <span>Cours</span>
+              </button>
+            )}
           </div>
         )}
         
