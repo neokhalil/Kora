@@ -324,19 +324,20 @@ body, html {
   padding-bottom: 30px;
 }
 
-/* Styles pour le titre et le sous-titre de bienvenue */
+/* Styles pour le titre et le sous-titre de bienvenue - Alignés sur la version mobile */
 .web-welcome-title {
-  font-size: 3.2rem;
-  font-weight: 800;
+  font-size: 1.75rem; /* Aligné sur mobile */
+  font-weight: 700; /* Aligné sur mobile */
   text-align: center;
   margin-bottom: 10px;
   margin-top: 0;
-  color: #000;
+  color: #333333 !important;
+  font-family: 'Tenon', 'Inter', sans-serif;
 }
 
 .web-welcome-subtitle {
   color: #6e7280;
-  font-size: 1.75rem;
+  font-size: 1rem; /* Aligné sur mobile */
   text-align: center;
   margin-top: 0;
   margin-bottom: 40px;

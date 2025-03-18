@@ -29,20 +29,22 @@
 
 /* Titre de bienvenue avec des règles de priorité élevée */
 .web-welcome-title {
-  font-size: 2.5rem;
+  font-size: 1.75rem; /* Taille mobile utilisée comme référence */
   font-weight: 700;
   color: #333333 !important;
   margin-bottom: 0.5rem;
   letter-spacing: -0.01em;
   text-shadow: 0 0 0 #333333;
   -webkit-text-fill-color: #333333 !important;
+  font-family: 'Tenon', 'Inter', sans-serif; /* Assurons-nous d'utiliser la même police partout */
 }
 
 /* Sous-titre de bienvenue */
 .web-welcome-subtitle {
-  font-size: 1.25rem;
+  font-size: 1rem; /* Taille mobile utilisée comme référence */
   color: var(--muted-foreground, #718096);
   margin-top: 0.5rem;
+  font-family: 'Tenon', 'Inter', sans-serif; /* Même police que le titre */
 }
 
 /* Adaptations pour mobile */
