@@ -85,8 +85,8 @@ form .web-question-container button[type="submit"],
   color: white !important;
   border: none !important;
   border-radius: 9999px !important;
-  width: 40px !important; /* Même taille que les autres boutons */
-  height: 40px !important;
+  width: 36px !important;
+  height: 36px !important;
   
   /* Positionnement */
   position: static !important; /* Changé de absolute à static */
@@ -100,9 +100,8 @@ form .web-question-container button[type="submit"],
   justify-content: center !important;
   padding: 0 !important;
   z-index: 100 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important; /* Ombre plus subtile */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
   cursor: pointer !important;
-  transition: background-color 0.2s ease !important;
 }
 
 /* Règles pour le bouton d'image */
@@ -111,12 +110,12 @@ button[aria-label="Télécharger une image"],
 .web-question-container .web-image-button,
 div.web-image-button {
   /* Apparence */
-  background-color: #f3f4f6 !important; /* Fond grisé comme dans l'image de référence */
+  background-color: transparent !important;
   color: #6b7280 !important;
   border: none !important;
   border-radius: 9999px !important;
-  width: 40px !important;
-  height: 40px !important;
+  width: 36px !important;
+  height: 36px !important;
   
   /* Positionnement */
   position: static !important; /* Changé de absolute à static */
@@ -131,7 +130,6 @@ div.web-image-button {
   padding: 0 !important;
   z-index: 10 !important;
   cursor: pointer !important;
-  transition: background-color 0.2s ease !important;
 }
 
 .web-image-button:hover {
@@ -150,8 +148,8 @@ div.web-mic-button {
   color: white !important;
   border: none !important;
   border-radius: 9999px !important;
-  width: 40px !important; /* Même taille que le bouton d'image */
-  height: 40px !important;
+  width: 36px !important;
+  height: 36px !important;
   
   /* Positionnement */
   position: static !important; /* Changé de absolute à static */
@@ -165,9 +163,8 @@ div.web-mic-button {
   justify-content: center !important;
   padding: 0 !important;
   z-index: 100 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important; /* Ombre plus subtile */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
   cursor: pointer !important;
-  transition: background-color 0.2s ease !important;
 }
 
 .web-mic-button:hover {
