@@ -20,8 +20,9 @@ body .web-home-container .web-layout .web-main-content .web-welcome-container .w
   font-size: 3.75rem !important; /* Force une taille absolue */
 }
 
-/* Fix spécifique pour mobile */
-@media (max-width: 640px) {
+/* Fix spécifique pour mobile et tablettes */
+@media (max-width: var(--breakpoint-sm)) {
+  /* Petit mobile et tablettes (640px et moins) */
   .web-welcome-title, 
   h1.web-welcome-title,
   .web-welcome-container h1,

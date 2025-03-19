@@ -72,7 +72,8 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Adaptations pour mobile */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   body {
     font-size: var(--font-size-sm);
   }
@@ -95,7 +96,8 @@ input::placeholder, textarea::placeholder {
 }
 
 /* Override pour petit mobile */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   p {
     font-size: var(--font-size-xs);
   }
