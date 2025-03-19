@@ -24,7 +24,7 @@
   background-color: var(--color-background);
   /* Retrait du trait de délimitation */
   border-top: none;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-4) 0; /* Suppression du padding bas */
   margin-top: var(--space-4);
   box-sizing: border-box;
 }

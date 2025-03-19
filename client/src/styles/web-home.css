@@ -415,6 +415,7 @@ body, html {
   font-size: 0.85rem;
   margin-top: 0; /* Supprime l'espace entre le texte et le footer */
   margin-bottom: 0;
+  padding-top: 12px; /* Ajoute un espace au-dessus du footer */
   font-weight: 400;
   line-height: 1.4;
 }
