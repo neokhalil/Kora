@@ -85,8 +85,8 @@ form .web-question-container button[type="submit"],
   color: white !important;
   border: none !important;
   border-radius: 9999px !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 40px !important; /* Même taille que les autres boutons */
+  height: 40px !important;
   
   /* Positionnement */
   position: static !important; /* Changé de absolute à static */
@@ -100,8 +100,9 @@ form .web-question-container button[type="submit"],
   justify-content: center !important;
   padding: 0 !important;
   z-index: 100 !important;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important; /* Ombre plus subtile */
   cursor: pointer !important;
+  transition: background-color 0.2s ease !important;
 }
 
 /* Règles pour le bouton d'image */

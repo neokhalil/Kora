@@ -348,9 +348,9 @@ body, html {
 
 .web-input-wrapper {
   width: 100%;
-  max-width: 600px; /* Largeur fixe correspondant à l'image de référence */
+  max-width: 450px; /* Largeur réduite pour correspondre à l'image de référence */
   margin: 0 auto; /* Centrage horizontal */
-  padding: 16px; /* Padding uniforme */
+  padding: 12px 16px; /* Padding vertical réduit */
   position: relative;
   display: flex;
   flex-direction: column; /* Structure verticale : input en haut, boutons en bas */
@@ -365,6 +365,10 @@ body, html {
   padding: 8px 12px;
   background-color: #f9fafb; /* Fond légèrement grisé comme dans l'image */
   border-radius: 8px; /* Coins arrondis */
+  border: 1px solid #e5e7eb; /* Bordure subtile comme dans l'image */
+  height: 44px; /* Hauteur fixe pour correspondre à l'image */
+  display: flex;
+  align-items: center;
 }
 
 .web-question-box input {
@@ -388,10 +392,10 @@ body, html {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding: 0 8px; /* Ajouté pour donner un peu d'espace sur les côtés */
+  padding: 0;
 }
 
-/* Pour le cas où nous avons deux boutons */
+/* Style pour l'alignement des boutons à gauche et à droite */
 .web-input-actions > button:first-child {
   margin-right: auto; /* Pousse le premier bouton à gauche */
 }
