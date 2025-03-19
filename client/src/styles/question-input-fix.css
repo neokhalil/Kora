@@ -8,8 +8,8 @@
   .web-question-container,
   div.web-question-container,
   .web-layout .web-main-content .web-question-container {
-    width: 600px !important;
-    max-width: 600px !important;
+    width: 800px !important; /* Augmentation de la largeur de 600px à 800px */
+    max-width: 800px !important; /* Augmentation de la largeur maximale également */
     position: fixed !important;
     bottom: 0 !important;
     /* Positionnement centré par rapport à la zone principale */
