@@ -4,6 +4,25 @@
  */
 
 /**
+ * Styles pour le champ d'entrée principal
+ * Basé sur le design de référence avec une apparence plus arrondie
+ */
+.web-input {
+  width: 100%;
+  height: 40px;
+  border: none;
+  font-size: 1rem;
+  color: #4B5563;
+  background: transparent;
+  outline: none;
+  padding: 8px 0;
+}
+
+.web-input:focus {
+  outline: none;
+}
+
+/**
  * Zone de saisie des questions
  * Composant principal pour l'interaction utilisateur
  */

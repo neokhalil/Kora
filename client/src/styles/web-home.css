@@ -348,16 +348,23 @@ body, html {
 
 .web-input-wrapper {
   width: 100%;
-  padding: 16px 20px; /* Padding réduit, car les boutons ne sont plus en absolue */
+  max-width: 600px; /* Largeur fixe correspondant à l'image de référence */
+  margin: 0 auto; /* Centrage horizontal */
+  padding: 16px; /* Padding uniforme */
   position: relative;
   display: flex;
   flex-direction: column; /* Structure verticale : input en haut, boutons en bas */
   gap: 16px; /* Espace entre le champ et les boutons */
+  background-color: #fff;
+  border-radius: 12px; /* Bordure arrondie comme dans l'image */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* Ombre légère pour donner de la profondeur */
 }
 
 .web-input-field {
   width: 100%;
-  padding: 10px 0;
+  padding: 8px 12px;
+  background-color: #f9fafb; /* Fond légèrement grisé comme dans l'image */
+  border-radius: 8px; /* Coins arrondis */
 }
 
 .web-question-box input {
@@ -365,9 +372,9 @@ body, html {
   border: none;
   outline: none;
   font-size: 1rem;
-  color: #6b7280;
+  color: #4B5563; /* Couleur de texte plus foncée pour meilleur contraste */
   background: transparent;
-  padding: 0;
+  padding: 8px 0;
   text-align: left; /* Aligné à gauche comme dans l'image de référence */
 }
 
