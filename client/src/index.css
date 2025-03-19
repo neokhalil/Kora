@@ -164,7 +164,7 @@
   }
   
   /* Gestion spécifique pour les téléphones mobiles */
-  @media (max-width: 640px) {
+  @media (max-width: var(--breakpoint-sm)) {
     .code-block {
       font-size: 0.85rem;
       padding: 0.75rem;
@@ -200,7 +200,7 @@
   }
   
   /* Pour les codes en ligne sur mobile */
-  @media (max-width: 640px) {
+  @media (max-width: var(--breakpoint-sm)) {
     .inline-code {
       font-size: 0.85em;
       padding: 0.15rem 0.3rem;
@@ -698,7 +698,7 @@
   }
   
   /* Amélioration des blocs de code pour mobile */
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: var(--breakpoint-md)) {
     .math-content pre.code-block {
       margin: 1rem 0;
       border-radius: 6px;
@@ -819,7 +819,7 @@
   }
   
   /* Amélioration de l'affichage des formules mathématiques sur mobile */
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: var(--breakpoint-md)) {
     .math-content .katex-display > .katex {
       max-width: calc(100vw - 40px);
       font-size: 1.05em !important;
@@ -1191,7 +1191,7 @@ body {
 }
 
 /* Support spécifique pour les écrans mobiles */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: var(--breakpoint-md)) {
   html, body {
     height: 100%;
     overflow-x: hidden;
