@@ -336,7 +336,7 @@ body, html {
 /* Styles pour la boîte de question */
 .web-question-box {
   width: 92%;
-  max-width: 940px;
+  max-width: 840px; /* Réduit de 100px (940px -> 840px) */
   border: 2px solid red; /* Bordure rouge ajoutée autour du composer */
   border-radius: 28px; /* Augmenté pour arrondir davantage les coins */
   display: flex;
@@ -409,7 +409,7 @@ body, html {
 /* Footer de la boîte de question */
 .web-question-footer {
   width: 100%;
-  max-width: 940px;
+  max-width: 840px; /* Réduit pour correspondre à la taille du composer */
   text-align: center;
   color: #6b7280;
   font-size: 0.85rem;
