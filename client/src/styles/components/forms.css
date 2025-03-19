@@ -14,7 +14,8 @@
   
   /* Styles de base communs à tous les breakpoints */
   background-color: var(--color-background);
-  border-top: 1px solid var(--color-border);
+  /* Retrait du trait de délimitation */
+  border-top: none;
   padding: var(--space-4);
   margin-top: var(--space-4);
 }
@@ -71,8 +72,10 @@
   display: flex;
   justify-content: flex-end;
   margin-top: var(--space-3);
+  position: relative; /* Pour le positionnement des enfants */
 }
 
+/* Styles génériques pour tous les boutons */
 .web-question-button {
   background-color: var(--color-primary);
   color: white;
@@ -86,4 +89,43 @@
 
 .web-question-button:hover {
   background-color: var(--color-primary-dark);
+}
+
+/* Styles spécifiques pour le bouton d'envoi */
+.web-send-button,
+button[type="submit"],
+button[aria-label="Envoyer"],
+.web-question-container button[type="submit"] {
+  background-color: #000000; /* Fond noir */
+  color: white;
+  border-radius: var(--border-radius-full); /* Bouton rond */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 0;
+  box-shadow: var(--shadow-md);
+}
+
+/* Styles pour l'icône du micro (pour assurer la cohérence) */
+.web-mic-button,
+button[aria-label="Microphone"],
+.web-question-container .web-mic-button {
+  background-color: #000000;
+  color: white;
+  border-radius: var(--border-radius-full);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  padding: 0;
+  box-shadow: var(--shadow-md);
 }

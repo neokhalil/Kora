@@ -14,6 +14,11 @@
  * SECTION: COMPOSANT DE SAISIE DE QUESTION
  * Solution propre et maintenable pour le positionnement et la taille de la zone de saisie
  * Cette approche utilise des propriétés CSS modernes et évite les hacks
+ * 
+ * Modifications:
+ * 1. Largeur réduite à 600px (variable dans settings/variables.css)
+ * 2. Retrait du trait de délimitation (dans components/forms.css)
+ * 3. Correction du style du bouton d'envoi (noir et bien positionné)
  */
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
   /* 
@@ -50,4 +55,22 @@ html body .web-welcome-container .web-welcome-subtitle {
   margin-top: 0.5rem !important; /* Équivalent à var(--space-2) */
   margin-bottom: 1rem !important; /* Équivalent à var(--space-4) */
   color: #6b7280 !important;
+}
+
+/* Règles prioritaires pour les boutons de la zone de saisie */
+.web-send-button,
+button[type="submit"],
+button[aria-label="Envoyer"],
+.web-question-container button[type="submit"] {
+  background-color: #000000 !important;
+  border-radius: 9999px !important;
+  position: absolute !important;
+  padding: 0 !important;
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  right: 10px !important;
+  bottom: 10px !important;
 }
