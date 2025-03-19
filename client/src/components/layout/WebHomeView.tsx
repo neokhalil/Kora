@@ -746,6 +746,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                         </button>
                       </div>
                       <div className="web-input-wrapper">
+                        <button 
+                          type="button"
+                          className="web-image-button"
+                          aria-label="Télécharger une image"
+                          onClick={handleImageClick}
+                        >
+                          <Image size={20} strokeWidth={2} />
+                        </button>
+                        
                         <input 
                           type="text" 
                           placeholder="Ajoute un commentaire sur cette image (optionnel)"
@@ -754,10 +763,47 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                           className="web-input"
                           disabled={isRecordingVoice}
                         />
+                        
+                        {question.trim() ? (
+                          <button 
+                            type="submit"
+                            className="web-send-button"
+                            aria-label="Envoyer"
+                          >
+                            <Send size={20} strokeWidth={2} />
+                          </button>
+                        ) : isRecordingVoice ? (
+                          <button 
+                            type="button"
+                            className="web-mic-button recording"
+                            aria-label="Arrêter l'enregistrement"
+                            onClick={handleVoiceButtonClick}
+                          >
+                            <X size={20} strokeWidth={2.5} />
+                          </button>
+                        ) : (
+                          <button 
+                            type="button"
+                            className="web-mic-button"
+                            aria-label="Enregistrer audio"
+                            onClick={handleVoiceButtonClick}
+                          >
+                            <Mic size={20} strokeWidth={2.5} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   ) : (
                     <div className="web-input-wrapper">
+                      <button 
+                        type="button"
+                        className="web-image-button"
+                        aria-label="Télécharger une image"
+                        onClick={handleImageClick}
+                      >
+                        <Image size={20} strokeWidth={2} />
+                      </button>
+                      
                       <input 
                         type="text" 
                         placeholder="Pose ta question"
@@ -767,55 +813,45 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                         autoFocus
                         disabled={isRecordingVoice}
                       />
+                      
+                      {question.trim() ? (
+                        <button 
+                          type="submit"
+                          className="web-send-button"
+                          aria-label="Envoyer"
+                        >
+                          <Send size={20} strokeWidth={2} />
+                        </button>
+                      ) : isRecordingVoice ? (
+                        <button 
+                          type="button"
+                          className="web-mic-button recording"
+                          aria-label="Arrêter l'enregistrement"
+                          onClick={handleVoiceButtonClick}
+                        >
+                          <X size={20} strokeWidth={2.5} />
+                        </button>
+                      ) : (
+                        <button 
+                          type="button"
+                          className="web-mic-button"
+                          aria-label="Enregistrer audio"
+                          onClick={handleVoiceButtonClick}
+                        >
+                          <Mic size={20} strokeWidth={2.5} />
+                        </button>
+                      )}
                     </div>
                   )}
-                  <div className="web-action-buttons">
-                    <button 
-                      type="button"
-                      className="web-image-button"
-                      aria-label="Télécharger une image"
-                      onClick={handleImageClick}
-                    >
-                      <Image size={20} strokeWidth={2} />
-                    </button>
-                    
-                    {question.trim() ? (
-                      <button 
-                        type="submit"
-                        className="web-send-button"
-                        aria-label="Envoyer"
-                      >
-                        <Send size={20} strokeWidth={2} />
-                      </button>
-                    ) : isRecordingVoice ? (
-                      <button 
-                        type="button"
-                        className="web-mic-button recording"
-                        aria-label="Arrêter l'enregistrement"
-                        onClick={handleVoiceButtonClick}
-                      >
-                        <X size={20} strokeWidth={2.5} />
-                      </button>
-                    ) : (
-                      <button 
-                        type="button"
-                        className="web-mic-button"
-                        aria-label="Enregistrer audio"
-                        onClick={handleVoiceButtonClick}
-                      >
-                        <Mic size={20} strokeWidth={2.5} />
-                      </button>
-                    )}
-                    
-                    {/* Input caché pour le téléchargement d'image */}
-                    <input 
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                  </div>
+                  
+                  {/* Input caché pour le téléchargement d'image */}
+                  <input 
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
                 </div>
               </form>
               

@@ -348,7 +348,8 @@ body, html {
 
 .web-input-wrapper {
   width: 100%;
-  padding: 20px 24px;
+  padding: 20px 64px; /* Augmente le padding latéral pour laisser de la place aux boutons */
+  position: relative; /* Pour le positionnement des enfants absolus */
 }
 
 .web-question-box input {
@@ -371,18 +372,11 @@ body, html {
   justify-content: space-between;
   width: 100%;
   padding: 10px 0;
+  position: relative; /* Ajout de position relative pour les enfants absolus */
 }
 
 /* Les styles pour les boutons d'action sont maintenant gérés
    dans le système ITCSS via forms.css et custom-fixes.css */
-
-.web-image-button:hover {
-  background-color: #ebebeb;
-}
-
-.web-mic-button:hover {
-  background-color: #1f1f1f;
-}
 
 /* Footer de la boîte de question */
 .web-question-footer {
