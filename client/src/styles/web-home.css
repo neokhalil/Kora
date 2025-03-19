@@ -337,11 +337,15 @@ body, html {
   right: 0;
 }
 
-/* Fix pour desktop: ajouter une marge à gauche pour compenser le panneau latéral */
+/* Fix pour desktop: centrer la zone de saisie comme le welcome message */
 @media (min-width: calc(var(--breakpoint-md) + 1px)) {
   .web-question-container {
-    padding-left: 250px; /* Largeur du panneau latéral */
+    width: calc(100% - 250px); /* Tenir compte de la largeur du panneau latéral */
+    margin-left: 250px; /* Position depuis la gauche tenant compte du panneau latéral */
     box-sizing: border-box;
+    right: 0;
+    left: 0;
+    padding-left: 0; /* Retirer le padding précédent */
   }
 }
 

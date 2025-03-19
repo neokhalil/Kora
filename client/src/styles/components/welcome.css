@@ -47,6 +47,15 @@
   width: 100%;
 }
 
+/* Styles spécifiques pour les écrans desktop (> 768px) */
+@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
+  /* Styles pour desktop (769px et plus) */
+  .web-welcome-subtitle {
+    font-size: var(--font-size-xl);
+    color: #6b7280;
+  }
+}
+
 /* Style pour la question principale dans le message de bienvenue */
 .web-welcome-question {
   color: #6b7280;
