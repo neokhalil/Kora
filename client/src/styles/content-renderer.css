@@ -124,7 +124,9 @@
 }
 
 /* Correction pour l'affichage sur mobile */
-@media (max-width: 768px) {
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
+  
   /* Réduire les marges et la taille de police pour les blocs de code */
   .content-renderer pre {
     margin: 0.5em 0;

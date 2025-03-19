@@ -56,7 +56,8 @@
 }
 
 /* Styles spécifiques pour les écrans desktop (> 768px) */
-@media screen and (min-width: 769px) {
+@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
+  /* Styles pour desktop (769px et plus) */
   .web-welcome-title {
     font-size: var(--desktop-welcome-title-size);
     font-weight: 700;
@@ -71,7 +72,8 @@
 }
 
 /* Adaptations pour mobile */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .web-welcome-container {
     padding: var(--space-6) var(--space-4);
     min-height: 40vh;
@@ -87,7 +89,8 @@
 }
 
 /* Adaptations pour les très petits écrans */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .web-welcome-container {
     padding: var(--space-4) var(--space-3);
     min-height: 35vh;

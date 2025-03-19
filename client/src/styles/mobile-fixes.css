@@ -1,4 +1,8 @@
-/* Corrections spécifiques pour l'affichage mobile */
+/**
+ * Corrections spécifiques pour l'affichage mobile
+ * Suivant la méthodologie ITCSS - ce fichier contient des corrections spécifiques
+ * qui remplacent les comportements par défaut pour l'affichage mobile
+ */
 
 /* Correction générale pour le conteneur principal sur mobile */
 .content-renderer {
@@ -9,7 +13,9 @@
 }
 
 /* Correction générale des problèmes d'espacement */
-@media (max-width: 768px) {
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
+  
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
     padding-bottom: 120px !important; /* Plus d'espace pour le composeur en bas */
@@ -75,7 +81,8 @@
 }
 
 /* Corrections spécifiques pour les très petits écrans */
-@media (max-width: 375px) {
+@media (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .content-renderer {
     font-size: 14px;
   }
