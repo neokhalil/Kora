@@ -33,7 +33,8 @@
 }
 
 /* Adaptation pour desktop avec sidebar */
-@media screen and (min-width: 769px) {
+@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
+  /* Styles pour desktop (769px et plus) */
   .web-question-container {
     /* Ajuster la position pour tenir compte de la sidebar sur desktop */
     width: calc(100% - 280px);
@@ -276,7 +277,8 @@
 }
 
 /* Adaptations pour mobile */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .web-question-container {
     padding: 8px 12px 12px;
   }
@@ -311,7 +313,8 @@
 }
 
 /* Styles pour les très petits écrans */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .web-question-container {
     padding: 8px 10px 10px;
   }

@@ -349,7 +349,8 @@
 }
 
 /* Mobile responsive adjustments */
-@media (max-width: 640px) {
+@media (max-width: var(--breakpoint-sm)) {
+  /* Petites tablettes et mobiles (640px et moins) */
   .code-block, .content-renderer pre {
     font-size: 0.85rem;
     padding: 0.75rem;

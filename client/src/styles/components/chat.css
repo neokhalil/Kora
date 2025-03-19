@@ -168,7 +168,8 @@
 }
 
 /* Mobile Adjustments */
-@media (max-width: 640px) {
+@media (max-width: var(--breakpoint-sm)) {
+  /* Petites tablettes et mobiles (640px et moins) */
   .message-user, .message-assistant {
     max-width: 95%;
   }
