@@ -357,7 +357,9 @@ body, html {
 
 .web-input-field {
   width: 100%;
-  padding: 10px 0;
+  padding: 10px;
+  border: 2px solid red; /* Ajout d'une bordure rouge */
+  border-radius: 8px; /* Ajout d'un rayon de bordure pour une apparence plus arrondie */
 }
 
 .web-question-box input {
