@@ -36,12 +36,12 @@
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
   /* Styles pour desktop (769px et plus) */
   .web-question-container {
-    /* Ajuster la position pour tenir compte de la sidebar sur desktop */
+    /* Centrer la zone de saisie comme le welcome message */
     width: calc(100% - 280px);
-    left: 280px;
+    max-width: 800px;
+    left: 140px; /* Décaler pour centrer par rapport au panneau latéral */
     right: 0;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
   }
 }
 
