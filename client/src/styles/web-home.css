@@ -356,19 +356,27 @@ body, html {
 }
 
 .web-input-field {
-  width: 100%;
+  width: 80%; /* Réduit de 100% à 80% */
+  max-width: 500px; /* Limite la largeur maximale */
+  margin: 0 auto; /* Centre le champ de saisie */
   padding: 10px 0;
 }
 
 .web-question-box input {
   width: 100%;
   border: none;
+  border-bottom: 1px solid #e5e7eb; /* Ajout d'une bordure inférieure */
   outline: none;
   font-size: 1rem;
   color: #6b7280;
   background: transparent;
-  padding: 0;
+  padding: 5px 0 8px 0; /* Padding ajusté pour donner plus d'espace */
   text-align: left; /* Aligné à gauche comme dans l'image de référence */
+  transition: border-color 0.2s ease; /* Transition douce pour les changements d'état */
+}
+
+.web-question-box input:focus {
+  border-color: #000; /* Bordure plus foncée au focus */
 }
 
 .web-question-box input::placeholder {
@@ -380,7 +388,9 @@ body, html {
 .web-input-actions {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 80%; /* Même largeur que le champ de saisie */
+  max-width: 500px; /* Même largeur maximale que le champ de saisie */
+  margin: 0 auto; /* Centre les boutons */
   padding: 0 8px; /* Ajouté pour donner un peu d'espace sur les côtés */
 }
 
