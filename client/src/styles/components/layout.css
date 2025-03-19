@@ -48,7 +48,8 @@
 }
 
 /* Fix pour le header mobile */
-@media (max-width: 640px) {
+@media (max-width: var(--breakpoint-sm)) {
+  /* Petites tablettes et mobiles (640px et moins) */
   .app-header {
     padding: 0 0.75rem;
     height: 54px;
@@ -68,7 +69,8 @@
 }
 
 /* Fix pour maintenir le logo visible sur les petits écrans */
-@media (max-width: 480px) {
+@media (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .header-secondary-items {
     display: none;
   }
@@ -111,7 +113,8 @@
 }
 
 /* Version mobile du sidebar */
-@media (max-width: 768px) {
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .sidebar {
     transform: translateX(-100%);
     width: 260px;
@@ -163,7 +166,8 @@
   margin-left: 60px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .content-area {
     margin-left: 0;
     padding: 0.75rem;
@@ -171,7 +175,8 @@
 }
 
 /* Correction des positions pour les écrans très petits */
-@media (max-width: 480px) {
+@media (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .app-header {
     height: 50px;
   }
