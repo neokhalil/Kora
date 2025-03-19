@@ -1,0 +1,29 @@
+/**
+ * Corrections spécifiques qui doivent avoir la priorité absolue
+ * Ce fichier doit être chargé en dernier dans l'ordre des fichiers CSS
+ */
+
+/* Centrage absolu de la zone de saisie sur desktop */
+@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
+  body .web-question-container,
+  html body .web-layout .web-main-content .web-question-container {
+    width: 600px !important;
+    max-width: 600px !important;
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin-left: 140px !important; /* Moitié de la sidebar */
+    right: auto !important;
+    z-index: 100 !important;
+  }
+}
+
+/* Taille de police et espacement pour le sous-titre de bienvenue */
+body .web-welcome-subtitle,
+html body .web-welcome-container .web-welcome-subtitle {
+  font-size: 1.875rem !important; /* Équivalent à var(--font-size-3xl) */
+  line-height: 1.2 !important;
+  margin-top: 0.5rem !important; /* Équivalent à var(--space-2) */
+  margin-bottom: 1rem !important; /* Équivalent à var(--space-4) */
+  color: #6b7280 !important;
+}

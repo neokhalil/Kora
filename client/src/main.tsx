@@ -34,6 +34,7 @@ import "./styles/components/welcome.css"; // ITCSS: Styles pour l'écran de bien
 
 // Fix spécifique pour desktop (doit être importé en dernier pour priorité maximale)
 import "./styles/components/welcome-desktop-fix.css"; // Solution pour l'écran de bienvenue en version desktop
+import "./styles/components/custom-fixes.css"; // Corrections CSS de haute priorité (spécificité maximale)
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {
