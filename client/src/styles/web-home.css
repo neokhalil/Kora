@@ -348,24 +348,49 @@ body, html {
 
 .web-input-wrapper {
   width: 100%;
-  padding: 16px 64px; /* Ajusté pour une meilleure hauteur */
-  position: relative; /* Pour le positionnement des enfants absolus */
+  padding: 16px 20px; /* Padding réduit, car les boutons ne sont plus en absolue */
+  position: relative;
+  display: flex;
+  flex-direction: column; /* Structure verticale : input en haut, boutons en bas */
+  gap: 16px; /* Espace entre le champ et les boutons */
+}
+
+.web-input-field {
+  width: 100%;
+  padding: 10px 0;
 }
 
 .web-question-box input {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 1rem; /* Taille légèrement réduite pour correspondre au design */
+  font-size: 1rem;
   color: #6b7280;
   background: transparent;
-  padding: 0 0 0 10px; /* Ajout de padding à gauche pour espacer du bouton d'image */
+  padding: 0;
+  text-align: left; /* Aligné à gauche comme dans l'image de référence */
 }
 
 .web-question-box input::placeholder {
   color: #9ca3af;
-  font-size: 1rem; /* Taille de police cohérente */
-  font-weight: 400; /* Weight normal */
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.web-input-actions {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 8px; /* Ajouté pour donner un peu d'espace sur les côtés */
+}
+
+/* Pour le cas où nous avons deux boutons */
+.web-input-actions > button:first-child {
+  margin-right: auto; /* Pousse le premier bouton à gauche */
+}
+
+.web-input-actions > button:last-child {
+  margin-left: auto; /* Pousse le dernier bouton à droite */
 }
 
 .web-action-buttons {
