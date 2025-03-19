@@ -340,8 +340,12 @@ body, html {
 /* Fix pour desktop: centrer la zone de saisie comme le welcome message */
 @media (min-width: calc(var(--breakpoint-md) + 1px)) {
   .web-question-container {
-    width: calc(100% - 250px); /* Tenir compte de la largeur du panneau latéral */
-    left: 125px; /* Ajustement pour compenser le décalage */
+    /* Utilisation de la variable globale définie dans settings/variables.css */
+    width: var(--question-input-width);
+    max-width: var(--question-input-width);
+    /* Positionnement centré tenant compte de la sidebar */
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
     position: fixed; /* Utiliser fixed au lieu de absolute */
     bottom: 32px; /* Maintenir la position en bas */
     margin: 0 auto; /* Centrer horizontalement */
@@ -406,8 +410,10 @@ body, html {
   transition: all 0.2s ease;
   border-radius: 50%;
   padding: 0;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
+  position: relative;
+  z-index: 5;
 }
 
 .web-image-button {
@@ -416,10 +422,38 @@ body, html {
   margin-left: 20px;
 }
 
-.web-mic-button {
+.web-mic-button,
+button[aria-label="Microphone"] {
   background-color: #000000;
   color: white;
   margin-right: 20px;
+  position: absolute;
+  right: 10px;
+  bottom: 50%;
+  transform: translateY(50%);
+}
+
+/* Style pour le bouton d'envoi */
+.web-send-button,
+button[type="submit"],
+button[aria-label="Envoyer"] {
+  background-color: #000000;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  right: 10px;
+  bottom: 50%;
+  transform: translateY(50%);
+  z-index: 5;
 }
 
 .web-image-button:hover {

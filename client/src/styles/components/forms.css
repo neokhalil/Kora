@@ -106,9 +106,10 @@ button[aria-label="Envoyer"],
   justify-content: center;
   position: absolute;
   right: 10px;
-  bottom: 10px;
+  bottom: 8px; /* Ajusté la position verticale */
   padding: 0;
   box-shadow: var(--shadow-md);
+  z-index: 2; /* Assurer qu'il est au-dessus d'autres éléments */
 }
 
 /* Styles pour l'icône du micro (pour assurer la cohérence) */
@@ -125,7 +126,8 @@ button[aria-label="Microphone"],
   justify-content: center;
   position: absolute;
   right: 10px;
-  bottom: 10px;
+  bottom: 8px; /* Ajusté la position verticale */
   padding: 0;
   box-shadow: var(--shadow-md);
+  z-index: 2; /* Assurer qu'il est au-dessus d'autres éléments */
 }
