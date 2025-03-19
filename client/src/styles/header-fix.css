@@ -88,7 +88,8 @@ input, textarea, select, button {
 }
 
 /* Optimisations pour les appareils mobiles */
-@media screen and (max-width: 767px) {
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   body {
     overscroll-behavior: none;
   }

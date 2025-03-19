@@ -214,7 +214,8 @@ button, input, select, textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-@media (min-width: 768px) {
+@media (min-width: calc(var(--breakpoint-md) + 1px)) {
+  /* Desktop (769px et plus) */
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

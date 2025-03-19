@@ -134,7 +134,8 @@
 }
 
 /* Amélioration de l'espacement pour une meilleure lisibilité sur petits écrans */
-@media (max-width: 640px) {
+@media (max-width: var(--breakpoint-sm)) {
+  /* Mobiles (640px et moins) */
   .text-renderer p,
   .message-content.text-content p {
     margin-bottom: 0.75rem;
