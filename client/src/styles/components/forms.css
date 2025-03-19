@@ -8,9 +8,17 @@
  * Composant principal pour l'interaction utilisateur
  */
 .web-question-container {
-  /* Dimensions responsives de base */
+  /* Positionnement et dimensions de base */
   width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
   
   /* Styles de base communs à tous les breakpoints */
   background-color: var(--color-background);
@@ -18,6 +26,7 @@
   border-top: none;
   padding: var(--space-4);
   margin-top: var(--space-4);
+  box-sizing: border-box;
 }
 
 /* Adaptation pour tablettes */
@@ -36,12 +45,26 @@
  */
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
   .web-question-container {
+    /* Taille fixe sur desktop */
+    width: var(--question-input-width);
+    max-width: var(--question-input-width);
+    
+    /* Positionnement fixe et centré */
+    position: fixed;
+    bottom: 32px;
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
+    
+    /* Styles visuels */
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
+    z-index: var(--z-index-question-input);
   }
   
   /* Support du data-attribute pour les composants créés dynamiquement */
   [data-component="question-input"] {
+    width: var(--question-input-width);
+    max-width: var(--question-input-width);
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-md);
   }
@@ -91,43 +114,48 @@
   background-color: var(--color-primary-dark);
 }
 
+/* Styles génériques pour les boutons ronds */
+.web-button-round {
+  background-color: #000000;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
 /* Styles spécifiques pour le bouton d'envoi */
 .web-send-button,
 button[type="submit"],
 button[aria-label="Envoyer"],
 .web-question-container button[type="submit"] {
-  background-color: #000000; /* Fond noir */
+  composes: web-button-round;
+  background-color: #000000;
   color: white;
-  border-radius: var(--border-radius-full); /* Bouton rond */
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: absolute;
-  right: 10px;
-  bottom: 8px; /* Ajusté la position verticale */
-  padding: 0;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   box-shadow: var(--shadow-md);
-  z-index: 2; /* Assurer qu'il est au-dessus d'autres éléments */
+  z-index: 10;
 }
 
-/* Styles pour l'icône du micro (pour assurer la cohérence) */
+/* Styles pour l'icône du micro */
 .web-mic-button,
 button[aria-label="Microphone"],
 .web-question-container .web-mic-button {
+  composes: web-button-round;
   background-color: #000000;
   color: white;
-  border-radius: var(--border-radius-full);
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   position: absolute;
-  right: 10px;
-  bottom: 8px; /* Ajusté la position verticale */
-  padding: 0;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
   box-shadow: var(--shadow-md);
-  z-index: 2; /* Assurer qu'il est au-dessus d'autres éléments */
+  z-index: 10;
 }

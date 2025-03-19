@@ -324,34 +324,8 @@ body, html {
 
 /* Le style pour .web-welcome-subtitle div a été déplacé vers components/welcome.css */
 
-/* Conteneur pour la zone de question */
-.web-question-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  bottom: 32px;
-  left: 0;
-  right: 0;
-}
-
-/* Fix pour desktop: centrer la zone de saisie comme le welcome message */
-@media (min-width: calc(var(--breakpoint-md) + 1px)) {
-  .web-question-container {
-    /* Utilisation de la variable globale définie dans settings/variables.css */
-    width: var(--question-input-width);
-    max-width: var(--question-input-width);
-    /* Positionnement centré tenant compte de la sidebar */
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    position: fixed; /* Utiliser fixed au lieu de absolute */
-    bottom: 32px; /* Maintenir la position en bas */
-    margin: 0 auto; /* Centrer horizontalement */
-    box-sizing: border-box;
-  }
-}
+/* Les styles pour .web-question-container sont maintenant gérés
+   dans le système ITCSS via forms.css et custom-fixes.css */
 
 .web-question-form {
   width: 100%;
@@ -399,62 +373,8 @@ body, html {
   padding: 10px 0;
 }
 
-.web-image-button,
-.web-mic-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: 50%;
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  position: relative;
-  z-index: 5;
-}
-
-.web-image-button {
-  background-color: #f5f5f5;
-  color: #6b7280;
-  margin-left: 20px;
-}
-
-.web-mic-button,
-button[aria-label="Microphone"] {
-  background-color: #000000;
-  color: white;
-  margin-right: 20px;
-  position: absolute;
-  right: 10px;
-  bottom: 50%;
-  transform: translateY(50%);
-}
-
-/* Style pour le bouton d'envoi */
-.web-send-button,
-button[type="submit"],
-button[aria-label="Envoyer"] {
-  background-color: #000000;
-  color: white;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border-radius: 50%;
-  padding: 0;
-  width: 40px;
-  height: 40px;
-  position: absolute;
-  right: 10px;
-  bottom: 50%;
-  transform: translateY(50%);
-  z-index: 5;
-}
+/* Les styles pour les boutons d'action sont maintenant gérés
+   dans le système ITCSS via forms.css et custom-fixes.css */
 
 .web-image-button:hover {
   background-color: #ebebeb;

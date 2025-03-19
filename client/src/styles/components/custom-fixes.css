@@ -12,38 +12,48 @@
 
 /**
  * SECTION: COMPOSANT DE SAISIE DE QUESTION
- * Solution propre et maintenable pour le positionnement et la taille de la zone de saisie
+ * Solution scalable pour le positionnement et la taille de la zone de saisie
  * Cette approche utilise des propriétés CSS modernes et évite les hacks
- * 
+ *
  * Modifications:
- * 1. Largeur réduite à 600px (variable dans settings/variables.css)
+ * 1. Largeur définie à 600px (variable dans settings/variables.css)
  * 2. Retrait du trait de délimitation (dans components/forms.css)
- * 3. Correction du style du bouton d'envoi (noir et bien positionné)
+ * 3. Positionnement correct et style des boutons
  */
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
   /* 
-   * Approche par attribut data-* pour cibler précisément les composants
-   * sans dépendre de la cascade CSS - technique de sélection plus propre
+   * Sélecteurs CSS précis pour maximiser la priorité
+   * tout en restant maintenable
    */
+  .web-question-container,
   [data-component="question-input"],
-  .web-question-container {
-    /* Dimensions et positionnement de base */
-    width: var(--question-input-width);
-    max-width: var(--question-input-width);
-    position: fixed;
+  div.web-question-container,
+  div[data-component="question-input"] {
+    /* Dimensions fixes sur desktop - PRIORITAIRE */
+    width: var(--question-input-width) !important;
+    max-width: var(--question-input-width) !important;
     
-    /* Calcul sophistiqué pour le centrage par rapport à la zone principale */
-    left: calc(50% + (var(--sidebar-width) / 2));
-    transform: translateX(-50%);
-    bottom: 0;
+    /* Positionnement centré prenant en compte la sidebar */
+    position: fixed !important;
+    left: calc(50% + (var(--sidebar-width) / 2)) !important;
+    transform: translateX(-50%) !important;
+    bottom: 32px !important;
     
-    /* Superposition correcte par rapport aux autres éléments */
-    z-index: var(--z-index-question-input);
+    /* Superposition et apparence */
+    z-index: var(--z-index-question-input) !important;
+    border-radius: var(--border-radius-lg) !important;
+    box-shadow: var(--shadow-md) !important;
     
-    /* Neutralisation des propriétés conflictuelles */
-    right: auto;
-    margin-left: 0;
-    margin-right: 0;
+    /* Annulation des styles potentiellement conflictuels */
+    right: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Correction de la boîte de question intérieure */
+  .web-question-box {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }
 
@@ -57,22 +67,68 @@ html body .web-welcome-container .web-welcome-subtitle {
   color: #6b7280 !important;
 }
 
-/* Règles prioritaires pour les boutons de la zone de saisie */
+/**
+ * SECTION: BOUTONS D'ACTION
+ * Styles prioritaires pour garantir l'apparence et le positionnement correct
+ * des boutons dans la zone de saisie.
+ */
+
+/* Règles pour le bouton d'envoi */
 .web-send-button,
 button[type="submit"],
 button[aria-label="Envoyer"],
-.web-question-container button[type="submit"] {
+.web-question-container button[type="submit"],
+form .web-question-container button[type="submit"],
+.web-question-form button[type="submit"] {
+  /* Apparence */
   background-color: #000000 !important;
+  color: white !important;
+  border: none !important;
   border-radius: 9999px !important;
-  position: absolute !important;
-  padding: 0 !important;
   width: 40px !important;
   height: 40px !important;
+  
+  /* Positionnement précis */
+  position: absolute !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  
+  /* Affichage et interactions */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  right: 10px !important;
-  bottom: 50% !important;
-  transform: translateY(50%) !important;
-  z-index: 10 !important;
+  padding: 0 !important;
+  z-index: 100 !important;
+  box-shadow: var(--shadow-md) !important;
+  cursor: pointer !important;
+}
+
+/* Règles pour le bouton microphone */
+.web-mic-button,
+button[aria-label="Microphone"],
+.web-question-container .web-mic-button,
+div.web-mic-button {
+  /* Apparence */
+  background-color: #000000 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  width: 40px !important;
+  height: 40px !important;
+  
+  /* Positionnement précis */
+  position: absolute !important;
+  right: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  
+  /* Affichage et interactions */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  z-index: 100 !important;
+  box-shadow: var(--shadow-md) !important;
+  cursor: pointer !important;
 }
