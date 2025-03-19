@@ -1,0 +1,24 @@
+/**
+ * Solution de secours pour le centrage de la zone de saisie
+ * Ce fichier est chargé manuellement après tous les autres styles
+ */
+
+@media screen and (min-width: 769px) {
+  /* Sélecteurs max-specificity pour le centrage de la zone de saisie */
+  .web-question-container,
+  div.web-question-container,
+  .web-layout .web-main-content .web-question-container {
+    width: 600px !important;
+    max-width: 600px !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    /* Positionnement centré par rapport à la zone principale */
+    left: calc(50% + 140px) !important; /* 50% + (280px / 2) */
+    transform: translateX(-50%) !important;
+    /* Neutralisation des autres propriétés */
+    right: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    z-index: 100 !important;
+  }
+}

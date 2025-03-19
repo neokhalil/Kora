@@ -3,21 +3,30 @@
  * Ce fichier doit être chargé en dernier dans l'ordre des fichiers CSS
  */
 
-/* Ajout d'une variable pour la largeur de la sidebar */
+/* Déclaration des variables globales */
 :root {
   --sidebar-width: 280px;
 }
 
-/* Centrage de la zone de saisie par rapport à la zone principale (sans la sidebar) sur desktop */
+/* SOLUTION POUR LE CENTRAGE DE LA ZONE DE SAISIE */
+/* Utilisation de sélecteurs ultra-spécifiques avec !important pour garantir la priorité */
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
-  body .web-question-container,
-  html body .web-layout .web-main-content .web-question-container {
+  /* Sélecteur hyper spécifique pour garantir la priorité */
+  body .web-layout .web-main-content .web-question-container,
+  html body .web-layout .web-main-content .web-question-container,
+  body div.web-layout div.web-main-content div.web-question-container,
+  .web-layout > .web-main-content > .web-question-container,
+  div[class*="web-question-container"] {
     width: 600px !important;
     max-width: 600px !important;
     position: fixed !important;
-    left: calc(50% + (var(--sidebar-width) / 2)) !important; /* Centre en tenant compte de la sidebar */
+    /* Calcul amélioré pour le centrage correct */
+    left: calc(50% + (var(--sidebar-width) / 2)) !important; 
     transform: translateX(-50%) !important;
+    /* Neutralisation des autres positionnements */
     right: auto !important;
+    margin-left: 0 !important; 
+    margin-right: 0 !important;
     z-index: 100 !important;
   }
 }
