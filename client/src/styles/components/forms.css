@@ -89,31 +89,6 @@
 }
 
 /**
- * Nouveau champ input de la zone principale basé sur la nouvelle disposition verticale
- */
-.web-input {
-  width: 100%;
-  height: 40px;
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 8px 2px;
-  font-size: 1rem;
-  background: transparent;
-  transition: border-color 0.2s ease;
-  color: #1f2937;
-}
-
-.web-input:focus {
-  outline: none;
-  border-color: #000;
-}
-
-.web-input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-}
-
-/**
  * Boutons d'action dans la zone de questions
  */
 .web-question-actions {
@@ -154,17 +129,33 @@
   transition: background-color 0.2s ease;
 }
 
-/* Styles de base pour les boutons d'action */
-.web-action-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+/* Styles spécifiques pour le bouton d'envoi */
+.web-send-button,
+button[type="submit"],
+button[aria-label="Envoyer"],
+.web-question-container button[type="submit"] {
+  composes: web-button-round;
+  background-color: #000000;
+  color: white;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
 }
 
-/* Note: Les styles spécifiques pour le bouton d'envoi, microphone, etc.
-   sont maintenant définis dans custom-fixes.css avec des priorités plus élevées
-   pour suivre la méthodologie ITCSS */
+/* Styles pour l'icône du micro */
+.web-mic-button,
+button[aria-label="Microphone"],
+.web-question-container .web-mic-button {
+  composes: web-button-round;
+  background-color: #000000;
+  color: white;
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
