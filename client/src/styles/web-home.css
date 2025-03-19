@@ -337,6 +337,14 @@ body, html {
   right: 0;
 }
 
+/* Fix pour desktop: ajouter une marge à gauche pour compenser le panneau latéral */
+@media (min-width: calc(var(--breakpoint-md) + 1px)) {
+  .web-question-container {
+    padding-left: 250px; /* Largeur du panneau latéral */
+    box-sizing: border-box;
+  }
+}
+
 .web-question-form {
   width: 100%;
   display: flex;

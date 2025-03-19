@@ -10,19 +10,19 @@
   visibility: visible !important;
   -webkit-text-fill-color: #333333 !important;
   text-fill-color: #333333 !important;
-  font-size: 3.75rem !important; /* Force une taille absolue */
+  font-size: var(--desktop-welcome-title-size) !important; /* Utilise la variable pour la taille */
   font-weight: 700 !important;
 }
 
 /* Ciblage extrêmement spécifique pour augmenter la priorité */
 body .web-home-container .web-layout .web-main-content .web-welcome-container .web-welcome-title {
   color: #333333 !important;
-  font-size: 3.75rem !important; /* Force une taille absolue */
+  font-size: var(--desktop-welcome-title-size) !important; /* Utilise la variable pour la taille */
 }
 
 /* Fix spécifique pour mobile et tablettes */
-@media (max-width: var(--breakpoint-sm)) {
-  /* Petit mobile et tablettes (640px et moins) */
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .web-welcome-title, 
   h1.web-welcome-title,
   .web-welcome-container h1,
@@ -32,10 +32,22 @@ body .web-home-container .web-layout .web-main-content .web-welcome-container .w
     visibility: visible !important;
     -webkit-text-fill-color: #333333 !important;
     text-fill-color: #333333 !important;
+    font-size: var(--font-size-2xl) !important; /* Taille réduite pour mobile */
   }
   
   /* Test de couleur de fond pour voir s'il y a un problème de transparence */
   .web-welcome-container {
     background-color: transparent !important;
+  }
+}
+
+/* Fix spécifique pour les très petits écrans */
+@media (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
+  .web-welcome-title, 
+  h1.web-welcome-title,
+  .web-welcome-container h1,
+  .web-welcome-container .web-welcome-title {
+    font-size: var(--font-size-xl) !important; /* Taille encore plus réduite pour petit mobile */
   }
 }
