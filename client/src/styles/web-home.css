@@ -358,6 +358,19 @@ body, html {
 .web-input-field {
   width: 100%;
   padding: 10px 0;
+  margin-bottom: 8px; /* Espacement entre le champ de saisie et les boutons */
+  position: relative; /* Pour le positionnement des enfants */
+}
+
+/* Style spécifique pour la ligne sous le champ de saisie */
+.web-input-field::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: #e5e7eb;
 }
 
 .web-question-box input {

@@ -110,18 +110,18 @@ button[aria-label="Télécharger une image"],
 .web-question-container .web-image-button,
 div.web-image-button {
   /* Apparence */
-  background-color: transparent !important;
-  color: #6b7280 !important;
-  border: none !important;
-  border-radius: 9999px !important;
-  width: 36px !important;
-  height: 36px !important;
+  background-color: #f9fafb !important; /* Fond léger pour mieux ressortir */
+  color: #4b5563 !important; /* Couleur légèrement plus foncée */
+  border: 1px solid #e5e7eb !important; /* Légère bordure */
+  border-radius: 6px !important; /* Border radius moins prononcé pour le style vertical */
+  width: 40px !important; /* Légèrement plus large */
+  height: 40px !important;
   
   /* Positionnement */
-  position: static !important; /* Changé de absolute à static */
-  left: auto !important; /* Suppression du positionnement spécifique */
-  top: auto !important; /* Suppression du positionnement spécifique */
-  transform: none !important; /* Suppression de la transformation */
+  position: static !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
   
   /* Affichage et interactions */
   display: flex !important;
@@ -130,6 +130,7 @@ div.web-image-button {
   padding: 0 !important;
   z-index: 10 !important;
   cursor: pointer !important;
+  transition: all 0.2s ease !important;
 }
 
 .web-image-button:hover {
@@ -144,18 +145,18 @@ button[aria-label="Arrêter l'enregistrement"],
 .web-question-container .web-mic-button,
 div.web-mic-button {
   /* Apparence */
-  background-color: #000000 !important;
+  background-color: #000000 !important; /* Noir pour le contraste */
   color: white !important;
   border: none !important;
-  border-radius: 9999px !important;
-  width: 36px !important;
-  height: 36px !important;
+  border-radius: 6px !important; /* Cohérent avec le bouton d'image */
+  width: 40px !important;
+  height: 40px !important;
   
   /* Positionnement */
-  position: static !important; /* Changé de absolute à static */
-  right: auto !important; /* Suppression du positionnement spécifique */
-  top: auto !important; /* Suppression du positionnement spécifique */
-  transform: none !important; /* Suppression de la transformation */
+  position: static !important;
+  right: auto !important;
+  top: auto !important;
+  transform: none !important;
   
   /* Affichage et interactions */
   display: flex !important;
@@ -165,6 +166,7 @@ div.web-mic-button {
   z-index: 100 !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
   cursor: pointer !important;
+  transition: all 0.2s ease !important;
 }
 
 .web-mic-button:hover {
