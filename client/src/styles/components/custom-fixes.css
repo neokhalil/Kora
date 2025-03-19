@@ -1,33 +1,44 @@
 /**
  * Corrections spécifiques qui doivent avoir la priorité absolue
- * Ce fichier doit être chargé en dernier dans l'ordre des fichiers CSS
+ * Ce fichier fait partie de la couche "Trumps" dans la méthodologie ITCSS
  */
 
-/* Déclaration des variables globales */
-:root {
-  --sidebar-width: 280px;
-}
+/* 
+ * Ces variables sont maintenant définies dans le fichier settings/variables.css
+ * pour une meilleure organisation suivant ITCSS
+ * --sidebar-width: 280px;
+ * --question-input-width: 800px;
+ */
 
-/* SOLUTION POUR LE CENTRAGE DE LA ZONE DE SAISIE */
-/* Utilisation de sélecteurs ultra-spécifiques avec !important pour garantir la priorité */
+/**
+ * SECTION: COMPOSANT DE SAISIE DE QUESTION
+ * Solution propre et maintenable pour le positionnement et la taille de la zone de saisie
+ * Cette approche utilise des propriétés CSS modernes et évite les hacks
+ */
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
-  /* Sélecteur hyper spécifique pour garantir la priorité */
-  body .web-layout .web-main-content .web-question-container,
-  html body .web-layout .web-main-content .web-question-container,
-  body div.web-layout div.web-main-content div.web-question-container,
-  .web-layout > .web-main-content > .web-question-container,
-  div[class*="web-question-container"] {
-    width: 800px !important;  /* Augmentation de la largeur de 600px à 800px */
-    max-width: 800px !important;  /* Augmentation de la largeur maximale également */
-    position: fixed !important;
-    /* Calcul amélioré pour le centrage correct */
-    left: calc(50% + (var(--sidebar-width) / 2)) !important; 
-    transform: translateX(-50%) !important;
-    /* Neutralisation des autres positionnements */
-    right: auto !important;
-    margin-left: 0 !important; 
-    margin-right: 0 !important;
-    z-index: 100 !important;
+  /* 
+   * Approche par attribut data-* pour cibler précisément les composants
+   * sans dépendre de la cascade CSS - technique de sélection plus propre
+   */
+  [data-component="question-input"],
+  .web-question-container {
+    /* Dimensions et positionnement de base */
+    width: var(--question-input-width);
+    max-width: var(--question-input-width);
+    position: fixed;
+    
+    /* Calcul sophistiqué pour le centrage par rapport à la zone principale */
+    left: calc(50% + (var(--sidebar-width) / 2));
+    transform: translateX(-50%);
+    bottom: 0;
+    
+    /* Superposition correcte par rapport aux autres éléments */
+    z-index: var(--question-input-z-index);
+    
+    /* Neutralisation des propriétés conflictuelles */
+    right: auto;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 

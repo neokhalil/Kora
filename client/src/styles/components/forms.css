@@ -1,346 +1,89 @@
 /**
- * Styles pour les formulaires dans l'application Kora
- * Composant: forms.css - Partie de l'architecture ITCSS
+ * Composants de formulaire
+ * Suivant la méthodologie ITCSS - niveau "Composants"
  */
 
-/* Variables CSS pour les couleurs communes - ITCSS: settings */
-:root {
-  --input-border-color: #e0e0e0;
-  --button-primary-bg: #1a1a1a;
-  --button-primary-hover: #333333;
-  --button-recording-bg: #ef4444;
-  --button-recording-hover: #dc2626;
-  --background-light: #f9fafb;
-  --background-white: #ffffff;
-  --text-dark: #1a202c;
-  --text-muted: #718096;
-}
-
-/* Zone de question principale - style unifié entre mobile et desktop */
+/**
+ * Zone de saisie des questions
+ * Composant principal pour l'interaction utilisateur
+ */
 .web-question-container {
-  position: fixed;
-  bottom: 0;
+  /* Dimensions responsives de base */
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  left: 0;
-  right: 0;
-  padding: 12px 16px 16px;
-  background-color: var(--background-white);
-  border-top: none; /* Suppression de la bordure supérieure */
-  box-shadow: none; /* Suppression de l'ombre */
-  z-index: 100;
+  max-width: 100%;
+  
+  /* Styles de base communs à tous les breakpoints */
+  background-color: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-4);
+  margin-top: var(--space-4);
 }
 
-/* Adaptation pour desktop avec sidebar */
-@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
-  /* Styles pour desktop (769px et plus) */
+/* Adaptation pour tablettes */
+@media screen and (min-width: var(--breakpoint-sm)) and (max-width: var(--breakpoint-md)) {
   .web-question-container {
-    /* Centrer par rapport à la page entière en tenant compte de la sidebar */
-    width: 100%;
-    max-width: 600px; /* Taille réduite comme sur l'image */
-    left: 50%; /* Positionner à 50% de la largeur de la page */
-    transform: translateX(-50%); /* Décaler de moitié de sa propre largeur vers la gauche */
-    margin-left: 140px; /* Compenser la moitié de la largeur de la sidebar (280/2) */
-    right: auto; /* Désactiver le positionnement à droite */
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
-.web-question-form {
+/* 
+ * Adaptation pour desktop
+ * Note: Les règles finales de centrage par rapport à la sidebar sont gérées
+ * dans custom-fixes.css (couche "Trumps" ITCSS) pour garantir la priorité
+ */
+@media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
+  .web-question-container {
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* Support du data-attribute pour les composants créés dynamiquement */
+  [data-component="question-input"] {
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+/**
+ * Champs de saisie à l'intérieur de la zone de questions
+ */
+.web-question-input {
   width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-base);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.web-question-box {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  background-color: var(--background-white);
-  border: 1px solid var(--input-border-color); /* Bordure fine et légère */
-  border-radius: 20px;
-  overflow: hidden;
-  transition: all 0.2s;
-  /* Suppression de l'effet d'ombre */
-  margin-bottom: 10px; /* Espace supplémentaire en bas */
-}
-
-.web-question-box:focus-within {
-  /* Léger effet de surbrillance au focus, sans bordure bleue */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
-}
-
-/* Wrapper d'input pour maintenir l'apparence appropriée */
-.web-input-wrapper {
-  flex: 1;
-  position: relative;
-}
-
-.web-input-wrapper input {
-  width: 100%;
-  padding: 10px 16px;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  color: var(--foreground, #1a202c);
+.web-question-input:focus {
   outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
 }
 
-/* Boutons d'action dans la zone de question */
-.web-action-buttons {
-  display: flex;
-  align-items: center;
-  padding: 0 10px 0 0;
-  margin-bottom: 6px; /* Ajouter un espace en bas des boutons */
-}
-
-.web-image-button,
-.web-send-button,
-.web-mic-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px; /* Légèrement plus grand */
-  height: 38px; /* Légèrement plus grand */
-  padding: 0;
-  margin-left: 8px; /* Plus d'espace entre les boutons */
-  border: none;
-  border-radius: 50%;
-  background-color: transparent;
-  color: var(--muted-foreground, #718096);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.web-send-button {
-  background-color: var(--button-primary-bg); /* Fond noir pour le bouton d'envoi */
-  color: var(--background-white);
-}
-
-.web-mic-button {
-  background-color: var(--button-primary-bg); /* Fond noir pour le bouton micro */
-  color: var(--background-white);
-}
-
-.web-mic-button.recording {
-  background-color: var(--button-recording-bg); /* Rouge pour le mode enregistrement */
-  color: var(--background-white);
-  /* L'animation est définie dans WebHomeView.css */
-}
-
-.web-image-button:hover {
-  background-color: var(--muted, #e2e8f0);
-}
-
-.web-mic-button:hover {
-  background-color: var(--button-primary-hover); /* Effet de survol plus clair que le noir */
-}
-
-.web-send-button:hover {
-  background-color: var(--button-primary-hover); /* Effet de survol plus clair que le noir */
-}
-
-.web-mic-button.recording:hover {
-  background-color: var(--button-recording-hover); /* Rouge légèrement plus foncé au survol */
-}
-
-/* Styles pour l'enregistreur vocal */
-.web-voice-recorder {
-  margin-top: 8px;
-  padding: 8px;
-  border-radius: 12px;
-  background-color: #f7fafc;
-}
-
-/* Styles pour le modal de téléchargement d'image */
-.web-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 16px;
-}
-
-.web-modal {
-  background-color: var(--background-white);
-  border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.web-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border, #e2e8f0);
-}
-
-.web-modal-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.web-modal-close {
-  background: transparent;
-  border: none;
-  color: var(--muted-foreground, #718096);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-}
-
-.web-modal-close:hover {
-  background-color: var(--muted, #e2e8f0);
-}
-
-.web-modal-content {
-  padding: 20px;
-}
-
-.web-image-preview {
-  margin-bottom: 16px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid var(--border, #e2e8f0);
-}
-
-.web-image-preview img {
-  width: 100%;
-  max-height: 300px;
-  object-fit: contain;
-}
-
-.web-modal-form {
-  margin-bottom: 16px;
-}
-
-.web-modal-textarea {
-  width: 100%;
-  min-height: 80px;
-  padding: 12px;
-  border: 1px solid var(--border, #e2e8f0);
-  border-radius: 8px;
-  resize: vertical;
-  font-size: 16px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.web-modal-textarea:focus {
-  border-color: var(--primary, #2563eb);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
-}
-
-.web-modal-footer {
-  padding: 16px 20px;
+/**
+ * Boutons d'action dans la zone de questions
+ */
+.web-question-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  border-top: 1px solid var(--border, #e2e8f0);
+  margin-top: var(--space-3);
 }
 
-.web-modal-button {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+.web-question-button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-md);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s ease;
 }
 
-.web-modal-button.cancel {
-  background-color: transparent;
-  border: 1px solid var(--border, #e2e8f0);
-  color: var(--foreground, #1a202c);
-}
-
-.web-modal-button.submit {
-  background-color: var(--primary, #2563eb);
-  border: 1px solid var(--primary, #2563eb);
-  color: var(--background-white);
-}
-
-.web-modal-button.cancel:hover {
-  background-color: var(--muted, #e2e8f0);
-}
-
-.web-modal-button.submit:hover {
-  background-color: #1d4ed8;
-  border-color: #1d4ed8;
-}
-
-/* Adaptations pour mobile */
-@media screen and (max-width: var(--breakpoint-md)) {
-  /* Tablettes et mobiles (768px et moins) */
-  .web-question-container {
-    padding: 8px 12px 12px;
-  }
-  
-  .web-question-box {
-    border-radius: 18px;
-    border: none; /* Suppression de la bordure sur mobile également */
-    background-color: var(--background-light);
-    /* Suppression de l'effet d'ombre sur mobile */
-  }
-  
-  .web-input-wrapper input {
-    padding: 9px 14px;
-    font-size: 15px;
-  }
-  
-  .web-action-buttons {
-    padding: 0 8px 0 0;
-  }
-  
-  .web-image-button,
-  .web-send-button,
-  .web-mic-button {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .web-modal {
-    max-width: 100%;
-    margin: 0 8px;
-  }
-}
-
-/* Styles pour les très petits écrans */
-@media screen and (max-width: var(--breakpoint-xs)) {
-  /* Mobiles (480px et moins) */
-  .web-question-container {
-    padding: 8px 10px 10px;
-  }
-  
-  .web-question-box {
-    /* Suppression des bordures sur très petits écrans */
-    border: none;
-    background-color: var(--background-light);
-    border-radius: 16px;
-    /* Suppression de l'effet d'ombre sur très petits écrans */
-  }
-  
-  .web-input-wrapper input {
-    padding: 8px 12px;
-    font-size: 14px;
-  }
-  
-  .web-action-buttons {
-    padding: 0 6px 0 0;
-  }
-  
-  .web-image-button,
-  .web-send-button,
-  .web-mic-button {
-    width: 30px;
-    height: 30px;
-  }
+.web-question-button:hover {
+  background-color: var(--color-primary-dark);
 }
