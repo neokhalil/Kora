@@ -341,11 +341,11 @@ body, html {
 @media (min-width: calc(var(--breakpoint-md) + 1px)) {
   .web-question-container {
     width: calc(100% - 250px); /* Tenir compte de la largeur du panneau latéral */
-    margin-left: 250px; /* Position depuis la gauche tenant compte du panneau latéral */
+    left: 125px; /* Ajustement pour compenser le décalage */
+    position: fixed; /* Utiliser fixed au lieu de absolute */
+    bottom: 32px; /* Maintenir la position en bas */
+    margin: 0 auto; /* Centrer horizontalement */
     box-sizing: border-box;
-    right: 0;
-    left: 0;
-    padding-left: 0; /* Retirer le padding précédent */
   }
 }
 

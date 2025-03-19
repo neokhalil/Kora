@@ -40,8 +40,8 @@
 /* Sous-titre de bienvenue - styles de base */
 .web-welcome-subtitle {
   color: var(--color-text-secondary);
-  margin-top: var(--space-6);
-  margin-bottom: var(--space-8);
+  margin-top: var(--space-3); /* Réduit l'espacement entre le titre et les sous-titres */
+  margin-bottom: var(--space-6); /* Réduit également l'espacement inférieur */
   font-family: var(--font-main);
   text-align: center;
   width: 100%;
@@ -51,8 +51,9 @@
 @media screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
   /* Styles pour desktop (769px et plus) */
   .web-welcome-subtitle {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-2xl); /* Police plus grande pour le sous-titre */
     color: #6b7280;
+    line-height: 1.3; /* Réduit l'interligne pour plus de compacité */
   }
 }
 
