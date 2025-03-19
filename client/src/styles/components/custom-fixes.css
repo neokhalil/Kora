@@ -33,7 +33,7 @@
     bottom: 0;
     
     /* Superposition correcte par rapport aux autres éléments */
-    z-index: var(--question-input-z-index);
+    z-index: var(--z-index-question-input);
     
     /* Neutralisation des propriétés conflictuelles */
     right: auto;
