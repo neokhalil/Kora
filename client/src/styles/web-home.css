@@ -336,7 +336,7 @@ body, html {
 /* Styles pour la boîte de question */
 .web-question-box {
   width: 92%;
-  max-width: 790px; /* Réduit de 50px supplémentaires (840px -> 790px) */
+  max-width: 740px; /* Réduit de 50px supplémentaires (790px -> 740px) */
   border: 1px solid #eaeaea; /* Bordure standard rétablie */
   border-radius: 28px; /* Augmenté pour arrondir davantage les coins */
   display: flex;
@@ -409,11 +409,11 @@ body, html {
 /* Footer de la boîte de question */
 .web-question-footer {
   width: 100%;
-  max-width: 790px; /* Réduit pour correspondre à la taille du composer */
+  max-width: 740px; /* Réduit pour correspondre à la taille du composer */
   text-align: center;
   color: #6b7280;
   font-size: 0.85rem;
-  margin-top: 16px;
+  margin-top: 0; /* Supprime l'espace entre le texte et le footer */
   margin-bottom: 0;
   font-weight: 400;
   line-height: 1.4;
