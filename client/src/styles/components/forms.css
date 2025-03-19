@@ -89,31 +89,6 @@
 }
 
 /**
- * Style spécifique pour l'entrée de texte dans la disposition verticale
- */
-.web-input {
-  width: 100%;
-  height: 40px;
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 8px 2px;
-  font-size: 1rem;
-  color: #4b5563;
-  background: transparent;
-  transition: border-color 0.2s ease;
-}
-
-.web-input:focus {
-  outline: none;
-  border-color: #000;
-}
-
-.web-input::placeholder {
-  color: #9ca3af;
-  font-weight: 400;
-}
-
-/**
  * Boutons d'action dans la zone de questions
  */
 .web-question-actions {
