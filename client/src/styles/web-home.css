@@ -338,17 +338,17 @@ body, html {
   width: 92%;
   max-width: 940px;
   border: 1px solid #eaeaea;
-  border-radius: 20px;
+  border-radius: 28px; /* Augmenté pour arrondir davantage les coins */
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); /* Ombre plus légère */
   overflow: hidden;
 }
 
 .web-input-wrapper {
   width: 100%;
-  padding: 20px 64px; /* Augmente le padding latéral pour laisser de la place aux boutons */
+  padding: 16px 64px; /* Ajusté pour une meilleure hauteur */
   position: relative; /* Pour le positionnement des enfants absolus */
 }
 
@@ -356,15 +356,16 @@ body, html {
   width: 100%;
   border: none;
   outline: none;
-  font-size: 1.05rem;
+  font-size: 1rem; /* Taille légèrement réduite pour correspondre au design */
   color: #6b7280;
   background: transparent;
-  padding: 0;
+  padding: 0 0 0 10px; /* Ajout de padding à gauche pour espacer du bouton d'image */
 }
 
 .web-question-box input::placeholder {
   color: #9ca3af;
-  font-size: 1.05rem;
+  font-size: 1rem; /* Taille de police cohérente */
+  font-weight: 400; /* Weight normal */
 }
 
 .web-action-buttons {
@@ -384,9 +385,19 @@ body, html {
   max-width: 940px;
   text-align: center;
   color: #6b7280;
-  font-size: 0.75rem;
-  margin-top: 12px;
+  font-size: 0.85rem;
+  margin-top: 16px;
   margin-bottom: 0;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Style pour mettre en gras le nom KORA */
+.kora-name {
+  font-weight: 700;
+  color: #000;
+  font-family: 'Elza Black', 'Arial Black', sans-serif;
+  letter-spacing: 0.04em;
 }
 
 /* Style ajouté dans index.css */
