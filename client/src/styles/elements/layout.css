@@ -116,14 +116,16 @@ body {
 }
 
 /* Media queries pour le responsive */
-@media (max-width: 640px) {
+@media (max-width: var(--breakpoint-sm)) {
+  /* Mobiles (640px et moins) */
   .container {
     padding-left: var(--space-2);
     padding-right: var(--space-2);
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   h1 { font-size: var(--font-size-3xl); }
   h2 { font-size: var(--font-size-2xl); }
   h3 { font-size: var(--font-size-xl); }
