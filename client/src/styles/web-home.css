@@ -337,7 +337,7 @@ body, html {
 .web-question-box {
   width: 92%;
   max-width: 940px;
-  border: 1px solid #eaeaea;
+  border: 2px solid red; /* Bordure rouge ajoutée autour du composer */
   border-radius: 28px; /* Augmenté pour arrondir davantage les coins */
   display: flex;
   flex-direction: column;
@@ -358,8 +358,8 @@ body, html {
 .web-input-field {
   width: 100%;
   padding: 10px;
-  border: 2px solid red; /* Ajout d'une bordure rouge */
-  border-radius: 8px; /* Ajout d'un rayon de bordure pour une apparence plus arrondie */
+  border: none; /* Suppression de la bordure rouge */
+  border-radius: 8px;
 }
 
 .web-question-box input {
