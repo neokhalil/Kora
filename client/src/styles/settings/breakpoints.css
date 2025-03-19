@@ -1,0 +1,38 @@
+/**
+ * Breakpoints standardisés pour l'application
+ * Suivant la méthodologie ITCSS - Settings layer
+ *
+ * Ce fichier contient les points de rupture (breakpoints) standardisés
+ * à utiliser dans toutes les media queries pour assurer la cohérence 
+ * de l'expérience responsive à travers l'application.
+ */
+
+:root {
+  /* 
+   * Breakpoints principaux pour les media queries 
+   * Ces valeurs doivent être utilisées systématiquement
+   */
+  --breakpoint-xs: 480px;  /* Téléphones mobiles en portrait */
+  --breakpoint-sm: 640px;  /* Téléphones mobiles en paysage et petites tablettes */
+  --breakpoint-md: 768px;  /* Tablettes en portrait */
+  --breakpoint-lg: 1024px; /* Tablettes en paysage et petits écrans */
+  --breakpoint-xl: 1280px; /* Écrans moyens à grands */
+  --breakpoint-2xl: 1536px; /* Grands écrans */
+}
+
+/**
+ * Utilisation recommandée dans les fichiers CSS:
+ * 
+ * @media (max-width: var(--breakpoint-md)) {
+ *   // Styles pour les écrans de largeur inférieure ou égale à 768px
+ * }
+ *
+ * @media (min-width: var(--breakpoint-md)) {
+ *   // Styles pour les écrans de largeur supérieure ou égale à 768px
+ * }
+ *
+ * Pour les plages (entre deux breakpoints):
+ * @media (min-width: var(--breakpoint-sm)) and (max-width: var(--breakpoint-md)) {
+ *   // Styles pour les écrans entre 640px et 768px
+ * }
+ */

@@ -8,6 +8,10 @@ import "./index.css";
 // Contrôle des thèmes (clair/sombre) - doit être importé en premier pour priorité maximale
 import "./styles/components/theme-control.css"; // Contrôle du thème et désactivation du mode sombre auto
 
+// Settings ITCSS (variables globales et breakpoints)
+import "./styles/settings/variables.css"; // Variables CSS globales
+import "./styles/settings/breakpoints.css"; // Breakpoints standardisés pour responsive design
+
 // Import des fichiers CSS originaux pour maintenir la compatibilité
 import "./styles/text.css"; // Styles de texte simples
 import "./styles/animations.css"; // Animations pour l'interface utilisateur

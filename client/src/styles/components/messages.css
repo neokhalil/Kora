@@ -156,7 +156,8 @@
 }
 
 /* Adaptations pour les différentes tailles d'écran */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .web-user-message .web-message-content {
     max-width: 85%;
     padding: 10px 14px;
@@ -196,7 +197,8 @@
 }
 
 /* Styles spécifiques pour les très petits écrans */
-@media screen and (max-width: 480px) {
+@media screen and (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
   .web-message-content {
     font-size: 14px;
   }
