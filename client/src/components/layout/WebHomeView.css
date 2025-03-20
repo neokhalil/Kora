@@ -63,6 +63,9 @@
   white-space: nowrap;
   position: absolute;
   left: 48px; /* Positionner le logo pour qu'il reste au même endroit */
+  opacity: 1; /* Visible par défaut */
+  visibility: visible; /* Visible par défaut */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Transition douce */
 }
 
 .web-hamburger-button {
@@ -81,9 +84,9 @@
 }
 
 .web-sidebar-closed .web-kora-logo {
-  opacity: 1; /* Garder le logo visible quand la sidebar est fermée */
-  left: 48px; /* Conserver la même position que quand la sidebar est ouverte */
-  font-size: inherit; /* Hériter exactement la même taille que la classe parente */
+  opacity: 0; /* Cacher le logo quand la sidebar est fermée */
+  visibility: hidden; /* Garantir que le logo est vraiment invisible */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Transition douce */
 }
 
 /* Transition pour le main content */
