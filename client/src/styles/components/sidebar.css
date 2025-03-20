@@ -10,12 +10,12 @@
   top: 0;
   left: 0;
   background-color: white;
-  border-right: 1px solid var(--color-border);
+  border-right: none; /* Suppression de la bordure droite */
   z-index: var(--z-index-fixed);
   transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-md);
+  box-shadow: none; /* Suppression de l'ombre */
   user-select: none;
 }
 

@@ -82,8 +82,8 @@
 
 .web-sidebar-closed .web-kora-logo {
   opacity: 1; /* Garder le logo visible quand la sidebar est fermée */
-  left: 38px; /* Ajuster la position du logo */
-  font-size: 1.2rem; /* Légèrement plus petit */
+  left: 48px; /* Conserver la même position que quand la sidebar est ouverte */
+  font-size: 1.4rem; /* Conserver la même taille que quand la sidebar est ouverte */
 }
 
 /* Transition pour le main content */
