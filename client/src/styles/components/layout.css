@@ -84,7 +84,7 @@
   bottom: 0;
   width: 260px;
   background-color: var(--background);
-  border-right: 1px solid var(--border);
+  border-right: none; /* Suppression de la bordure */
   z-index: 90;
   overflow-y: auto;
   transition: transform 0.3s ease, width 0.3s ease;
