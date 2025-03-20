@@ -644,7 +644,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
       <div className="web-home-container">
         <div className="web-layout">
           {/* Sidebar - menu latéral gauche */}
-          <div className="web-sidebar">
+          <div className={`web-sidebar ${!isMenuOpen ? 'web-sidebar-closed' : ''}`}>
             {/* Logo KORA et hamburger icon */}
             <div className="web-logo-container">
               <div className="web-header-items">
