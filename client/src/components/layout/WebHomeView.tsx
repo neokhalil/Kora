@@ -44,8 +44,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
-  // État pour le menu hamburger
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // État pour le menu hamburger - par défaut ouvert
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   
   // Références
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -642,6 +642,15 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
   return (
       <div className="web-home-container">
+        {/* Bouton hamburger flottant pour mobile */}
+        <button 
+          className="web-hamburger-button-mobile"
+          aria-label="Ouvrir le menu"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          <HamburgerIcon size={20} className="web-hamburger-icon" />
+        </button>
+        
         <div className="web-layout">
           {/* Sidebar - menu latéral gauche */}
           <div className={`web-sidebar ${!isMenuOpen ? 'web-sidebar-closed' : ''}`}>
