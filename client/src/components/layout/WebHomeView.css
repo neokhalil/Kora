@@ -526,6 +526,37 @@
   }
 }
 
+/* Header items container pour le logo et le hamburger icon */
+.web-header-items {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px;
+  width: 100%;
+}
+
+/* Bouton hamburger */
+.web-hamburger-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-right: 12px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.web-hamburger-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.web-hamburger-icon {
+  color: #333;
+}
+
 @media (max-width: 768px) {
   .web-layout {
     flex-direction: column;

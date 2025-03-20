@@ -44,6 +44,9 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   
+  // État pour le menu hamburger
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   // Références
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
