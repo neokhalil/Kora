@@ -31,7 +31,7 @@
 .web-welcome-title {
   font-weight: 700;
   color: var(--color-text);
-  margin-bottom: var(--space-2);
+  margin-bottom: 0; /* Suppression de la marge sous le titre */
   letter-spacing: -0.01em;
   font-family: var(--font-main);
   text-align: center;
@@ -40,7 +40,7 @@
 /* Sous-titre de bienvenue - styles de base */
 .web-welcome-subtitle {
   color: var(--color-text-secondary);
-  margin-top: var(--space-2); /* Espace encore plus réduit entre le titre et les sous-titres */
+  margin-top: 0; /* Espace entre le titre et les sous-titres supprimé */
   margin-bottom: var(--space-4); /* Espace réduit en bas également */
   font-family: var(--font-main);
   text-align: center;
