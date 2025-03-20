@@ -27,7 +27,7 @@
   overflow: hidden;
   background-color: white;
   box-shadow: none;
-  border-right: none;
+  border-right: none !important; /* Force l'absence de bordure quand la sidebar est fermée */
 }
 
 /* Pour le contenu du sidebar fermé, on cache tout sauf le logo et le hamburger */
@@ -83,7 +83,7 @@
 .web-sidebar-closed .web-kora-logo {
   opacity: 1; /* Garder le logo visible quand la sidebar est fermée */
   left: 48px; /* Conserver la même position que quand la sidebar est ouverte */
-  font-size: 1.4rem; /* Conserver la même taille que quand la sidebar est ouverte */
+  font-size: inherit; /* Hériter exactement la même taille que la classe parente */
 }
 
 /* Transition pour le main content */
@@ -97,7 +97,7 @@
 }
 
 .web-sidebar-closed + .web-main-content {
-  margin-left: -140px; /* Compensation plus importante pour bien centrer le contenu */
+  margin-left: -195px; /* Compensation plus importante pour bien centrer le contenu */
 }
 
 .web-main-content {
