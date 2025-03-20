@@ -13,11 +13,10 @@
   min-width: 280px;
   height: 100vh;
   background-color: #f9f9f9;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  transition: transform 0.3s ease, width 0.3s ease;
+  transition: width 0.3s ease;
 }
 
 /* Sidebar fermée */
@@ -35,15 +34,21 @@
   display: none;
 }
 
-/* Centrer le header-items en mode sidebar fermée */
-.web-sidebar-closed .web-logo-container {
-  margin: 0 auto;
-  padding: 0;
+/* Maintenir la position du header-items en mode sidebar fermée */
+.web-logo-container {
+  padding: 1rem 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
 }
 
-.web-sidebar-closed .web-header-items {
-  justify-content: center;
-  padding: 0;
+.web-header-items {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 16px;
+  transition: padding 0.3s ease;
+  position: relative;
 }
 
 .web-kora-logo {
@@ -51,10 +56,28 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: #0066ff;
+  white-space: nowrap;
+  position: absolute;
+  left: 48px; /* Positionner le logo pour qu'il reste au même endroit */
 }
 
-.web-sidebar-closed .web-hamburger-button {
-  margin-right: 4px;
+.web-hamburger-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin-right: 12px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+  position: absolute;
+  left: 8px;
+}
+
+.web-sidebar-closed .web-kora-logo {
+  opacity: 0; /* Cacher le logo quand la sidebar est fermée */
 }
 
 /* Transition pour le main content */
@@ -68,7 +91,7 @@
 }
 
 .web-sidebar-closed + .web-main-content {
-  margin-left: -110px; /* Compensation pour centrer le contenu (différence: 280px -> 60px = 220px, divisé par 2) */
+  margin-left: -140px; /* Compensation plus importante pour bien centrer le contenu */
 }
 
 .web-main-content {
