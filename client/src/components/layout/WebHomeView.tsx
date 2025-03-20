@@ -722,7 +722,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               // Affichage du message de bienvenue lorsqu'aucune conversation n'est démarrée
               <div className="web-welcome-container">
                 <h1 className="web-welcome-title">
-                  Hello Ibrahima
+                  Bienvenue sur Kora
                 </h1>
                 <div className="web-welcome-subtitle">
                   <div className="web-welcome-question">Comment puis-je t'aider<br />aujourd'hui?</div>
