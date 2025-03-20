@@ -22,10 +22,53 @@
 
 /* Sidebar fermée */
 .web-sidebar-closed {
-  width: 0;
-  min-width: 0;
+  width: 60px;
+  min-width: 60px;
   overflow: hidden;
-  transform: translateX(-280px);
+}
+
+/* Pour le contenu du sidebar fermé, on cache tout sauf le logo et le hamburger */
+.web-sidebar-closed .web-search-container,
+.web-sidebar-closed .web-sidebar-section,
+.web-sidebar-closed .web-sidebar-divider,
+.web-sidebar-closed .web-profile-container {
+  display: none;
+}
+
+/* Centrer le header-items en mode sidebar fermée */
+.web-sidebar-closed .web-logo-container {
+  margin: 0 auto;
+  padding: 0;
+}
+
+.web-sidebar-closed .web-header-items {
+  justify-content: center;
+  padding: 0;
+}
+
+.web-kora-logo {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0066ff;
+}
+
+.web-sidebar-closed .web-hamburger-button {
+  margin-right: 4px;
+}
+
+/* Transition pour le main content */
+.web-main-content {
+  transition: margin-left 0.3s ease;
+}
+
+/* Quand la sidebar est fermée, ajuster la marge pour centrer le contenu */
+.web-layout {
+  transition: margin-left 0.3s ease;
+}
+
+.web-sidebar-closed + .web-main-content {
+  margin-left: -110px; /* Compensation pour centrer le contenu (différence: 280px -> 60px = 220px, divisé par 2) */
 }
 
 .web-main-content {
