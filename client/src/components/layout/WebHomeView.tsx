@@ -3,6 +3,7 @@ import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
 import { ArrowRight, Mic, Image, Search, PenLine, PlusCircle, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
+import HamburgerIcon from '@/components/ui/HamburgerIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import VoiceRecorder from '@/components/VoiceRecorder';
@@ -641,9 +642,18 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         <div className="web-layout">
           {/* Sidebar - menu latéral gauche */}
           <div className="web-sidebar">
-            {/* Logo KORA */}
+            {/* Logo KORA et hamburger icon */}
             <div className="web-logo-container">
-              <h1 className="web-kora-logo">KORA</h1>
+              <div className="web-header-items">
+                <button 
+                  className="web-hamburger-button"
+                  aria-label="Ouvrir le menu"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  <HamburgerIcon size={20} className="web-hamburger-icon" />
+                </button>
+                <h1 className="web-kora-logo">KORA</h1>
+              </div>
             </div>
             
             {/* Barre de recherche */}
