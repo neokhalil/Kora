@@ -77,38 +77,22 @@ fi
 
 # 4. Mise à jour des dépendances
 echo -e "${YELLOW}4. Mise à jour des dépendances...${NC}"
-echo -e "${YELLOW}Installation des dépendances avec npm ci incluant les dépendances de développement...${NC}"
-npm ci --include=dev || {
+echo -e "${YELLOW}Installation des dépendances avec npm ci (installation propre)...${NC}"
+npm ci || {
   echo -e "${RED}Erreur lors de l'installation des dépendances avec npm ci.${NC}"
   echo -e "${YELLOW}Tentative avec npm install comme solution de repli...${NC}"
-  npm install --include=dev || {
+  npm install || {
     echo -e "${RED}Erreur lors de l'installation des dépendances. Vérifiez le fichier package.json et les logs.${NC}"
     exit 1
   }
 }
-# Vérification de la disponibilité de Vite
-echo -e "${YELLOW}Vérification de la disponibilité de Vite...${NC}"
-if [ ! -d "node_modules/vite" ]; then
-  echo -e "${YELLOW}Vite n'est pas disponible. Installation spécifique de Vite...${NC}"
-  npm install --no-save vite || {
-    echo -e "${RED}Erreur lors de l'installation de Vite.${NC}"
-    exit 1
-  }
-fi
+
 # 5. Construction de l'application pour l'environnement de production
 echo -e "${YELLOW}5. Construction de l'application...${NC}"
-# Ajout d'une variable d'environnement pour forcer Vite à utiliser le bon chemin
-export VITE_CJS_IGNORE_WARNING=true
-export NODE_ENV=production
 
 # Vérification et création du script de build amélioré s'il n'existe pas
 if [ ! -f "scripts/build-with-fix.sh" ]; then
   echo -e "${YELLOW}Le script build-with-fix.sh n'existe pas. Création du script...${NC}"
-
-# Nettoyage du cache pour éviter les problèmes de build
-echo -e "${YELLOW}Nettoyage du cache Node.js...${NC}"
-rm -rf node_modules/.vite-temp 2>/dev/null
-rm -rf node_modules/.vite 2>/dev/null
   
   # Créer le script build-with-fix.sh
   cat > scripts/build-with-fix.sh << 'EOF'
