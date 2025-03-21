@@ -702,18 +702,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
 
             {/* Contenu de la sidebar nettoyé selon les instructions */}
 
-            {/* Profil utilisateur en bas */}
-            <div className="web-profile-container">
-              <div className="web-profile-wrapper">
-                <Link href="/profile" className="web-profile-link">
-                  <User size={16} strokeWidth={2} />
-                  <span>Mon profil</span>
-                </Link>
-                <Link href="/settings" className="web-settings-link">
-                  <Settings size={16} strokeWidth={2} />
-                </Link>
-              </div>
-            </div>
+            {/* Profil utilisateur supprimé */}
           </div>
           
           {/* Contenu principal - partie centrale */}
