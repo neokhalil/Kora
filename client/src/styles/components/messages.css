@@ -8,9 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 150px; /* Augmenté pour s'assurer que les messages sont entièrement visibles */
+  padding: 16px 0 220px; /* Considérablement augmenté pour laisser beaucoup plus d'espace en bas */
   width: 100%;
-  margin-bottom: 30px; /* Légèrement augmenté */
+  margin-bottom: 40px; /* Marge supplémentaire au bas de la liste */
 }
 
 /* Styles communs pour tous les messages */
@@ -185,7 +185,7 @@
   
   .web-message-actions {
     margin-top: 15px !important;
-    padding-bottom: 70px !important; /* Augmenté pour garantir la visibilité des boutons */
+    padding-bottom: 120px !important; /* Considérablement augmenté pour éviter tout chevauchement avec le composer */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
@@ -205,10 +205,10 @@
   /* Style spécifique pour les actions sous les messages */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 15px !important;
-    margin-bottom: 30px !important; /* Réduit considérablement pour moins d'espace entre les messages */
-    padding-top: 5px !important;
-    padding-bottom: 10px !important; /* Réduit aussi le padding */
+    margin-top: 20px !important;
+    margin-bottom: 130px !important;
+    padding-top: 12px !important;
+    padding-bottom: 40px !important;
     position: relative !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
   }
@@ -223,6 +223,6 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 180px !important; /* Augmenté pour s'assurer que les messages sont pleinement visibles */
+    padding: 12px 0 240px !important; /* Énormément plus d'espace sur petits écrans */
   }
 }
