@@ -1,5 +1,9 @@
 /* Import des styles pour les composants mathématiques et code */
 @import './styles/mathCode.css';
+/* Import des corrections de layout pour le chat */
+@import './styles/layout-fixes.css';
+/* Import des corrections spécifiques pour mobile */
+@import './styles/mobile-fixes.css';
 
 @tailwind base;
 @tailwind components;
