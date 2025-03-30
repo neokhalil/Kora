@@ -140,8 +140,8 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 30px !important; /* Réduit de 60px à 30px */
-    padding-bottom: 10px !important; /* Réduit de 20px à 10px */
+    margin-bottom: 90px !important; /* Augmenté à 90px pour assurer la visibilité */
+    padding-bottom: 20px !important; /* Augmenté à 20px */
     display: flex;
     flex-wrap: wrap;
     gap: 10px !important;

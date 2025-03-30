@@ -1082,8 +1082,8 @@ input, textarea, select, button {
   .action-buttons-container,
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-bottom: 20px !important; /* Réduit de 130px à 20px */
-    padding-bottom: 10px !important; /* Réduit de 30px à 10px */
+    margin-bottom: 80px !important; /* Augmenté à 80px pour assurer la visibilité */
+    padding-bottom: 15px !important; /* Augmenté à 15px */
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important; /* Pour que z-index fonctionne */
   }
