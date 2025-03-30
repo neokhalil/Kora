@@ -853,7 +853,7 @@ const ChatAssistant: React.FC = () => {
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
-            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
+            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container bg-blue-100/30" 
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">
@@ -891,7 +891,7 @@ const ChatAssistant: React.FC = () => {
           </div>
           
           {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-20 composer-container input-area initial-load">
+          <div className="fixed bottom-0 left-0 right-0 bg-pink-100 dark:bg-pink-900 px-4 py-2 pb-4 pt-2 z-20 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
