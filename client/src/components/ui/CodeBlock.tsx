@@ -1,7 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Prism from 'prismjs';
-// Ne pas importer le thème par défaut de Prism - nous utilisons notre propre CSS
-// import 'prismjs/themes/prism.css';
+// Import Prism core styles first (important for proper initialization)
+import 'prismjs/themes/prism-okaidia.css';
+// Import line numbers plugin
+import 'prismjs/plugins/line-numbers/prism-line-numbers.js';
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css';
+
+// Import all language components for syntax highlighting
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-python';
@@ -10,13 +15,38 @@ import 'prismjs/components/prism-c';
 import 'prismjs/components/prism-cpp';
 import 'prismjs/components/prism-csharp';
 import 'prismjs/components/prism-markup';
+import 'prismjs/components/prism-markup-templating'; // Required for PHP
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-sql';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
-// Ajout du plugin pour les numéros de ligne
-import 'prismjs/plugins/line-numbers/prism-line-numbers';
+import 'prismjs/components/prism-jsx';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-php';
+import 'prismjs/components/prism-php-extras';
+import 'prismjs/components/prism-ruby';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-kotlin';
+import 'prismjs/components/prism-swift';
+
+// Type sécurisé pour Prism
+interface ExtendedPrism {
+  highlightElement: (element: HTMLElement) => void;
+  highlightAll: () => void;
+  manual?: boolean;
+  hooks?: {
+    run: (name: string, env: any) => void;
+  };
+  languages: any;
+}
+
+// Déclaration étendue pour TypeScript
+declare global {
+  interface Window {
+    Prism: ExtendedPrism;
+  }
+}
 
 interface CodeBlockProps {
   code: string;
@@ -24,15 +54,6 @@ interface CodeBlockProps {
   showLineNumbers?: boolean;
   showCopyButton?: boolean;
   className?: string;
-}
-
-// Assurer la compatibilité des types avec window.Prism
-declare global {
-  interface Window {
-    Prism: typeof Prism & {
-      manual?: boolean;
-    };
-  }
 }
 
 /**
@@ -57,72 +78,115 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 
   // Normaliser le langage
   const normalizedLanguage = language?.toLowerCase() || 'plaintext';
-  const supportedLanguage = [
+  
+  // Liste complète des langages supportés
+  const supportedLanguages = [
     'javascript', 'js', 'typescript', 'ts', 'python', 'py', 'java', 
     'c', 'cpp', 'csharp', 'cs', 'html', 'css', 'sql', 'bash', 'sh',
-    'json', 'yaml', 'yml', 'plaintext', 'text'
-  ].includes(normalizedLanguage) 
+    'json', 'yaml', 'yml', 'php', 'ruby', 'rb', 'go', 'kotlin', 'kt',
+    'swift', 'jsx', 'tsx', 'markdown', 'md', 'plaintext', 'text'
+  ];
+  
+  const supportedLanguage = supportedLanguages.includes(normalizedLanguage) 
     ? normalizedLanguage 
     : 'plaintext';
 
   // Mapper les alias de langage aux noms Prism
   const languageMap: Record<string, string> = {
+    // JavaScript & TypeScript
     'js': 'javascript',
     'ts': 'typescript',
+    'jsx': 'jsx',
+    'tsx': 'tsx',
+    
+    // Python
     'py': 'python',
+    
+    // .NET
     'cs': 'csharp',
+    
+    // Shell
     'sh': 'bash',
+    
+    // Data formats
     'yml': 'yaml',
+    
+    // Ruby
+    'rb': 'ruby',
+    
+    // Kotlin
+    'kt': 'kotlin',
+    
+    // Markdown
+    'md': 'markdown',
+    
+    // Plain text
     'text': 'plaintext'
   };
 
   const prismLanguage = languageMap[supportedLanguage] || supportedLanguage;
 
-  // Initialisation de Prism et suppression des effets de surexposition
-useEffect(() => {
-    // Cette fonction s'exécute une seule fois au montage du composant
-    const style = document.createElement('style');
-    style.innerHTML = `
-      code[class*="language-"], pre[class*="language-"] {
-        text-shadow: none !important;
-        background: transparent !important;
-      }
-      .token {
-        text-shadow: none !important;
-        background: transparent !important;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // Force le rechargement de Prism pour appliquer les styles
-    if (typeof window !== 'undefined' && 'Prism' in window) {
-      (window as any).Prism.manual = true;
-    }
-    
-    // Nettoyage lors du démontage
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
+  // Initialisation de Prism - une seule fois au montage du composant
   useEffect(() => {
-    // Appliquer la coloration syntaxique
-    if (codeRef.current) {
-      Prism.highlightElement(codeRef.current);
-      
-      // Nettoyer les styles en ligne indésirables après highlight
-      if (codeRef.current.querySelectorAll) {
-        const tokens = codeRef.current.querySelectorAll('.token');
-        tokens.forEach(token => {
-          if (token instanceof HTMLElement) {
-            // Supprimer tout style inline qui pourrait causer un effet de transparence
-            token.style.textShadow = 'none';
-            token.style.background = 'transparent';
-          }
-        });
+    // S'assurer que Prism est correctement configuré
+    if (typeof window !== 'undefined') {
+      // Définir global Prism si non défini
+      if (!window.Prism) {
+        window.Prism = Prism as unknown as ExtendedPrism;
       }
+      
+      // Prism.manual = true signifie que nous devons appeler manuellement highlight
+      window.Prism.manual = true;
     }
-  }, [code, prismLanguage]);
+    
+    // Nettoyer les ressources à la destruction du composant
+    return () => {
+      if (copyTimeout) {
+        clearTimeout(copyTimeout);
+      }
+    };
+  }, [copyTimeout]);
+  
+  // Effet pour appliquer la coloration syntaxique quand le code ou le langage change
+  useEffect(() => {
+    if (!code) return;
+    
+    // Fonction pour appliquer la coloration syntaxique
+    const highlightCode = () => {
+      try {
+        // Vérifier que l'élément et le DOM sont disponibles
+        if (codeRef.current && document.body.contains(codeRef.current)) {
+          // Réinitialiser les classes pour éviter les conflits
+          codeRef.current.className = `language-${prismLanguage}`;
+          
+          // Appliquer la coloration syntaxique
+          Prism.highlightElement(codeRef.current);
+          
+          // Forcer l'affichage des numéros de ligne si nécessaire
+          if (showLineNumbers) {
+            const parent = codeRef.current.parentElement;
+            if (parent && !parent.querySelector('.line-numbers-rows')) {
+              // Appliquer la coloration à tout le bloc
+              Prism.highlightAll();
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors de la coloration syntaxique:', error);
+      }
+    };
+    
+    // Appliquer la coloration syntaxique après le rendu du DOM
+    // Essayer plusieurs fois avec un délai croissant pour s'assurer que cela fonctionne
+    const timeouts = [10, 100, 500, 1000].map((delay) => 
+      setTimeout(highlightCode, delay)
+    );
+    
+    // Nettoyage des timeouts
+    return () => {
+      timeouts.forEach(timeout => clearTimeout(timeout));
+    };
+  }, [code, prismLanguage, showLineNumbers]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -162,13 +226,11 @@ useEffect(() => {
       </div>
       
       <pre 
-        className={`${showLineNumbers ? 'line-numbers' : ''}`}
-        style={{ backgroundColor: '#1a202c', color: '#e2e8f0' }}
+        className={`${showLineNumbers ? 'line-numbers' : ''} prism-code`}
       >
         <code 
           ref={codeRef}
           className={`language-${prismLanguage}`}
-          style={{ backgroundColor: '#1a202c', color: '#e2e8f0' }}
         >
           {code}
         </code>

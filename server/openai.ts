@@ -1,6 +1,8 @@
 import OpenAI from "openai";
 import fs from "fs";
 import { Buffer } from "buffer";
+import { extractPdfText, processPdfForAI } from "./pdfUtils";
+import { extractDocText, processDocForAI } from "./docUtils";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -275,6 +277,164 @@ export async function generateChallengeProblem(
   } catch (error) {
     console.error("Error generating challenge problem:", error);
     return "Désolé, j'ai rencontré un problème en essayant de créer un défi. Veuillez réessayer.";
+  }
+}
+
+/**
+ * Process an uploaded file (non-image) and generate an educational response
+ * 
+ * @param fileContent - Content of the file (text or base64 encoded)
+ * @param fileType - MIME type of the file
+ * @param fileName - Original file name
+ * @param textQuery - Optional text query accompanying the file
+ * @param subject - Optional subject area (math, science, language, history, etc.)
+ * @returns Promise with the generated educational response
+ */
+export async function processFileQuery(
+  fileContent: string,
+  fileType: string,
+  fileName: string,
+  textQuery: string = "",
+  subject: string = "general"
+): Promise<string> {
+  try {
+    // Check for valid API key
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("API key not configured. Please set OPENAI_API_KEY in environment variables.");
+    }
+
+    // Special handling for text files
+    let fileDescription = "";
+    let fileExtension = fileName.split('.').pop()?.toLowerCase() || "";
+    let promptContent = "";
+    let fileContentForProcessing = fileContent;
+    
+    if (fileType === 'text/plain') {
+      // Pour les fichiers texte, on peut utiliser le contenu directement
+      promptContent = `Le contenu du fichier texte "${fileName}" est le suivant :\n\n${fileContent}`;
+      fileDescription = "fichier texte";
+    } else if (fileType === 'application/pdf') {
+      // Pour les PDF, nous utilisons pdf-parse pour extraire le texte
+      let pdfText = "";
+      let pdfInfo = "";
+      
+      try {
+        if (fileContent.startsWith("PDF:")) {
+          // On enlève le préfixe "PDF:" pour avoir le contenu binaire encodé en base64
+          const base64PdfContent = fileContent.substring(4);
+          // Convertir le contenu base64 en buffer
+          const pdfBuffer = Buffer.from(base64PdfContent, 'base64');
+          
+          // Extraire le texte du PDF avec notre utilitaire
+          pdfText = await extractPdfText(pdfBuffer);
+          pdfInfo = "\n\nAnalyse du contenu PDF :\n\n" + pdfText;
+          
+          // Limiter la taille du texte extrait pour éviter de dépasser les limites de l'API
+          if (pdfInfo.length > 15000) {
+            pdfInfo = pdfInfo.substring(0, 15000) + "\n\n[Le contenu du PDF est trop volumineux et a été tronqué. Seule une partie du texte a été analysée.]";
+          }
+        }
+      } catch (error) {
+        console.error("Erreur lors de l'extraction du texte PDF:", error);
+        pdfInfo = "\n\nLe PDF a été reçu, mais son contenu n'a pas pu être extrait correctement. Il pourrait être protégé, corrompu ou dans un format non pris en charge.";
+      }
+      
+      promptContent = `L'étudiant a partagé un document PDF nommé "${fileName}".${pdfInfo}`;
+      fileDescription = "document PDF";
+    } else if (fileType === 'application/msword' || fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      // Pour les documents Word
+      let docInfo = "";
+      let extractedText = "";
+      
+      // Vérifier si le contenu est en base64 et le convertir en buffer si nécessaire
+      const contentBuffer = fileContent.startsWith('data:') 
+        ? Buffer.from(fileContent.split(',')[1], 'base64')
+        : Buffer.from(fileContent, 'base64');
+      
+      try {
+        // Utiliser notre outil d'extraction de texte Word
+        extractedText = await processDocForAI(contentBuffer);
+        fileContentForProcessing = extractedText;
+        docInfo = `\n\nContenu extrait du document Word :\n\n${extractedText}`;
+      } catch (error) {
+        console.error("Erreur lors de l'extraction du contenu du document Word:", error);
+        docInfo = "\n\nLe document Word a été reçu, mais son contenu n'a pas pu être extrait correctement. Il pourrait être protégé, corrompu ou dans un format non pris en charge.";
+      }
+      
+      promptContent = `L'étudiant a partagé un document Word nommé "${fileName}".${docInfo}`;
+      fileDescription = "document Word";
+    } else {
+      // Pour les autres types de fichiers
+      promptContent = `L'étudiant a partagé un fichier de type "${fileType}" nommé "${fileName}".\n\nExpliquez comment vous pouvez aider l'étudiant avec ce type de fichier et quelles informations supplémentaires seraient utiles.`;
+      fileDescription = "fichier";
+    }
+
+    // Build user query based on the file content and any additional text query
+    const userQuery = textQuery 
+      ? `J'ai partagé ce ${fileDescription} et j'ai une question à ce sujet : ${textQuery}` 
+      : `J'ai partagé ce ${fileDescription}. Peux-tu m'aider à le comprendre ou l'analyser ?`;
+
+    // Create a system prompt specifically for file analysis
+    const fileSystemPrompt = `${SYSTEM_PROMPT}
+    
+Vous analysez un fichier partagé par un étudiant. Il s'agit d'un ${fileDescription} nommé "${fileName}".
+
+Important lors de l'analyse des fichiers :
+1. Identifiez brièvement le contenu et le type du fichier
+2. Identifiez la matière et le sujet spécifique (mathématiques, sciences, langues, etc.)
+3. Suivez les directives de tutorat - n'offrez jamais de solutions directes aux problèmes
+4. Ne communiquez pas d'informations sensibles ou personnelles qui pourraient être dans le fichier
+5. Concentrez-vous sur l'aide à la compréhension, pas sur la résolution des exercices
+
+Pour les fichiers texte :
+- Analysez le contenu pour comprendre le sujet
+- Expliquez les concepts sans résoudre directement les problèmes
+- Offrez des conseils méthodologiques adaptés au contenu
+
+Pour les documents (PDF, Word) :
+- Expliquez comment l'étudiant peut approcher ce type de document
+- Proposez des méthodes générales de compréhension et d'analyse
+
+${subject !== "general" ? `Le sujet identifié est : ${subject}` : ""}`;
+
+    // Send the query to the OpenAI API - pour les fichiers non-image
+    let response;
+    
+    // Pour tout type de fichier, utiliser l'API standard (sans vision)
+    // car l'API Vision n'accepte que les vrais formats d'images
+    // Nous pourrions traiter les fichiers PDF avec PDF.js côté serveur pour en extraire le texte,
+    // mais dans cette version, nous utilisons une approche simplifiée
+    response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: fileSystemPrompt
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: promptContent
+            }
+          ]
+        },
+        {
+          role: "user",
+          content: userQuery
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 1500
+    });
+
+    // Return the generated response
+    return response.choices[0].message.content || 
+      "Je n'ai pas pu analyser ce fichier. Veuillez essayer avec un autre format ou poser votre question directement.";
+  } catch (error) {
+    console.error("Error processing file:", error);
+    return "Désolé, j'ai rencontré un problème en analysant ce fichier. Veuillez réessayer avec un fichier plus petit ou un format différent.";
   }
 }
 

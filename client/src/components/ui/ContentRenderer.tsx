@@ -117,6 +117,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
           language={language}
           showLineNumbers={true}
           showCopyButton={true}
+          className="syntax-highlight-enforced"
         />
       );
     }

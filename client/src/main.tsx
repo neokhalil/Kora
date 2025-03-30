@@ -25,6 +25,8 @@ import "./styles/header-fix.css"; // Solution définitive pour le header fixe
 import "./styles/main.css"; // Fichier principal avec settings, generic, elements, objects et utilities
 import "./styles/components/math.css"; // ITCSS: Styles pour le rendu mathématique
 import "./styles/components/code.css"; // ITCSS: Styles pour les blocs de code
+import "./styles/components/prism-syntax.css"; // ITCSS: Styles pour la coloration syntaxique avec Prism.js
+import "./styles/prism-force.css"; // Styles de forçage pour garantir la coloration syntaxique sur toutes plateformes
 import "./styles/components/layout.css"; // ITCSS: Styles pour le layout (header, sidebar)
 import "./styles/components/chat.css"; // ITCSS: Styles pour l'interface de chat
 import "./styles/components/forms.css"; // ITCSS: Styles pour les formulaires

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { RecentQuestion } from '@/lib/types';
-import { ArrowRight, Mic, Image, Search, PenLine, PlusCircle, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle } from 'lucide-react';
+import { ArrowRight, Mic, Image, Search, PenLine, PlusCircle, User, Settings, X, Send, RefreshCcw, BookOpen, Lightbulb, HelpCircle, FileText } from 'lucide-react';
 import BookIcon from '@/components/ui/BookIcon';
 import HamburgerIcon from '@/components/ui/HamburgerIcon';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
@@ -215,23 +215,47 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     if (file) {
       setUploadedImage(file);
       
-      // Créer une URL pour l'aperçu de l'image
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreviewUrl(reader.result as string);
-        // Sur mobile, on affiche la modale. Sur desktop, on affiche directement l'image dans la zone de saisie
+      // Déterminer si c'est une image ou un autre type de fichier
+      const isImage = file.type.startsWith('image/');
+      const isPdf = file.type === 'application/pdf';
+      const isText = file.type === 'text/plain';
+      const isWord = file.type === 'application/msword' || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      
+      if (isImage) {
+        // Créer une URL pour l'aperçu de l'image
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreviewUrl(reader.result as string);
+          // Sur mobile, on affiche la modale. Sur desktop, on affiche directement l'image dans la zone de saisie
+          if (window.innerWidth <= 768) {
+            setIsImageUploadModalOpen(true);
+          } else {
+            // Sur desktop, on n'ouvre pas de modale
+            // On pourrait ajouter un focus sur l'input, mais on le laisse naturel
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // Pour les autres types de fichiers, on affiche juste le nom du fichier
+        let filePrefix = 'file://';
+        
+        // Ajouter le type de fichier pour une meilleure UX
+        if (isPdf) filePrefix = 'pdf://';
+        else if (isText) filePrefix = 'text://';
+        else if (isWord) filePrefix = 'doc://';
+        
+        setImagePreviewUrl(`${filePrefix}${file.name}`);  // Format spécial pour indiquer un fichier non-image
+        
+        // Uniquement ouvrir la modale sur mobile, comme pour les images
         if (window.innerWidth <= 768) {
           setIsImageUploadModalOpen(true);
-        } else {
-          // Sur desktop, on n'ouvre pas de modale
-          // On pourrait ajouter un focus sur l'input, mais on le laisse naturel
         }
-      };
-      reader.readAsDataURL(file);
+        // Sur desktop, on n'ouvre pas de modale pour aucun type de fichier
+      }
     }
   };
   
-  // Envoyer l'image avec une question (utilisé depuis la modale)
+  // Envoyer l'image ou le fichier avec une question (utilisé depuis la modale)
   const handleImageSubmit = async (imageText: string = '') => {
     if (!uploadedImage || !imagePreviewUrl) return;
     
@@ -244,21 +268,45 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     setIsImageUploadModalOpen(false);
     setQuestion('');
     
-    // On sauvegarde une copie de l'image avant de l'effacer, pour pouvoir l'envoyer
-    const imageToSend = uploadedImage;
-    const imageUrlToSend = imagePreviewUrl;
+    // On sauvegarde une copie du fichier avant de l'effacer, pour pouvoir l'envoyer
+    const fileToSend = uploadedImage;
+    const fileUrlToSend = imagePreviewUrl;
+    const isFileNotImage = fileUrlToSend.startsWith('file://') || 
+                          fileUrlToSend.startsWith('pdf://') || 
+                          fileUrlToSend.startsWith('text://') || 
+                          fileUrlToSend.startsWith('doc://');
     
-    // Effacer l'image immédiatement pour la zone de saisie
+    // Effacer l'image/fichier immédiatement pour la zone de saisie
     setUploadedImage(null);
     setImagePreviewUrl(null);
     
-    // Créer un message utilisateur avec l'image
+    // Déterminer le type de fichier pour un message utilisateur plus précis
+    let defaultMessage = 'Analyse cette image s\'il te plaît';
+    if (fileUrlToSend.startsWith('pdf://')) {
+      defaultMessage = 'Analyse ce document PDF s\'il te plaît';
+    } else if (fileUrlToSend.startsWith('text://')) {
+      defaultMessage = 'Analyse ce fichier texte s\'il te plaît';
+    } else if (fileUrlToSend.startsWith('doc://')) {
+      defaultMessage = 'Analyse ce document Word s\'il te plaît';
+    } else if (fileUrlToSend.startsWith('file://')) {
+      defaultMessage = 'Analyse ce fichier s\'il te plaît';
+    }
+    
+    // Créer un message utilisateur avec l'image ou le fichier
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: imageText || 'Analyse cette image s\'il te plaît',
+      content: imageText || defaultMessage,
       sender: 'user',
-      imageUrl: imageUrlToSend,
+      imageUrl: isFileNotImage ? null : fileUrlToSend, // N'afficher que les images comme aperçu
     };
+    
+    // Si c'est un fichier non-image, ajouter une propriété pour l'identifier
+    if (isFileNotImage) {
+      // Extraire le nom du fichier à partir de l'URL
+      const fileName = fileUrlToSend.substring(fileUrlToSend.indexOf('://') + 3);
+      // Ajouter cette information au message
+      userMessage.content = `${userMessage.content}\nFichier: ${fileName}`;
+    }
     
     // Ajouter le message utilisateur à la conversation
     setMessages(prev => [...prev, userMessage]);
@@ -267,15 +315,20 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
     setIsThinking(true);
     
     try {
-      // Préparer le formulaire pour l'envoi de l'image
+      // Préparer le formulaire pour l'envoi du fichier
       const formData = new FormData();
-      formData.append('image', imageToSend);
+      formData.append('image', fileToSend); // Gardons le même nom de paramètre pour compatibilité API
       
       if (imageText) {
         formData.append('text_query', imageText);
       }
       
-      // Appel API pour l'analyse d'image
+      // Ajouter le type de fichier si ce n'est pas une image
+      if (isFileNotImage) {
+        formData.append('file_type', fileToSend.type);
+      }
+      
+      // Appel API pour l'analyse d'image ou de fichier
       const response = await fetch('/api/image-analysis', {
         method: 'POST',
         body: formData,
@@ -297,12 +350,14 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
         messageId: Date.now().toString(), // ID pour les fonctions d'action
       }]);
     } catch (error) {
-      console.error('Erreur lors de l\'analyse de l\'image:', error);
+      console.error('Erreur lors de l\'analyse du fichier:', error);
       
-      // Message d'erreur à l'utilisateur
+      // Message d'erreur à l'utilisateur avec message adapté au type de fichier
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        content: "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Pourriez-vous réessayer ou reformuler votre question?",
+        content: isFileNotImage 
+          ? "Désolé, j'ai rencontré un problème en essayant d'analyser ce fichier. Pourriez-vous réessayer avec un autre format ou reformuler votre question?" 
+          : "Désolé, j'ai rencontré un problème en essayant d'analyser cette image. Pourriez-vous réessayer ou reformuler votre question?",
         sender: 'kora',
       }]);
     } finally {
@@ -541,6 +596,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
   // Fonction pour afficher les messages de la conversation
   const renderMessage = (message: Message) => {
     const isUserMessage = message.sender === 'user';
+    const hasFileReference = isUserMessage && message.content.includes('Fichier:') && !message.imageUrl;
     
     return (
       <div key={message.id}>
@@ -554,6 +610,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   alt="Uploaded content" 
                   className="web-message-image"
                 />
+              </div>
+            )}
+            
+            {/* Fichier non-image téléchargé par l'utilisateur */}
+            {hasFileReference && (
+              <div className="web-message-file-reference">
+                <FileText size={24} className="web-message-file-icon" />
               </div>
             )}
             
@@ -742,25 +805,60 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                 <div className="web-question-box">
                   {window.innerWidth > 768 && imagePreviewUrl && !isImageUploadModalOpen ? (
                     <div className="web-input-with-image">
-                      <div className="web-input-image-preview">
-                        <img 
-                          src={imagePreviewUrl} 
-                          alt="Aperçu de l'image" 
-                          className="web-input-image"
-                        />
-                        <button 
-                          type="button"
-                          className="web-remove-image-button"
-                          onClick={handleCancelImageUpload}
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
+                      {imagePreviewUrl.startsWith('file://') || 
+                       imagePreviewUrl.startsWith('pdf://') || 
+                       imagePreviewUrl.startsWith('text://') || 
+                       imagePreviewUrl.startsWith('doc://') ? (
+                        <div className="web-input-file-preview">
+                          <div className="web-input-file-info">
+                            {imagePreviewUrl.startsWith('pdf://') ? (
+                              <FileText size={24} className="web-input-file-icon" style={{color: '#e74c3c'}} />
+                            ) : imagePreviewUrl.startsWith('text://') ? (
+                              <FileText size={24} className="web-input-file-icon" style={{color: '#2ecc71'}} />
+                            ) : imagePreviewUrl.startsWith('doc://') ? (
+                              <FileText size={24} className="web-input-file-icon" style={{color: '#3498db'}} />
+                            ) : (
+                              <FileText size={24} className="web-input-file-icon" />
+                            )}
+                            <span className="web-input-file-name">
+                              {uploadedImage ? uploadedImage.name : 'Fichier'}
+                            </span>
+                          </div>
+                          <button 
+                            type="button"
+                            className="web-remove-image-button"
+                            onClick={handleCancelImageUpload}
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="web-input-image-preview">
+                          <img 
+                            src={imagePreviewUrl} 
+                            alt="Aperçu de l'image" 
+                            className="web-input-image"
+                          />
+                          <button 
+                            type="button"
+                            className="web-remove-image-button"
+                            onClick={handleCancelImageUpload}
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
                       <div className="web-input-wrapper">
                         <div className="web-input-field">
                           <input 
                             type="text" 
-                            placeholder="Ajoute un commentaire sur cette image (optionnel)"
+                            placeholder={
+                              imagePreviewUrl?.startsWith('pdf://') ? "Ajoute une question sur ce PDF (optionnel)" :
+                              imagePreviewUrl?.startsWith('text://') ? "Ajoute une question sur ce fichier texte (optionnel)" :
+                              imagePreviewUrl?.startsWith('doc://') ? "Ajoute une question sur ce document Word (optionnel)" :
+                              imagePreviewUrl?.startsWith('file://') ? "Ajoute une question sur ce fichier (optionnel)" :
+                              "Ajoute un commentaire sur cette image (optionnel)"
+                            }
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
                             className="web-input"
@@ -826,10 +924,12 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                         <button 
                           type="button"
                           className="web-image-button"
-                          aria-label="Télécharger une image"
+                          aria-label="Télécharger un fichier"
                           onClick={handleImageClick}
                         >
-                          <Image size={20} strokeWidth={2} />
+                          <div className="web-image-button-circle">
+                            <Image size={20} strokeWidth={2} />
+                          </div>
                         </button>
                         
                         {question.trim() ? (
@@ -863,12 +963,12 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                     </div>
                   )}
                   
-                  {/* Input caché pour le téléchargement d'image */}
+                  {/* Input caché pour le téléchargement de fichiers (images et autres) */}
                   <input 
                     type="file"
                     ref={fileInputRef}
                     style={{ display: 'none' }}
-                    accept="image/*"
+                    accept="image/*,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={handleImageChange}
                   />
                 </div>
@@ -896,7 +996,13 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
               <div className="web-modal-overlay">
                 <div className="web-modal">
                   <div className="web-modal-header">
-                    <h3>Télécharger une image</h3>
+                    <h3>
+                      {imagePreviewUrl?.startsWith('pdf://') ? 'Document PDF' :
+                       imagePreviewUrl?.startsWith('text://') ? 'Fichier texte' :
+                       imagePreviewUrl?.startsWith('doc://') ? 'Document Word' :
+                       imagePreviewUrl?.startsWith('file://') ? 'Fichier' :
+                       'Image'}
+                    </h3>
                     <button 
                       type="button" 
                       className="web-modal-close"
@@ -908,17 +1014,45 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
                   
                   <div className="web-modal-content">
                     {imagePreviewUrl && (
-                      <div className="web-image-preview">
-                        <img 
-                          src={imagePreviewUrl} 
-                          alt="Aperçu de l'image" 
-                        />
-                      </div>
+                      imagePreviewUrl.startsWith('file://') || 
+                      imagePreviewUrl.startsWith('pdf://') || 
+                      imagePreviewUrl.startsWith('text://') ||
+                      imagePreviewUrl.startsWith('doc://') ? (
+                        <div className="web-file-preview">
+                          <div className="web-file-icon">
+                            {imagePreviewUrl.startsWith('pdf://') ? (
+                              <FileText size={48} style={{color: '#e74c3c'}} />
+                            ) : imagePreviewUrl.startsWith('text://') ? (
+                              <FileText size={48} style={{color: '#2ecc71'}} />
+                            ) : imagePreviewUrl.startsWith('doc://') ? (
+                              <FileText size={48} style={{color: '#3498db'}} />
+                            ) : (
+                              <FileText size={48} />
+                            )}
+                          </div>
+                          <div className="web-file-name">
+                            {uploadedImage ? uploadedImage.name : 'Fichier'}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="web-image-preview">
+                          <img 
+                            src={imagePreviewUrl} 
+                            alt="Aperçu de l'image" 
+                          />
+                        </div>
+                      )
                     )}
                     
                     <div className="web-modal-form">
                       <textarea
-                        placeholder="Ajoute une question ou une description (optionnel)"
+                        placeholder={
+                          imagePreviewUrl?.startsWith('pdf://') ? "Pose ta question sur ce PDF (optionnel)" :
+                          imagePreviewUrl?.startsWith('text://') ? "Pose ta question sur ce fichier texte (optionnel)" :
+                          imagePreviewUrl?.startsWith('doc://') ? "Pose ta question sur ce document Word (optionnel)" :
+                          imagePreviewUrl?.startsWith('file://') ? "Pose ta question sur ce fichier (optionnel)" :
+                          "Ajoute une question ou une description (optionnel)"
+                        }
                         className="web-modal-textarea"
                         onChange={(e) => setQuestion(e.target.value)}
                         value={question}

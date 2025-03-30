@@ -5,7 +5,7 @@ import { z } from "zod";
 import { insertQuestionSchema, insertInteractionSchema, insertTagSchema, insertInteractionTagSchema, insertFieldSchema, insertTopicSchema } from "@shared/schema";
 import { WebSocketServer, WebSocket } from 'ws';
 import multer from 'multer';
-import { generateTutoringResponse, generateReExplanation, generateChallengeProblem, processImageQuery } from './openai';
+import { generateTutoringResponse, generateReExplanation, generateChallengeProblem, processImageQuery, processFileQuery } from './openai';
 import { handleAudioTranscription } from './whisper';
 import fs from 'fs';
 import path from 'path';
@@ -32,13 +32,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // File filter to only allow image files
+  // File filter to allow image files and other document types
   const imageFileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    // Accept only images
+    // Accept images
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
+    }
+    // Accept PDFs
+    else if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    }
+    // Accept text files
+    else if (file.mimetype === 'text/plain') {
+      cb(null, true);
+    }
+    // Accept Word documents
+    else if (file.mimetype === 'application/msword' || 
+             file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      cb(null, true);
+    }
+    else {
+      cb(new Error('File type not supported. Please upload an image, PDF, text, or Word document.'));
     }
   };
   
@@ -82,7 +96,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/image-analysis', upload.single('image'), async (req: Request, res: Response) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: 'No image file uploaded' });
+        return res.status(400).json({ message: 'No file uploaded' });
       }
 
       // Verify OpenAI API key availability
@@ -93,9 +107,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Read the uploaded file
-      const imagePath = req.file.path;
-      const imageBuffer = fs.readFileSync(imagePath);
-      const imageBase64 = imageBuffer.toString('base64');
+      const filePath = req.file.path;
+      const fileBuffer = fs.readFileSync(filePath);
+      let fileContent: string;
+      let isImage = false;
+      
+      // Determine the file type and convert to appropriate format
+      if (req.file.mimetype.startsWith('image/')) {
+        // For images, convert to base64
+        fileContent = fileBuffer.toString('base64');
+        isImage = true;
+      } else if (req.file.mimetype === 'application/pdf') {
+        // For PDFs, indicate the type and send base64
+        fileContent = `PDF:${fileBuffer.toString('base64')}`;
+      } else if (req.file.mimetype === 'text/plain') {
+        // For text files, just extract the text content
+        fileContent = fileBuffer.toString('utf-8');
+      } else {
+        // For Word docs or other supported files, indicate type and send base64
+        fileContent = `DOCUMENT:${fileBuffer.toString('base64')}`;
+      }
       
       // Get optional parameters with validation
       const { 
@@ -113,8 +144,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`Processing image analysis: mode=${analysisMode}, subject=${subject}`);
       
-      // Process the image with enhanced OpenAI Vision API
-      const response = await processImageQuery(imageBase64, query, subject, analysisMode);
+      // Process the file with OpenAI API
+      let response;
+      let fileType = req.file.mimetype;
+      let fileName = req.file.originalname;
+      
+      if (isImage) {
+        // Pour les images, utiliser l'API Vision dédiée
+        console.log('Processing as image with Vision API');
+        response = await processImageQuery(fileContent, query, subject, analysisMode);
+      } else {
+        // Pour les fichiers non-image (PDF, Word, texte), utiliser l'API adaptée
+        console.log(`Processing file: ${fileName} (${fileType}) with GPT-4o`);
+        response = await processFileQuery(fileContent, fileType, fileName, query, subject);
+      }
       
       // Store conversation history in the shared map for context memory
       if (!userConversations.has(sessionId)) {
@@ -124,12 +167,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get the conversation history
       const conversationHistory = userConversations.get(sessionId) || [];
       
-      // Add the current interaction to history
+      // Add the current interaction to history with appropriate type indication
+      let contentPrefix = "";
+      if (isImage) {
+        contentPrefix = "[Image]";
+      } else if (fileType === 'application/pdf') {
+        contentPrefix = "[PDF]";
+      } else if (fileType === 'application/msword' || 
+                 fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        contentPrefix = "[Document]";
+      } else if (fileType === 'text/plain') {
+        contentPrefix = "[Texte]";
+      } else {
+        contentPrefix = "[Fichier]";
+      }
+      
       conversationHistory.push({ 
         role: 'user', 
         content: query 
-          ? `[Image] ${query}` 
-          : "[Image] Analyse cette image s'il te plaît" 
+          ? `${contentPrefix} ${query}` 
+          : `${contentPrefix} Analyse ce contenu s'il te plaît` 
       });
       
       conversationHistory.push({ 
@@ -149,19 +206,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let interactionId = null;
       if (userId) {
         try {
-          // Generate a public URL for the image
+          // Generate a public URL for the file
           // For simplicity we're using the filename, but in production
           // this should be a proper URL based on your hosting setup
-          const imageUrl = `/uploads/${path.basename(imagePath)}`;
+          const fileUrl = `/uploads/${path.basename(filePath)}`;
           
           // Save to database
           const interaction = await dbStorage.createInteraction({
             userId: parseInt(userId as string, 10),
             topicId: null, // Could be set based on subject detection
-            question: query || "Analyse d'image",
+            question: query || (isImage ? "Analyse d'image" : `Analyse de fichier: ${req.file.originalname}`),
             answer: response,
-            type: "image",
-            imageUrl: imageUrl,
+            type: isImage ? "image" : 
+              fileType === 'application/pdf' ? "pdf" :
+              fileType === 'text/plain' ? "text" :
+              (fileType === 'application/msword' || fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') ? "document" : "file",
+            imageUrl: fileUrl,
             starred: false,
             metadata: {
               subject: subject,
@@ -187,10 +247,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         interactionId
       });
       
-      // We don't delete the image if it's been saved to the database
+      // We don't delete the file if it's been saved to the database
       if (!userId) {
         // Clean up - remove the temporary file if not saved to database
-        fs.unlinkSync(imagePath);
+        fs.unlinkSync(filePath);
       }
       
     } catch (error: any) {

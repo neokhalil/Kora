@@ -219,6 +219,7 @@ export function sanitizeFormula(formula: string): string {
 
 /**
  * Convertit un bloc de code Markdown en HTML avec coloration syntaxique
+ * Améliore la détection des langages, en particulier pour PHP
  */
 export function parseCodeBlock(codeBlock: string): { language: string, code: string } {
   // Format: ```language\ncode```
@@ -228,9 +229,21 @@ export function parseCodeBlock(codeBlock: string): { language: string, code: str
     return { language: '', code: codeBlock.replace(/```/g, '') };
   }
   
+  let language = match[1].toLowerCase() || 'plaintext';
+  const code = match[2];
+  
+  // Détection automatique pour PHP si le langage n'est pas spécifié
+  if (language === 'plaintext' || language === '') {
+    // Si le code contient <?php, c'est du PHP
+    if (code.trim().startsWith('<?php') || code.trim().startsWith('<?')) {
+      language = 'php';
+    }
+    // Autres détections automatiques possibles ici
+  }
+  
   return {
-    language: match[1] || 'plaintext',
-    code: match[2]
+    language,
+    code
   };
 }
 

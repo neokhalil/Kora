@@ -115,12 +115,28 @@ const ChatAssistant: React.FC = () => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
   
-  // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
+  // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages, 
+  // mais pas trop bas pour garder les boutons d'action visibles
   useEffect(() => {
     if (messagesEndRef.current) {
       // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (window.innerWidth <= 768) { // Pour les mobiles uniquement
+          // Calculer la position optimale pour voir les boutons d'action
+          const lastMessage = document.querySelector('.web-message:last-child');
+          const messageActions = lastMessage?.querySelector('.web-message-actions');
+          
+          if (messageActions) {
+            // Défiler pour montrer les actions du message plutôt que le marqueur de fin
+            messageActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            // Comportement par défaut si pas de boutons d'action
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else {
+          // Comportement normal pour desktop
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 300);
     }
     
@@ -410,8 +426,21 @@ const ChatAssistant: React.FC = () => {
       
       // Faire défiler vers le bas après l'ajout du message
       setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        if (window.innerWidth <= 768) { // Pour les mobiles uniquement  
+          // Chercher le dernier message et ses actions
+          const lastMessage = document.querySelector('.web-message:last-child');
+          const messageActions = lastMessage?.querySelector('.web-message-actions');
+          
+          if (messageActions) {
+            // Scroller vers les actions si elles existent
+            messageActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (messagesEndRef.current) {
+            // Scroller vers le marqueur de fin en gardant de l'espace pour voir les actions
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else if (messagesEndRef.current) {
+          // Comportement normal pour desktop
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
       }, 100);
     }
@@ -520,8 +549,21 @@ const ChatAssistant: React.FC = () => {
       
       // Faire défiler vers le bas
       setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        if (window.innerWidth <= 768) { // Pour les mobiles uniquement  
+          // Chercher le dernier message et ses actions
+          const lastMessage = document.querySelector('.web-message:last-child');
+          const messageActions = lastMessage?.querySelector('.web-message-actions');
+          
+          if (messageActions) {
+            // Scroller vers les actions si elles existent
+            messageActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else if (messagesEndRef.current) {
+            // Scroller vers le marqueur de fin en gardant de l'espace pour voir les actions
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        } else if (messagesEndRef.current) {
+          // Comportement normal pour desktop
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
       }, 100);
     }
@@ -684,7 +726,7 @@ const ChatAssistant: React.FC = () => {
     const isKora = message.sender === 'kora';
     
     return (
-      <div key={message.id} className="px-4 py-2 mb-4">
+      <div key={message.id} className="px-4 py-2 mb-4 web-message">
         <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
           <div 
             className={`inline-block rounded-2xl ${
@@ -713,7 +755,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
-              <div className="mt-4 flex flex-row gap-2 justify-start">
+              <div className="mt-4 flex flex-row gap-2 justify-start web-message-actions">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 
@@ -851,7 +893,7 @@ const ChatAssistant: React.FC = () => {
   return (
       <div className="flex flex-col h-full max-w-4xl mx-auto no-extra-space">
         <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Zone des messages - optimisée pour le mobile */}
+          {/* Zone des messages */}
           <div 
             className="flex-1 overflow-y-auto p-4 pb-0 chat-messages-container messages-container no-extra-space" 
           >
@@ -890,7 +932,7 @@ const ChatAssistant: React.FC = () => {
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas - optimisée pour mobile */}
+          {/* Zone de saisie fixe en bas - ajustée pour mobile, z-index ajusté pour ne pas cacher les boutons d'action */}
           <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-1 pb-3 pt-1 z-10 composer-container input-area initial-load no-extra-space">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
@@ -937,7 +979,7 @@ const ChatAssistant: React.FC = () => {
                   // Scroll vers la fin des messages après un court délai
                   setTimeout(() => {
                     if (messagesEndRef.current) {
-                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
                     }
                   }, 300);
                 }}
@@ -985,7 +1027,7 @@ const ChatAssistant: React.FC = () => {
                       // Scroll vers le bas après l'ouverture du clavier
                       setTimeout(() => {
                         if (messagesEndRef.current) {
-                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
                         }
                       }, 100);
                     }}
@@ -1144,7 +1186,7 @@ const ChatAssistant: React.FC = () => {
                                 // Faire défiler vers le bas 
                                 setTimeout(() => {
                                   if (messagesEndRef.current) {
-                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                                    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
                                   }
                                 }, 100);
                               }

@@ -187,6 +187,35 @@
   object-fit: contain;
 }
 
+/* Style pour les fichiers non-image dans les messages */
+.web-message-file-reference {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 10px 15px;
+  background-color: #f5f5f7;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.web-message-file-icon {
+  color: #555;
+  margin-right: 10px;
+}
+
+/* Styles spécifiques pour différents types de fichiers */
+.web-message-file-reference[data-filetype="pdf"] .web-message-file-icon {
+  color: #e74c3c;
+}
+
+.web-message-file-reference[data-filetype="doc"] .web-message-file-icon {
+  color: #3498db;
+}
+
+.web-message-file-reference[data-filetype="text"] .web-message-file-icon {
+  color: #2ecc71;
+}
+
 /* Contenu du message */
 .web-message-content {
   font-size: 15px;
@@ -311,9 +340,16 @@
   display: none;
 }
 
-/* Ajoute une marge en bas pour que le dernier message soit visible */
+/* Ajoute une marge en bas pour que le dernier message soit visible (desktop uniquement) */
 .web-messages-list {
-  padding-bottom: 200px; /* Espace doublé comme demandé */
+  padding-bottom: 200px; /* Espace pour desktop */
+}
+
+/* Ajustement pour les écrans mobiles */
+@media (max-width: 767px) {
+  .web-messages-list {
+    padding-bottom: 20px !important; /* Beaucoup moins d'espace sur mobile (priorité élevée) */
+  }
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */
@@ -426,6 +462,22 @@
   }
 }
 
+/* Style pour le cercle grisâtre autour de l'icône d'image */
+.web-image-button-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.web-image-button:hover .web-image-button-circle {
+  background-color: #e0e0e0;
+}
+
 /* Zone de l'enregistreur vocal */
 .web-voice-recorder {
   margin-top: 1rem;
@@ -457,6 +509,38 @@
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
+}
+
+/* Style pour l'aperçu de fichier (non-image) dans le composer */
+.web-input-file-preview {
+  position: relative;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #f5f5f7;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.web-input-file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.web-input-file-icon {
+  color: #0066ff;
+}
+
+.web-input-file-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .web-remove-image-button {
@@ -552,6 +636,34 @@
   max-width: 100%;
   max-height: 300px;
   object-fit: contain;
+}
+
+/* Styles pour les fichiers dans la modale */
+.web-file-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: #f5f5f7;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.web-file-icon {
+  color: #0066ff;
+  margin-bottom: 12px;
+}
+
+.web-file-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 .web-modal-textarea {

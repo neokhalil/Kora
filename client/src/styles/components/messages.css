@@ -185,9 +185,17 @@
   
   .web-message-actions {
     margin-top: 10px;
-    padding-bottom: 36px; /* Augmenté de 16px à 36px pour plus d'espace sur mobile */
+    padding-bottom: 16px; /* Réduit de 36px à 16px pour diminuer l'espace sur mobile */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
+  }
+  
+  /* Style spécifique pour les très petits écrans */
+  @media screen and (max-width: var(--breakpoint-xs)) {
+    .web-message-actions {
+      padding-bottom: 0 !important; /* Force l'absence de padding pour éliminer tout espace */
+      margin-bottom: 0 !important;
+    }
   }
   
   .web-action-button {
@@ -205,6 +213,7 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 140px; /* Augmenté de 100px à 140px pour plus d'espace sur petits écrans */
+    padding: 12px 0 0 !important; /* Suppression totale du padding inférieur sur mobile */
+    margin-bottom: 0 !important; /* Suppression totale de la marge inférieure sur mobile */
   }
 }
