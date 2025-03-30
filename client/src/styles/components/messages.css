@@ -8,9 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 24px; /* Padding minimal, l'espace est géré par le spacer dynamique */
+  padding: 16px 0 16px; /* Padding minimal, l'espace est géré par le spacer dynamique */
   width: 100%;
-  margin-bottom: 10px; /* Marge minimale, car nous utilisons le spacer dynamique */
+  margin-bottom: 0; /* Supprimé la marge, car nous utilisons le spacer dynamique */
 }
 
 /* Spacer dynamique qui s'adapte à la hauteur du composer */
@@ -123,7 +123,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
-  padding-bottom: 40px; /* Augmenté de 20px à 40px pour créer plus d'espace avec la zone de saisie */
+  padding-bottom: 0; /* Supprimé le padding-bottom car nous utilisons le spacer dynamique */
   margin-left: 16px; /* Aligner avec le message */
   z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
 }
@@ -192,7 +192,7 @@
   
   .web-message-actions {
     margin-top: 15px !important;
-    padding-bottom: 20px !important; /* Réduit car nous utilisons maintenant le spacer dynamique */
+    padding-bottom: 0 !important; /* Supprimé le padding car nous utilisons le spacer dynamique */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
@@ -204,7 +204,7 @@
     font-size: 14px !important;
     border-radius: 20px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 6px !important; /* Réduit la marge pour un meilleur espacement avec le spacer dynamique */
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important;
   }
@@ -213,9 +213,9 @@
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
     margin-top: 20px !important;
-    margin-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
+    margin-bottom: 0 !important; /* Supprimé la marge car nous utilisons le spacer dynamique */
     padding-top: 12px !important;
-    padding-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
+    padding-bottom: 0 !important; /* Supprimé le padding car nous utilisons le spacer dynamique */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
@@ -230,7 +230,7 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 24px !important; /* Utilisation du spacer dynamique au lieu de padding fixe */
+    padding: 12px 0 12px !important; /* Padding minimal, car nous utilisons le spacer dynamique */
   }
   
   /* L'espace est géré par le spacer dynamique */
