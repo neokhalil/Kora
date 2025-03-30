@@ -12,14 +12,6 @@
   word-break: break-word;
 }
 
-/* Correction spécifique pour l'espacement des mathématiques */
-.content-renderer .math-content {
-  margin-top: 0.35em !important;
-  margin-bottom: 0.35em !important;
-  padding: 0 !important;
-  line-height: 1.4 !important;
-}
-
 /* Correction générale des problèmes d'espacement */
 @media (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
@@ -59,15 +51,7 @@
     max-width: 100% !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
-    padding: 0.15em 0 !important;
-    margin: 0.3em 0 !important; /* Marge verticale réduite */
-    height: auto !important; /* Hauteur adaptative */
-    box-sizing: border-box;
-    background: rgba(0, 0, 0, 0.01) !important; /* Fond à peine visible */
-    border-radius: 3px;
-    position: relative !important;
-    display: inline-block !important;
-    min-height: 0 !important; /* Pas de hauteur minimale */
+    padding: 0.25em 0 !important;
   }
   
   /* Ajouter un indicateur visuel pour le défilement horizontal */
@@ -81,37 +65,6 @@
     background: linear-gradient(to right, transparent, rgba(255,255,255,0.3));
     pointer-events: none;
     opacity: 0.5;
-  }
-  
-  /* Réduire les espaces verticaux excessifs avec les formules mathématiques */
-  .prose .content-renderer p {
-    margin-bottom: 0.4em !important;
-    margin-top: 0.4em !important;
-  }
-  
-  /* Corriger l'affichage des conteneurs avec formules mathématiques */
-  .web-kora-message .web-message-content {
-    padding-bottom: 10px !important; /* Ajouter un peu d'espace en bas mais pas trop */
-  }
-  
-  /* Ajuster les blocs d'équations mathématiques dans Kora */
-  .katex-html {
-    display: inline-block !important;
-    height: auto !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-  
-  /* Réduire l'espacement vertical dans les formules mathématiques */
-  .katex .vlist-t2 {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Optimisation pour les paragraphes avec contenu mathématique */
-  .prose p:has(.katex) {
-    margin-top: 0.3em !important;
-    margin-bottom: 0.3em !important;
   }
   
   /* Correction pour l'espacement final sur mobile */
@@ -140,8 +93,8 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 90px !important; /* Augmenté à 90px pour assurer la visibilité */
-    padding-bottom: 20px !important; /* Augmenté à 20px */
+    margin-bottom: 60px !important;
+    padding-bottom: 20px !important;
     display: flex;
     flex-wrap: wrap;
     gap: 10px !important;

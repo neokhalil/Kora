@@ -100,19 +100,15 @@
 }
 
 .math-content .katex-display, .content-renderer .katex-display {
-  margin: 0.7em 0;  /* Réduit les marges verticales */
+  margin: 1.2em 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.3em 0;
+  padding: 0.4em 0;
   will-change: contents;
   transform: translateZ(0);
   contain: layout style paint;
   background: rgba(0, 0, 0, 0.02);
   border-radius: 4px;
-  height: auto !important; /* Hauteur adaptative */
-  max-height: none !important; /* Pas de limite de hauteur */
-  display: block; /* Pour éviter les problèmes de mise en page */
-  width: 100%;
 }
 
 /* Amélioration des formules mathématiques */
@@ -121,28 +117,6 @@
   overflow-x: auto;
   overflow-y: hidden;
   padding: 1px; /* Permet le défilement correct sur certains navigateurs */
-}
-
-/* Ajustements essentiels pour corriger les espaces de blanc excessifs */
-.katex .mord, 
-.katex .mspace,
-.katex .mbin,
-.katex .mrel,
-.katex .mpunct,
-.katex .mopen,
-.katex .mclose,
-.katex .vlist > span {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-  box-sizing: border-box;
-  vertical-align: middle !important;
-}
-
-/* Corriger les espaces verticaux dans les listes KaTeX */
-.katex .vlist-t,
-.katex .vlist-r,
-.katex .vlist {
-  height: auto !important;
 }
 
 /* Styles pour les titres dans le ContentRenderer */
@@ -196,48 +170,10 @@
   
   .math-content .katex-display, .content-renderer .katex-display {
     font-size: 0.9em;
-    padding: 0.15em 0;
-    margin: 0.3em 0;  /* Réduit la marge verticale */
+    padding: 0.25em 0;
+    margin: 0.5em 0;
     max-width: 100%;
     -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
-    display: inline-block; /* Pour réduire l'espace pris */
-    min-height: unset; /* Annule la hauteur minimale imposée */
-    height: auto; /* Hauteur adaptative */
-    overflow: visible !important; /* Évite les barres de défilement indésirables */
-  }
-  
-  /* Optimisations pour les formules mathématiques sur mobile */
-  .mobile-math {
-    margin: 0.2em 0 !important;
-    padding: 0 !important;
-  }
-  
-  /* Réduire l'espace des éléments KaTeX sur mobile */
-  .katex-html {
-    max-height: none !important;
-    display: inline-block !important;
-  }
-  
-  /* Ajustements pour les éléments verticaux de KaTeX */
-  .katex .vlist-t, 
-  .katex .vlist-r, 
-  .katex .vlist {
-    height: auto !important;
-  }
-  
-  /* Optimisations pour les éléments de tableaux KaTeX */
-  .katex .array-col-align-c > .col-align-c,
-  .katex .array-col-align-l > .col-align-l,
-  .katex .array-col-align-r > .col-align-r {
-    padding: 0 0.2em !important;
-  }
-  
-  /* Réduction de l'espace des éléments de structure mathématique */
-  .katex .base, 
-  .katex .strut,
-  .katex .mord {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
   }
   
   /* Forcer le bon positionnement des conteneurs */
