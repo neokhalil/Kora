@@ -340,16 +340,9 @@
   display: none;
 }
 
-/* Ajoute une marge en bas pour que le dernier message soit visible (desktop uniquement) */
+/* Ajoute une marge en bas pour que le dernier message soit visible */
 .web-messages-list {
-  padding-bottom: 200px; /* Espace pour desktop */
-}
-
-/* Ajustement pour les écrans mobiles */
-@media (max-width: 767px) {
-  .web-messages-list {
-    padding-bottom: 20px !important; /* Beaucoup moins d'espace sur mobile (priorité élevée) */
-  }
+  padding-bottom: 200px; /* Espace doublé comme demandé */
 }
 
 /* Réduire l'espace quand Kora est en train de réfléchir */

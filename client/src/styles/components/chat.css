@@ -178,11 +178,6 @@
     padding: 0.75rem;
   }
   
-  /* Ajustement du conteneur de messages pour mobile */
-  .messages-container {
-    padding-bottom: 0.5rem; /* Padding réduit en bas pour mobile */
-  }
-  
   .input-container {
     padding: 0.5rem;
     background-color: white;
@@ -205,17 +200,5 @@
   
   .web-input-wrapper input {
     background-color: white;
-  }
-}
-
-/* Ajustements spécifiques pour très petits écrans */
-@media (max-width: var(--breakpoint-xs)) {
-  /* Mobiles (480px et moins) */
-  .messages-container {
-    padding-bottom: 0; /* Éliminer tout padding en bas pour les petits mobiles */
-  }
-  
-  .chat-messages-container {
-    padding-bottom: 0 !important; /* Force l'absence de padding pour éliminer l'espace blanc */
   }
 }

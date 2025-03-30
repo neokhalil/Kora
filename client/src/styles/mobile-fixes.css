@@ -13,30 +13,16 @@
 }
 
 /* Correction générale des problèmes d'espacement */
-@media (max-width: var(--breakpoint-md)) and (min-width: calc(var(--breakpoint-xs) + 1px)) {
-  /* Tablettes uniquement (entre 481px et 768px) */
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 70px !important; /* Spécifique aux tablettes seulement */
+    padding-bottom: 120px !important; /* Plus d'espace pour le composeur en bas */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
-}
-
-/* Styles spécifiques pour les mobiles */
-@media (max-width: var(--breakpoint-xs)) {
-  /* Petits mobiles uniquement (480px et moins) */
-  .chat-messages-container {
-    padding-bottom: 0 !important; /* Élimination complète de l'espace en bas pour les mobiles */
-    margin-bottom: 0 !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
-/* Styles globaux pour les appareils mobiles */
-@media (max-width: var(--breakpoint-md)) {
+  
   /* Empêcher les débordements qui causent des problèmes de mise en page */
   .prose {
     width: 100%;
@@ -94,26 +80,6 @@
   }
 }
 
-/* Style pour l'élément de référence messagesEndRef */
-.message-end-marker {
-  display: block;
-  height: 1px; /* Hauteur minimale */
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Style spécial pour la classe mobile-space-fix, pour réduire l'espace au maximum */
-.mobile-space-fix {
-  display: block;
-  height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  visibility: visible;
-  position: relative;
-  z-index: 1;
-}
-
 /* Corrections spécifiques pour les très petits écrans */
 @media (max-width: var(--breakpoint-xs)) {
   /* Mobiles (480px et moins) */
@@ -123,21 +89,5 @@
   
   .katex {
     font-size: 0.9em;
-  }
-  
-  /* Sur les petits écrans, s'assurer que le marker de fin n'ajoute pas d'espace */
-  .message-end-marker {
-    height: 0;
-    margin-bottom: 0;
-  }
-  
-  /* Ajustements lorsque le clavier est ouvert sur mobile */
-  body.keyboard-open .chat-messages-container {
-    padding-bottom: 0 !important;
-  }
-  
-  /* S'assurer que le dernier message n'est pas coupé */
-  body.keyboard-open .web-message:last-of-type {
-    margin-bottom: 20px;
   }
 }
