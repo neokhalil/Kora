@@ -1,6 +1,7 @@
 import React from 'react';
 import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface KatexRendererProps {
   formula: string;
@@ -60,17 +61,32 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
     );
   };
 
+  const isMobile = useIsMobile();
+  
+  // Optimisation pour les formules mathématiques sur mobile
+  const mobileMathClass = isMobile ? 'mobile-math' : '';
+  
+  // Simplification de la formule sur mobile pour moins d'espacement
+  const mobileOptimizedFormula = isMobile && display 
+    ? cleanFormula
+        // Utiliser des formes plus compactes sur mobile
+        .replace(/\\frac{([^{}]+)}{([^{}]+)}/g, '\\tfrac{$1}{$2}') // fractions plus petites
+        .replace(/\\sum_{([^{}]+)}^{([^{}]+)}/g, '\\sum\\limits_{$1}^{$2}') // limites plus compactes
+        .replace(/\\int_{([^{}]+)}^{([^{}]+)}/g, '\\int\\limits_{$1}^{$2}') // intégrales plus compactes
+    : cleanFormula;
+  
   return (
-    <div className={`katex-${display ? 'block' : 'inline'}-wrapper ${className}`}>
+    <div className={`katex-${display ? 'block' : 'inline'}-wrapper ${mobileMathClass} ${className}`} 
+         style={isMobile && display ? { margin: '0.3em 0', padding: '0.1em 0' } : undefined}>
       {display ? (
         <BlockMath 
-          math={cleanFormula} 
+          math={mobileOptimizedFormula} 
           errorColor={errorColor}
           renderError={handleError}
         />
       ) : (
         <InlineMath 
-          math={cleanFormula} 
+          math={mobileOptimizedFormula} 
           errorColor={errorColor}
           renderError={handleError}
         />
