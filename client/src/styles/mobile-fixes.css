@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 220px !important; /* Augmenté de 160px à 220px pour avoir beaucoup plus d'espace pour le composeur en bas */
+    padding-bottom: 280px !important; /* Augmenté encore plus pour avoir un espace très confortable en bas */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }

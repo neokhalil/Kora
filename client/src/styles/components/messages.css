@@ -8,9 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 160px; /* Augmenté pour laisser plus d'espace pour la zone de texte et les boutons d'action */
+  padding: 16px 0 220px; /* Considérablement augmenté pour laisser beaucoup plus d'espace en bas */
   width: 100%;
-  margin-bottom: 20px; /* Marge supplémentaire au bas de la liste */
+  margin-bottom: 40px; /* Marge supplémentaire au bas de la liste */
 }
 
 /* Styles communs pour tous les messages */
@@ -184,15 +184,33 @@
   }
   
   .web-message-actions {
-    margin-top: 10px;
-    padding-bottom: 36px; /* Augmenté de 16px à 36px pour plus d'espace sur mobile */
+    margin-top: 15px !important;
+    padding-bottom: 120px !important; /* Considérablement augmenté pour éviter tout chevauchement avec le composer */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
+    position: relative !important;
+    z-index: 150 !important;
   }
   
   .web-action-button {
-    padding: 6px 12px;
-    font-size: 13px;
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 10px !important;
+    z-index: 150 !important;
+    position: relative !important;
+  }
+  
+  /* Style spécifique pour les actions sous les messages */
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
+    margin-top: 20px !important;
+    margin-bottom: 130px !important;
+    padding-top: 12px !important;
+    padding-bottom: 40px !important;
+    position: relative !important;
+    z-index: 150 !important;
   }
 }
 
@@ -205,6 +223,6 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 140px; /* Augmenté de 100px à 140px pour plus d'espace sur petits écrans */
+    padding: 12px 0 240px !important; /* Énormément plus d'espace sur petits écrans */
   }
 }
