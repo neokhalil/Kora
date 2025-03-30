@@ -1,0 +1,57 @@
+/* Correctifs spécifiques pour éliminer l'espace blanc sur mobile */
+
+/* Sur les mobiles uniquement */
+@media screen and (max-width: 768px) {
+  /* Modifier le padding du conteneur de messages */
+  .chat-messages-container {
+    padding-bottom: 85px !important;  /* Tenir compte de la hauteur du composer */
+    margin-bottom: 0 !important;
+  }
+
+  /* S'assurer que le marqueur de fin n'ajoute pas d'espace */
+  .message-end-marker {
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 0 !important;
+  }
+
+  /* Fixer la zone de composer pour éviter les marges et espaces indésirables */
+  .composer-container {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 100 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: env(safe-area-inset-bottom, 15px) !important;
+  }
+
+  /* Assurer que les messages ne sont pas poussés vers le haut */
+  .web-message:last-child {
+    margin-bottom: 5px !important; 
+  }
+  
+  /* Augmenter le z-index des boutons d'action pour qu'ils restent au-dessus du composer */
+  .web-message-actions {
+    position: relative;
+    z-index: 50;
+  }
+
+  /* Empêcher l'espace supplémentaire dans le contenu des messages */
+  .chat-content {
+    margin-bottom: 0 !important;
+  }
+
+  /* Ajuster la façon dont le clavier mobile affecte la mise en page */
+  body.keyboard-open .composer-container {
+    position: sticky !important;
+    bottom: 0 !important;
+  }
+
+  /* Assurer que le conteneur parent occupe tout l'espace disponible */
+  .no-extra-space {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}

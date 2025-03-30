@@ -849,11 +849,11 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
+      <div className="flex flex-col h-full max-w-4xl mx-auto no-extra-space">
         <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Zone des messages */}
+          {/* Zone des messages - optimisée pour le mobile */}
           <div 
-            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
+            className="flex-1 overflow-y-auto p-4 pb-0 chat-messages-container messages-container no-extra-space" 
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">
@@ -885,13 +885,13 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                <div ref={messagesEndRef} />
+                <div ref={messagesEndRef} className="message-end-marker mobile-space-fix h-0 m-0 p-0" style={{height: '0', padding: '0', margin: '0', lineHeight: '0'}} />
               </>
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-50 composer-container input-area initial-load">
+          {/* Zone de saisie fixe en bas - optimisée pour mobile */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-1 pb-3 pt-1 z-10 composer-container input-area initial-load no-extra-space">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (

@@ -1,5 +1,7 @@
 /* Import des styles pour les composants mathématiques et code */
 @import './styles/mathCode.css';
+/* Import des correctifs pour l'espace blanc sur mobile */
+@import './styles/remove-space-fix.css';
 
 @tailwind base;
 @tailwind components;
