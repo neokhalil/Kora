@@ -45,8 +45,8 @@
 
 .web-kora-message .web-message-content {
   background-color: #ffffff;
-  /* Pas de bordure pour les messages Kora */
-  border: none !important; /* Important pour s'assurer qu'aucun style ne surcharge */
+  /* Ajout d'une bordure rouge pour visualisation */
+  border: 2px solid red !important;
   border-radius: 16px 16px 16px 0;
   color: #333333;
   max-width: 100%; /* Permet d'utiliser toute la largeur disponible */
