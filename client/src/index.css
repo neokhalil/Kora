@@ -1071,7 +1071,7 @@ input, textarea, select, button {
     font-size: 0.85rem;
     padding: 0.5rem 0.8rem;
     height: 32px;
-    z-index: 110; /* Augmenté considérablement sur mobile */
+    z-index: 15; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     margin-right: 6px;
@@ -1084,7 +1084,7 @@ input, textarea, select, button {
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
     margin-bottom: 130px !important; /* Énormément plus d'espace en bas des actions pour éviter tout chevauchement */
     padding-bottom: 30px !important;
-    z-index: 150;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important; /* Pour que z-index fonctionne */
   }
 }

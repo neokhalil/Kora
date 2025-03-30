@@ -99,13 +99,13 @@
     flex-wrap: wrap;
     gap: 10px !important;
     position: relative !important;
-    z-index: 100 !important;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
   }
   
   /* Style spécifique pour les boutons eux-mêmes */
   .kora-action-button {
     position: relative !important;
-    z-index: 100 !important;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     padding: 8px 15px !important;
     margin-bottom: 10px !important;
     background-color: #f0f3f8 !important;
