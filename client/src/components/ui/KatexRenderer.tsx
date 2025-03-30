@@ -77,12 +77,7 @@ const KatexRenderer: React.FC<KatexRendererProps> = ({
   
   return (
     <div className={`katex-${display ? 'block' : 'inline'}-wrapper ${mobileMathClass} ${className}`} 
-         style={isMobile && display ? { 
-           margin: '0.1em 0', // Réduire la marge verticale sur mobile
-           padding: '0',      // Éliminer le padding
-           maxHeight: 'none', // Éviter les restrictions de hauteur
-           overflow: 'visible' // Éviter les barres de défilement indésirables
-         } : undefined}>
+         style={isMobile && display ? { margin: '0.3em 0', padding: '0.1em 0' } : undefined}>
       {display ? (
         <BlockMath 
           math={mobileOptimizedFormula} 

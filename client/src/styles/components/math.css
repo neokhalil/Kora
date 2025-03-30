@@ -53,21 +53,10 @@
   transform: translateZ(0); /* Force GPU acceleration */
   backface-visibility: hidden; /* Reduce flickering */
   font-feature-settings: "tnum";
-  min-height: 0; /* Hauteur minimale réduite pour éviter l'espace blanc */
+  min-height: 20px; /* Hauteur minimale pour stabiliser le contenu */
   position: relative;
-  line-height: 1.4; /* Ligne plus compacte */
+  line-height: 1.5;
   contain: style;
-}
-
-/* Éliminer les espaces vides autour des exemples à la fin des messages */
-.math-content h3:last-child,
-.math-content h4:last-child,
-.math-content p:last-child,
-.math-content ul:last-child,
-.math-content ol:last-child,
-.math-content .katex-display:last-child {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
 }
 
 /* Style pour le symbole delta */
@@ -207,19 +196,19 @@
   
   .math-content .katex-display, .content-renderer .katex-display {
     font-size: 0.9em;
-    padding: 0 !important; /* Aucun padding vertical */
-    margin: 0.1em 0 !important;  /* Marge verticale minimale */
+    padding: 0.15em 0;
+    margin: 0.3em 0;  /* Réduit la marge verticale */
     max-width: 100%;
     -webkit-overflow-scrolling: touch; /* Améliore le défilement sur iOS */
     display: inline-block; /* Pour réduire l'espace pris */
-    min-height: 0 !important; /* Aucune hauteur minimale imposée */
-    height: auto !important; /* Hauteur adaptative */
+    min-height: unset; /* Annule la hauteur minimale imposée */
+    height: auto; /* Hauteur adaptative */
     overflow: visible !important; /* Évite les barres de défilement indésirables */
   }
   
   /* Optimisations pour les formules mathématiques sur mobile */
   .mobile-math {
-    margin: 0 !important;
+    margin: 0.2em 0 !important;
     padding: 0 !important;
   }
   
@@ -227,14 +216,6 @@
   .katex-html {
     max-height: none !important;
     display: inline-block !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  
-  /* Conteneur principal des formules KaTeX */
-  .katex-block-wrapper, .katex-inline-wrapper {
-    margin: 0 !important;
-    padding: 0 !important;
   }
   
   /* Ajustements pour les éléments verticaux de KaTeX */

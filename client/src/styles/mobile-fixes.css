@@ -85,25 +85,13 @@
   
   /* Réduire les espaces verticaux excessifs avec les formules mathématiques */
   .prose .content-renderer p {
-    margin-bottom: 0.3em !important;
-    margin-top: 0.3em !important;
+    margin-bottom: 0.4em !important;
+    margin-top: 0.4em !important;
   }
   
-  /* Supprimer les espaces excessifs à la fin des messages */
-  .web-kora-message .web-message-content .content-renderer > *:last-child {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  
-  /* Fix spécifique pour l'espace entre le dernier élément et le composer */
-  .web-messages-list .web-message:last-child .web-message-content {
-    padding-bottom: 5px !important;
-    margin-bottom: 0 !important;
-  }
-  
-  /* Ajuster les espacements dans les messages Kora */
+  /* Corriger l'affichage des conteneurs avec formules mathématiques */
   .web-kora-message .web-message-content {
-    padding-bottom: 5px !important; /* Réduire l'espace excessif en bas */
+    padding-bottom: 10px !important; /* Ajouter un peu d'espace en bas mais pas trop */
   }
   
   /* Ajuster les blocs d'équations mathématiques dans Kora */
