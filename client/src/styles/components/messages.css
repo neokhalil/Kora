@@ -8,9 +8,9 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 220px; /* Considérablement augmenté pour laisser beaucoup plus d'espace en bas */
+  padding: 16px 0 160px; /* Réduit de 220px à 160px pour un espace plus équilibré */
   width: 100%;
-  margin-bottom: 40px; /* Marge supplémentaire au bas de la liste */
+  margin-bottom: 30px; /* Marge réduite au bas de la liste */
 }
 
 /* Styles communs pour tous les messages */
@@ -45,8 +45,8 @@
 
 .web-kora-message .web-message-content {
   background-color: #ffffff;
-  /* Ajout d'une bordure rouge pour visualisation */
-  border: 2px solid red !important;
+  /* On supprime la bordure rouge de visualisation */
+  border: none !important;
   border-radius: 16px 16px 16px 0;
   color: #333333;
   max-width: 100%; /* Permet d'utiliser toute la largeur disponible */
@@ -185,11 +185,11 @@
   
   .web-message-actions {
     margin-top: 15px !important;
-    padding-bottom: 120px !important; /* Considérablement augmenté pour éviter tout chevauchement avec le composer */
+    padding-bottom: 90px !important; /* Réduit à 90px tout en conservant assez d'espace */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
   
   .web-action-button {
@@ -206,11 +206,11 @@
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
     margin-top: 20px !important;
-    margin-bottom: 130px !important;
+    margin-bottom: 90px !important; /* Réduit de 130px à 90px */
     padding-top: 12px !important;
-    padding-bottom: 40px !important;
+    padding-bottom: 30px !important; /* Réduit de 40px à 30px */
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
 }
 
@@ -223,6 +223,6 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 240px !important; /* Énormément plus d'espace sur petits écrans */
+    padding: 12px 0 180px !important; /* Espace réduit mais suffisant pour les petits écrans */
   }
 }
