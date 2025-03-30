@@ -103,7 +103,7 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
           key={`math-block-${index}`}
           formula={sanitizeFormula(segment.content)}
           display={true}
-          className="my-4"
+          className={isMobile ? "my-1" : "my-2"} // Réduire les marges, surtout sur mobile
         />
       );
     }
