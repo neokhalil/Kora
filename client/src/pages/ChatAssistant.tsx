@@ -121,8 +121,15 @@ const ChatAssistant: React.FC = () => {
   const composerDimensions = useResizeObserver(composerRef, (entry) => {
     // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
     if (spacerRef.current && entry.contentRect) {
-      const composerHeight = entry.contentRect.height + 20; // Ajouter une marge de 20px
+      const composerHeight = entry.contentRect.height + 16; // Ajout d'une petite marge de 16px
       spacerRef.current.style.height = `${composerHeight}px`;
+      
+      // Forcer le défilement vers le bas après le redimensionnement
+      if (messagesEndRef.current) {
+        setTimeout(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 50);
+      }
     }
   });
   
@@ -149,11 +156,23 @@ const ChatAssistant: React.FC = () => {
     const handleFocusIn = () => {
       // Assurer que le clavier s'ouvre correctement
       document.body.classList.add('keyboard-open');
+      
+      // Mettre à jour le spacer avec une valeur plus grande pour le clavier ouvert
+      if (spacerRef.current && composerRef.current) {
+        const composerHeight = composerRef.current.offsetHeight + 20; // Ajouter un peu plus d'espace
+        spacerRef.current.style.height = `${composerHeight}px`;
+      }
     };
     
     const handleFocusOut = () => {
       // Retirer la classe quand un champ perd le focus
       document.body.classList.remove('keyboard-open');
+      
+      // Remettre le spacer à la taille normale
+      if (spacerRef.current && composerRef.current) {
+        const composerHeight = composerRef.current.offsetHeight + 16;
+        spacerRef.current.style.height = `${composerHeight}px`;
+      }
     };
     
     // Gestion des événements du Visual Viewport API (pour iOS)
@@ -162,9 +181,27 @@ const ChatAssistant: React.FC = () => {
       if (vv && vv.height < window.innerHeight) {
         document.body.classList.add('keyboard-open');
         document.body.classList.add('visual-viewport-active');
+        
+        // Ajuster le spacer quand le clavier est ouvert (iOS spécifique)
+        if (spacerRef.current && composerRef.current) {
+          // Ajouter un plus grand espace pour le clavier iOS
+          const composerHeight = composerRef.current.offsetHeight + 36;
+          spacerRef.current.style.height = `${composerHeight}px`;
+          
+          // Faire défiler vers le bas après le réajustement du spacer
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 50);
+        }
       } else {
         document.body.classList.remove('keyboard-open');
         document.body.classList.remove('visual-viewport-active');
+        
+        // Remettre le spacer à sa taille normale quand le clavier se ferme
+        if (spacerRef.current && composerRef.current) {
+          const composerHeight = composerRef.current.offsetHeight + 16;
+          spacerRef.current.style.height = `${composerHeight}px`;
+        }
       }
     };
     
