@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 170px !important; /* Réduit pour avoir un espace raisonnable en bas sans trop d'espace vide */
+    padding-bottom: 220px !important; /* Revenu à une valeur plus élevée pour éviter que le texte soit coupé */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
@@ -93,8 +93,8 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 60px !important;
-    padding-bottom: 20px !important;
+    margin-bottom: 70px !important;
+    padding-bottom: 30px !important;
     display: flex;
     flex-wrap: wrap;
     gap: 10px !important;
