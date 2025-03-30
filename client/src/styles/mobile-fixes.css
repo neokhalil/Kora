@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 120px !important; /* Plus d'espace pour le composeur en bas */
+    padding-bottom: 160px !important; /* Augmenté de 120px à 160px pour avoir plus d'espace pour le composeur en bas */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
@@ -89,5 +89,14 @@
   
   .katex {
     font-size: 0.9em;
+  }
+  
+  /* Style spécifique pour les boutons d'action sur petit écran */
+  .action-buttons-container {
+    margin-bottom: 40px !important;
+    padding-bottom: 12px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px !important;
   }
 }
