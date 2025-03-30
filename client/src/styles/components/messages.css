@@ -123,7 +123,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
-  padding-bottom: 10px; /* Réduit au minimum car nous utilisons le spacer dynamique */
+  padding-bottom: 40px; /* Augmenté de 20px à 40px pour créer plus d'espace avec la zone de saisie */
   margin-left: 16px; /* Aligner avec le message */
   z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
 }
@@ -192,7 +192,7 @@
   
   .web-message-actions {
     margin-top: 15px !important;
-    padding-bottom: 10px !important; /* Aligné sur la version desktop pour cohérence */
+    padding-bottom: 20px !important; /* Réduit car nous utilisons maintenant le spacer dynamique */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
@@ -204,7 +204,7 @@
     font-size: 14px !important;
     border-radius: 20px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 5px !important; /* Réduit au minimum pour éviter les espaces en trop */
+    margin-bottom: 10px !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important;
   }
@@ -212,10 +212,10 @@
   /* Style spécifique pour les actions sous les messages */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 15px !important;
-    margin-bottom: 10px !important; /* Réduit au minimum grâce au spacer dynamique */
-    padding-top: 8px !important;
-    padding-bottom: 8px !important; /* Réduit au minimum grâce au spacer dynamique */
+    margin-top: 20px !important;
+    margin-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
+    padding-top: 12px !important;
+    padding-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
