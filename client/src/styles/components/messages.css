@@ -8,13 +8,14 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 24px; /* Padding minimal, l'espace est géré par le spacer dynamique */
+  padding: 16px 0 160px; /* Sur desktop, on garde un padding fixe assez grand */
   width: 100%;
-  margin-bottom: 10px; /* Marge minimale, car nous utilisons le spacer dynamique */
+  margin-bottom: 30px; /* Marge pour desktop */
 }
 
-/* Spacer dynamique qui s'adapte à la hauteur du composer */
+/* Spacer dynamique qui s'adapte à la hauteur du composer - uniquement utilisé sur mobile */
 .dynamic-spacer {
+  display: none; /* Caché par défaut sur desktop */
   width: 100%;
   min-height: 30px; /* Hauteur minimale au cas où */
   transition: height 0.2s ease; /* Transition douce pour les changements de hauteur */
@@ -165,6 +166,16 @@
 /* Adaptations pour les différentes tailles d'écran */
 @media screen and (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
+  .web-messages-list {
+    padding: 16px 0 24px !important; /* Padding minimal pour utiliser le spacer dynamique sur mobile/tablette */
+  }
+  
+  /* Activer le spacer dynamique sur tablette/mobile */
+  .dynamic-spacer {
+    display: block !important;
+    min-height: 40px;
+  }
+  
   .web-user-message .web-message-content {
     max-width: 85%;
     padding: 10px 14px;
@@ -230,11 +241,12 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 24px !important; /* Utilisation du spacer dynamique au lieu de padding fixe */
+    padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
   }
   
-  /* L'espace est géré par le spacer dynamique */
+  /* L'espace est géré par le spacer dynamique - activé seulement sur mobile */
   .dynamic-spacer {
+    display: block !important; /* Afficher le spacer sur mobile */
     min-height: 50px; /* Hauteur minimale un peu plus grande sur mobile */
   }
 }
