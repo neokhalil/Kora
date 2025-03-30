@@ -21,6 +21,7 @@
     padding-bottom: 220px !important; /* Revenu à une valeur plus élevée pour éviter que le texte soit coupé */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    background-color: rgba(173, 216, 230, 0.15) !important; /* Bleu clair semi-transparent pour visualiser le conteneur */
   }
   
   /* Empêcher les débordements qui causent des problèmes de mise en page */
