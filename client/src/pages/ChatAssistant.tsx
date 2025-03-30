@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { useResizeObserver } from '../hooks/useResizeObserver';
 import { 
   Send, 
   Loader2, 
@@ -83,6 +84,7 @@ const ChatAssistant: React.FC = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
+  const spacerRef = useRef<HTMLDivElement>(null);
   
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
@@ -114,6 +116,15 @@ const ChatAssistant: React.FC = () => {
   useEffect(() => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
+  
+  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
+  const composerDimensions = useResizeObserver(composerRef, (entry) => {
+    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
+    if (spacerRef.current && entry.contentRect) {
+      const composerHeight = entry.contentRect.height + 20; // Ajouter une marge de 20px
+      spacerRef.current.style.height = `${composerHeight}px`;
+    }
+  });
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
@@ -884,6 +895,9 @@ const ChatAssistant: React.FC = () => {
                     </div>
                   </div>
                 )}
+                
+                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
+                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 20 }} />
                 
                 <div ref={messagesEndRef} />
               </>

@@ -8,9 +8,16 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 16px 0 160px; /* Réduit de 220px à 160px pour un espace plus équilibré */
+  padding: 16px 0 24px; /* Padding minimal, l'espace est géré par le spacer dynamique */
   width: 100%;
-  margin-bottom: 30px; /* Marge réduite au bas de la liste */
+  margin-bottom: 10px; /* Marge minimale, car nous utilisons le spacer dynamique */
+}
+
+/* Spacer dynamique qui s'adapte à la hauteur du composer */
+.dynamic-spacer {
+  width: 100%;
+  min-height: 30px; /* Hauteur minimale au cas où */
+  transition: height 0.2s ease; /* Transition douce pour les changements de hauteur */
 }
 
 /* Styles communs pour tous les messages */
@@ -185,7 +192,7 @@
   
   .web-message-actions {
     margin-top: 15px !important;
-    padding-bottom: 90px !important; /* Réduit à 90px tout en conservant assez d'espace */
+    padding-bottom: 20px !important; /* Réduit car nous utilisons maintenant le spacer dynamique */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
@@ -206,9 +213,9 @@
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
     margin-top: 20px !important;
-    margin-bottom: 90px !important; /* Réduit de 130px à 90px */
+    margin-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
     padding-top: 12px !important;
-    padding-bottom: 30px !important; /* Réduit de 40px à 30px */
+    padding-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
@@ -223,6 +230,11 @@
   
   .web-messages-list {
     gap: 12px;
-    padding: 12px 0 180px !important; /* Espace réduit mais suffisant pour les petits écrans */
+    padding: 12px 0 24px !important; /* Utilisation du spacer dynamique au lieu de padding fixe */
+  }
+  
+  /* L'espace est géré par le spacer dynamique */
+  .dynamic-spacer {
+    min-height: 50px; /* Hauteur minimale un peu plus grande sur mobile */
   }
 }
