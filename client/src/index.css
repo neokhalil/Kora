@@ -4,6 +4,8 @@
 @import './styles/layout-fixes.css';
 /* Import des corrections spécifiques pour mobile */
 @import './styles/mobile-fixes.css';
+/* Import des corrections de priorité max (niveau TRUMPS) */
+@import './styles/trumps/mobile-action-buttons.css';
 
 @tailwind base;
 @tailwind components;

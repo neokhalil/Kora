@@ -1,0 +1,123 @@
+/**
+ * Mobile Action Buttons Fix - TRUMPS
+ * Niveau TRUMPS dans la méthodologie ITCSS - Le plus prioritaire
+ * Ce fichier contient des corrections d'urgence avec !important pour s'assurer
+ * que les boutons d'action restent visibles sur mobile et ne sont pas masqués
+ * par le composer.
+ */
+
+/* ==================== FIXATION DES BOUTONS D'ACTION SUR MOBILE ==================== */
+
+@media (max-width: 768px) {
+  /* Boutons d'action principaux situés sous les messages de Kora */
+  .web-message-actions,
+  .action-buttons-container,
+  .web-action-button,
+  [class*="action-button"],
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
+  [class*="kora-action-button"] {
+    /* Garantir une priorité visuelle absolue */
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    /* Forcer la visibilité */
+    visibility: visible !important;
+    display: flex !important;
+    /* Positionnement en dessous du conteneur */
+    z-index: 30 !important; /* Valeur supérieure au composer */
+    /* Espacements optimisés */
+    margin-top: 12px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 0 !important;
+    /* Animation pour s'assurer qu'ils ne disparaissent pas */
+    opacity: 1 !important;
+    transition: none !important;
+  }
+
+  /* Style pour les conteneurs de boutons spécifiques */
+  .web-message-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    margin-left: 0 !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Style pour les boutons individuels */
+  .web-action-button,
+  [class*="kora-action-button"],
+  .web-message-actions button {
+    padding: 7px 12px !important;
+    margin-bottom: 8px !important;
+    margin-right: 8px !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    height: auto !important;
+    min-height: 32px !important;
+    font-weight: 600 !important;
+    border-radius: 16px !important;
+    background-color: #f2f2f2 !important;
+    color: #333 !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    white-space: nowrap !important;
+    z-index: 30 !important;
+  }
+
+  /* Ajouter de l'espace supplémentaire après chaque message Kora */
+  .web-kora-message {
+    margin-bottom: 20px !important;
+  }
+
+  /* Garantir la séparation nette entre les boutons et le composer */
+  .web-question-container {
+    margin-top: 20px !important;
+    border-top: 1px solid #e0e0e0 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Réduire la hauteur du padding dans le conteneur des messages */
+  .web-messages-list {
+    padding-bottom: 16px !important;
+  }
+
+  /* Corriger la hauteur du conteneur de conversation */
+  .web-conversation-container {
+    padding-bottom: 16px !important;
+    height: calc(100vh - 70px - 60px) !important; /* viewport - header - composer */
+  }
+
+  /* Empêcher les problèmes de scroll (double scrolling) */
+  body, html {
+    overflow: hidden !important;
+    height: 100% !important;
+    position: fixed !important;
+    width: 100% !important;
+  }
+
+  /* Corriger le conteneur principal */
+  .web-main-content {
+    height: 100% !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    padding-top: 70px !important; /* Hauteur du header */
+  }
+}
+
+/* Corrections spécifiques pour les très petits écrans */
+@media (max-width: 480px) {
+  /* Réduire encore plus la taille des textes et espacements */
+  .web-action-button,
+  [class*="kora-action-button"],
+  .web-message-actions button {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    min-height: 28px !important;
+  }
+}
