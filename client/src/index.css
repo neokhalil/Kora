@@ -1265,3 +1265,27 @@ body.menu-open {
   width: 100%;
   height: 100%;
 }
+/* Style optimisé pour les boutons d'action sur mobile */
+.kora-action-button-mobile {
+  font-size: 0.8rem !important;
+  padding: 0.35rem 0.6rem !important;
+  height: 26px !important;
+  line-height: 1.2 !important;
+  z-index: 15 !important; /* Sous le composer (z-index: 20) */
+  border-radius: 16px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+  margin-right: 4px !important;
+  border: none !important;
+  background-color: #f0f3f8 !important;
+}
+
+/* Réduire les marges pour les boutons sur mobile */
+@media screen and (max-width: 767px) {
+  .action-buttons-container {
+    margin-top: 2px !important;
+    margin-bottom: 8px !important;
+    padding-top: 0 !important;
+    padding-bottom: 4px !important;
+    gap: 5px !important;
+  }
+}

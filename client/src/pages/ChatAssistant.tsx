@@ -74,7 +74,9 @@ const ChatAssistant: React.FC = () => {
     fullText: '',
     currentText: ''
   });
+  // Détection de l'appareil mobile vs desktop
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   
   // Vérifier si c'est un appareil mobile
   const isMobile = useIsMobile();
@@ -112,9 +114,22 @@ const ChatAssistant: React.FC = () => {
     }
   }, []);
 
-  // Détecter l'appareil mobile
+  // Détecter l'appareil mobile et l'affichage mobile
   useEffect(() => {
     setIsMobileDevice(isMobile);
+    
+    // Gestionnaire pour mettre à jour l'état de l'affichage mobile lors du redimensionnement
+    const handleResize = () => {
+      setIsMobileView(window.innerWidth < 768);
+    };
+    
+    // Ajouter l'écouteur de redimensionnement
+    window.addEventListener('resize', handleResize);
+    
+    // Nettoyer l'écouteur lors du démontage
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, [isMobile]);
   
   // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
@@ -695,7 +710,7 @@ const ChatAssistant: React.FC = () => {
     const isKora = message.sender === 'kora';
     
     return (
-      <div key={message.id} className="px-4 py-2 mb-4">
+      <div key={message.id} className={`px-4 ${isMobileView ? 'py-1 mb-1' : 'py-2 mb-4'}`}>
         <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
           <div 
             className={`inline-block rounded-2xl ${
@@ -724,11 +739,11 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
-              <div className="mt-4 mb-6 pt-2 pb-3 flex flex-row gap-3 justify-start action-buttons-container">
+              <div className={`${isMobileView ? 'mt-2 mb-2 pt-1 pb-1' : 'mt-4 mb-6 pt-2 pb-3'} flex flex-row flex-wrap ${isMobileView ? 'gap-1' : 'gap-2'} justify-start action-buttons-container`}>
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 
-                    className="kora-action-button"
+                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -759,7 +774,7 @@ const ChatAssistant: React.FC = () => {
                 {/* Bouton Indice - uniquement visible pour les défis */}
                 {message.isChallenge && (
                   <button 
-                    className="kora-action-button"
+                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
                     onClick={async () => {
                       if (isThinking) return;
                       
@@ -824,7 +839,7 @@ const ChatAssistant: React.FC = () => {
                 {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
                 {(!message.isChallenge || message.isHint) && (
                   <button 
-                    className="kora-action-button"
+                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -864,7 +879,7 @@ const ChatAssistant: React.FC = () => {
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
-            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
+            className={`flex-1 overflow-y-auto ${isMobileView ? 'p-2' : 'p-4'} chat-messages-container messages-container`}
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">

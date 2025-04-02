@@ -108,15 +108,18 @@
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
   }
   
-  /* Style spécifique pour les boutons eux-mêmes */
-  .kora-action-button {
+  /* Style spécifique pour les boutons eux-mêmes - remplacé par kora-action-button-mobile */
+  .kora-action-button-mobile {
     position: relative !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
-    padding: 6px 12px !important; /* Padding plus compact */
+    padding: 0.35rem 0.6rem !important; /* Padding plus compact */
     margin-bottom: 4px !important; /* Marge verticale fortement réduite */
+    margin-right: 4px !important;
     background-color: #f0f3f8 !important; 
-    font-size: 13px !important; /* Texte un peu plus petit */
+    font-size: 0.8rem !important; /* Texte un peu plus petit */
     font-weight: 600 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important; /* Ombre plus subtile */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important; /* Ombre plus subtile */
+    height: 26px !important;
+    line-height: 1.2 !important;
   }
 }
