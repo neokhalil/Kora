@@ -38,21 +38,13 @@
     padding-bottom: 2px !important;
   }
   
-  /* Montrer les boutons d'action mais sans espace supplémentaire */
-  .action-buttons-container {
-    margin-top: 8px !important;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    display: flex !important;
-  }
-  
-  /* Style compact pour les boutons d'action */
-  .kora-action-button {
-    padding: 4px 8px !important;
-    font-size: 12px !important;
-    height: auto !important;
-    margin-right: 4px !important;
+  /* Masquer tous les boutons d'action sur mobile */
+  .action-buttons-container,
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
+  .kora-action-button,
+  [class*="action-button"] {
+    display: none !important;
   }
   
   /* Optimisations pour les formules mathématiques */
