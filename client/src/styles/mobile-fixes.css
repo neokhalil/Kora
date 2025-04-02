@@ -16,11 +16,25 @@
 @media (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
   
-  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
+  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header ou le composer */
   .chat-messages-container {
-    padding-bottom: 100px !important; /* Considérablement réduit pour éviter l'espace excessif */
+    padding-bottom: 140px !important; /* Augmenté pour garantir la visibilité complète */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Point de référence pour le défilement - essentiel pour garantir un espace suffisant */
+  .scroll-reference-point {
+    height: 1px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: block;
+  }
+  
+  /* Spacer dynamique - hauteur minimale augmentée pour garantir la visibilité */
+  .dynamic-spacer {
+    min-height: 80px !important;
+    display: block !important;
   }
   
   /* Empêcher les débordements qui causent des problèmes de mise en page */
@@ -93,24 +107,39 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 15px !important; /* Considérablement réduit */
-    padding-bottom: 5px !important; /* Considérablement réduit */
+    margin-top: 10px !important;
+    margin-bottom: 20px !important; /* Augmenté pour garantir la visibilité */
+    padding-bottom: 10px !important; /* Augmenté pour garantir la visibilité */
     display: flex;
     flex-wrap: wrap;
-    gap: 8px !important; /* Légèrement réduit */
+    gap: 8px !important;
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 15 !important;
   }
   
   /* Style spécifique pour les boutons eux-mêmes */
   .kora-action-button {
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
-    padding: 6px 12px !important; /* Réduit */
-    margin-bottom: 0 !important; /* Éliminé */
+    z-index: 15 !important;
+    padding: 8px 14px !important; /* Augmenté pour meilleure tactilité */
+    margin-bottom: 6px !important; /* Ajouté pour espacement entre boutons si wrap */
+    margin-top: 4px !important; /* Ajouté pour espacement entre boutons si wrap */
     background-color: #f0f3f8 !important;
     font-weight: 600 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    font-size: 13px !important; /* Texte plus petit */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12) !important; /* Ombre plus visible */
+    font-size: 13px !important;
+    border-radius: 18px !important; /* Plus arrondi pour meilleure ergonomie */
+  }
+  
+  /* S'assurer que les nouveaux messages ne sont pas coupés */
+  .messages-container > div:last-of-type .prose {
+    margin-bottom: 12px !important;
+  }
+  
+  /* Message d'information en bas - s'assurer qu'il est visible mais pas trop visible */
+  .footer-message {
+    opacity: 0.6;
+    font-size: 11px !important;
+    padding-bottom: 2px !important;
   }
 }

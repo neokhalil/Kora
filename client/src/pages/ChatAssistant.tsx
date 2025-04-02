@@ -121,19 +121,35 @@ const ChatAssistant: React.FC = () => {
         const messageContainer = document.querySelector('.messages-container');
         
         if (messageContainer) {
-          // Calculer la position pour laisser un espace minimal au-dessus du composer
-          const lastKoraMessage = document.querySelector('.messages-container .message:last-of-type');
+          // Trouver le dernier message et ses boutons d'action
+          const lastKoraMessage = document.querySelector('.chat-messages-container > div:last-of-type');
+          const actionButtons = document.querySelector('.action-buttons-container:last-of-type');
+          
           if (lastKoraMessage) {
-            // Défilement optimisé qui place le message juste au-dessus du composer
-            const scrollPosition = messageContainer.scrollTop + lastKoraMessage.getBoundingClientRect().bottom - composerRect.top + 20;
+            // Calculer la position pour laisser un espace suffisant au-dessus du composer
+            // Utiliser le bouton d'action comme référence si disponible, sinon utiliser le message
+            let bottomElement = actionButtons || lastKoraMessage;
+            let bottomPosition = bottomElement ? bottomElement.getBoundingClientRect().bottom : lastKoraMessage.getBoundingClientRect().bottom;
+            
+            // Garantir un espace minimal de 60px entre le dernier élément et le composer
+            const minSpacing = 60; 
+            const scrollPosition = messageContainer.scrollTop + bottomPosition - composerRect.top + minSpacing;
+            
+            // Appliquer le défilement avec une transition douce
             messageContainer.scrollTo({ top: scrollPosition, behavior: 'smooth' });
           } else {
-            // Fallback au défilement standard si on ne trouve pas le dernier message
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            // Fallback au défilement standard, mais avec positionnement précis
+            messagesEndRef.current.scrollIntoView({ 
+              behavior: 'smooth',
+              block: 'start' // S'assurer que le point de référence est en haut
+            });
           }
         } else {
-          // Fallback au défilement standard
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+          // Fallback au défilement standard avec positionnement précis
+          messagesEndRef.current.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start' // Positionner l'élément en haut
+          });
         }
       }
     }, delay);
@@ -442,51 +458,9 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Faire défiler pour positionner le message juste au-dessus du composer
-      setTimeout(() => {
-        if (messagesEndRef.current && composerRef.current) {
-          // Calculer la position optimale pour que les boutons d'action soient visibles
-          const composerRect = composerRef.current.getBoundingClientRect();
-          const messageContainer = document.querySelector('.messages-container');
-          
-          if (messageContainer) {
-            // Calculer la position pour laisser un espace minimal au-dessus du composer
-            const lastKoraMessage = document.querySelector('.messages-container .message:last-of-type');
-            if (lastKoraMessage) {
-              // Défilement optimisé qui place le message juste au-dessus du composer
-              const scrollPosition = messageContainer.scrollTop + lastKoraMessage.getBoundingClientRect().bottom - composerRect.top + 20;
-              messageContainer.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-            } else {
-              // Fallback au défilement standard si on ne trouve pas le dernier message
-              messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-            }
-          } else {
-            // Fallback au défilement standard
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      }, 300);
-      
-      // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
-      setTimeout(() => {
-        if (messagesEndRef.current && composerRef.current) {
-          // Utiliser le même algorithme mais avec un délai plus long pour s'assurer que tout est rendu
-          const composerRect = composerRef.current.getBoundingClientRect();
-          const messageContainer = document.querySelector('.messages-container');
-          
-          if (messageContainer) {
-            const lastKoraMessage = document.querySelector('.messages-container .message:last-of-type');
-            if (lastKoraMessage) {
-              const scrollPosition = messageContainer.scrollTop + lastKoraMessage.getBoundingClientRect().bottom - composerRect.top + 20;
-              messageContainer.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-            } else {
-              messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-            }
-          } else {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-          }
-        }
-      }, 800);
+      // Utiliser notre fonction optimisée de défilement à deux moments différents
+      scrollToOptimalPosition(300);
+      scrollToOptimalPosition(800);
     }
   };
   
@@ -967,10 +941,11 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
-                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 5 }} />
+                {/* Spacer dynamique qui s'adapte à la hauteur du composer avec une marge supplémentaire pour garantir la visibilité */}
+                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 60 }} />
                 
-                <div ref={messagesEndRef} />
+                {/* Point de référence pour le défilement automatique */}
+                <div ref={messagesEndRef} className="scroll-reference-point" />
               </>
             )}
           </div>
