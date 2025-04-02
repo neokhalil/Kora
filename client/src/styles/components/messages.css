@@ -209,15 +209,9 @@
   }
   
   /* 
-   * Activation du spacer dynamique pour tablettes/mobiles
-   * - display: block pour rendre visible le spacer (hidden sur desktop)
-   * - min-height considérablement augmentée pour garantir la visibilité des messages
-   * - la hauteur réelle est contrôlée par JavaScript via le hook useResizeObserver
+   * Le spacer dynamique a été supprimé en faveur d'un padding-bottom fixe
+   * Cette approche est plus simple, plus fiable et maintient les messages visibles
    */
-  .dynamic-spacer {
-    display: block !important; /* Activer le spacer sur tablette/mobile */
-    min-height: 150px; /* Hauteur minimale considérablement augmentée pour éviter les messages cachés */
-  }
   
   .web-user-message .web-message-content {
     max-width: 85%;
@@ -317,13 +311,7 @@
   }
   
   /* 
-   * Adaptation du spacer dynamique pour smartphones
-   * - min-height considérablement augmentée (40px → 200px) pour garantir
-   *   que les messages sont toujours visibles, même sur les plus petits écrans
-   *   où les formules mathématiques peuvent occuper beaucoup d'espace
+   * Le padding-bottom fixe remplace le spacer dynamique
+   * pour une solution plus simple et cohérente sur tous les appareils
    */
-  .dynamic-spacer {
-    display: block !important; /* Assurer que le spacer est visible */
-    min-height: 200px; /* Hauteur minimale considérablement augmentée pour garantir la visibilité */
-  }
 }

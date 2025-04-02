@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
-import { useResizeObserver } from '../hooks/useResizeObserver';
 import { 
   Send, 
   Loader2, 
@@ -84,7 +83,6 @@ const ChatAssistant: React.FC = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const composerRef = useRef<HTMLDivElement>(null);
-  const spacerRef = useRef<HTMLDivElement>(null);
   
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
@@ -117,23 +115,8 @@ const ChatAssistant: React.FC = () => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
   
-  /* 
-   * Utilisation du ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
-   * Ce mécanisme est essentiel à notre solution mobile pour plusieurs raisons:
-   * 1. Il surveille les changements de hauteur de la zone de saisie (quand l'utilisateur tape du texte)
-   * 2. Il ajuste automatiquement la hauteur du spacer pour maintenir suffisamment d'espace
-   * 3. Il crée un effet de "coussin" qui empêche les messages d'être cachés
-   * 4. Contrairement à un padding fixe, il s'adapte à toutes les tailles de composer
-   */
-  const composerDimensions = useResizeObserver(composerRef, (entry) => {
-    // Mettre à jour la hauteur du spacer en fonction de la hauteur de la zone de saisie
-    if (spacerRef.current && entry.contentRect) {
-      // Ajouter une marge supplémentaire de 20px pour éviter que le contenu 
-      // ne soit trop proche de la zone de saisie
-      const composerHeight = entry.contentRect.height + 20;
-      spacerRef.current.style.height = `${composerHeight}px`;
-    }
-  });
+  // Le hook useResizeObserver a été supprimé en faveur d'une approche plus simple
+  // avec un padding-bottom fixe important
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
@@ -905,19 +888,7 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
-                {/* 
-                  Élément spacer dynamique - pièce centrale de notre solution pour mobile/tablette
-                  - ref={spacerRef}: référence utilisée par useResizeObserver pour ajuster la hauteur
-                  - height: dynamiquement calculée en fonction de la hauteur du composer + marge
-                  - Visible uniquement sur mobile/tablette grâce aux règles CSS dans messages.css
-                  - S'ajuste automatiquement quand la zone de saisie change de taille
-                */}
-                <div 
-                  ref={spacerRef} 
-                  className="dynamic-spacer" 
-                  style={{ height: composerDimensions.height + 120 }} /* Considérablement augmenté (de 20 à 120) pour garantir la visibilité */
-                />
+                {/* Le spacer dynamique a été retiré pour une approche plus simple avec un padding-bottom fixe */}
                 
                 <div ref={messagesEndRef} />
               </>

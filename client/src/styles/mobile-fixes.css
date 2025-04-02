@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 400px !important; /* Considérablement augmenté pour garantir la visibilité de tous les messages */
+    padding-bottom: 500px !important; /* Valeur fixe très importante pour garantir que même les longues équations restent visibles */
     padding-top: 10px !important; /* Réduire l'espace en haut sur mobile */
     padding-left: 8px !important; /* Réduire les marges horizontales sur mobile */
     padding-right: 8px !important;
@@ -110,6 +110,7 @@
   .chat-messages-container {
     padding-left: 4px !important; /* Marges horizontales minimales */
     padding-right: 4px !important;
+    padding-bottom: 600px !important; /* Valeur très importante pour les très petits écrans */
   }
   
   /* Mise en page plus compacte des messages */
