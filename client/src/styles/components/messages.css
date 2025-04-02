@@ -1,6 +1,6 @@
 /**
  * Styles pour les messages dans l'application Kora
- * Composant: messages.css - Adaptations pour la nouvelle approche
+ * Composant: messages.css - Partie de l'architecture ITCSS
  */
 
 /* Container principal des messages */
@@ -8,8 +8,17 @@
   display: flex;
   flex-direction: column;
   gap: 16px; /* Espacement standard entre les messages sur desktop */
-  padding: 16px 0 120px; /* Padding fixe sur desktop */
+  padding: 16px 0 160px; /* Sur desktop, on garde un padding fixe assez grand */
   width: 100%;
+  margin-bottom: 30px; /* Marge pour desktop */
+}
+
+/* Spacer dynamique qui s'adapte à la hauteur du composer - uniquement utilisé sur mobile */
+.dynamic-spacer {
+  display: none; /* Caché par défaut sur desktop */
+  width: 100%;
+  min-height: 30px; /* Hauteur minimale au cas où */
+  transition: height 0.2s ease; /* Transition douce pour les changements de hauteur */
 }
 
 /* Styles communs pour tous les messages */
@@ -19,18 +28,27 @@
   margin-bottom: 8px;
 }
 
+/* Ajustement de la marge pour les appareils mobiles */
+@media screen and (max-width: var(--breakpoint-md)) {
+  .web-message {
+    margin-bottom: 6px; /* Marge réduite sur mobile */
+  }
+}
+
 /* Messages de l'utilisateur */
 .web-user-message {
   justify-content: flex-end;
 }
 
 .web-user-message .web-message-content {
-  background-color: #f2f2f2;
+  background-color: #f2f2f2; /* Gris clair au lieu de bleu */
   border-radius: 16px 16px 0 16px;
   color: #333333;
+  /* Largeur adaptative au contenu, avec une limite maximale */
   display: inline-block;
   max-width: max-content;
   padding: 10px 14px;
+  /* Pas de bordure pour le message utilisateur */
   border: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
@@ -42,11 +60,13 @@
 
 .web-kora-message .web-message-content {
   background-color: #ffffff;
+  /* On supprime la bordure rouge de visualisation */
   border: none !important;
   border-radius: 16px 16px 16px 0;
   color: #333333;
   max-width: 100%; /* Permet d'utiliser toute la largeur disponible */
   padding: 14px 18px;
+  /* Aucune ombre */
   box-shadow: none !important;
 }
 
@@ -109,19 +129,19 @@
 .web-message-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-  padding-bottom: 12px;
-  margin-left: 12px;
-  z-index: var(--actions-z-index);
+  gap: 10px;
+  margin-top: 14px;
+  padding-bottom: 40px; /* Augmenté de 20px à 40px pour créer plus d'espace avec la zone de saisie */
+  margin-left: 16px; /* Aligner avec le message */
+  z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
 }
 
 .web-action-button {
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #f9fafb;
-  border: 1px solid #f0f0f0;
+  background-color: #f9fafb; /* Même couleur que sur mobile */
+  border: 1px solid #f0f0f0; /* Bordure plus légère */
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;
@@ -133,7 +153,7 @@
 }
 
 .web-action-button:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0; /* Gris légèrement plus foncé au survol */
   border-color: #e5e5e5;
   transform: translateY(-1px);
 }
@@ -144,45 +164,24 @@
   color: #6b7280;
 }
 
-/* Nouveaux styles pour les boutons d'action de Kora dans la nouvelle structure */
-.kora-action-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #f9fafb;
-  border: 1px solid #f0f0f0;
-  border-radius: 18px;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  z-index: var(--actions-z-index);
-}
-
-.kora-action-button:hover {
-  background-color: #f0f0f0;
-  border-color: #e5e5e5;
-  transform: translateY(-1px);
-}
-
-.action-buttons-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-  z-index: var(--actions-z-index);
+/* Style spécifique pour les actions des défis */
+.web-challenge-actions {
+  /* Hérite de web-message-actions mais on peut ajouter des styles spécifiques ici */
+  margin-bottom: 8px; /* Espacement supplémentaire si plusieurs boutons d'action se suivent */
 }
 
 /* Adaptations pour les différentes tailles d'écran */
-@media screen and (max-width: 768px) {
-  /* Tablettes et mobiles */
+@media screen and (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
   .web-messages-list {
-    gap: 12px;
-    padding: 16px 0 120px; /* Padding suffisant pour laisser place au composer */
+    gap: 12px !important; /* Réduit l'espace entre les messages sur tablette */
+    padding: 16px 0 24px !important; /* Padding minimal pour utiliser le spacer dynamique sur mobile/tablette */
+  }
+  
+  /* Activer le spacer dynamique sur tablette/mobile */
+  .dynamic-spacer {
+    display: block !important;
+    min-height: 40px;
   }
   
   .web-user-message .web-message-content {
@@ -191,8 +190,8 @@
   }
   
   .web-kora-message .web-message-content {
-    max-width: 95%;
-    padding: 12px 14px;
+    max-width: 100%;
+    padding: 10px 14px;
   }
   
   /* Mode thème clair forcé sur mobile */
@@ -200,96 +199,62 @@
     background-color: #ffffff !important;
     color: #333333 !important;
     border: none !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   }
   
   .web-user-message .web-message-content {
-    background-color: #f2f2f2 !important;
+    background-color: #f2f2f2 !important; /* Même gris que sur desktop */
     color: #333333 !important;
     border: none !important;
+    box-shadow: none !important; /* S'assurer qu'il n'y a pas d'ombres non plus */
   }
   
-  /* Style pour les boutons d'action mobile */
-  .kora-action-button-mobile {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    height: 32px;
-    padding: 0 10px;
-    border-radius: 16px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    background-color: rgba(0, 0, 0, 0.05);
-    border: none;
-    color: rgba(0, 0, 0, 0.8);
-    z-index: var(--actions-z-index);
-    position: relative;
+  .web-message-actions {
+    margin-top: 12px !important; /* Légèrement réduit */
+    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    margin-left: 8px;
+    gap: 8px; /* Espacement réduit entre les boutons sur mobile */
+    position: relative !important;
+    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
   
-  .action-buttons-container {
-    margin-top: 8px;
-    margin-bottom: 4px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    z-index: var(--actions-z-index);
-    position: relative;
+  .web-action-button {
+    padding: 8px 16px !important;
+    font-size: 14px !important;
+    border-radius: 20px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 10px !important;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    position: relative !important;
   }
   
-  /* Fin marker - élément invisible qui assure l'espace en bas des messages */
-  .messages-end-marker {
-    height: var(--mobile-marker-height);
-    width: 100%;
-    margin-top: 20px;
-  }
-  
-  /* Meilleure visibilité pour le contenu des messages avec des contraintes d'espace */
-  .prose {
-    width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    font-size: 0.95rem;
-  }
-  
-  /* Optimisations pour l'affichage des formules mathématiques */
-  .katex-display, .katex {
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0.25em 0;
-    font-size: 0.95em;
-  }
-  
-  /* Meilleur affichage du code sur mobile */
-  pre, code {
-    max-width: 100%;
-    white-space: pre-wrap;
-    font-size: 0.85em;
+  /* Style spécifique pour les actions sous les messages */
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
+    margin-top: 12px !important; /* Réduit pour cohérence avec les autres espacements */
+    margin-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    padding-top: 8px !important; /* Légèrement réduit */
+    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    position: relative !important;
+    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
 }
 
 /* Styles spécifiques pour les très petits écrans */
-@media screen and (max-width: 375px) {
-  /* Mobiles très petits */
-  .prose {
-    font-size: 0.9rem;
+@media screen and (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
+  .web-message-content {
+    font-size: 14px;
   }
   
-  .katex {
-    font-size: 0.85em;
+  .web-messages-list {
+    gap: 10px !important; /* Réduit l'espace entre les messages sur mobile pour être plus proche de l'expérience desktop */
+    padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
   }
   
-  .kora-action-button-mobile {
-    height: 28px;
-    padding: 0 8px;
-    font-size: 0.75rem;
-  }
-  
-  .chat-messages-container > div {
-    padding: 4px 8px;
-  }
-  
-  .web-kora-message .web-message-content,
-  .web-user-message .web-message-content {
-    padding: 8px 12px;
+  /* L'espace est géré par le spacer dynamique - activé seulement sur mobile */
+  .dynamic-spacer {
+    display: block !important; /* Afficher le spacer sur mobile */
+    min-height: 50px; /* Hauteur minimale un peu plus grande sur mobile */
   }
 }

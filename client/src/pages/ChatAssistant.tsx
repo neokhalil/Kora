@@ -74,9 +74,7 @@ const ChatAssistant: React.FC = () => {
     fullText: '',
     currentText: ''
   });
-  // Détection de l'appareil mobile vs desktop
   const [isMobileDevice, setIsMobileDevice] = useState(false);
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 768);
   
   // Vérifier si c'est un appareil mobile
   const isMobile = useIsMobile();
@@ -114,58 +112,36 @@ const ChatAssistant: React.FC = () => {
     }
   }, []);
 
-  // Détecter l'appareil mobile et l'affichage mobile
+  // Détecter l'appareil mobile
   useEffect(() => {
     setIsMobileDevice(isMobile);
-    
-    // Gestionnaire pour mettre à jour l'état de l'affichage mobile lors du redimensionnement
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 768);
-    };
-    
-    // Ajouter l'écouteur de redimensionnement
-    window.addEventListener('resize', handleResize);
-    
-    // Nettoyer l'écouteur lors du démontage
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
   }, [isMobile]);
   
-  // Utilisation simplifiée de ResizeObserver pour suivre seulement la hauteur du composer
-  const composerDimensions = useResizeObserver(composerRef);
-  
-  // Fonction simple de défilement vers le bas - approche unique et fiable
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      // Utiliser la méthode standard pour le défilement
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
+  const composerDimensions = useResizeObserver(composerRef, (entry) => {
+    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
+    if (spacerRef.current && entry.contentRect) {
+      const composerHeight = entry.contentRect.height + 20; // Ajouter une marge de 20px
+      spacerRef.current.style.height = `${composerHeight}px`;
     }
-  };
+  });
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
-    // Délai court pour permettre le rendu du contenu
-    const scrollTimeout = setTimeout(() => {
-      scrollToBottom();
-    }, 100);
+    if (messagesEndRef.current) {
+      // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
     
-    // Nettoyage du timeout en cas de changements rapides
-    return () => clearTimeout(scrollTimeout);
+    // S'assurer que la hauteur initiale du textarea est correcte
+    const textareas = document.querySelectorAll('.chat-textarea');
+    textareas.forEach((textarea) => {
+      const el = textarea as HTMLTextAreaElement;
+      el.style.height = '40px';
+    });
   }, [messages, isThinking]);
-  
-  // Réinitialiser la hauteur du textarea
-  useEffect(() => {
-    const resetTextareaHeight = () => {
-      const textareas = document.querySelectorAll('.chat-textarea');
-      textareas.forEach((textarea) => {
-        const el = textarea as HTMLTextAreaElement;
-        el.style.height = '40px';
-      });
-    };
-    
-    resetTextareaHeight();
-  }, []);
   
   // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
   useEffect(() => {
@@ -173,8 +149,6 @@ const ChatAssistant: React.FC = () => {
     const handleFocusIn = () => {
       // Assurer que le clavier s'ouvre correctement
       document.body.classList.add('keyboard-open');
-      // Retirer la classe d'interaction avec les boutons quand on focus sur un champ
-      document.body.classList.remove('interaction-with-buttons');
     };
     
     const handleFocusOut = () => {
@@ -194,31 +168,9 @@ const ChatAssistant: React.FC = () => {
       }
     };
     
-    // Gestionnaire pour les clics sur les boutons d'action
-    const handleActionButtonInteraction = (e: MouseEvent | TouchEvent) => {
-      const target = e.target as HTMLElement;
-      // Vérifier si l'élément cliqué ou un de ses parents est un bouton d'action
-      if (
-        target.closest('.action-buttons-container') || 
-        target.closest('.web-message-actions') || 
-        target.closest('.web-action-button') ||
-        target.closest('.kora-action-button-mobile')
-      ) {
-        // Activer la classe pour désactiver temporairement les événements du composer
-        document.body.classList.add('interaction-with-buttons');
-        
-        // Prévoir de retirer cette classe après un court délai (pour permettre le clic)
-        setTimeout(() => {
-          document.body.classList.remove('interaction-with-buttons');
-        }, 1000); // 1 seconde devrait suffire pour un clic
-      }
-    };
-    
     // Enregistrement des écouteurs d'événements
     document.addEventListener('focusin', handleFocusIn);
     document.addEventListener('focusout', handleFocusOut);
-    document.addEventListener('mousedown', handleActionButtonInteraction);
-    document.addEventListener('touchstart', handleActionButtonInteraction);
     
     // Si VisualViewport API est disponible (principalement iOS)
     if (window.visualViewport) {
@@ -230,8 +182,6 @@ const ChatAssistant: React.FC = () => {
     return () => {
       document.removeEventListener('focusin', handleFocusIn);
       document.removeEventListener('focusout', handleFocusOut);
-      document.removeEventListener('mousedown', handleActionButtonInteraction);
-      document.removeEventListener('touchstart', handleActionButtonInteraction);
       
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
@@ -471,7 +421,9 @@ const ChatAssistant: React.FC = () => {
       
       // Faire défiler vers le bas après l'ajout du message
       setTimeout(() => {
-        scrollToBottom();
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 100);
     }
   };
@@ -579,7 +531,9 @@ const ChatAssistant: React.FC = () => {
       
       // Faire défiler vers le bas
       setTimeout(() => {
-        scrollToBottom();
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 100);
     }
   };
@@ -741,7 +695,7 @@ const ChatAssistant: React.FC = () => {
     const isKora = message.sender === 'kora';
     
     return (
-      <div key={message.id} className={`px-4 ${isMobileView ? 'py-1 mb-1' : 'py-2 mb-4'}`}>
+      <div key={message.id} className="px-4 py-2 mb-4">
         <div className={`max-w-3xl mx-auto ${isKora ? "" : "flex justify-end"}`}>
           <div 
             className={`inline-block rounded-2xl ${
@@ -770,11 +724,11 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
-              <div className={`${isMobileView ? 'mt-2 mb-2 pt-1 pb-1' : 'mt-4 mb-6 pt-2 pb-3'} flex flex-row flex-wrap ${isMobileView ? 'gap-1' : 'gap-2'} justify-start action-buttons-container`}>
+              <div className="mt-4 mb-6 pt-2 pb-3 flex flex-row gap-3 justify-start action-buttons-container">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 
-                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
+                    className="kora-action-button"
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -805,7 +759,7 @@ const ChatAssistant: React.FC = () => {
                 {/* Bouton Indice - uniquement visible pour les défis */}
                 {message.isChallenge && (
                   <button 
-                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
+                    className="kora-action-button"
                     onClick={async () => {
                       if (isThinking) return;
                       
@@ -870,7 +824,7 @@ const ChatAssistant: React.FC = () => {
                 {/* Bouton exercice - visible pour tous sauf défis, mais disponible pour les indices */}
                 {(!message.isChallenge || message.isHint) && (
                   <button 
-                    className={`kora-action-button ${isMobileView ? "kora-action-button-mobile" : ""}`}
+                    className="kora-action-button"
                     onClick={() => {
                       // Trouver le message d'utilisateur précédent
                       const messagesArray = [...messages];
@@ -906,11 +860,11 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-      <div className="chat-container">
-        <div className="flex flex-col h-full max-w-4xl mx-auto">
-          {/* Zone des messages - structure simplifiée */}
+      <div className="flex flex-col h-full max-w-4xl mx-auto">
+        <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Zone des messages */}
           <div 
-            className={`flex-1 ${isMobileView ? 'p-2' : 'p-4'} chat-messages-container`}
+            className="flex-1 overflow-y-auto p-4 chat-messages-container messages-container" 
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">
@@ -942,14 +896,16 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Marqueur de fin de messages - hauteur fixe simple */}
-                <div className="messages-end-marker" ref={messagesEndRef} />
+                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
+                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 20 }} />
+                
+                <div ref={messagesEndRef} />
               </>
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas - structure simplifiée */}
-          <div className="composer-container">
+          {/* Zone de saisie fixe en bas */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-20 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (

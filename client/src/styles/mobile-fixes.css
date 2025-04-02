@@ -1,183 +1,115 @@
 /**
- * Mobile optimizations for Kora - Clean and Modern Approach (REFACTORED SOLUTION)
- * This file implements a simplified mobile interface with a clear focus on 
- * proper message visibility and natural scrolling behavior 
+ * Corrections spécifiques pour l'affichage mobile
+ * Suivant la méthodologie ITCSS - ce fichier contient des corrections spécifiques
+ * qui remplacent les comportements par défaut pour l'affichage mobile
  */
 
-/**
- * SECTION 1: CORE LAYOUT VARIABLES
- * Centralized variables for consistent styling and behavior
- */
-:root {
-  --composer-height-mobile: 65px;    /* Base height for composer on mobile */
-  --composer-height-desktop: 60px;   /* Base height for composer on desktop */
-  --composer-z-index: 100;           /* Very high z-index to ensure it stays on top */
-  --messages-z-index: 5;             /* Messages sit below composer */
-  --actions-z-index: 50;             /* Action buttons need to be very visible */
-  --page-background: #f9f9f9;        /* Light background for the chat page */
-  --composer-background: white;      /* White background for the composer */
-  --composer-shadow: 0 -1px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-  --mobile-marker-height: 120px;     /* Height for end marker on mobile */
-  --desktop-marker-height: 80px;     /* Height for end marker on desktop */
+/* Correction générale pour le conteneur principal sur mobile */
+.content-renderer {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
-/**
- * SECTION 2: GLOBAL CHAT LAYOUT
- * Core structure applicable to all device sizes
- */
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
-  background-color: var(--page-background);
-  overflow: hidden; /* Prevents double scrolling issues */
-  position: relative;
-}
-
-/* Messages container - the scrollable area */
-.chat-messages-container {
-  flex: 1;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* Ensures smooth scrolling on iOS */
-  padding-bottom: 0; /* Base padding controlled by end marker */
-  position: relative;
-  z-index: var(--messages-z-index);
-  display: flex;
-  flex-direction: column;
-}
-
-/* End marker - provides necessary space at bottom of message list */
-.messages-end-marker {
-  height: var(--desktop-marker-height);
-  width: 100%;
-  margin-top: 20px;
-}
-
-/* Composer area - fixed at bottom of screen */
-.composer-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: var(--composer-z-index);
-  background-color: var(--composer-background);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  box-shadow: var(--composer-shadow);
-  padding: 10px 8px;
-  padding-bottom: env(safe-area-inset-bottom, 10px); /* iOS notch support */
-}
-
-/**
- * SECTION 3: MOBILE SPECIFIC ADJUSTMENTS
- * Optimizations for mobile and tablet devices
- */
-@media (max-width: 768px) {
-  /* Larger space at the end of messages for mobile */
-  .messages-end-marker {
-    height: var(--mobile-marker-height);
+/* Correction générale des problèmes d'espacement */
+@media (max-width: var(--breakpoint-md)) {
+  /* Tablettes et mobiles (768px et moins) */
+  
+  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
+  .chat-messages-container {
+    padding-bottom: 280px !important; /* Augmenté encore plus pour avoir un espace très confortable en bas */
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   
-  /* Better message content wrapping */
-  .chat-content {
-    max-width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-  
-  /* Action buttons area - ensure visibility */
-  .action-buttons-container {
-    margin-top: 8px;
-    margin-bottom: 4px;
-    z-index: var(--actions-z-index);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  
-  /* Making action buttons more tappable */
-  .kora-action-button-mobile {
-    height: 32px;
-    padding: 0 10px;
-    border-radius: 16px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 4px;
-    background-color: rgba(0, 0, 0, 0.05);
-    border: none;
-    color: rgba(0, 0, 0, 0.8);
-    z-index: var(--actions-z-index);
-  }
-  
-  /* Mobile-optimized message display */
+  /* Empêcher les débordements qui causent des problèmes de mise en page */
   .prose {
     width: 100%;
     overflow-wrap: break-word;
     word-break: break-word;
-    font-size: 0.95rem;
+    overflow: visible;
   }
   
-  /* Mobile-optimized math display */
-  .katex-display, .katex {
+  /* Forcer les conteneurs de messages à être correctement dimensionnés */
+  .prose .content-renderer {
     max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 0.25em 0;
-    font-size: 0.95em;
+    width: 100%;
+    display: block;
   }
   
-  /* Better code display on mobile */
-  pre, code {
-    max-width: 100%;
+  /* Corrections spécifiques pour les équations et le code */
+  .prose code,
+  .prose pre {
     white-space: pre-wrap;
+    max-width: 100%;
     font-size: 0.85em;
+  }
+  
+  /* Correction importante pour les mathématiques en bloc */
+  .katex-display {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0.25em 0 !important;
+  }
+  
+  /* Ajouter un indicateur visuel pour le défilement horizontal */
+  .katex-display::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3));
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  
+  /* Correction pour l'espacement final sur mobile */
+  .prose .content-renderer:last-child,
+  .web-message-content .content-renderer:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  /* Correction spécifique pour les messages avec équations ou code */
+  .chat-messages-container .prose {
+    padding-bottom: 8px;
   }
 }
 
-/**
- * SECTION 4: EXTRA SMALL SCREEN OPTIMIZATIONS
- * Specific adjustments for very small mobile devices
- */
-@media (max-width: 375px) {
-  /* Even more compact text */
-  .prose {
-    font-size: 0.9rem;
+/* Corrections spécifiques pour les très petits écrans */
+@media (max-width: var(--breakpoint-xs)) {
+  /* Mobiles (480px et moins) */
+  .content-renderer {
+    font-size: 14px;
   }
   
-  /* Smaller math display */
   .katex {
-    font-size: 0.85em;
+    font-size: 0.9em;
   }
   
-  /* Ultra-compact action buttons */
-  .kora-action-button-mobile {
-    height: 28px;
-    padding: 0 8px;
-    font-size: 0.75rem;
+  /* Style spécifique pour les boutons d'action sur petit écran */
+  .action-buttons-container {
+    margin-bottom: 60px !important;
+    padding-bottom: 20px !important;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px !important;
+    position: relative !important;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
   }
   
-  /* Simplified padding for messages */
-  .chat-messages-container > div {
-    padding: 4px 8px;
-  }
-}
-
-/**
- * SECTION 5: DARK MODE SUPPORT
- * Ensures proper contrast in dark mode
- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page-background: #121212;
-    --composer-background: #1e1e1e;
-    --composer-shadow: 0 -1px 10px rgba(0, 0, 0, 0.3);
-  }
-  
-  .kora-action-button-mobile {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.9);
+  /* Style spécifique pour les boutons eux-mêmes */
+  .kora-action-button {
+    position: relative !important;
+    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    padding: 8px 15px !important;
+    margin-bottom: 10px !important;
+    background-color: #f0f3f8 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   }
 }
