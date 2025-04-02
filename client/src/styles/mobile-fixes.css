@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 280px !important; /* Augmenté encore plus pour avoir un espace très confortable en bas */
+    padding-bottom: 400px !important; /* Considérablement augmenté pour garantir la visibilité de tous les messages */
     padding-top: 10px !important; /* Réduire l'espace en haut sur mobile */
     padding-left: 8px !important; /* Réduire les marges horizontales sur mobile */
     padding-right: 8px !important;

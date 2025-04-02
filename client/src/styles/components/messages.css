@@ -211,12 +211,12 @@
   /* 
    * Activation du spacer dynamique pour tablettes/mobiles
    * - display: block pour rendre visible le spacer (hidden sur desktop)
-   * - min-height définit une hauteur minimale même quand le composer est petit
+   * - min-height considérablement augmentée pour garantir la visibilité des messages
    * - la hauteur réelle est contrôlée par JavaScript via le hook useResizeObserver
    */
   .dynamic-spacer {
     display: block !important; /* Activer le spacer sur tablette/mobile */
-    min-height: 40px; /* Hauteur minimale pour éviter un espace insuffisant */
+    min-height: 150px; /* Hauteur minimale considérablement augmentée pour éviter les messages cachés */
   }
   
   .web-user-message .web-message-content {
@@ -318,12 +318,12 @@
   
   /* 
    * Adaptation du spacer dynamique pour smartphones
-   * - min-height augmentée (40px → 50px) pour garantir suffisamment d'espace
-   *   même sur les petits écrans où la zone de saisie peut être plus grande
-   *   proportionnellement à l'écran
+   * - min-height considérablement augmentée (40px → 200px) pour garantir
+   *   que les messages sont toujours visibles, même sur les plus petits écrans
+   *   où les formules mathématiques peuvent occuper beaucoup d'espace
    */
   .dynamic-spacer {
     display: block !important; /* Assurer que le spacer est visible */
-    min-height: 50px; /* Hauteur minimale plus importante sur smartphone */
+    min-height: 200px; /* Hauteur minimale considérablement augmentée pour garantir la visibilité */
   }
 }
