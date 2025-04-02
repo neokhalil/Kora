@@ -85,10 +85,10 @@
     margin-bottom: 8px;
   }
   
-  /* S'assurer que les messages sont visibles */
+  /* S'assurer que les messages sont visibles - z-index très élevé */
   .messages-container {
     position: relative;
-    z-index: 10;
+    z-index: 1000 !important;
   }
   
   /* Assurer que les boutons sous les messages sont cliquables */
@@ -114,7 +114,7 @@
     font-size: 0.9em;
   }
   
-  /* Style spécifique pour les boutons d'action sur petit écran */
+  /* Style spécifique pour les boutons d'action sur petit écran - z-index extrêmement élevé */
   .action-buttons-container {
     margin-bottom: 30px !important; /* Augmenté pour garantir que les boutons ne sont pas cachés */
     padding-bottom: 20px !important; /* Augmenté pour plus d'espace */
@@ -123,7 +123,7 @@
     flex-wrap: wrap;
     gap: 6px !important; /* Espacement entre boutons légèrement réduit */
     position: relative !important;
-    z-index: 30 !important; /* Augmenté pour être au-dessus du composer (qui est à z-index: 50) */
+    z-index: 5000 !important; /* Beaucoup plus élevé pour garantir que les boutons sont toujours au-dessus */
   }
   
   /* Style spécifique pour les boutons eux-mêmes - remplacé par kora-action-button-mobile */
