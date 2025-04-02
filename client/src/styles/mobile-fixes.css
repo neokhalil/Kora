@@ -36,14 +36,24 @@
     /* Permet un défilement fluide tout en évitant les chevauchements */
     -webkit-overflow-scrolling: touch;
     overflow-x: hidden;
+    overflow-y: auto; /* Assurer que le défilement vertical est actif */
     position: relative;
     z-index: var(--z-messages);
+    /* Garantir que le conteneur utilise toute sa hauteur disponible */
+    height: 100%;
+    /* Force le conteneur à calculer correctement sa hauteur pour les mobiles */
+    display: flex;
+    flex-direction: column;
   }
   
   /* Système d'espacement intelligent pour l'aire de visualisation */
   .dynamic-spacer {
-    min-height: 300px !important;
+    min-height: 350px !important; /* Augmenté pour garantir plus d'espace sur les appareils mobiles */
     display: block !important;
+    width: 100% !important; /* S'assurer qu'il prend toute la largeur */
+    position: relative !important;
+    z-index: var(--z-messages) !important; /* Niveau cohérent avec les messages */
+    margin-top: 20px !important; /* Espace supplémentaire après le dernier message */
   }
   
   /**
@@ -99,11 +109,24 @@
   .input-container {
     position: relative;
     z-index: var(--z-input) !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05) !important; /* Ajouter une ombre subtile */
+    border-top: 1px solid rgba(0, 0, 0, 0.07) !important; /* Ajouter une ligne de séparation */
   }
   
   /* Facilite l'interaction avec les boutons en désactivant le composer pendant l'interaction */
   body.interaction-with-buttons .composer-container {
     pointer-events: none !important;
+  }
+  
+  /* Ajout d'un hack spécifique pour Safari mobile qui peut avoir des problèmes de calcul de hauteur */
+  @supports (-webkit-touch-callout: none) {
+    .chat-messages-container {
+      padding-bottom: 350px !important; /* Padding exagéré pour Safari mobile */
+    }
+    
+    .dynamic-spacer {
+      min-height: 400px !important; /* Encore plus d'espace pour Safari */
+    }
   }
 }
 

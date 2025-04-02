@@ -147,14 +147,39 @@ const ChatAssistant: React.FC = () => {
     }
   });
   
+  // Fonction améliorée pour le défilement vers le bas
+  const scrollToBottom = (forceScroll = false) => {
+    if (messagesEndRef.current) {
+      // Différentes approches de défilement pour une meilleure compatibilité mobile
+      
+      // 1. Méthode classique - peut ne pas fonctionner sur tous les appareils
+      messagesEndRef.current.scrollIntoView({ behavior: forceScroll ? 'auto' : 'smooth' });
+      
+      // 2. Méthode manuelle pour les cas où scrollIntoView ne fonctionne pas
+      const chatContainer = document.querySelector('.chat-messages-container');
+      if (chatContainer) {
+        // Forcer un délai pour permettre le rendu complet
+        setTimeout(() => {
+          const scrollHeight = chatContainer.scrollHeight;
+          (chatContainer as HTMLElement).scrollTop = scrollHeight;
+        }, 50);
+      }
+      
+      // 3. Pour iOS spécifiquement, qui peut avoir des comportements particuliers
+      if (isMobileDevice) {
+        setTimeout(() => {
+          window.scrollTo(0, document.body.scrollHeight);
+        }, 100);
+      }
+    }
+  };
+  
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
-    if (messagesEndRef.current) {
-      // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 300);
-    }
+    // Délai plus long pour s'assurer que tout le contenu est rendu, y compris les éléments complexes
+    setTimeout(() => {
+      scrollToBottom();
+    }, 500);
     
     // S'assurer que la hauteur initiale du textarea est correcte
     const textareas = document.querySelectorAll('.chat-textarea');
@@ -466,11 +491,9 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Faire défiler vers le bas après l'ajout du message
+      // Faire défiler vers le bas après l'ajout du message en utilisant notre fonction améliorée
       setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
+        scrollToBottom(true); // Force scroll après une interaction utilisateur
       }, 100);
     }
   };
@@ -576,11 +599,9 @@ const ChatAssistant: React.FC = () => {
       setSelectedImage(null);
       setImagePreview(null);
       
-      // Faire défiler vers le bas
+      // Faire défiler vers le bas en utilisant notre fonction améliorée
       setTimeout(() => {
-        if (messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
+        scrollToBottom(true);
       }, 100);
     }
   };
