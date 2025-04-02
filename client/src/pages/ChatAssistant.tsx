@@ -419,12 +419,19 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Faire défiler vers le bas après l'ajout du message
+      // Faire défiler vers le bas après l'ajout du message avec un délai suffisant pour le rendu complet
       setTimeout(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 300);
+      
+      // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 800);
     }
   };
   
@@ -529,12 +536,19 @@ const ChatAssistant: React.FC = () => {
       setSelectedImage(null);
       setImagePreview(null);
       
-      // Faire défiler vers le bas
+      // Faire défiler vers le bas avec un délai suffisant pour le rendu complet
       setTimeout(() => {
         if (messagesEndRef.current) {
           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 300);
+      
+      // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 800);
     }
   };
   
@@ -611,6 +625,20 @@ const ChatAssistant: React.FC = () => {
       }]);
     } finally {
       setIsThinking(false);
+      
+      // Faire défiler vers le bas après l'ajout du message avec un délai suffisant
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+      
+      // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 800);
     }
   };
   
@@ -688,6 +716,20 @@ const ChatAssistant: React.FC = () => {
       }]);
     } finally {
       setIsThinking(false);
+      
+      // Faire défiler vers le bas après l'ajout du message avec un délai suffisant
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 300);
+      
+      // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 800);
     }
   };
 
@@ -813,6 +855,20 @@ const ChatAssistant: React.FC = () => {
                         }]);
                       } finally {
                         setIsThinking(false);
+                        
+                        // Faire défiler vers le bas après l'ajout de l'indice avec un délai suffisant
+                        setTimeout(() => {
+                          if (messagesEndRef.current) {
+                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 300);
+                        
+                        // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+                        setTimeout(() => {
+                          if (messagesEndRef.current) {
+                            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }, 800);
                       }
                     }}
                   >
@@ -1155,12 +1211,19 @@ const ChatAssistant: React.FC = () => {
                               } finally {
                                 setIsThinking(false);
                                 
-                                // Faire défiler vers le bas 
+                                // Faire défiler vers le bas avec un délai suffisant pour le rendu complet
                                 setTimeout(() => {
                                   if (messagesEndRef.current) {
                                     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
                                   }
-                                }, 100);
+                                }, 300);
+                                
+                                // Second défilement avec un délai plus long pour s'assurer que tout le contenu est visible
+                                setTimeout(() => {
+                                  if (messagesEndRef.current) {
+                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                                  }
+                                }, 800);
                               }
                             }
                           }}
