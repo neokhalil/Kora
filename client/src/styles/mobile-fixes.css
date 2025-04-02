@@ -1,16 +1,17 @@
 /**
- * Corrections spécifiques pour l'affichage mobile
- * Suivant la méthodologie ITCSS - ce fichier contient des corrections spécifiques
- * qui remplacent les comportements par défaut pour l'affichage mobile
+ * Solution simplifiée pour le mobile 
+ * --------------------------------
+ * Ce fichier a été complètement réécrit avec une approche fondamentalement simplifiée:
  * 
- * ARCHITECTURE UNIFIÉE DE L'ESPACEMENT:
- * 1. Ce fichier gère les grands espacements bottom fixes qui empêchent les messages 
- *    d'être cachés sous la zone de saisie
- * 2. Les espacements entre éléments (gap, margin) sont gérés dans messages.css
- * 3. Les z-index suivent cette hiérarchie : composer (20) > boutons d'action (15) > contenu (5)
+ * PRINCIPES:
+ * 1. Utiliser une quantité excessive de padding-bottom fixe (800px) afin de garantir que
+ *    tous les messages restent visibles au-dessus de la zone de saisie.
+ * 2. Désactiver tous les boutons d'action sur mobile.
+ * 3. Optimiser l'affichage des formules mathématiques et du code.
+ * 4. Maximiser l'espace disponible en réduisant toutes les marges et espacements.
  */
 
-/* Correction générale pour le conteneur principal sur mobile */
+/* Base: correction des débordements et du rendu du texte */
 .content-renderer {
   max-width: 100%;
   overflow-x: hidden;
@@ -18,148 +19,68 @@
   word-break: break-word;
 }
 
-/* Correction générale des problèmes d'espacement */
-@media (max-width: var(--breakpoint-md)) {
-  /* Tablettes et mobiles (768px et moins) */
-  
-  /* 
-   * PADDING-BOTTOM PRINCIPAL
-   * Cette déclaration est le cœur de notre solution de défilement:
-   * - Valeur fixe très importante (500px) qui pousse tout le contenu vers le haut
-   * - Garantit que tout reste visible au-dessus de la zone de saisie
-   * - Remplace l'ancien système dynamique par une approche simple mais efficace
-   */
+/* Tablettes et mobiles (768px et moins) */
+@media (max-width: 768px) {
+  /* SOLUTION PRINCIPALE: padding-bottom extrêmement grand */
   .chat-messages-container {
-    padding-bottom: 500px !important; /* Valeur fixe garantissant la visibilité de tout le contenu */
-    padding-top: 10px !important; /* Réduire l'espace en haut sur mobile */
-    padding-left: 8px !important; /* Réduire les marges horizontales sur mobile */
-    padding-right: 8px !important;
+    padding-bottom: 800px !important; /* Valeur augmentée drastiquement */
+    padding-top: 8px !important;
+    padding-left: 6px !important;
+    padding-right: 6px !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
   
-  /* Réduire l'espacement vertical entre les messages */
+  /* Supprimer tout espacement vertical superflu */
   .chat-messages-container > div {
-    margin-bottom: 4px !important; /* Espace très compact entre les messages */
+    margin-bottom: 2px !important;
     padding-top: 2px !important;
     padding-bottom: 2px !important;
   }
   
-  /* Empêcher les débordements qui causent des problèmes de mise en page */
-  .prose {
-    width: 100%;
-    overflow-wrap: break-word;
-    word-break: break-word;
-    overflow: visible;
+  /* Masquer tous les boutons d'action (approche unifiée) */
+  .web-message-actions,
+  .action-buttons-container,
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
+  .kora-action-button,
+  [class*="action-button"] {
+    display: none !important;
   }
   
-  /* Forcer les conteneurs de messages à être correctement dimensionnés */
-  .prose .content-renderer {
-    max-width: 100%;
-    width: 100%;
-    display: block;
+  /* Optimisations pour les formules mathématiques */
+  .katex-display {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    padding: 0.25em 0 !important;
   }
   
-  /* Corrections spécifiques pour les équations et le code */
+  /* Optimisations pour le code */
   .prose code,
   .prose pre {
     white-space: pre-wrap;
     max-width: 100%;
     font-size: 0.85em;
   }
-  
-  /* Correction importante pour les mathématiques en bloc */
-  .katex-display {
-    max-width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding: 0.25em 0 !important;
-  }
-  
-  /* Ajouter un indicateur visuel pour le défilement horizontal */
-  .katex-display::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: 20px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3));
-    pointer-events: none;
-    opacity: 0.5;
-  }
-  
-  /* Correction pour l'espacement final sur mobile */
-  .prose .content-renderer:last-child,
-  .web-message-content .content-renderer:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-  
-  /* 
-   * DÉSACTIVATION DES BOUTONS D'ACTION SUR TABLETTE
-   * Nous utilisons la même approche que sur smartphones: masquer complètement
-   * tous les types de boutons d'action pour libérer l'espace et simplifier l'interface
-   */
-  .web-message-actions,
-  .action-buttons-container,
-  .mt-4.flex.flex-row.gap-2.justify-start,
-  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    display: none !important; /* Masquer tous les types de boutons d'action */
-  }
-  
-  /* Correction spécifique pour les messages avec équations ou code */
-  .chat-messages-container .prose {
-    padding-bottom: 8px;
-  }
 }
 
-/* Corrections spécifiques pour les très petits écrans */
-@media (max-width: var(--breakpoint-xs)) {
-  /* Mobiles (480px et moins) */
-  
-  /* Réduire la taille des polices pour économiser de l'espace vertical */
+/* Smartphones (480px et moins) - optimisations supplémentaires */
+@media (max-width: 480px) {
+  /* Réduire encore la taille des polices */
   .content-renderer {
     font-size: 14px;
   }
   
-  .katex {
-    font-size: 0.9em;
-  }
-  
-  /* 
-   * PADDING-BOTTOM PRINCIPAL POUR SMARTPHONES
-   * Encore plus grand (600px) que celui des tablettes (500px) pour compenser
-   * la hauteur réduite de l'écran et garantir la visibilité complète du contenu
-   */
-  .chat-messages-container {
-    padding-left: 4px !important; /* Marges horizontales minimales */
-    padding-right: 4px !important;
-    padding-bottom: 600px !important; /* Valeur augmentée pour les très petits écrans */
-  }
-  
-  /* Mise en page extrêmement compacte pour maximiser l'espace disponible */
-  .chat-messages-container > div {
-    margin-bottom: 2px !important; /* Espacement vertical minimal */
-    padding-top: 1px !important;
-    padding-bottom: 1px !important;
-  }
-  
-  /* Réduire les marges internes des bulles de message */
-  .chat-messages-container .rounded-2xl {
+  /* Marges internes minimales pour les bulles de messages */
+  .chat-messages-container .rounded-2xl,
+  .web-message-content {
     padding: 8px !important;
   }
-  
-  /* 
-   * DÉSACTIVATION COMPLÈTE DES BOUTONS D'ACTION
-   * Pour simplifier et unifier les contrôles de visibilité des boutons d'action,
-   * nous utilisons une seule approche cohérente pour tous les types de boutons
-   */
-  .action-buttons-container,
-  .web-message-actions,
-  .mt-4.flex.flex-row.gap-2.justify-start,
-  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
-  .kora-action-button {
-    display: none !important; /* Masquer complètement tous les types de boutons d'action */
-  }
+}
+
+/* Fix spécifique pour les équations mathématiques */
+.katex, .MathJax {
+  max-width: 100%;
+  overflow-x: auto;
+  display: inline-block;
 }

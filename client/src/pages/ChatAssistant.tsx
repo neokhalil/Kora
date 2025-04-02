@@ -87,14 +87,11 @@ const ChatAssistant: React.FC = () => {
   // Initialisation du fix pour mobile et réinitialisation du textarea
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Configuration simplifiée du viewport mobile
       setupMobileViewportFix();
       
-      // Forcer le repositionnement dès le chargement pour éviter l'espace blanc initial
-      document.body.classList.add('keyboard-open');
-      
-      // Simuler un clic pour déclencher le repositionnement
+      // Forcer le défilement initial pour garantir le positionnement correct
       setTimeout(() => {
-        // Forcer le rendu de la page complète
         window.scrollTo(0, 1);
         window.scrollTo(0, 0);
       }, 100);
@@ -150,49 +147,21 @@ const ChatAssistant: React.FC = () => {
     });
   }, [messages, isThinking]);
   
-  // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
+  // Fonction simplifiée pour la gestion du défilement
   useEffect(() => {
-    // Gestion des événements de focus
-    const handleFocusIn = () => {
-      // Assurer que le clavier s'ouvre correctement
-      document.body.classList.add('keyboard-open');
-    };
-    
-    const handleFocusOut = () => {
-      // Retirer la classe quand un champ perd le focus
-      document.body.classList.remove('keyboard-open');
-    };
-    
-    // Gestion des événements du Visual Viewport API (pour iOS)
-    const handleVisualViewportChange = () => {
-      const vv = window.visualViewport;
-      if (vv && vv.height < window.innerHeight) {
-        document.body.classList.add('keyboard-open');
-        document.body.classList.add('visual-viewport-active');
-      } else {
-        document.body.classList.remove('keyboard-open');
-        document.body.classList.remove('visual-viewport-active');
+    // Fonction simple pour défiler vers le bas quand nécessaire
+    const scrollToBottom = () => {
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
       }
     };
     
-    // Enregistrement des écouteurs d'événements
-    document.addEventListener('focusin', handleFocusIn);
-    document.addEventListener('focusout', handleFocusOut);
-    
-    // Si VisualViewport API est disponible (principalement iOS)
-    if (window.visualViewport) {
-      document.body.classList.add('visual-viewport-supported');
-      window.visualViewport.addEventListener('resize', handleVisualViewportChange);
-    }
+    // On utilise uniquement un écouteur de redimensionnement
+    window.addEventListener('resize', scrollToBottom);
     
     // Fonction de nettoyage
     return () => {
-      document.removeEventListener('focusin', handleFocusIn);
-      document.removeEventListener('focusout', handleFocusOut);
-      
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
-      }
+      window.removeEventListener('resize', scrollToBottom);
     };
   }, []);
   
@@ -958,10 +927,7 @@ const ChatAssistant: React.FC = () => {
                 className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
                 ref={composerRef}
                 onFocus={() => {
-                  // Déclenche la classe keyboard-open pour adapter l'UI
-                  document.body.classList.add('keyboard-open');
-                  
-                  // Scroll vers la fin des messages après un court délai
+                  // Défiler vers le bas des messages après un court délai
                   setTimeout(() => {
                     if (messagesEndRef.current) {
                       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -998,18 +964,14 @@ const ChatAssistant: React.FC = () => {
                     className="chat-textarea message-input border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-gray-600 dark:text-gray-300 placeholder:text-gray-400 dark:placeholder:text-gray-500 w-full py-2 px-2 overflow-y-auto"
                     disabled={isThinking || isUploadingImage}
                     onFocus={() => {
-                      // Marquer que le clavier est ouvert
-                      document.body.classList.add('keyboard-open');
-                      
-                      // S'assurer que le header fixe est visible
+                      // S'assurer que le header fixe est visible 
+                      // avec une approche plus simple et directe
                       const headerContainer = document.getElementById('kora-header-container');
                       if (headerContainer) {
-                        headerContainer.style.position = 'absolute';
-                        headerContainer.style.top = '0';
                         headerContainer.style.zIndex = '9999';
                       }
                       
-                      // Scroll vers le bas après l'ouverture du clavier
+                      // Défiler vers le bas quand le clavier s'ouvre
                       setTimeout(() => {
                         if (messagesEndRef.current) {
                           messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
