@@ -7,7 +7,7 @@
 .web-messages-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16px; /* Espacement standard entre les messages sur desktop */
   padding: 16px 0 160px; /* Sur desktop, on garde un padding fixe assez grand */
   width: 100%;
   margin-bottom: 30px; /* Marge pour desktop */
@@ -26,6 +26,13 @@
   display: flex;
   width: 100%;
   margin-bottom: 8px;
+}
+
+/* Ajustement de la marge pour les appareils mobiles */
+@media screen and (max-width: var(--breakpoint-md)) {
+  .web-message {
+    margin-bottom: 6px; /* Marge réduite sur mobile */
+  }
 }
 
 /* Messages de l'utilisateur */
@@ -167,6 +174,7 @@
 @media screen and (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
   .web-messages-list {
+    gap: 12px !important; /* Réduit l'espace entre les messages sur tablette */
     padding: 16px 0 24px !important; /* Padding minimal pour utiliser le spacer dynamique sur mobile/tablette */
   }
   
@@ -202,8 +210,8 @@
   }
   
   .web-message-actions {
-    margin-top: 15px !important;
-    padding-bottom: 20px !important; /* Réduit car nous utilisons maintenant le spacer dynamique */
+    margin-top: 12px !important; /* Légèrement réduit */
+    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
     position: relative !important;
@@ -223,10 +231,10 @@
   /* Style spécifique pour les actions sous les messages */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 20px !important;
-    margin-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
-    padding-top: 12px !important;
-    padding-bottom: 20px !important; /* Réduit grâce au spacer dynamique */
+    margin-top: 12px !important; /* Réduit pour cohérence avec les autres espacements */
+    margin-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    padding-top: 8px !important; /* Légèrement réduit */
+    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
@@ -240,7 +248,7 @@
   }
   
   .web-messages-list {
-    gap: 12px;
+    gap: 10px !important; /* Réduit l'espace entre les messages sur mobile pour être plus proche de l'expérience desktop */
     padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
   }
   
