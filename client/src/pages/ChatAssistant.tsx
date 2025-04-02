@@ -904,12 +904,7 @@ const ChatAssistant: React.FC = () => {
                 className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
                 ref={composerRef}
                 onFocus={() => {
-                  // Défiler vers le bas des messages après un court délai
-                  setTimeout(() => {
-                    if (messagesEndRef.current) {
-                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }, 300);
+                  // Comportement de défilement supprimé pour une meilleure expérience mobile
                 }}
               >
                 {/* Hidden file input pour les images */}
