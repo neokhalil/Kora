@@ -117,11 +117,20 @@ const ChatAssistant: React.FC = () => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
   
-  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
+  /* 
+   * Utilisation du ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
+   * Ce mécanisme est essentiel à notre solution mobile pour plusieurs raisons:
+   * 1. Il surveille les changements de hauteur de la zone de saisie (quand l'utilisateur tape du texte)
+   * 2. Il ajuste automatiquement la hauteur du spacer pour maintenir suffisamment d'espace
+   * 3. Il crée un effet de "coussin" qui empêche les messages d'être cachés
+   * 4. Contrairement à un padding fixe, il s'adapte à toutes les tailles de composer
+   */
   const composerDimensions = useResizeObserver(composerRef, (entry) => {
-    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
+    // Mettre à jour la hauteur du spacer en fonction de la hauteur de la zone de saisie
     if (spacerRef.current && entry.contentRect) {
-      const composerHeight = entry.contentRect.height + 20; // Ajouter une marge de 20px
+      // Ajouter une marge supplémentaire de 20px pour éviter que le contenu 
+      // ne soit trop proche de la zone de saisie
+      const composerHeight = entry.contentRect.height + 20;
       spacerRef.current.style.height = `${composerHeight}px`;
     }
   });
@@ -897,7 +906,18 @@ const ChatAssistant: React.FC = () => {
                 )}
                 
                 {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
-                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 20 }} />
+                {/* 
+                  Élément spacer dynamique - pièce centrale de notre solution pour mobile/tablette
+                  - ref={spacerRef}: référence utilisée par useResizeObserver pour ajuster la hauteur
+                  - height: dynamiquement calculée en fonction de la hauteur du composer + marge
+                  - Visible uniquement sur mobile/tablette grâce aux règles CSS dans messages.css
+                  - S'ajuste automatiquement quand la zone de saisie change de taille
+                */}
+                <div 
+                  ref={spacerRef} 
+                  className="dynamic-spacer" 
+                  style={{ height: composerDimensions.height + 20 }} 
+                />
                 
                 <div ref={messagesEndRef} />
               </>

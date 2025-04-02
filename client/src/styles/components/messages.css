@@ -3,22 +3,34 @@
  * Composant: messages.css - Partie de l'architecture ITCSS
  */
 
-/* Container principal des messages */
+/* 
+ * Container principal des messages
+ * Sur desktop, nous utilisons un padding-bottom fixe de grande taille (160px)
+ * car la hauteur de la zone de saisie est relativement constante
+ */
 .web-messages-list {
   display: flex;
   flex-direction: column;
   gap: 16px; /* Espacement standard entre les messages sur desktop */
-  padding: 16px 0 160px; /* Sur desktop, on garde un padding fixe assez grand */
+  padding: 16px 0 160px; /* Padding fixe sur desktop - approche traditionnelle */
   width: 100%;
-  margin-bottom: 30px; /* Marge pour desktop */
+  margin-bottom: 30px; /* Marge supplémentaire pour desktop */
 }
 
-/* Spacer dynamique qui s'adapte à la hauteur du composer - uniquement utilisé sur mobile */
+/* 
+ * Spacer dynamique qui s'adapte à la hauteur du composer
+ * C'est un élément clé de notre solution pour mobile/tablette:
+ * 1. Il est masqué sur desktop (display: none)
+ * 2. Sur mobile/tablette, il devient visible (display: block dans les media queries)
+ * 3. Sa hauteur est dynamiquement ajustée par JavaScript via le hook useResizeObserver
+ *    qui détecte les changements de taille de la zone de saisie
+ * 4. La transition douce évite les sauts brusques lors des changements de hauteur
+ */
 .dynamic-spacer {
-  display: none; /* Caché par défaut sur desktop */
+  display: none; /* Masqué sur desktop - nous utilisons le padding fixe à la place */
   width: 100%;
-  min-height: 30px; /* Hauteur minimale au cas où */
-  transition: height 0.2s ease; /* Transition douce pour les changements de hauteur */
+  min-height: 30px; /* Hauteur minimale pour éviter un espace trop petit */
+  transition: height 0.2s ease; /* Animation fluide quand la hauteur change */
 }
 
 /* Styles communs pour tous les messages */
@@ -125,23 +137,34 @@
   object-fit: contain;
 }
 
-/* Boutons d'action sous les messages de Kora */
+/* 
+ * Boutons d'action sous les messages de Kora 
+ * Pour la version desktop, nous utilisons un z-index plus bas (5) car
+ * il n'y a pas de superposition avec la zone de saisie comme sur mobile
+ */
 .web-message-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
-  padding-bottom: 40px; /* Augmenté de 20px à 40px pour créer plus d'espace avec la zone de saisie */
+  padding-bottom: 40px; /* Espace important pour éviter que le contenu ne soit caché par la zone de saisie */
   margin-left: 16px; /* Aligner avec le message */
-  z-index: 5; /* Assurer que les boutons restent au dessus d'autres éléments */
+  z-index: 5; /* Sur desktop, un z-index bas suffit car pas de superposition avec le composer */
 }
 
+/* 
+ * Style des boutons d'action individuels
+ * - display: flex avec align-items: center pour aligner l'icône et le texte
+ * - gap: espace entre l'icône et le texte
+ * - border-radius et padding: créent un bouton arrondi avec espacement interne
+ * - transition: ajoute une animation douce lors des interactions
+ */
 .web-action-button {
   display: flex;
   align-items: center;
   gap: 6px;
-  background-color: #f9fafb; /* Même couleur que sur mobile */
-  border: 1px solid #f0f0f0; /* Bordure plus légère */
+  background-color: #f9fafb; /* Couleur claire pour contraster avec le fond */
+  border: 1px solid #f0f0f0; /* Bordure légère pour définir les limites */
   border-radius: 18px;
   padding: 8px 14px;
   font-size: 14px;
@@ -173,15 +196,26 @@
 /* Adaptations pour les différentes tailles d'écran */
 @media screen and (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
+  /* 
+   * Adaptation du conteneur principal pour tablettes/mobiles
+   * - gap réduit (16px → 6px) pour un affichage plus compact
+   * - padding-bottom minimal (160px → 24px) car nous utilisons le spacer dynamique
+   *   au lieu du padding fixe sur ces appareils
+   */
   .web-messages-list {
-    gap: 6px !important; /* Réduit l'espace entre les messages de moitié sur tablette */
-    padding: 16px 0 24px !important; /* Padding minimal pour utiliser le spacer dynamique sur mobile/tablette */
+    gap: 6px !important; /* Réduit l'espacement vertical entre messages */
+    padding: 16px 0 24px !important; /* Padding-bottom minimal compensé par le spacer dynamique */
   }
   
-  /* Activer le spacer dynamique sur tablette/mobile */
+  /* 
+   * Activation du spacer dynamique pour tablettes/mobiles
+   * - display: block pour rendre visible le spacer (hidden sur desktop)
+   * - min-height définit une hauteur minimale même quand le composer est petit
+   * - la hauteur réelle est contrôlée par JavaScript via le hook useResizeObserver
+   */
   .dynamic-spacer {
-    display: block !important;
-    min-height: 40px;
+    display: block !important; /* Activer le spacer sur tablette/mobile */
+    min-height: 40px; /* Hauteur minimale pour éviter un espace insuffisant */
   }
   
   .web-user-message .web-message-content {
@@ -209,52 +243,87 @@
     box-shadow: none !important; /* S'assurer qu'il n'y a pas d'ombres non plus */
   }
   
+  /* 
+   * Configuration des boutons d'action pour mobile/tablette
+   * - espacement réduit pour un design plus compact
+   * - margins et paddings ajustés pour un flux plus naturel
+   * - position: relative pour garder les boutons dans le flux du document
+   * - z-index: 15 est crucial - il place les boutons sous la zone de saisie fixe (z-index: 20)
+   *   mais au-dessus du contenu normal (z-index: 1), permettant un défilement naturel
+   */
   .web-message-actions {
-    margin-top: 8px !important; /* Réduit davantage pour un flux plus dense */
-    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    margin-top: 8px !important; /* Réduit pour un flux plus compact */
+    padding-bottom: 16px !important; /* Espace sous les boutons */
     margin-left: 8px;
-    gap: 8px; /* Espacement réduit entre les boutons sur mobile */
-    position: relative !important;
-    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
+    gap: 8px; /* Espacement réduit entre les boutons */
+    position: relative !important; /* Maintient les boutons dans le flux du document */
+    z-index: 15 !important; /* Place les boutons sous le composer (z-index: 20) */
   }
   
+  /* 
+   * Style des boutons individuels sur mobile
+   * - padding et border-radius augmentés pour une meilleure ergonomie tactile
+   * - box-shadow améliorée pour une meilleure visibilité sur fond blanc
+   * - position relative et z-index identique aux conteneurs pour cohérence
+   */
   .web-action-button {
-    padding: 8px 16px !important;
+    padding: 8px 16px !important; /* Plus grand pour cible tactile */
     font-size: 14px !important;
-    border-radius: 20px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 6px !important; /* Réduit pour un flux plus dense */
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
-    position: relative !important;
+    border-radius: 20px !important; /* Plus arrondi sur mobile */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Ombre plus prononcée */
+    margin-bottom: 6px !important; /* Espace vertical entre boutons */
+    z-index: 15 !important; /* Coordonné avec le conteneur */
+    position: relative !important; /* Maintient dans le flux du document */
   }
   
-  /* Style spécifique pour les actions sous les messages */
+  /* 
+   * Style pour les actions générées directement dans le JSX
+   * Ces sélecteurs ciblent les conteneurs d'actions définis par classes Tailwind
+   * dans ChatAssistant.tsx plutôt que par classes CSS nommées
+   * - Les valeurs sont alignées avec .web-message-actions pour cohérence
+   */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 8px !important; /* Réduit pour un flux plus dense, aligné avec web-message-actions */
-    margin-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
-    padding-top: 4px !important; /* Réduit davantage */
-    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
-    position: relative !important;
-    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
+    margin-top: 8px !important; /* Aligné avec web-message-actions */
+    margin-bottom: 16px !important; /* Espace sous les boutons */
+    padding-top: 4px !important; /* Espace au-dessus des boutons */
+    padding-bottom: 16px !important; /* Espace sous les boutons */
+    position: relative !important; /* Maintient dans le flux du document */
+    z-index: 15 !important; /* Coordonné avec les autres éléments d'action */
   }
 }
 
-/* Styles spécifiques pour les très petits écrans */
+/* 
+ * Styles spécifiques pour les très petits écrans (smartphones)
+ * Sur ces appareils, nous avons besoin d'une adaptation encore plus poussée:
+ * - Gap encore plus réduit pour la densité d'information
+ * - Hauteur minimale du spacer augmentée pour compenser les plus petits écrans
+ * - Taille de police réduite pour les messages
+ */
 @media screen and (max-width: var(--breakpoint-xs)) {
-  /* Mobiles (480px et moins) */
+  /* Smartphones (480px et moins) */
   .web-message-content {
-    font-size: 14px;
+    font-size: 14px; /* Police légèrement plus petite sur smartphone */
   }
   
+  /* 
+   * Adaptation du conteneur de messages pour smartphones
+   * - gap encore plus réduit (6px → 5px) pour maximiser l'espace utilisable
+   * - padding-bottom maintenu à 24px comme sur tablette
+   */
   .web-messages-list {
-    gap: 5px !important; /* Réduit l'espace entre les messages de moitié sur mobile */
-    padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
+    gap: 5px !important; /* Espacement minimal entre messages */
+    padding: 12px 0 24px !important; /* Padding-bottom maintenu identique à la tablette */
   }
   
-  /* L'espace est géré par le spacer dynamique - activé seulement sur mobile */
+  /* 
+   * Adaptation du spacer dynamique pour smartphones
+   * - min-height augmentée (40px → 50px) pour garantir suffisamment d'espace
+   *   même sur les petits écrans où la zone de saisie peut être plus grande
+   *   proportionnellement à l'écran
+   */
   .dynamic-spacer {
-    display: block !important; /* Afficher le spacer sur mobile */
-    min-height: 50px; /* Hauteur minimale un peu plus grande sur mobile */
+    display: block !important; /* Assurer que le spacer est visible */
+    min-height: 50px; /* Hauteur minimale plus importante sur smartphone */
   }
 }
