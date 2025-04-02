@@ -43,7 +43,7 @@
 /* Ajustement de la marge pour les appareils mobiles */
 @media screen and (max-width: var(--breakpoint-md)) {
   .web-message {
-    margin-bottom: 4px; /* Marge réduite encore davantage sur mobile */
+    margin-bottom: 2px !important; /* TEST: Marge réduite au minimum entre les bulles */
   }
 }
 
@@ -198,12 +198,13 @@
   /* Tablettes et mobiles (768px et moins) */
   /* 
    * Adaptation du conteneur principal pour tablettes/mobiles
-   * - gap réduit (16px → 6px) pour un affichage plus compact
+   * - gap considérablement réduit (16px → 2px) pour un affichage encore plus compact 
+   *   et tester l'impact sur l'espacement
    * - padding-bottom minimal (160px → 24px) car nous utilisons le spacer dynamique
    *   au lieu du padding fixe sur ces appareils
    */
   .web-messages-list {
-    gap: 6px !important; /* Réduit l'espacement vertical entre messages */
+    gap: 2px !important; /* TEST: Espacement vertical minimal entre messages */
     padding: 16px 0 24px !important; /* Padding-bottom minimal compensé par le spacer dynamique */
   }
   
@@ -245,13 +246,11 @@
   
   /* 
    * Configuration des boutons d'action pour mobile/tablette
-   * - espacement réduit pour un design plus compact
-   * - margins et paddings ajustés pour un flux plus naturel
-   * - position: relative pour garder les boutons dans le flux du document
-   * - z-index: 15 est crucial - il place les boutons sous la zone de saisie fixe (z-index: 20)
-   *   mais au-dessus du contenu normal (z-index: 1), permettant un défilement naturel
+   * - Temporairement masqués pour tester l'impact sur l'espacement
+   * - Normalement : espacement réduit, position relative, z-index 15
    */
   .web-message-actions {
+    display: none !important; /* TEST: Masquer complètement les boutons d'action sur mobile */
     margin-top: 8px !important; /* Réduit pour un flux plus compact */
     padding-bottom: 16px !important; /* Espace sous les boutons */
     margin-left: 8px;
@@ -280,10 +279,11 @@
    * Style pour les actions générées directement dans le JSX
    * Ces sélecteurs ciblent les conteneurs d'actions définis par classes Tailwind
    * dans ChatAssistant.tsx plutôt que par classes CSS nommées
-   * - Les valeurs sont alignées avec .web-message-actions pour cohérence
+   * - Temporairement masqués pour tester l'impact sur l'espacement
    */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
+    display: none !important; /* TEST: Masquer complètement les boutons d'action Tailwind sur mobile */
     margin-top: 8px !important; /* Aligné avec web-message-actions */
     margin-bottom: 16px !important; /* Espace sous les boutons */
     padding-top: 4px !important; /* Espace au-dessus des boutons */
@@ -308,11 +308,11 @@
   
   /* 
    * Adaptation du conteneur de messages pour smartphones
-   * - gap encore plus réduit (6px → 5px) pour maximiser l'espace utilisable
+   * - gap considérablement réduit (5px → 1px) pour tester l'impact sur l'espacement
    * - padding-bottom maintenu à 24px comme sur tablette
    */
   .web-messages-list {
-    gap: 5px !important; /* Espacement minimal entre messages */
+    gap: 1px !important; /* TEST: Espacement quasi-nul entre messages */
     padding: 12px 0 24px !important; /* Padding-bottom maintenu identique à la tablette */
   }
   
