@@ -130,7 +130,7 @@ const ChatAssistant: React.FC = () => {
    * qui peuvent varier entre les appareils et navigateurs.
    */
   
-  // Ajuster la hauteur du textarea et ne défiler que si nécessaire
+  // Ajuster uniquement la hauteur du textarea sans auto-scroll
   useEffect(() => {
     // S'assurer que la hauteur initiale du textarea est correcte
     const textareas = document.querySelectorAll('.chat-textarea');
@@ -139,42 +139,14 @@ const ChatAssistant: React.FC = () => {
       el.style.height = '40px';
     });
     
-    // Défiler uniquement si nous avons un nouveau message ou lorsque isThinking change
-    if (messagesEndRef.current && (messages.length > 0 || isThinking)) {
-      // Déterminer si l'utilisateur est déjà en bas de la page
-      const isNearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-      
-      // Ne défiler automatiquement que si l'utilisateur est déjà près du bas
-      // ou si c'est un nouveau message de l'utilisateur (le dernier message a sender='user')
-      const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
-      const isUserMessage = lastMessage?.sender === 'user';
-      
-      if (isNearBottom || isUserMessage) {
-        // Délai réduit pour une expérience plus fluide
-        setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
-    }
+    // Ne pas faire d'auto-scroll automatique lors des messages
+    // Laissons l'utilisateur contrôler le défilement manuellement
+    // car ça cause des problèmes sur mobile
   }, [messages, isThinking]);
   
-  // Fonction simplifiée pour la gestion du défilement
-  useEffect(() => {
-    // Fonction simple pour défiler vers le bas quand nécessaire
-    const scrollToBottom = () => {
-      if (messagesEndRef.current) {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    };
-    
-    // On utilise uniquement un écouteur de redimensionnement
-    window.addEventListener('resize', scrollToBottom);
-    
-    // Fonction de nettoyage
-    return () => {
-      window.removeEventListener('resize', scrollToBottom);
-    };
-  }, []);
+  // Suppression complète de la fonction de défilement automatique
+  // pour permettre à l'utilisateur de contrôler le défilement manuellement
+  // car le défilement automatique pose problème sur mobile
   
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
@@ -406,14 +378,9 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Vérifier s'il faut faire défiler vers le bas
-      setTimeout(() => {
-        // Ne défiler que si l'utilisateur est proche du bas
-        const isNearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-        if (isNearBottom && messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 200);
+      // Ne pas faire défiler automatiquement
+      // Laissons l'utilisateur contrôler le défilement manuellement
+      // car ça cause des problèmes sur mobile
     }
   };
   
@@ -518,14 +485,9 @@ const ChatAssistant: React.FC = () => {
       setSelectedImage(null);
       setImagePreview(null);
       
-      // Vérifier s'il faut faire défiler vers le bas
-      setTimeout(() => {
-        // Ne défiler que si l'utilisateur est proche du bas
-        const isNearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-        if (isNearBottom && messagesEndRef.current) {
-          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 200);
+      // Ne pas faire défiler automatiquement
+      // Laissons l'utilisateur contrôler le défilement manuellement
+      // car ça cause des problèmes sur mobile
     }
   };
   
@@ -986,14 +948,9 @@ const ChatAssistant: React.FC = () => {
                         headerContainer.style.zIndex = '9999';
                       }
                       
-                      // Défiler vers le bas seulement si l'utilisateur était déjà près du bas
-                      setTimeout(() => {
-                        // Ne défiler que si l'utilisateur est proche du bas
-                        const isNearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-                        if (isNearBottom && messagesEndRef.current) {
-                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }, 200);
+                      // Ne pas faire défiler automatiquement
+                      // Laissons l'utilisateur contrôler le défilement manuellement
+                      // car ça cause des problèmes sur mobile
                     }}
                   />
                 </div>
@@ -1147,14 +1104,9 @@ const ChatAssistant: React.FC = () => {
                               } finally {
                                 setIsThinking(false);
                                 
-                                // Vérifier s'il faut faire défiler vers le bas
-                                setTimeout(() => {
-                                  // Ne défiler que si l'utilisateur est proche du bas
-                                  const isNearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 300;
-                                  if (isNearBottom && messagesEndRef.current) {
-                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-                                  }
-                                }, 200);
+                                // Ne pas faire défiler automatiquement
+                                // Laissons l'utilisateur contrôler le défilement manuellement
+                                // car ça cause des problèmes sur mobile
                               }
                             }
                           }}
