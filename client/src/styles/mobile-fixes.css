@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le composer */
   .chat-messages-container {
-    padding-bottom: 220px !important; /* Augmenté à 220px pour garantir la visibilité des messages et boutons */
+    padding-bottom: 280px !important; /* Augmenté à 280px pour garantir la visibilité des messages et boutons */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }

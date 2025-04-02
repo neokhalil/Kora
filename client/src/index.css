@@ -1299,7 +1299,7 @@ body.menu-open {
   
   /* Plus grand spacer pour mobile */
   .dynamic-spacer {
-    min-height: 80px;
+    min-height: 120px;
     margin-top: 15px;
   }
 }
