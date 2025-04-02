@@ -1,10 +1,24 @@
 /**
- * Corrections spécifiques pour l'affichage mobile
- * Suivant la méthodologie ITCSS - ce fichier contient des corrections spécifiques
- * qui remplacent les comportements par défaut pour l'affichage mobile
+ * Optimisations mobile pour Kora - Approche systémique
+ * Ce fichier implémente les optimisations d'interface pour les appareils mobiles
+ * en utilisant une organisation claire et des règles non conflictuelles
  */
 
-/* Correction générale pour le conteneur principal sur mobile */
+/**
+ * SECTION 1: STRUCTURE DE BASE ET HIÉRARCHIE DE CONTENU
+ * Établit les bases du comportement de défilement et des règles z-index
+ */
+
+/* Constantes CSS pour les niveaux z-index sur mobile - aide à maintenir la cohérence */
+:root {
+  --z-base: 1;           /* Niveau base pour le contenu standard */
+  --z-input: 50;         /* Niveau pour la zone de saisie (composer) */
+  --z-messages: 100;     /* Niveau pour les conteneurs de messages */
+  --z-message-content: 200; /* Niveau pour le contenu des messages */
+  --z-buttons: 300;      /* Niveau pour les boutons d'action */
+}
+
+/* Base pour les conteneurs de messages */
 .content-renderer {
   max-width: 100%;
   overflow-x: hidden;
@@ -12,100 +26,93 @@
   word-break: break-word;
 }
 
-/* Correction générale des problèmes d'espacement */
+/* BREAKPOINT PRINCIPAL: TABLETTES ET MOBILES */
 @media (max-width: var(--breakpoint-md)) {
-  /* Tablettes et mobiles (768px et moins) */
-  
-  /* Assurer que les messages restent visibles et ne disparaissent pas sous le composer */
+  /**
+   * STRUCTURE DU CONTENEUR DE MESSAGES
+   * Définit le comportement de défilement et l'espacement du contenu
+   */
   .chat-messages-container {
-    padding-bottom: 400px !important; /* Considérablement augmenté pour garantir la visibilité des messages et boutons */
-    overflow-x: hidden;
+    /* Permet un défilement fluide tout en évitant les chevauchements */
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
+    position: relative;
+    z-index: var(--z-messages);
   }
   
-  /* Empêcher les débordements qui causent des problèmes de mise en page */
+  /* Système d'espacement intelligent pour l'aire de visualisation */
+  .dynamic-spacer {
+    min-height: 300px !important;
+    display: block !important;
+  }
+  
+  /**
+   * STRUCTURE DE RENDU DU CONTENU
+   * Garantit que le contenu est correctement dimensionné et formate
+   */
+  .messages-container {
+    position: relative;
+    z-index: var(--z-messages);
+  }
+  
+  /* Format du contenu des messages */
   .prose {
     width: 100%;
     overflow-wrap: break-word;
     word-break: break-word;
     overflow: visible;
+    position: relative;
+    z-index: var(--z-message-content);
   }
   
-  /* Forcer les conteneurs de messages à être correctement dimensionnés */
+  /* Assure que le contenu des messages est correctement dimensionné */
   .prose .content-renderer {
     max-width: 100%;
     width: 100%;
     display: block;
   }
-  
-  /* Corrections spécifiques pour les équations et le code */
-  .prose code,
-  .prose pre {
-    white-space: pre-wrap;
-    max-width: 100%;
-    font-size: 0.85em;
-  }
-  
-  /* Correction importante pour les mathématiques en bloc */
-  .katex-display {
-    max-width: 100% !important;
-    overflow-x: auto !important;
-    overflow-y: hidden !important;
-    padding: 0.25em 0 !important;
-  }
-  
-  /* Ajouter un indicateur visuel pour le défilement horizontal */
-  .katex-display::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 0;
-    height: 100%;
-    width: 20px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3));
-    pointer-events: none;
-    opacity: 0.5;
-  }
-  
-  /* Correction pour l'espacement final sur mobile */
-  .prose .content-renderer:last-child,
-  .web-message-content .content-renderer:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-  
-  /* Correction spécifique pour les messages avec équations ou code */
-  .chat-messages-container .prose {
-    padding-bottom: 4px; /* Réduit davantage pour des espaces plus compacts */
-  }
-  
-  /* Correction spécifique pour les messages */
-  .web-message {
-    padding-bottom: 0;
-    margin-bottom: 8px;
-  }
-  
-  /* S'assurer que les messages sont visibles - z-index très élevé */
-  .messages-container {
-    position: relative;
-    z-index: 1000 !important;
-  }
-  
-  /* Assurer que les boutons sous les messages sont cliquables */
-  .action-buttons-container button {
-    position: relative;
-    z-index: 30 !important;
-  }
 
-  /* Solution radicale: désactiver les événements de pointeur du composer lorsqu'un utilisateur interagit avec les boutons */
+  /**
+   * ZONE D'INTERACTION ET BOUTONS D'ACTION
+   * Permet aux utilisateurs d'interagir avec les boutons et contrôles
+   */
+  .action-buttons-container {
+    position: relative !important;
+    z-index: var(--z-buttons) !important;
+    margin-bottom: 20px !important;
+  }
+  
+  /* Boutons individuels */
+  .action-buttons-container button,
+  .web-action-button,
+  .kora-action-button-mobile {
+    position: relative !important;
+    z-index: var(--z-buttons) !important;
+  }
+  
+  /**
+   * ZONE DE SAISIE (COMPOSER)
+   * Définit le comportement et l'apparence de la zone de saisie
+   */
+  .composer-container, 
+  .chat-form, 
+  .input-container {
+    position: relative;
+    z-index: var(--z-input) !important;
+  }
+  
+  /* Facilite l'interaction avec les boutons en désactivant le composer pendant l'interaction */
   body.interaction-with-buttons .composer-container {
     pointer-events: none !important;
   }
 }
 
-/* Corrections spécifiques pour les très petits écrans */
+/* BREAKPOINT SECONDAIRE: PETITS ÉCRANS MOBILES */
 @media (max-width: var(--breakpoint-xs)) {
-  /* Mobiles (480px et moins) */
+  /**
+   * AJUSTEMENTS TYPOGRAPHIQUES
+   * Optimisations de lisibilité pour petits écrans
+   */
   .content-renderer {
     font-size: 14px;
   }
@@ -114,30 +121,47 @@
     font-size: 0.9em;
   }
   
-  /* Style spécifique pour les boutons d'action sur petit écran - z-index extrêmement élevé */
+  /**
+   * BOUTONS D'ACTION SUR PETITS ÉCRANS
+   * Optimisation de l'espace et de la lisibilité
+   */
   .action-buttons-container {
-    margin-bottom: 30px !important; /* Augmenté pour garantir que les boutons ne sont pas cachés */
-    padding-bottom: 20px !important; /* Augmenté pour plus d'espace */
-    margin-top: 8px !important; /* Ajoute de l'espace en haut aussi */
+    margin-top: 8px !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 10px !important;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px !important; /* Espacement entre boutons légèrement réduit */
-    position: relative !important;
-    z-index: 5000 !important; /* Beaucoup plus élevé pour garantir que les boutons sont toujours au-dessus */
+    gap: 6px !important;
   }
   
-  /* Style spécifique pour les boutons eux-mêmes - remplacé par kora-action-button-mobile */
+  /* Style compact pour les boutons sur mobile */
   .kora-action-button-mobile {
-    position: relative !important;
-    z-index: 30 !important; /* Augmenté pour être au-dessus du composer (qui est à z-index: 50) */
-    padding: 0.35rem 0.6rem !important; /* Padding plus compact */
-    margin-bottom: 4px !important; /* Marge verticale fortement réduite */
+    padding: 0.35rem 0.6rem !important;
+    margin-bottom: 4px !important;
     margin-right: 4px !important;
-    background-color: #f0f3f8 !important; 
-    font-size: 0.8rem !important; /* Texte un peu plus petit */
+    background-color: #f0f3f8 !important;
+    font-size: 0.8rem !important;
     font-weight: 600 !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important; /* Ombre plus subtile */
     height: 26px !important;
     line-height: 1.2 !important;
+  }
+  
+  /**
+   * OPTIMISATIONS MATHÉMATIQUES ET CODE
+   * Garantit que le contenu technique reste lisible
+   */
+  .prose code,
+  .prose pre {
+    white-space: pre-wrap;
+    max-width: 100%;
+    font-size: 0.85em;
+  }
+  
+  /* Optimisations KaTeX pour le défilement horizontal */
+  .katex-display {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding: 0.25em 0 !important;
   }
 }

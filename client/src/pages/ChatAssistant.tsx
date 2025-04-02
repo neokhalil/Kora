@@ -132,12 +132,17 @@ const ChatAssistant: React.FC = () => {
     };
   }, [isMobile]);
   
-  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages
+  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages avec une approche plus robuste
   const composerDimensions = useResizeObserver(composerRef, (entry) => {
-    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
+    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer avec une marge de sécurité
     if (spacerRef.current && entry.contentRect) {
-      const extraPadding = isMobileView ? 20 : 10;
-      const composerHeight = entry.contentRect.height + extraPadding; // Ajout d'un padding plus important sur mobile
+      // La hauteur minimale garantie sur mobile est plus grande pour assurer la visibilité des boutons
+      const minHeight = isMobileView ? 300 : 100;
+      // Calcul du padding supplémentaire basé sur l'appareil
+      const extraPadding = isMobileView ? 100 : 20;
+      // Assurer que la hauteur du spacer est au moins égale à la hauteur du composer + padding, mais jamais inférieure à minHeight
+      const composerHeight = Math.max(entry.contentRect.height + extraPadding, minHeight);
+      // Appliquer la hauteur au spacer
       spacerRef.current.style.height = `${composerHeight}px`;
     }
   });

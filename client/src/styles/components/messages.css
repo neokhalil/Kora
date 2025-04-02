@@ -215,7 +215,7 @@
     margin-left: 4px;
     gap: 4px; /* Espacement minimal entre les boutons sur mobile */
     position: relative !important;
-    z-index: 100 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
+    z-index: var(--z-buttons) !important; /* Utilise la valeur standardisée */
   }
   
   .web-action-button {
@@ -224,19 +224,19 @@
     border-radius: 18px !important; /* Légèrement plus compact */
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; /* Ombre plus légère */
     margin-bottom: 6px !important; /* Marge inférieure réduite */
-    z-index: 101 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
+    z-index: var(--z-buttons) !important; /* Utilise la valeur standardisée */
     position: relative !important;
   }
   
-  /* Style spécifique pour les actions sous les messages */
+  /* Style spécifique pour les actions sous les messages - utilise nos variables de z-index */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
     margin-top: 6px !important; /* Considérablement réduit */
     margin-bottom: 6px !important; /* Considérablement réduit */
     padding-top: 4px !important; /* Considérablement réduit */
-    padding-bottom: 6px !important; /* Considérablement réduit */
+    padding-bottom: 8px !important; /* Légèrement augmenté */
     position: relative !important;
-    z-index: 100 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
+    z-index: var(--z-buttons) !important; /* Utilise la valeur standardisée */
     gap: 6px !important; /* Espacement plus compact entre les éléments */
   }
 }
@@ -253,9 +253,8 @@
     padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
   }
   
-  /* L'espace est géré par le spacer dynamique - activé seulement sur mobile */
-  .dynamic-spacer {
-    display: block !important; /* Afficher le spacer sur mobile */
-    min-height: 10px !important; /* Hauteur minimale considérablement réduite */
-  }
+  /* 
+   * L'espace est géré par le spacer dynamique - 
+   * Configuration centralisée dans mobile-fixes.css pour éviter les chevauchements
+   */
 }
