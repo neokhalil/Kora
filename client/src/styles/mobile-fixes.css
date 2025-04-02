@@ -21,9 +21,9 @@
 
 /* Tablettes et mobiles (768px et moins) */
 @media (max-width: 768px) {
-  /* SOLUTION PRINCIPALE: padding-bottom extrêmement grand */
+  /* SOLUTION PRINCIPALE: padding-bottom plus modéré et équilibré */
   .chat-messages-container {
-    padding-bottom: 800px !important; /* Valeur augmentée drastiquement */
+    padding-bottom: 400px !important; /* Valeur réduite de 800px à 400px */
     padding-top: 8px !important;
     padding-left: 6px !important;
     padding-right: 6px !important;
