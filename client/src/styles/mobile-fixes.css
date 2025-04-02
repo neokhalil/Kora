@@ -19,8 +19,18 @@
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
     padding-bottom: 280px !important; /* Augmenté encore plus pour avoir un espace très confortable en bas */
+    padding-top: 10px !important; /* Réduire l'espace en haut sur mobile */
+    padding-left: 8px !important; /* Réduire les marges horizontales sur mobile */
+    padding-right: 8px !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Réduire l'espacement vertical entre les messages */
+  .chat-messages-container > div {
+    margin-bottom: 4px !important; /* Espace très compact entre les messages */
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
   }
   
   /* Empêcher les débordements qui causent des problèmes de mise en page */
@@ -74,6 +84,11 @@
     padding-bottom: 0;
   }
   
+  /* Masquer les boutons d'action dans les messages pour libérer de l'espace */
+  .web-message-actions {
+    display: none !important;
+  }
+  
   /* Correction spécifique pour les messages avec équations ou code */
   .chat-messages-container .prose {
     padding-bottom: 8px;
@@ -91,36 +106,47 @@
     font-size: 0.9em;
   }
   
+  /* Réduire encore plus l'espacement pour les très petits écrans */
+  .chat-messages-container {
+    padding-left: 4px !important; /* Marges horizontales minimales */
+    padding-right: 4px !important;
+  }
+  
+  /* Mise en page plus compacte des messages */
+  .chat-messages-container > div {
+    margin-bottom: 2px !important; /* Espacement vertical minimal */
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+  }
+  
+  /* Réduire les marges internes des bulles de message */
+  .chat-messages-container .rounded-2xl {
+    padding: 8px !important;
+  }
+  
   /* 
    * Style spécifique pour le conteneur des boutons d'action sur petit écran
-   * - margin-bottom: ajoute de l'espace entre les boutons et le bas du message
-   * - padding-bottom: crée un espace additionnel sous les boutons
-   * - flex-wrap: wrap permet aux boutons de passer à la ligne sur petit écran
-   * - position: relative assure que les boutons suivent le flux normal du document
-   * - z-index: 15 place les boutons sous la zone de saisie (qui a z-index: 20)
-   *   pour qu'ils défilent naturellement avec le contenu
+   * - TEMPORAIREMENT MASQUÉ pour tester l'impact sur l'espacement
+   * - Normalement : margin-bottom, position relative, etc.
    */
   .action-buttons-container {
+    display: none !important; /* TEST: Masquer complètement le conteneur des boutons */
     margin-bottom: 60px !important;
     padding-bottom: 20px !important;
-    display: flex;
     flex-wrap: wrap;
     gap: 10px !important;
     position: relative !important;
-    z-index: 15 !important; /* Place les boutons sous le composer (qui est à z-index: 20) */
+    z-index: 15 !important;
   }
   
   /* 
    * Style spécifique pour les boutons d'action individuels
-   * - position: relative pour suivre le flux normal du document
-   * - z-index: 15 coordonné avec le conteneur pour être sous le composer
-   * - padding et margin-bottom: crée un bouton plus grand et plus espacé
-   * - background-color et box-shadow: améliore la visibilité du bouton
-   * - font-weight: rend le texte plus visible
+   * - TEMPORAIREMENT MASQUÉ pour tester l'impact sur l'espacement
    */
   .kora-action-button {
+    display: none !important; /* TEST: Masquer individuellement les boutons au cas où */
     position: relative !important;
-    z-index: 15 !important; /* Coordonné avec le conteneur pour être sous le composer */
+    z-index: 15 !important;
     padding: 8px 15px !important;
     margin-bottom: 10px !important;
     background-color: #f0f3f8 !important;

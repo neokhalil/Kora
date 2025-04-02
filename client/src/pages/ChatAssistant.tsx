@@ -404,7 +404,7 @@ const ChatAssistant: React.FC = () => {
         id: messageId,
         content: '',
         sender: 'kora',
-        allowActions: true,
+        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -520,7 +520,7 @@ const ChatAssistant: React.FC = () => {
         content: data.content,
         sender: 'kora',
         isImageAnalysis: true,
-        allowActions: true,
+        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
       }]);
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
@@ -598,7 +598,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isReExplanation: true,
-        allowActions: true,
+        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -674,7 +674,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isChallenge: true,
-        allowActions: true,
+        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
         challengeId: challengeId,
       }]);
       
@@ -732,7 +732,7 @@ const ChatAssistant: React.FC = () => {
             </div>
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
-            {isKora && (
+            {isKora && message.allowActions && (
               <div className="mt-4 mb-6 pt-2 pb-3 flex flex-row gap-3 justify-start action-buttons-container">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
