@@ -627,8 +627,8 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           </div>
         </div>
         
-        {/* Boutons d'action standards pour les messages de Kora - maintenant à l'extérieur du div message */}
-        {!isUserMessage && message.allowActions && (
+        {/* Boutons d'action standards pour les messages de Kora - temporairement masqués */}
+        {false && !isUserMessage && message.allowActions && (
           <div className="web-message-actions">
             <button 
               type="button"
@@ -677,7 +677,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
           </div>
         )}
         
-        {/* Bouton d'indice pour les exercices - également à l'extérieur du div message */}
+        {/* Bouton d'indice pour les exercices - temporairement commenté 
         {!isUserMessage && message.isChallenge && message.challengeId && (
           <div className="web-message-actions web-challenge-actions">
             <button 
@@ -699,6 +699,7 @@ const WebHomeView: React.FC<WebHomeViewProps> = ({ recentQuestions }) => {
             </button>
           </div>
         )}
+        */}
       </div>
     );
   };
