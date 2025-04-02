@@ -38,14 +38,8 @@
     padding-bottom: 2px !important;
   }
   
-  /* Masquer tous les boutons d'action sur mobile */
-  .action-buttons-container,
-  .mt-4.flex.flex-row.gap-2.justify-start,
-  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
-  .kora-action-button,
-  [class*="action-button"] {
-    display: none !important;
-  }
+  /* Aucun style particulier pour les boutons d'action, ils sont simplement désactivés 
+     dans le composant React via allowActions: !isMobile */
   
   /* Optimisations pour les formules mathématiques */
   .katex-display {

@@ -230,35 +230,10 @@
   }
   
   /* 
-   * Configuration des boutons d'action pour mobile/tablette
-   * - Ces styles sont conservés ici à titre de référence mais ne sont pas appliqués
-   * - L'affichage 'display: none' est géré dans mobile-fixes.css de manière unifiée
-   * - Si les boutons sont réactivés à l'avenir, ces styles seront prêts à l'emploi
+   * Boutons d'action supprimés sur mobile
+   * - Les boutons sont désactivés directement dans le composant React
+   * - Aucun style spécifique n'est nécessaire pour mobile
    */
-  .web-message-actions {
-    /* Propriétés styles désactivées - référence pour implémentation future */
-    /* margin-top: 8px !important; */
-    /* padding-bottom: 16px !important; */
-    /* margin-left: 8px; */
-    /* gap: 8px; */
-    /* position: relative !important; */
-    /* z-index: 15 !important; */
-  }
-  
-  /* 
-   * Style des boutons individuels sur mobile
-   * - Conservé à titre de référence pour une future réactivation des boutons
-   */
-  .web-action-button {
-    /* Propriétés styles désactivées - référence pour implémentation future */
-    /* padding: 8px 16px !important; */
-    /* font-size: 14px !important; */
-    /* border-radius: 20px !important; */
-    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; */
-    /* margin-bottom: 6px !important; */
-    /* z-index: 15 !important; */
-    /* position: relative !important; */
-  }
 }
 
 /* 
