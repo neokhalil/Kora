@@ -349,12 +349,12 @@ const ChatAssistant: React.FC = () => {
       // Générer un ID unique pour ce message
       const messageId = Date.now().toString();
       
-      // Ajouter la réponse avec du contenu initial vide
+      // Ajouter la réponse avec du contenu initial vide - actions activées
       setMessages(prev => [...prev, {
         id: messageId,
         content: '',
         sender: 'kora',
-        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
+        allowActions: true, // Activé avec CSS optimisé pour le mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -461,13 +461,13 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de l'IA aux messages
+      // Ajouter la réponse de l'IA aux messages avec actions activées
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         isImageAnalysis: true,
-        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
+        allowActions: true, // Activé avec CSS optimisé pour le mobile
       }]);
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
@@ -542,7 +542,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isReExplanation: true,
-        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
+        allowActions: true, // Activé avec CSS optimisé pour le mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -618,7 +618,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isChallenge: true,
-        allowActions: false, // Désactivé pour éviter les problèmes d'espacement sur mobile
+        allowActions: true, // Activé avec CSS optimisé pour le mobile
         challengeId: challengeId,
       }]);
       
