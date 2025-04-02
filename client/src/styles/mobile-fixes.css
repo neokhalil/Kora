@@ -2,6 +2,12 @@
  * Corrections spécifiques pour l'affichage mobile
  * Suivant la méthodologie ITCSS - ce fichier contient des corrections spécifiques
  * qui remplacent les comportements par défaut pour l'affichage mobile
+ * 
+ * ARCHITECTURE UNIFIÉE DE L'ESPACEMENT:
+ * 1. Ce fichier gère les grands espacements bottom fixes qui empêchent les messages 
+ *    d'être cachés sous la zone de saisie
+ * 2. Les espacements entre éléments (gap, margin) sont gérés dans messages.css
+ * 3. Les z-index suivent cette hiérarchie : composer (20) > boutons d'action (15) > contenu (5)
  */
 
 /* Correction générale pour le conteneur principal sur mobile */
@@ -16,9 +22,15 @@
 @media (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
   
-  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
+  /* 
+   * PADDING-BOTTOM PRINCIPAL
+   * Cette déclaration est le cœur de notre solution de défilement:
+   * - Valeur fixe très importante (500px) qui pousse tout le contenu vers le haut
+   * - Garantit que tout reste visible au-dessus de la zone de saisie
+   * - Remplace l'ancien système dynamique par une approche simple mais efficace
+   */
   .chat-messages-container {
-    padding-bottom: 500px !important; /* Valeur fixe très importante pour garantir que même les longues équations restent visibles */
+    padding-bottom: 500px !important; /* Valeur fixe garantissant la visibilité de tout le contenu */
     padding-top: 10px !important; /* Réduire l'espace en haut sur mobile */
     padding-left: 8px !important; /* Réduire les marges horizontales sur mobile */
     padding-right: 8px !important;
@@ -84,9 +96,16 @@
     padding-bottom: 0;
   }
   
-  /* Masquer les boutons d'action dans les messages pour libérer de l'espace */
-  .web-message-actions {
-    display: none !important;
+  /* 
+   * DÉSACTIVATION DES BOUTONS D'ACTION SUR TABLETTE
+   * Nous utilisons la même approche que sur smartphones: masquer complètement
+   * tous les types de boutons d'action pour libérer l'espace et simplifier l'interface
+   */
+  .web-message-actions,
+  .action-buttons-container,
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
+    display: none !important; /* Masquer tous les types de boutons d'action */
   }
   
   /* Correction spécifique pour les messages avec équations ou code */
@@ -98,6 +117,8 @@
 /* Corrections spécifiques pour les très petits écrans */
 @media (max-width: var(--breakpoint-xs)) {
   /* Mobiles (480px et moins) */
+  
+  /* Réduire la taille des polices pour économiser de l'espace vertical */
   .content-renderer {
     font-size: 14px;
   }
@@ -106,14 +127,18 @@
     font-size: 0.9em;
   }
   
-  /* Réduire encore plus l'espacement pour les très petits écrans */
+  /* 
+   * PADDING-BOTTOM PRINCIPAL POUR SMARTPHONES
+   * Encore plus grand (600px) que celui des tablettes (500px) pour compenser
+   * la hauteur réduite de l'écran et garantir la visibilité complète du contenu
+   */
   .chat-messages-container {
     padding-left: 4px !important; /* Marges horizontales minimales */
     padding-right: 4px !important;
-    padding-bottom: 600px !important; /* Valeur très importante pour les très petits écrans */
+    padding-bottom: 600px !important; /* Valeur augmentée pour les très petits écrans */
   }
   
-  /* Mise en page plus compacte des messages */
+  /* Mise en page extrêmement compacte pour maximiser l'espace disponible */
   .chat-messages-container > div {
     margin-bottom: 2px !important; /* Espacement vertical minimal */
     padding-top: 1px !important;
@@ -126,32 +151,15 @@
   }
   
   /* 
-   * Style spécifique pour le conteneur des boutons d'action sur petit écran
-   * - TEMPORAIREMENT MASQUÉ pour tester l'impact sur l'espacement
-   * - Normalement : margin-bottom, position relative, etc.
+   * DÉSACTIVATION COMPLÈTE DES BOUTONS D'ACTION
+   * Pour simplifier et unifier les contrôles de visibilité des boutons d'action,
+   * nous utilisons une seule approche cohérente pour tous les types de boutons
    */
-  .action-buttons-container {
-    display: none !important; /* TEST: Masquer complètement le conteneur des boutons */
-    margin-bottom: 60px !important;
-    padding-bottom: 20px !important;
-    flex-wrap: wrap;
-    gap: 10px !important;
-    position: relative !important;
-    z-index: 15 !important;
-  }
-  
-  /* 
-   * Style spécifique pour les boutons d'action individuels
-   * - TEMPORAIREMENT MASQUÉ pour tester l'impact sur l'espacement
-   */
+  .action-buttons-container,
+  .web-message-actions,
+  .mt-4.flex.flex-row.gap-2.justify-start,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start,
   .kora-action-button {
-    display: none !important; /* TEST: Masquer individuellement les boutons au cas où */
-    position: relative !important;
-    z-index: 15 !important;
-    padding: 8px 15px !important;
-    margin-bottom: 10px !important;
-    background-color: #f0f3f8 !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    display: none !important; /* Masquer complètement tous les types de boutons d'action */
   }
 }

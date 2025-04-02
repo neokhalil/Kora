@@ -115,8 +115,23 @@ const ChatAssistant: React.FC = () => {
     setIsMobileDevice(isMobile);
   }, [isMobile]);
   
-  // Le hook useResizeObserver a été supprimé en faveur d'une approche plus simple
-  // avec un padding-bottom fixe important
+  /**
+   * ARCHITECTURE UNIFIÉE POUR L'ESPACEMENT MOBILE
+   * 
+   * Note importante: Le hook useResizeObserver a été complètement supprimé
+   * en faveur d'une approche CSS simplifiée avec:
+   * 
+   * 1. Un padding-bottom fixe très important sur .chat-messages-container:
+   *    - 500px pour les tablettes
+   *    - 600px pour les smartphones
+   * 
+   * 2. Les boutons d'action masqués sur mobile pour maximiser l'espace
+   * 
+   * 3. Aucun JavaScript n'est nécessaire pour maintenir l'espacement
+   * 
+   * Cette solution est plus fiable car elle ne dépend pas de calculs dynamiques
+   * qui peuvent varier entre les appareils et navigateurs.
+   */
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
@@ -888,8 +903,15 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Le spacer dynamique a été retiré pour une approche plus simple avec un padding-bottom fixe */}
+                {/* 
+                  Note: Le spacer dynamique a été complètement supprimé en faveur
+                  d'une approche plus simple utilisant:
+                  - Un padding-bottom fixe de 500px (tablettes) ou 600px (smartphones)
+                  - Défini dans mobile-fixes.css sur .chat-messages-container
+                  - Aucun JavaScript n'est nécessaire pour cette solution
+                */}
                 
+                {/* Ancre pour le défilement automatique vers le bas */}
                 <div ref={messagesEndRef} />
               </>
             )}

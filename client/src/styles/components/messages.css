@@ -18,20 +18,12 @@
 }
 
 /* 
- * Spacer dynamique qui s'adapte à la hauteur du composer
- * C'est un élément clé de notre solution pour mobile/tablette:
- * 1. Il est masqué sur desktop (display: none)
- * 2. Sur mobile/tablette, il devient visible (display: block dans les media queries)
- * 3. Sa hauteur est dynamiquement ajustée par JavaScript via le hook useResizeObserver
- *    qui détecte les changements de taille de la zone de saisie
- * 4. La transition douce évite les sauts brusques lors des changements de hauteur
+ * Solution d'espacement pour le défilement
+ * Approche unifiée :
+ * 1. Sur desktop, nous utilisons un padding-bottom fixe modéré (voir .web-messages-list)
+ * 2. Sur mobile/tablette, nous augmentons considérablement ce padding dans .chat-messages-container
+ *    pour assurer que tous les messages, y compris les formules mathématiques, restent visibles
  */
-.dynamic-spacer {
-  display: none; /* Masqué sur desktop - nous utilisons le padding fixe à la place */
-  width: 100%;
-  min-height: 30px; /* Hauteur minimale pour éviter un espace trop petit */
-  transition: height 0.2s ease; /* Animation fluide quand la hauteur change */
-}
 
 /* Styles communs pour tous les messages */
 .web-message {
@@ -198,14 +190,13 @@
   /* Tablettes et mobiles (768px et moins) */
   /* 
    * Adaptation du conteneur principal pour tablettes/mobiles
-   * - gap considérablement réduit (16px → 2px) pour un affichage encore plus compact 
-   *   et tester l'impact sur l'espacement
-   * - padding-bottom minimal (160px → 24px) car nous utilisons le spacer dynamique
-   *   au lieu du padding fixe sur ces appareils
+   * - gap considérablement réduit (16px → 2px) pour un affichage plus compact 
+   * - padding-bottom réduit à 24px car le padding principal est géré par .chat-messages-container
+   *   avec une valeur beaucoup plus importante (500px) dans mobile-fixes.css
    */
   .web-messages-list {
-    gap: 2px !important; /* TEST: Espacement vertical minimal entre messages */
-    padding: 16px 0 24px !important; /* Padding-bottom minimal compensé par le spacer dynamique */
+    gap: 2px !important; /* Espacement vertical minimal entre messages */
+    padding: 16px 0 24px !important; /* Padding-bottom minimal, le principal étant géré ailleurs */
   }
   
   /* 
@@ -240,59 +231,42 @@
   
   /* 
    * Configuration des boutons d'action pour mobile/tablette
-   * - Temporairement masqués pour tester l'impact sur l'espacement
-   * - Normalement : espacement réduit, position relative, z-index 15
+   * - Ces styles sont conservés ici à titre de référence mais ne sont pas appliqués
+   * - L'affichage 'display: none' est géré dans mobile-fixes.css de manière unifiée
+   * - Si les boutons sont réactivés à l'avenir, ces styles seront prêts à l'emploi
    */
   .web-message-actions {
-    display: none !important; /* TEST: Masquer complètement les boutons d'action sur mobile */
-    margin-top: 8px !important; /* Réduit pour un flux plus compact */
-    padding-bottom: 16px !important; /* Espace sous les boutons */
-    margin-left: 8px;
-    gap: 8px; /* Espacement réduit entre les boutons */
-    position: relative !important; /* Maintient les boutons dans le flux du document */
-    z-index: 15 !important; /* Place les boutons sous le composer (z-index: 20) */
+    /* Propriétés styles désactivées - référence pour implémentation future */
+    /* margin-top: 8px !important; */
+    /* padding-bottom: 16px !important; */
+    /* margin-left: 8px; */
+    /* gap: 8px; */
+    /* position: relative !important; */
+    /* z-index: 15 !important; */
   }
   
   /* 
    * Style des boutons individuels sur mobile
-   * - padding et border-radius augmentés pour une meilleure ergonomie tactile
-   * - box-shadow améliorée pour une meilleure visibilité sur fond blanc
-   * - position relative et z-index identique aux conteneurs pour cohérence
+   * - Conservé à titre de référence pour une future réactivation des boutons
    */
   .web-action-button {
-    padding: 8px 16px !important; /* Plus grand pour cible tactile */
-    font-size: 14px !important;
-    border-radius: 20px !important; /* Plus arrondi sur mobile */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* Ombre plus prononcée */
-    margin-bottom: 6px !important; /* Espace vertical entre boutons */
-    z-index: 15 !important; /* Coordonné avec le conteneur */
-    position: relative !important; /* Maintient dans le flux du document */
-  }
-  
-  /* 
-   * Style pour les actions générées directement dans le JSX
-   * Ces sélecteurs ciblent les conteneurs d'actions définis par classes Tailwind
-   * dans ChatAssistant.tsx plutôt que par classes CSS nommées
-   * - Temporairement masqués pour tester l'impact sur l'espacement
-   */
-  .mt-4.flex.flex-row.gap-2.justify-start,
-  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    display: none !important; /* TEST: Masquer complètement les boutons d'action Tailwind sur mobile */
-    margin-top: 8px !important; /* Aligné avec web-message-actions */
-    margin-bottom: 16px !important; /* Espace sous les boutons */
-    padding-top: 4px !important; /* Espace au-dessus des boutons */
-    padding-bottom: 16px !important; /* Espace sous les boutons */
-    position: relative !important; /* Maintient dans le flux du document */
-    z-index: 15 !important; /* Coordonné avec les autres éléments d'action */
+    /* Propriétés styles désactivées - référence pour implémentation future */
+    /* padding: 8px 16px !important; */
+    /* font-size: 14px !important; */
+    /* border-radius: 20px !important; */
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; */
+    /* margin-bottom: 6px !important; */
+    /* z-index: 15 !important; */
+    /* position: relative !important; */
   }
 }
 
 /* 
  * Styles spécifiques pour les très petits écrans (smartphones)
  * Sur ces appareils, nous avons besoin d'une adaptation encore plus poussée:
- * - Gap encore plus réduit pour la densité d'information
- * - Hauteur minimale du spacer augmentée pour compenser les plus petits écrans
+ * - Gap réduit au minimum pour une densité maximale d'information
  * - Taille de police réduite pour les messages
+ * - padding-bottom minimal car géré par .chat-messages-container (600px dans mobile-fixes.css)
  */
 @media screen and (max-width: var(--breakpoint-xs)) {
   /* Smartphones (480px et moins) */
@@ -302,16 +276,11 @@
   
   /* 
    * Adaptation du conteneur de messages pour smartphones
-   * - gap considérablement réduit (5px → 1px) pour tester l'impact sur l'espacement
-   * - padding-bottom maintenu à 24px comme sur tablette
+   * - gap considérablement réduit (2px → 1px) pour maximiser l'espace disponible
+   * - padding-bottom maintenu minimal car géré ailleurs (600px) 
    */
   .web-messages-list {
-    gap: 1px !important; /* TEST: Espacement quasi-nul entre messages */
-    padding: 12px 0 24px !important; /* Padding-bottom maintenu identique à la tablette */
+    gap: 1px !important; /* Espacement quasi-nul entre messages */
+    padding: 12px 0 24px !important; /* Padding-bottom minimal */
   }
-  
-  /* 
-   * Le padding-bottom fixe remplace le spacer dynamique
-   * pour une solution plus simple et cohérente sur tous les appareils
-   */
 }

@@ -1,26 +1,25 @@
 import { useEffect, useState, RefObject } from 'react';
 
 /**
- * Hook personnalisé qui utilise ResizeObserver pour suivre les changements de taille d'un élément DOM
+ * HOOK OBSOLÈTE - CONSERVÉ UNIQUEMENT COMME RÉFÉRENCE
  * 
- * Ce hook est un élément essentiel de notre solution d'adaptation mobile pour plusieurs raisons:
- * 1. Il permet de détecter en temps réel les changements de dimensions d'un élément (par exemple 
- *    la zone de saisie quand l'utilisateur tape un message plus long)
- * 2. Contrairement à un gestionnaire d'événements classique (resize, etc.), il surveille
- *    spécifiquement les changements de dimensions d'un élément particulier
- * 3. Il permet d'adapter dynamiquement l'interface en fonction de ces changements (par exemple
- *    ajuster la hauteur du spacer dynamique pour empêcher la zone de saisie de masquer du contenu)
- * 4. Il offre une solution plus robuste qu'un padding statique car il s'adapte aux variations
- *    de hauteur du composer sur différents appareils et états d'interface
+ * Ce hook n'est plus utilisé dans l'application. Nous l'avons remplacé par 
+ * une approche plus simple utilisant un padding-bottom fixe très important
+ * dans les fichiers CSS (mobile-fixes.css).
  * 
- * Dans notre application, ce hook est utilisé pour:
- * - Surveiller la hauteur de la zone de saisie (composer)
- * - Ajuster la hauteur du spacer dynamique en conséquence
- * - Maintenir une expérience utilisateur fluide sur mobile
+ * ARCHITECTURE PRÉCÉDENTE (OBSOLÈTE) :
+ * Ce hook faisait partie d'une solution dynamique qui ajustait l'espacement
+ * en fonction de la hauteur du composer. Bien que techniquement correcte,
+ * cette approche s'est avérée trop complexe et sujette à des problèmes
+ * sur certains appareils.
  * 
- * @param ref Référence React à l'élément DOM à observer
- * @param callback Fonction optionnelle à appeler lors des changements de taille
- * @returns Un objet contenant la largeur et la hauteur actuelles de l'élément
+ * NOUVELLE ARCHITECTURE :
+ * - padding-bottom fixe de 500px sur tablette dans .chat-messages-container
+ * - padding-bottom fixe de 600px sur mobile dans .chat-messages-container
+ * - Aucun calcul dynamique JavaScript
+ * 
+ * Cette nouvelle approche est plus simple, plus robuste et offre une 
+ * meilleure compatibilité entre appareils.
  */
 export function useResizeObserver<T extends HTMLElement>(
   ref: RefObject<T>,
