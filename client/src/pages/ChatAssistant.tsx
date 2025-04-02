@@ -121,7 +121,7 @@ const ChatAssistant: React.FC = () => {
   const composerDimensions = useResizeObserver(composerRef, (entry) => {
     // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer
     if (spacerRef.current && entry.contentRect) {
-      const composerHeight = entry.contentRect.height + 20; // Ajouter une marge de 20px
+      const composerHeight = entry.contentRect.height + 5; // Réduire la marge à 5px seulement
       spacerRef.current.style.height = `${composerHeight}px`;
     }
   });
@@ -897,7 +897,7 @@ const ChatAssistant: React.FC = () => {
                 )}
                 
                 {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
-                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 20 }} />
+                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 5 }} />
                 
                 <div ref={messagesEndRef} />
               </>

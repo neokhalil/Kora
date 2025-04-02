@@ -17,7 +17,7 @@
 .dynamic-spacer {
   display: none; /* Caché par défaut sur desktop */
   width: 100%;
-  min-height: 30px; /* Hauteur minimale au cas où */
+  min-height: 20px; /* Hauteur minimale réduite */
   transition: height 0.2s ease; /* Transition douce pour les changements de hauteur */
 }
 
@@ -181,7 +181,7 @@
   /* Activer le spacer dynamique sur tablette/mobile */
   .dynamic-spacer {
     display: block !important;
-    min-height: 40px;
+    min-height: 20px; /* Hauteur minimale fortement réduite */
   }
   
   .web-user-message .web-message-content {
@@ -210,20 +210,20 @@
   }
   
   .web-message-actions {
-    margin-top: 12px !important; /* Légèrement réduit */
-    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    margin-top: 8px !important; /* Considérablement réduit */
+    padding-bottom: 8px !important; /* Considérablement réduit */
     margin-left: 8px;
-    gap: 8px; /* Espacement réduit entre les boutons sur mobile */
+    gap: 6px; /* Espacement minimal entre les boutons sur mobile */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
   }
   
   .web-action-button {
-    padding: 8px 16px !important;
-    font-size: 14px !important;
-    border-radius: 20px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 10px !important;
+    padding: 6px 12px !important; /* Padding réduit */
+    font-size: 13px !important; /* Texte plus petit */
+    border-radius: 18px !important; /* Légèrement plus compact */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; /* Ombre plus légère */
+    margin-bottom: 6px !important; /* Marge inférieure réduite */
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important;
   }
@@ -231,12 +231,13 @@
   /* Style spécifique pour les actions sous les messages */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 12px !important; /* Réduit pour cohérence avec les autres espacements */
-    margin-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
-    padding-top: 8px !important; /* Légèrement réduit */
-    padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
+    margin-top: 6px !important; /* Considérablement réduit */
+    margin-bottom: 6px !important; /* Considérablement réduit */
+    padding-top: 4px !important; /* Considérablement réduit */
+    padding-bottom: 6px !important; /* Considérablement réduit */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
+    gap: 6px !important; /* Espacement plus compact entre les éléments */
   }
 }
 
@@ -255,6 +256,6 @@
   /* L'espace est géré par le spacer dynamique - activé seulement sur mobile */
   .dynamic-spacer {
     display: block !important; /* Afficher le spacer sur mobile */
-    min-height: 50px; /* Hauteur minimale un peu plus grande sur mobile */
+    min-height: 10px !important; /* Hauteur minimale considérablement réduite */
   }
 }
