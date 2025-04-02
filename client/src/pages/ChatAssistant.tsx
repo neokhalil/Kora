@@ -165,6 +165,8 @@ const ChatAssistant: React.FC = () => {
     const handleFocusIn = () => {
       // Assurer que le clavier s'ouvre correctement
       document.body.classList.add('keyboard-open');
+      // Retirer la classe d'interaction avec les boutons quand on focus sur un champ
+      document.body.classList.remove('interaction-with-buttons');
     };
     
     const handleFocusOut = () => {
@@ -184,9 +186,31 @@ const ChatAssistant: React.FC = () => {
       }
     };
     
+    // Gestionnaire pour les clics sur les boutons d'action
+    const handleActionButtonInteraction = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      // Vérifier si l'élément cliqué ou un de ses parents est un bouton d'action
+      if (
+        target.closest('.action-buttons-container') || 
+        target.closest('.web-message-actions') || 
+        target.closest('.web-action-button') ||
+        target.closest('.kora-action-button-mobile')
+      ) {
+        // Activer la classe pour désactiver temporairement les événements du composer
+        document.body.classList.add('interaction-with-buttons');
+        
+        // Prévoir de retirer cette classe après un court délai (pour permettre le clic)
+        setTimeout(() => {
+          document.body.classList.remove('interaction-with-buttons');
+        }, 1000); // 1 seconde devrait suffire pour un clic
+      }
+    };
+    
     // Enregistrement des écouteurs d'événements
     document.addEventListener('focusin', handleFocusIn);
     document.addEventListener('focusout', handleFocusOut);
+    document.addEventListener('mousedown', handleActionButtonInteraction);
+    document.addEventListener('touchstart', handleActionButtonInteraction);
     
     // Si VisualViewport API est disponible (principalement iOS)
     if (window.visualViewport) {
@@ -198,6 +222,8 @@ const ChatAssistant: React.FC = () => {
     return () => {
       document.removeEventListener('focusin', handleFocusIn);
       document.removeEventListener('focusout', handleFocusOut);
+      document.removeEventListener('mousedown', handleActionButtonInteraction);
+      document.removeEventListener('touchstart', handleActionButtonInteraction);
       
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleVisualViewportChange);
@@ -901,7 +927,7 @@ const ChatAssistant: React.FC = () => {
                 {isThinking && (
                   <div className="px-4 py-2 mb-4">
                     <div className="max-w-3xl mx-auto">
-                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" style={{ zIndex: 150, position: 'relative' }}>
                         <div className="flex space-x-1">
                           <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
                           <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
@@ -917,8 +943,8 @@ const ChatAssistant: React.FC = () => {
                   ref={spacerRef} 
                   className="dynamic-spacer" 
                   style={{ 
-                    height: composerDimensions.height + (isMobileView ? 120 : 20),  
-                    minHeight: isMobileView ? '200px' : '80px',
+                    height: composerDimensions.height + (isMobileView ? 250 : 20),  
+                    minHeight: isMobileView ? '300px' : '80px',
                     width: '100%'
                   }} 
                 />
@@ -928,8 +954,8 @@ const ChatAssistant: React.FC = () => {
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-20 composer-container input-area initial-load">
+          {/* Zone de saisie fixe en bas - on baisse le z-index pour que les boutons d'action puissent apparaître au-dessus */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-10 composer-container input-area initial-load">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (

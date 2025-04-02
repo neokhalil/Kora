@@ -215,7 +215,7 @@
     margin-left: 4px;
     gap: 4px; /* Espacement minimal entre les boutons sur mobile */
     position: relative !important;
-    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
+    z-index: 100 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
   }
   
   .web-action-button {
@@ -224,7 +224,7 @@
     border-radius: 18px !important; /* Légèrement plus compact */
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important; /* Ombre plus légère */
     margin-bottom: 6px !important; /* Marge inférieure réduite */
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 101 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
     position: relative !important;
   }
   
@@ -236,7 +236,7 @@
     padding-top: 4px !important; /* Considérablement réduit */
     padding-bottom: 6px !important; /* Considérablement réduit */
     position: relative !important;
-    z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
+    z-index: 100 !important; /* Z-index très élevé pour être sûr qu'il est au-dessus du composer */
     gap: 6px !important; /* Espacement plus compact entre les éléments */
   }
 }

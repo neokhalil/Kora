@@ -94,7 +94,12 @@
   /* Assurer que les boutons sous les messages sont cliquables */
   .action-buttons-container button {
     position: relative;
-    z-index: 15 !important;
+    z-index: 30 !important;
+  }
+
+  /* Solution radicale: désactiver les événements de pointeur du composer lorsqu'un utilisateur interagit avec les boutons */
+  body.interaction-with-buttons .composer-container {
+    pointer-events: none !important;
   }
 }
 
@@ -118,13 +123,13 @@
     flex-wrap: wrap;
     gap: 6px !important; /* Espacement entre boutons légèrement réduit */
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 30 !important; /* Augmenté pour être au-dessus du composer (qui est à z-index: 50) */
   }
   
   /* Style spécifique pour les boutons eux-mêmes - remplacé par kora-action-button-mobile */
   .kora-action-button-mobile {
     position: relative !important;
-    z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
+    z-index: 30 !important; /* Augmenté pour être au-dessus du composer (qui est à z-index: 50) */
     padding: 0.35rem 0.6rem !important; /* Padding plus compact */
     margin-bottom: 4px !important; /* Marge verticale fortement réduite */
     margin-right: 4px !important;
