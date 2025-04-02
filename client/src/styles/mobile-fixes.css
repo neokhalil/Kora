@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
   .chat-messages-container {
-    padding-bottom: 280px !important; /* Augmenté encore plus pour avoir un espace très confortable en bas */
+    padding-bottom: 120px !important; /* Réduit considérablement (était 280px) pour une mise en page plus compacte */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
@@ -76,7 +76,13 @@
   
   /* Correction spécifique pour les messages avec équations ou code */
   .chat-messages-container .prose {
-    padding-bottom: 8px;
+    padding-bottom: 4px; /* Réduit davantage pour des espaces plus compacts */
+  }
+  
+  /* Correction spécifique pour les messages */
+  .web-message {
+    padding-bottom: 0;
+    margin-bottom: 8px;
   }
 }
 
@@ -93,11 +99,11 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 60px !important;
-    padding-bottom: 20px !important;
+    margin-bottom: 8px !important; /* Considérablement réduit par rapport aux 60px précédents */
+    padding-bottom: 8px !important; /* Également réduit par rapport aux 20px précédents */
     display: flex;
     flex-wrap: wrap;
-    gap: 10px !important;
+    gap: 6px !important; /* Espacement entre boutons légèrement réduit */
     position: relative !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
   }
@@ -106,10 +112,11 @@
   .kora-action-button {
     position: relative !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
-    padding: 8px 15px !important;
-    margin-bottom: 10px !important;
-    background-color: #f0f3f8 !important;
+    padding: 6px 12px !important; /* Padding plus compact */
+    margin-bottom: 4px !important; /* Marge verticale fortement réduite */
+    background-color: #f0f3f8 !important; 
+    font-size: 13px !important; /* Texte un peu plus petit */
     font-weight: 600 !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important; /* Ombre plus subtile */
   }
 }
