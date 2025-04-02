@@ -1279,14 +1279,9 @@ body.menu-open {
   background-color: #f0f3f8 !important;
 }
 
-/* Style pour le spacer dynamique */
-.dynamic-spacer {
-  display: block;
-  width: 100%;
-  min-height: 80px;
-  margin-top: 10px;
-  margin-bottom: 40px;
-  padding-bottom: 40px;
+/* Classes de support pour le clavier mobile */
+.keyboard-open .messages-end-marker {
+  height: 150px; /* Hauteur réduite quand le clavier est ouvert */
 }
 
 /* Réduire les marges pour les boutons sur mobile */
@@ -1299,11 +1294,12 @@ body.menu-open {
     gap: 5px !important;
   }
   
-  /* Plus grand spacer pour mobile */
-  .dynamic-spacer {
-    min-height: 300px !important;
-    margin-top: 40px;
-    margin-bottom: 60px;
-    padding-bottom: 60px;
+  /* Support pour iOS Visual Viewport API */
+  .visual-viewport-active .composer-container {
+    position: absolute !important;
+    bottom: auto;
+    width: 100%;
+    left: 0;
+    right: 0;
   }
 }

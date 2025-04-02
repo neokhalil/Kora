@@ -132,62 +132,40 @@ const ChatAssistant: React.FC = () => {
     };
   }, [isMobile]);
   
-  // Utiliser le ResizeObserver pour ajuster dynamiquement l'espace en bas des messages avec une approche plus robuste
-  const composerDimensions = useResizeObserver(composerRef, (entry) => {
-    // Mettre à jour la hauteur du spacer en fonction de la hauteur du composer avec une marge de sécurité
-    if (spacerRef.current && entry.contentRect) {
-      // La hauteur minimale garantie sur mobile est plus grande pour assurer la visibilité des boutons
-      const minHeight = isMobileView ? 300 : 100;
-      // Calcul du padding supplémentaire basé sur l'appareil
-      const extraPadding = isMobileView ? 100 : 20;
-      // Assurer que la hauteur du spacer est au moins égale à la hauteur du composer + padding, mais jamais inférieure à minHeight
-      const composerHeight = Math.max(entry.contentRect.height + extraPadding, minHeight);
-      // Appliquer la hauteur au spacer
-      spacerRef.current.style.height = `${composerHeight}px`;
-    }
-  });
+  // Utilisation simplifiée de ResizeObserver pour suivre seulement la hauteur du composer
+  const composerDimensions = useResizeObserver(composerRef);
   
-  // Fonction améliorée pour le défilement vers le bas
-  const scrollToBottom = (forceScroll = false) => {
+  // Fonction simple de défilement vers le bas - approche unique et fiable
+  const scrollToBottom = () => {
     if (messagesEndRef.current) {
-      // Différentes approches de défilement pour une meilleure compatibilité mobile
-      
-      // 1. Méthode classique - peut ne pas fonctionner sur tous les appareils
-      messagesEndRef.current.scrollIntoView({ behavior: forceScroll ? 'auto' : 'smooth' });
-      
-      // 2. Méthode manuelle pour les cas où scrollIntoView ne fonctionne pas
-      const chatContainer = document.querySelector('.chat-messages-container');
-      if (chatContainer) {
-        // Forcer un délai pour permettre le rendu complet
-        setTimeout(() => {
-          const scrollHeight = chatContainer.scrollHeight;
-          (chatContainer as HTMLElement).scrollTop = scrollHeight;
-        }, 50);
-      }
-      
-      // 3. Pour iOS spécifiquement, qui peut avoir des comportements particuliers
-      if (isMobileDevice) {
-        setTimeout(() => {
-          window.scrollTo(0, document.body.scrollHeight);
-        }, 100);
-      }
+      // Utiliser la méthode standard pour le défilement
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
   
   // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
-    // Délai plus long pour s'assurer que tout le contenu est rendu, y compris les éléments complexes
-    setTimeout(() => {
+    // Délai court pour permettre le rendu du contenu
+    const scrollTimeout = setTimeout(() => {
       scrollToBottom();
-    }, 500);
+    }, 100);
     
-    // S'assurer que la hauteur initiale du textarea est correcte
-    const textareas = document.querySelectorAll('.chat-textarea');
-    textareas.forEach((textarea) => {
-      const el = textarea as HTMLTextAreaElement;
-      el.style.height = '40px';
-    });
+    // Nettoyage du timeout en cas de changements rapides
+    return () => clearTimeout(scrollTimeout);
   }, [messages, isThinking]);
+  
+  // Réinitialiser la hauteur du textarea
+  useEffect(() => {
+    const resetTextareaHeight = () => {
+      const textareas = document.querySelectorAll('.chat-textarea');
+      textareas.forEach((textarea) => {
+        const el = textarea as HTMLTextAreaElement;
+        el.style.height = '40px';
+      });
+    };
+    
+    resetTextareaHeight();
+  }, []);
   
   // Surveiller les événements de focus et de clavier pour améliorer l'UX mobile
   useEffect(() => {
@@ -491,9 +469,9 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Faire défiler vers le bas après l'ajout du message en utilisant notre fonction améliorée
+      // Faire défiler vers le bas après l'ajout du message
       setTimeout(() => {
-        scrollToBottom(true); // Force scroll après une interaction utilisateur
+        scrollToBottom();
       }, 100);
     }
   };
@@ -599,9 +577,9 @@ const ChatAssistant: React.FC = () => {
       setSelectedImage(null);
       setImagePreview(null);
       
-      // Faire défiler vers le bas en utilisant notre fonction améliorée
+      // Faire défiler vers le bas
       setTimeout(() => {
-        scrollToBottom(true);
+        scrollToBottom();
       }, 100);
     }
   };
@@ -928,11 +906,11 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Zone des messages */}
+      <div className="chat-container">
+        <div className="flex flex-col h-full max-w-4xl mx-auto">
+          {/* Zone des messages - structure simplifiée */}
           <div 
-            className={`flex-1 overflow-y-auto ${isMobileView ? 'p-2' : 'p-4'} chat-messages-container messages-container`}
+            className={`flex-1 ${isMobileView ? 'p-2' : 'p-4'} chat-messages-container`}
           >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col justify-start pt-12">
@@ -953,7 +931,7 @@ const ChatAssistant: React.FC = () => {
                 {isThinking && (
                   <div className="px-4 py-2 mb-4">
                     <div className="max-w-3xl mx-auto">
-                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200" style={{ zIndex: 150, position: 'relative' }}>
+                      <div className="inline-block rounded-2xl px-4 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
                         <div className="flex space-x-1">
                           <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
                           <span className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
@@ -964,24 +942,14 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
-                <div 
-                  ref={spacerRef} 
-                  className="dynamic-spacer" 
-                  style={{ 
-                    height: composerDimensions.height + (isMobileView ? 250 : 20),  
-                    minHeight: isMobileView ? '300px' : '80px',
-                    width: '100%'
-                  }} 
-                />
-                
-                <div ref={messagesEndRef} />
+                {/* Marqueur de fin de messages - hauteur fixe simple */}
+                <div className="messages-end-marker" ref={messagesEndRef} />
               </>
             )}
           </div>
           
-          {/* Zone de saisie fixe en bas - on baisse le z-index pour que les boutons d'action puissent apparaître au-dessus */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 px-4 py-2 pb-4 pt-2 z-10 composer-container input-area initial-load">
+          {/* Zone de saisie fixe en bas - structure simplifiée */}
+          <div className="composer-container">
             <div className="max-w-4xl mx-auto px-2">
               {/* Zone d'aperçu d'image */}
               {imagePreview && (
