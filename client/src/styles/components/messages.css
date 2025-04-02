@@ -31,7 +31,7 @@
 /* Ajustement de la marge pour les appareils mobiles */
 @media screen and (max-width: var(--breakpoint-md)) {
   .web-message {
-    margin-bottom: 6px; /* Marge réduite sur mobile */
+    margin-bottom: 4px; /* Marge réduite encore davantage sur mobile */
   }
 }
 
@@ -174,7 +174,7 @@
 @media screen and (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
   .web-messages-list {
-    gap: 12px !important; /* Réduit l'espace entre les messages sur tablette */
+    gap: 6px !important; /* Réduit l'espace entre les messages de moitié sur tablette */
     padding: 16px 0 24px !important; /* Padding minimal pour utiliser le spacer dynamique sur mobile/tablette */
   }
   
@@ -186,12 +186,12 @@
   
   .web-user-message .web-message-content {
     max-width: 85%;
-    padding: 10px 14px;
+    padding: 8px 12px; /* Padding réduit pour une apparence plus compacte */
   }
   
   .web-kora-message .web-message-content {
     max-width: 100%;
-    padding: 10px 14px;
+    padding: 8px 12px; /* Padding réduit pour une apparence plus compacte */
   }
   
   /* Mode thème clair forcé sur mobile */
@@ -210,7 +210,7 @@
   }
   
   .web-message-actions {
-    margin-top: 12px !important; /* Légèrement réduit */
+    margin-top: 8px !important; /* Réduit davantage pour un flux plus dense */
     padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
     margin-left: 8px;
     gap: 8px; /* Espacement réduit entre les boutons sur mobile */
@@ -223,7 +223,7 @@
     font-size: 14px !important;
     border-radius: 20px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    margin-bottom: 10px !important;
+    margin-bottom: 6px !important; /* Réduit pour un flux plus dense */
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important;
   }
@@ -231,9 +231,9 @@
   /* Style spécifique pour les actions sous les messages */
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-top: 12px !important; /* Réduit pour cohérence avec les autres espacements */
+    margin-top: 8px !important; /* Réduit pour un flux plus dense, aligné avec web-message-actions */
     margin-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
-    padding-top: 8px !important; /* Légèrement réduit */
+    padding-top: 4px !important; /* Réduit davantage */
     padding-bottom: 16px !important; /* Réduit pour un espacement plus naturel */
     position: relative !important;
     z-index: 15 !important; /* Z-index à 15 pour être sous le composer (qui est à z-index: 20) */
@@ -248,7 +248,7 @@
   }
   
   .web-messages-list {
-    gap: 10px !important; /* Réduit l'espace entre les messages sur mobile pour être plus proche de l'expérience desktop */
+    gap: 5px !important; /* Réduit l'espace entre les messages de moitié sur mobile */
     padding: 12px 0 24px !important; /* Padding minimal, car on utilise le spacer dynamique */
   }
   
