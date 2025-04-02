@@ -18,7 +18,7 @@
   
   /* Assurer que les messages restent visibles et ne disparaissent pas sous le composer */
   .chat-messages-container {
-    padding-bottom: 280px !important; /* Augmenté à 280px pour garantir la visibilité des messages et boutons */
+    padding-bottom: 400px !important; /* Considérablement augmenté pour garantir la visibilité des messages et boutons */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
@@ -111,8 +111,9 @@
   
   /* Style spécifique pour les boutons d'action sur petit écran */
   .action-buttons-container {
-    margin-bottom: 8px !important; /* Considérablement réduit par rapport aux 60px précédents */
-    padding-bottom: 8px !important; /* Également réduit par rapport aux 20px précédents */
+    margin-bottom: 30px !important; /* Augmenté pour garantir que les boutons ne sont pas cachés */
+    padding-bottom: 20px !important; /* Augmenté pour plus d'espace */
+    margin-top: 8px !important; /* Ajoute de l'espace en haut aussi */
     display: flex;
     flex-wrap: wrap;
     gap: 6px !important; /* Espacement entre boutons légèrement réduit */

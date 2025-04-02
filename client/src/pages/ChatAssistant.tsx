@@ -917,8 +917,8 @@ const ChatAssistant: React.FC = () => {
                   ref={spacerRef} 
                   className="dynamic-spacer" 
                   style={{ 
-                    height: composerDimensions.height + (isMobileView ? 60 : 20),  
-                    minHeight: isMobileView ? '120px' : '60px',
+                    height: composerDimensions.height + (isMobileView ? 120 : 20),  
+                    minHeight: isMobileView ? '200px' : '80px',
                     width: '100%'
                   }} 
                 />
