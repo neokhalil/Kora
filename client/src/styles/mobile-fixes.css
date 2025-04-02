@@ -16,9 +16,9 @@
 @media (max-width: var(--breakpoint-md)) {
   /* Tablettes et mobiles (768px et moins) */
   
-  /* Assurer que les messages restent visibles et ne disparaissent pas sous le header */
+  /* Assurer que les messages restent visibles et ne disparaissent pas sous le composer */
   .chat-messages-container {
-    padding-bottom: 120px !important; /* Réduit considérablement (était 280px) pour une mise en page plus compacte */
+    padding-bottom: 220px !important; /* Augmenté à 220px pour garantir la visibilité des messages et boutons */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
@@ -83,6 +83,18 @@
   .web-message {
     padding-bottom: 0;
     margin-bottom: 8px;
+  }
+  
+  /* S'assurer que les messages sont visibles */
+  .messages-container {
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Assurer que les boutons sous les messages sont cliquables */
+  .action-buttons-container button {
+    position: relative;
+    z-index: 15 !important;
   }
 }
 

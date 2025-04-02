@@ -1279,6 +1279,14 @@ body.menu-open {
   background-color: #f0f3f8 !important;
 }
 
+/* Style pour le spacer dynamique */
+.dynamic-spacer {
+  display: block;
+  width: 100%;
+  min-height: 60px;
+  margin-top: 10px;
+}
+
 /* Réduire les marges pour les boutons sur mobile */
 @media screen and (max-width: 767px) {
   .action-buttons-container {
@@ -1287,5 +1295,11 @@ body.menu-open {
     padding-top: 0 !important;
     padding-bottom: 4px !important;
     gap: 5px !important;
+  }
+  
+  /* Plus grand spacer pour mobile */
+  .dynamic-spacer {
+    min-height: 80px;
+    margin-top: 15px;
   }
 }
