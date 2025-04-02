@@ -100,13 +100,13 @@
 }
 
 .math-content .katex-display, .content-renderer .katex-display {
-  margin: 0.6em 0; /* Réduit de 1.2em à 0.6em */
+  margin: 0.6em 0; 
   overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.2em 0; /* Réduit de 0.4em à 0.2em */
-  will-change: contents;
-  transform: translateZ(0);
-  contain: layout style paint;
+  overflow-y: visible; /* Changé de 'hidden' à 'visible' pour éviter les problèmes de défilement */
+  padding: 0.2em 0;
+  /* Suppression de 'will-change: contents' qui peut causer des problèmes de performance */
+  /* Suppression de 'transform: translateZ(0)' qui crée un contexte de pile et perturbe le défilement */
+  /* Suppression de 'contain: layout style paint' qui isole trop et cause des problèmes de défilement */
   background: rgba(0, 0, 0, 0.02);
   border-radius: 4px;
 }
@@ -188,8 +188,7 @@
   
   /* Correction pour l'interface ChatAssistant spécifiquement */
   .prose .content-renderer {
-    transform: translateZ(0); /* Forcer le rendu hardware pour éviter les sauts */
-    contain: content; /* Aide à isoler le contenu pour la performance */
+    /* Suppression de transform et contain qui causent des problèmes de défilement */
     padding: 0;
     margin: 0;
   }

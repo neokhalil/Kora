@@ -17,35 +17,9 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   
-  // Effet pour s'assurer que les éléments mathématiques et code sont bien rendus sur mobile
-  useEffect(() => {
-    // Fonction pour s'assurer que les conteneurs d'équations ne créent pas de problèmes de mise en page
-    const fixMathLayout = () => {
-      if (containerRef.current) {
-        // Trouver tous les conteneurs d'équations en bloc
-        const katexDisplays = containerRef.current.querySelectorAll('.katex-display');
-        
-        // Ajuster chaque conteneur pour éviter les problèmes de mise en page
-        katexDisplays.forEach((display) => {
-          // S'assurer que l'élément ne dépasse pas de son conteneur
-          if (display instanceof HTMLElement) {
-            display.style.maxWidth = '100%';
-            display.style.overflowX = 'auto';
-            display.style.overflowY = 'hidden';
-          }
-        });
-      }
-    };
-    
-    // Exécuter la correction de mise en page après un court délai pour s'assurer que le rendu est terminé
-    if (isMobile) {
-      const timer = setTimeout(() => {
-        fixMathLayout();
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [content, isMobile]);
+  // Nous n'utilisons plus d'effet de synchronisation retardée pour éviter les problèmes de défilement
+  // Les styles nécessaires sont maintenant directement appliqués via CSS
+  // Ce changement évite les modifications dynamiques de la mise en page qui perturbaient le défilement
   
   if (!content) {
     return null;
