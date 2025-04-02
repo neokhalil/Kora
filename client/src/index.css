@@ -908,7 +908,7 @@
 
 /* Styles pour la zone de messages */
 .chat-messages-container {
-  padding-bottom: 80px; /* Considérablement réduit pour éviter l'espace excessif */
+  padding-bottom: 180px; /* Espace très important pour le compositeur pour éviter les chevauchements */
   -webkit-overflow-scrolling: touch;
   padding-top: 16px;
   display: flex;
@@ -1082,8 +1082,8 @@ input, textarea, select, button {
   .action-buttons-container,
   .mt-4.flex.flex-row.gap-2.justify-start,
   .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start {
-    margin-bottom: 5px !important; /* Considérablement réduit, car nous utilisons un spacer dynamique */
-    padding-bottom: 5px !important; /* Considérablement réduit également */
+    margin-bottom: 130px !important; /* Énormément plus d'espace en bas des actions pour éviter tout chevauchement */
+    padding-bottom: 30px !important;
     z-index: 15 !important; /* Réduit pour être sous le composer (qui est à z-index: 20) */
     position: relative !important; /* Pour que z-index fonctionne */
   }

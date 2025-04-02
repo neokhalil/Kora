@@ -112,49 +112,6 @@ const ChatAssistant: React.FC = () => {
     }
   }, []);
 
-  // Fonction utilitaire pour le défilement optimal des messages
-  const scrollToOptimalPosition = (delay = 300) => {
-    setTimeout(() => {
-      if (messagesEndRef.current && composerRef.current) {
-        // Calculer la position optimale pour que les boutons d'action soient visibles
-        const composerRect = composerRef.current.getBoundingClientRect();
-        const messageContainer = document.querySelector('.messages-container');
-        
-        if (messageContainer) {
-          // Trouver le dernier message et ses boutons d'action
-          const lastKoraMessage = document.querySelector('.chat-messages-container > div:last-of-type');
-          const actionButtons = document.querySelector('.action-buttons-container:last-of-type');
-          
-          if (lastKoraMessage) {
-            // Calculer la position pour laisser un espace suffisant au-dessus du composer
-            // Utiliser le bouton d'action comme référence si disponible, sinon utiliser le message
-            let bottomElement = actionButtons || lastKoraMessage;
-            let bottomPosition = bottomElement ? bottomElement.getBoundingClientRect().bottom : lastKoraMessage.getBoundingClientRect().bottom;
-            
-            // Garantir un espace minimal de 60px entre le dernier élément et le composer
-            const minSpacing = 60; 
-            const scrollPosition = messageContainer.scrollTop + bottomPosition - composerRect.top + minSpacing;
-            
-            // Appliquer le défilement avec une transition douce
-            messageContainer.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-          } else {
-            // Fallback au défilement standard, mais avec positionnement précis
-            messagesEndRef.current.scrollIntoView({ 
-              behavior: 'smooth',
-              block: 'start' // S'assurer que le point de référence est en haut
-            });
-          }
-        } else {
-          // Fallback au défilement standard avec positionnement précis
-          messagesEndRef.current.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start' // Positionner l'élément en haut
-          });
-        }
-      }
-    }, delay);
-  };
-  
   // Détecter l'appareil mobile
   useEffect(() => {
     setIsMobileDevice(isMobile);
@@ -169,10 +126,14 @@ const ChatAssistant: React.FC = () => {
     }
   });
   
-  // Faire défiler jusqu'à la position optimale lors de l'ajout de nouveaux messages
+  // Faire défiler jusqu'au bas des messages lors de l'ajout de nouveaux messages
   useEffect(() => {
-    // Utiliser notre fonction optimisée de défilement
-    scrollToOptimalPosition(300);
+    if (messagesEndRef.current) {
+      // Utiliser un délai pour assurer que le contenu est rendu avant de défiler
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
     
     // S'assurer que la hauteur initiale du textarea est correcte
     const textareas = document.querySelectorAll('.chat-textarea');
@@ -458,9 +419,12 @@ const ChatAssistant: React.FC = () => {
       // Dans tous les cas, arrêter l'indicateur de réflexion
       setIsThinking(false);
       
-      // Utiliser notre fonction optimisée de défilement à deux moments différents
-      scrollToOptimalPosition(300);
-      scrollToOptimalPosition(800);
+      // Faire défiler vers le bas après l'ajout du message
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
   
@@ -565,9 +529,12 @@ const ChatAssistant: React.FC = () => {
       setSelectedImage(null);
       setImagePreview(null);
       
-      // Utiliser notre fonction optimisée de défilement à deux moments différents
-      scrollToOptimalPosition(300);
-      scrollToOptimalPosition(800);
+      // Faire défiler vers le bas
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   };
   
@@ -644,10 +611,6 @@ const ChatAssistant: React.FC = () => {
       }]);
     } finally {
       setIsThinking(false);
-      
-      // Utiliser notre fonction optimisée de défilement à deux moments différents
-      scrollToOptimalPosition(300);
-      scrollToOptimalPosition(800);
     }
   };
   
@@ -725,10 +688,6 @@ const ChatAssistant: React.FC = () => {
       }]);
     } finally {
       setIsThinking(false);
-      
-      // Utiliser notre fonction optimisée de défilement à deux moments différents
-      scrollToOptimalPosition(300);
-      scrollToOptimalPosition(800);
     }
   };
 
@@ -765,7 +724,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && (
-              <div className="mt-2 mb-2 pt-1 pb-1 flex flex-row gap-2 justify-start action-buttons-container">
+              <div className="mt-4 mb-6 pt-2 pb-3 flex flex-row gap-3 justify-start action-buttons-container">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 
@@ -854,10 +813,6 @@ const ChatAssistant: React.FC = () => {
                         }]);
                       } finally {
                         setIsThinking(false);
-                        
-                        // Utiliser notre fonction optimisée de défilement à deux moments différents
-                        scrollToOptimalPosition(300);
-                        scrollToOptimalPosition(800);
                       }
                     }}
                   >
@@ -941,11 +896,10 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Spacer dynamique qui s'adapte à la hauteur du composer avec une marge supplémentaire pour garantir la visibilité */}
-                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 60 }} />
+                {/* Spacer dynamique qui s'adapte à la hauteur du composer */}
+                <div ref={spacerRef} className="dynamic-spacer" style={{ height: composerDimensions.height + 5 }} />
                 
-                {/* Point de référence pour le défilement automatique */}
-                <div ref={messagesEndRef} className="scroll-reference-point" />
+                <div ref={messagesEndRef} />
               </>
             )}
           </div>
@@ -994,8 +948,12 @@ const ChatAssistant: React.FC = () => {
                   // Déclenche la classe keyboard-open pour adapter l'UI
                   document.body.classList.add('keyboard-open');
                   
-                  // Utiliser notre fonction optimisée de défilement
-                  scrollToOptimalPosition(300);
+                  // Scroll vers la fin des messages après un court délai
+                  setTimeout(() => {
+                    if (messagesEndRef.current) {
+                      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }, 300);
                 }}
               >
                 {/* Hidden file input pour les images */}
@@ -1038,8 +996,12 @@ const ChatAssistant: React.FC = () => {
                         headerContainer.style.zIndex = '9999';
                       }
                       
-                      // Utiliser notre fonction optimisée de défilement
-                      scrollToOptimalPosition(100);
+                      // Scroll vers le bas après l'ouverture du clavier
+                      setTimeout(() => {
+                        if (messagesEndRef.current) {
+                          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }, 100);
                     }}
                   />
                 </div>
@@ -1193,9 +1155,12 @@ const ChatAssistant: React.FC = () => {
                               } finally {
                                 setIsThinking(false);
                                 
-                                // Utiliser notre fonction optimisée de défilement à deux moments différents
-                                scrollToOptimalPosition(300);
-                                scrollToOptimalPosition(800);
+                                // Faire défiler vers le bas 
+                                setTimeout(() => {
+                                  if (messagesEndRef.current) {
+                                    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                                  }
+                                }, 100);
                               }
                             }
                           }}
