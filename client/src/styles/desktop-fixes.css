@@ -1,0 +1,12 @@
+/**
+ * Ajustements spécifiques pour l'affichage desktop (≥ 991px)
+ * ITCSS - Niveau "Trumps" (priorité la plus élevée)
+ */
+
+/* Réduction de l'espace entre le composer et le texte de footer */
+@media (min-width: 991px) {
+  .web-question-footer {
+    margin-top: 4px !important; /* Réduit de 8px à 4px */
+    padding-bottom: 16px !important; /* Réduit l'espace entre le texte et le bas de la page */
+  }
+}
