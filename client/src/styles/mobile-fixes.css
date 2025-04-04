@@ -133,8 +133,9 @@
   margin-bottom: 2px !important;
 }
 
-/* Supprimer l'espace entre le composer et le footer */
+/* Supprimer l'espace entre le composer et le footer - appliqué à tous les appareils */
 .footer-message {
   margin-top: -3px !important;
   margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }

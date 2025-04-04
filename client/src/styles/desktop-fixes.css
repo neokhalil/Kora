@@ -1,0 +1,19 @@
+/**
+ * Styles spécifiques pour les correctifs desktop
+ * Pour s'assurer que le footer s'affiche correctement sur tous les appareils
+ */
+
+/* Suppression de l'espace entre le composer et le footer sur desktop */
+@media (min-width: 769px) {
+  /* Suppression de l'espace entre le composer et le texte du footer */
+  .footer-message {
+    margin-top: -5px !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Suppression de la marge inférieure du composeur */
+  .chat-assistant-composer {
+    margin-bottom: 0 !important;
+  }
+}
