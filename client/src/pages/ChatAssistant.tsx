@@ -1117,7 +1117,7 @@ const ChatAssistant: React.FC = () => {
               </div>
               
 {/* Message d'information visible sous la zone de saisie */}
-              <div className="text-xs text-gray-500 text-center mt-1 w-full footer-message">
+              <div className="text-xs text-gray-500 text-center w-full footer-message">
                 KORA, ton assistant IA pour réviser et faire tes exercices.
               </div>
             </div>
