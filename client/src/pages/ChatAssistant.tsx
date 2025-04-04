@@ -902,7 +902,7 @@ const ChatAssistant: React.FC = () => {
               
               {/* Composeur de message style iOS, reformaté avec le texte en haut */}
               <div 
-                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-2"
+                className="bg-white dark:bg-gray-800 p-3 pb-2 rounded-3xl border border-gray-200 shadow-sm flex flex-col gap-1 mb-0"
                 ref={composerRef}
                 onFocus={() => {
                   // Comportement de défilement supprimé pour une meilleure expérience mobile

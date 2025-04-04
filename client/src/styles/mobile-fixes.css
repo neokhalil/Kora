@@ -132,3 +132,9 @@
   padding-bottom: 5px !important;
   margin-bottom: 2px !important;
 }
+
+/* Supprimer l'espace entre le composer et le footer */
+.footer-message {
+  margin-top: -3px !important;
+  margin-bottom: 0 !important;
+}
