@@ -19,11 +19,11 @@ const routes = [
   { path: "/math-code-test", Component: MathCodeTest }
 ];
 
-// App simplifié sans menu latéral
+// App avec header visible sur toutes les versions (mobile et desktop)
 const AppContainer = () => {
   return (
     <div className="flex flex-col h-full">
-      {/* Header fixe en haut */}
+      {/* Header fixe en haut - toujours affiché */}
       <Header />
       
       <div className="flex h-full">
