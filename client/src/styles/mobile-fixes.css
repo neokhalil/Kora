@@ -3,11 +3,12 @@
  * ITCSS - Niveau "Trumps" (priorité la plus élevée)
  */
 
-/* Centrage vertical du texte de bienvenue sur mobile */
+/* Centrage complet du texte de bienvenue sur mobile */
 @media (max-width: 990px) {
   /* Pour l'écran d'accueil dans ChatAssistant.tsx */
   .messages-container .h-full.flex.flex-col.justify-start.pt-12 {
     justify-content: center !important; /* Centre verticalement */
+    align-items: center !important; /* Centre horizontalement */
     padding-top: 0 !important; /* Supprime le padding-top pour centrer correctement */
     margin-bottom: 0 !important; /* Élimine la marge en bas */
     height: calc(100vh - 170px) !important; /* Ajuste la hauteur pour centrer verticalement entre header et composer */
@@ -15,6 +16,18 @@
   
   /* Style du texte de bienvenue lui-même */
   .messages-container .h-full.flex.flex-col.justify-start.pt-12 .max-w-md {
-    padding-left: 24px !important; /* Garde un espacement à gauche */
+    padding-left: 0 !important; /* Supprime l'espacement à gauche */
+    margin: 0 auto !important; /* Centre le conteneur */
+    text-align: center !important; /* Centre le texte */
+  }
+  
+  /* Centre spécifiquement les éléments de texte */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 h2,
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 p {
+    text-align: center !important; 
+    width: 100% !important;
+    max-width: 280px !important; /* Limite la largeur pour un meilleur aspect sur mobile */
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
