@@ -30,4 +30,55 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
+  
+  /* Correction des blocs de code sur mobile */
+  .code-block-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    margin: 0.75rem 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Assurer que le conteneur de code est bien contenu */
+  .code-block-wrapper pre {
+    overflow-x: auto !important;
+    white-space: pre !important;
+    max-width: 100% !important;
+  }
+  
+  /* Supprime le positionnement absolu du badge de langage sur mobile */
+  .language-label {
+    position: static !important; /* Annule le position absolute */
+    top: auto !important;
+    right: auto !important;
+    border-radius: 4px !important;
+    font-size: 0.65rem !important;
+    padding: 0.15rem 0.4rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+  
+  /* Assurer que le header contenant le badge de langage s'affiche correctement */
+  .code-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.4rem 0.75rem !important;
+    border-radius: 8px 8px 0 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Assurez-vous que les blocs de code dans les messages ne débordent pas */
+  .bg-white, .dark\\:bg-gray-800 {
+    overflow-x: hidden !important;
+    max-width: 100% !important;
+  }
+  
+  /* Assurer que les conteneurs de messages contiennent bien leur contenu */
+  .px-4.py-2.mb-4 {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
 }
