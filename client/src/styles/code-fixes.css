@@ -1,0 +1,58 @@
+/**
+ * Corrections spécifiques pour les blocs de code et les badges de langage
+ * Solution au problème de badge de langage coupé sur mobile
+ */
+
+/* Remplacer le positionnement absolu du badge par un positionnement dans le header */
+.language-label {
+  /* Supprime le positionnement absolu qui cause le problème */
+  position: static !important;
+  /* Style cohérent pour tous les badges de langage */
+  background-color: #3b4252 !important;
+  color: #e5e9f0 !important;
+  padding: 0.15rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 4px !important; /* Adapté pour être visible dans le header */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* S'assurer que l'en-tête du bloc de code affiche correctement le badge */
+.code-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.5rem 1rem !important;
+  background-color: #2e3440 !important;
+  color: #e5e9f0 !important;
+  font-size: 0.75rem !important;
+  border-radius: 8px 8px 0 0 !important;
+}
+
+/* Ajustements spécifiques pour mobile */
+@media (max-width: 768px) {
+  /* Réduire légèrement la taille du badge sur mobile */
+  .language-label {
+    font-size: 0.7rem !important;
+    padding: 0.1rem 0.4rem !important;
+  }
+  
+  /* S'assurer que le bloc de code ne dépasse pas sur mobile */
+  .code-block-wrapper {
+    max-width: 100% !important;
+    overflow-x: hidden !important; /* Contient le bloc dans la largeur disponible */
+  }
+  
+  /* Permettre le défilement horizontal à l'intérieur du bloc de code */
+  .code-block-wrapper pre {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important; /* Pour le défilement fluide sur iOS */
+  }
+  
+  /* S'assurer que l'en-tête n'est pas trop grand sur mobile */
+  .code-header {
+    padding: 0.4rem 0.8rem !important;
+  }
+}
