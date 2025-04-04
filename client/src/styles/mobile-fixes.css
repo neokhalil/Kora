@@ -1,141 +1,21 @@
 /**
- * Solution simplifiée pour le mobile 
- * --------------------------------
- * Ce fichier a été complètement réécrit avec une approche fondamentalement simplifiée:
- * 
- * PRINCIPES:
- * 1. Utiliser un padding-bottom (250px) pour garantir que les messages restent visibles
- *    au-dessus de la zone de saisie.
- * 2. Traitement spécial pour les messages contenant des formules mathématiques afin d'éviter
- *    les problèmes de double défilement.
- * 3. Maintenir actifs les boutons d'action sur mobile avec un style compact.
- * 4. Optimiser l'affichage des formules mathématiques et du code.
- * 5. Maximiser l'espace disponible en réduisant toutes les marges et espacements.
+ * Ajustements spécifiques pour l'affichage mobile (< 991px)
+ * ITCSS - Niveau "Trumps" (priorité la plus élevée)
  */
 
-/* Base: correction des débordements et du rendu du texte */
-.content-renderer {
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-/* Tablettes et mobiles (768px et moins) */
-@media (max-width: 768px) {
-  /* SOLUTION PRINCIPALE: padding-bottom ajusté pour améliorer l'expérience */
-  .chat-messages-container {
-    padding-bottom: 250px !important; /* Valeur ajustée à 250px pour garantir que tout le contenu soit visible */
-    padding-top: 8px !important;
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
+/* Centrage du texte de bienvenue sur mobile */
+@media (max-width: 990px) {
+  /* Pour l'écran d'accueil dans ChatAssistant.tsx */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 {
+    justify-content: center !important; /* Centre verticalement */
+    align-items: center !important; /* Centre horizontalement */
+    padding-top: 0 !important; /* Supprime le padding-top pour centrer correctement */
   }
   
-  /* Supprimer tout espacement vertical superflu */
-  .chat-messages-container > div {
-    margin-bottom: 2px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-  }
-  
-  /* Styles pour les boutons d'action sur mobile (Reformuler, Exercice, Indice) */
-  .action-buttons-container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 4px !important;
-    margin-top: 4px !important;
-    margin-bottom: 2px !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
-  
-  .kora-action-button {
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    font-size: 14px !important;
-    padding: 6px 10px !important;
-    border-radius: 14px !important;
-    background-color: rgba(0, 0, 0, 0.05) !important;
-    color: rgba(0, 0, 0, 0.7) !important;
-    font-weight: 500 !important;
-    border: none !important;
-    transition: background-color 0.2s !important;
-    height: 30px !important;
-  }
-  
-  .dark .kora-action-button {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-    color: rgba(255, 255, 255, 0.9) !important;
-  }
-  
-  .kora-action-button:active {
-    background-color: rgba(0, 0, 0, 0.1) !important;
-  }
-  
-  .dark .kora-action-button:active {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-  }
-  
-  /* Optimisations pour les formules mathématiques */
-  .katex-display {
-    max-width: 100% !important;
-    overflow-x: auto !important;
-    padding: 0.25em 0 !important;
-  }
-  
-  /* Optimisations pour le code */
-  .prose code,
-  .prose pre {
-    white-space: pre-wrap;
-    max-width: 100%;
-    font-size: 0.85em;
-  }
-}
-
-/* Smartphones (480px et moins) - optimisations supplémentaires */
-@media (max-width: 480px) {
-  /* Réduire encore la taille des polices */
-  .content-renderer {
-    font-size: 14px;
-  }
-  
-  /* Marges internes minimales pour les bulles de messages */
-  .chat-messages-container .rounded-2xl,
-  .web-message-content {
-    padding: 8px !important;
-  }
-}
-
-/* Fix spécifique pour les équations mathématiques */
-.katex, .MathJax {
-  max-width: 100%;
-  overflow-x: auto;
-  display: inline-block;
-}
-
-/* Styles pour le wrapper des messages avec formules mathématiques */
-.math-content-wrapper {
-  position: relative;
-  isolation: isolate; /* Création d'un contexte de formatage indépendant */
-}
-
-/* Réduire le padding-bottom excessif uniquement pour les messages mathématiques */
-.math-content-wrapper .katex-display {
-  margin-bottom: 0.3em !important; /* Marge inférieure réduite */
-}
-
-/* Ajouter un peu d'espace entre le contenu des réponses et les boutons d'action */
-.web-message-content, .chat-content {
-  padding-bottom: 5px !important;
-  margin-bottom: 2px !important;
-}
-
-/* Réduire l'espace entre le composer et le footer sur tablette */
-@media (min-width: 768px) {
-  .footer-message {
-    margin-top: 0 !important;
+  /* Pour que le texte de bienvenue reste aligné à gauche mais avec container centré */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 .max-w-md {
+    margin: 0 auto !important; /* Centre le conteneur */
+    padding-left: 16px !important; /* Garde un peu d'espace à gauche */
+    padding-right: 16px !important; /* Garde un peu d'espace à droite */
   }
 }
