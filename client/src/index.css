@@ -1,7 +1,5 @@
 /* Import des styles pour les composants mathématiques et code */
 @import './styles/mathCode.css';
-/* Import des correctifs pour desktop et mobile */
-@import './styles/desktop-fixes.css';
 
 @tailwind base;
 @tailwind components;

@@ -15,8 +15,6 @@
   padding: 16px 0 160px; /* Padding fixe sur desktop - approche traditionnelle */
   width: 100%;
   margin-bottom: 30px; /* Marge supplémentaire pour desktop */
-  position: relative; /* Position relative pour stacking context correct */
-  z-index: 10; /* Valeur basse pour être sous le composer et le footer */
 }
 
 /* 
