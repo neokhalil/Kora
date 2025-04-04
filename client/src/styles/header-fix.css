@@ -23,33 +23,6 @@
   padding-top: env(safe-area-inset-top, 0) !important;
 }
 
-/* Version desktop du header - plus discret et centré sur le logo */
-.desktop-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 56px;
-  background-color: white;
-  border-bottom: 1px solid #f0f0f0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-  z-index: 999;
-}
-
-.desktop-header #kora-header {
-  justify-content: center;
-}
-
-.desktop-header .header-left-group {
-  justify-content: center;
-}
-
-.desktop-header #kora-header-title {
-  position: relative;
-  left: 0;
-  margin-left: 0;
-  text-align: center;
-}
-
 /* Styles du contenu du header pour cohérence, plutôt qu'inline */
 #kora-header {
   height: 56px;

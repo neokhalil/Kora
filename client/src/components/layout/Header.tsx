@@ -64,41 +64,44 @@ const Header: React.FC = () => {
     }
   }, [isMenuOpen]);
   
+  // Si on n'est pas sur mobile, ne pas afficher le header
+  if (!isMobile) {
+    return null;
+  }
+  
   return (
     <>
-      {/* Header container - affiché sur toutes les versions */}
-      <div id="kora-header-container" className={isMobile ? "" : "desktop-header"}>
+      {/* Header container - uniquement affiché en version mobile */}
+      <div id="kora-header-container">
         {/* Header content */}
         <div id="kora-header">
           {/* Menu button avec indicateur d'état */}
           <div className="header-left-group">
-            {isMobile && (
-              <button 
-                id="kora-menu-button"
-                ref={menuButtonRef}
-                aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-                onClick={toggleMenu}
-                onTouchStart={(e) => {
-                  // Vide intentionnellement - capture le toucher initial
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  // Sur mobile, déclencher le toggle au touchEnd
-                  const syntheticEvent = e as unknown as React.MouseEvent<HTMLButtonElement>;
-                  toggleMenu(syntheticEvent);
-                }}
-                className="kora-menu-button-control"
-                data-state={isMenuOpen ? 'open' : 'closed'}
-              >
-                <div className="menu-icon-container">
-                  {isMenuOpen ? (
-                    <X size={24} className="text-gray-800 animate-to-x" />
-                  ) : (
-                    <HamburgerIcon size={24} className="text-gray-800 animate-to-menu" />
-                  )}
-                </div>
-              </button>
-            )}
+            <button 
+              id="kora-menu-button"
+              ref={menuButtonRef}
+              aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+              onClick={toggleMenu}
+              onTouchStart={(e) => {
+                // Vide intentionnellement - capture le toucher initial
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                // Sur mobile, déclencher le toggle au touchEnd
+                const syntheticEvent = e as unknown as React.MouseEvent<HTMLButtonElement>;
+                toggleMenu(syntheticEvent);
+              }}
+              className="kora-menu-button-control"
+              data-state={isMenuOpen ? 'open' : 'closed'}
+            >
+              <div className="menu-icon-container">
+                {isMenuOpen ? (
+                  <X size={24} className="text-gray-800 animate-to-x" />
+                ) : (
+                  <HamburgerIcon size={24} className="text-gray-800 animate-to-menu" />
+                )}
+              </div>
+            </button>
             
             {/* Logo - style déplacé vers le CSS */}
             <h1 id="kora-header-title" className="kora-name">KORA</h1>
@@ -109,8 +112,8 @@ const Header: React.FC = () => {
         </div>
       </div>
       
-      {/* Menu latéral - uniquement rendu sur mobile */}
-      {isMobile && <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />}
+      {/* Menu latéral */}
+      <SideMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </>
   );
 };
