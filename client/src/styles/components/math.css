@@ -93,6 +93,23 @@
   line-height: 1.7;
 }
 
+/* Nouveau wrapper pour messages avec math */
+.message-content-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Styles spéciaux pour les messages contenant des formules mathématiques */
+.math-content-wrapper {
+  position: relative;
+  width: 100%;
+  /* Assure que les enfants ne dépassent pas les limites du parent */
+  overflow: visible;
+  /* Crée un contexte d'empilement pour positionner correctement les éléments mathématiques */
+  z-index: 0;
+  isolation: isolate;
+}
+
 /* Amélioration pour les formules KaTeX */
 .math-content .katex, .content-renderer .katex {
   font-size: 1.15em;
@@ -196,5 +213,16 @@
   /* Ajuster la largeur des mathématiques inline pour éviter le débordement */
   .content-renderer .katex {
     max-width: 100%;
+  }
+  
+  /* Optimisation supplémentaire pour le wrapper mathématique sur mobile */
+  .math-content-wrapper .katex-display {
+    margin-bottom: 0.3em !important; /* Marge inférieure réduite */
+  }
+  
+  /* Réduire la hauteur minimale pour les messages mathématiques sur mobile */
+  .math-content-wrapper {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 }

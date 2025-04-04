@@ -4,11 +4,13 @@
  * Ce fichier a été complètement réécrit avec une approche fondamentalement simplifiée:
  * 
  * PRINCIPES:
- * 1. Utiliser une quantité excessive de padding-bottom fixe (800px) afin de garantir que
- *    tous les messages restent visibles au-dessus de la zone de saisie.
- * 2. Désactiver tous les boutons d'action sur mobile.
- * 3. Optimiser l'affichage des formules mathématiques et du code.
- * 4. Maximiser l'espace disponible en réduisant toutes les marges et espacements.
+ * 1. Utiliser un padding-bottom (200px) pour garantir que les messages restent visibles
+ *    au-dessus de la zone de saisie.
+ * 2. Traitement spécial pour les messages contenant des formules mathématiques afin d'éviter
+ *    les problèmes de double défilement.
+ * 3. Désactiver tous les boutons d'action sur mobile.
+ * 4. Optimiser l'affichage des formules mathématiques et du code.
+ * 5. Maximiser l'espace disponible en réduisant toutes les marges et espacements.
  */
 
 /* Base: correction des débordements et du rendu du texte */
@@ -21,9 +23,9 @@
 
 /* Tablettes et mobiles (768px et moins) */
 @media (max-width: 768px) {
-  /* SOLUTION PRINCIPALE: padding-bottom plus modéré et équilibré */
+  /* SOLUTION PRINCIPALE: padding-bottom réduit pour améliorer l'expérience */
   .chat-messages-container {
-    padding-bottom: 400px !important; /* Valeur réduite de 800px à 400px */
+    padding-bottom: 200px !important; /* Valeur réduite de 400px à 200px */
     padding-top: 8px !important;
     padding-left: 6px !important;
     padding-right: 6px !important;
@@ -76,4 +78,15 @@
   max-width: 100%;
   overflow-x: auto;
   display: inline-block;
+}
+
+/* Styles pour le wrapper des messages avec formules mathématiques */
+.math-content-wrapper {
+  position: relative;
+  isolation: isolate; /* Création d'un contexte de formatage indépendant */
+}
+
+/* Réduire le padding-bottom excessif uniquement pour les messages mathématiques */
+.math-content-wrapper .katex-display {
+  margin-bottom: 0.3em !important; /* Marge inférieure réduite */
 }

@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import KatexRenderer from './KatexRenderer';
 import CodeBlock from './CodeBlock';
+import MathMessageWrapper from './MathMessageWrapper';
 import { MathSegment, segmentTextWithMath, sanitizeFormula, parseCodeBlock } from '../../utils/mathProcessor';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -17,9 +18,8 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   
-  // Nous n'utilisons plus d'effet de synchronisation retardée pour éviter les problèmes de défilement
-  // Les styles nécessaires sont maintenant directement appliqués via CSS
-  // Ce changement évite les modifications dynamiques de la mise en page qui perturbaient le défilement
+  // Détecter si le contenu contient des formules mathématiques
+  const containsMath = content.includes('$$') || content.includes('$');
   
   if (!content) {
     return null;
@@ -105,9 +105,11 @@ const ContentRenderer: React.FC<ContentRendererProps> = ({ content, className = 
   });
   
   return (
-    <div ref={containerRef} className={`content-renderer ${className}`}>
-      {renderedContent}
-    </div>
+    <MathMessageWrapper hasMath={containsMath}>
+      <div ref={containerRef} className={`content-renderer ${className}`}>
+        {renderedContent}
+      </div>
+    </MathMessageWrapper>
   );
 };
 
