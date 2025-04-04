@@ -677,7 +677,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && message.allowActions && (
-              <div className="mt-4 mb-6 pt-2 pb-3 flex flex-row gap-3 justify-start action-buttons-container">
+              <div className="mt-2 mb-2 flex flex-row gap-3 justify-start action-buttons-container">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 
@@ -704,7 +704,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <RefreshCw size={15} />
+                    <RefreshCw size={12} />
                     <span>Reformuler</span>
                   </button>
                 )}
@@ -769,7 +769,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <HelpCircle size={15} />
+                    <HelpCircle size={12} />
                     <span>Indice</span>
                   </button>
                 )}
@@ -800,7 +800,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <Lightbulb size={15} />
+                    <Lightbulb size={12} />
                     <span>Exercice</span>
                   </button>
                 )}
@@ -852,9 +852,10 @@ const ChatAssistant: React.FC = () => {
                 {/* 
                   Note: Le spacer dynamique a été complètement supprimé en faveur
                   d'une approche plus simple utilisant:
-                  - Un padding-bottom fixe de 500px (tablettes) ou 600px (smartphones)
+                  - Un padding-bottom fixe de 250px
                   - Défini dans mobile-fixes.css sur .chat-messages-container
                   - Aucun JavaScript n'est nécessaire pour cette solution
+                  - Les boutons d'action sont désormais activés sur mobile
                 */}
                 
                 {/* Ancre pour le défilement automatique vers le bas */}

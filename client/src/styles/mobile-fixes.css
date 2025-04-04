@@ -44,23 +44,26 @@
   .action-buttons-container {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
-    margin-top: 8px !important;
-    margin-bottom: 4px !important;
+    gap: 4px !important;
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
   }
   
   .kora-action-button {
     display: flex !important;
     align-items: center !important;
     gap: 4px !important;
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-    border-radius: 16px !important;
+    font-size: 11px !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
     background-color: rgba(0, 0, 0, 0.05) !important;
     color: rgba(0, 0, 0, 0.7) !important;
     font-weight: 500 !important;
     border: none !important;
     transition: background-color 0.2s !important;
+    height: 24px !important;
   }
   
   .dark .kora-action-button {
