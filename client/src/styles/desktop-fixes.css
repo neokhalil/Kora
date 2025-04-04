@@ -3,10 +3,16 @@
  * ITCSS - Niveau "Trumps" (priorité la plus élevée)
  */
 
-/* Réduction de l'espace entre le composer et le texte de footer */
+/* Réduction des espaces pour l'expérience desktop */
 @media (min-width: 991px) {
+  /* Réduire l'espace entre le conteneur et le bas de la page */
+  .web-question-container {
+    bottom: 16px !important; /* Réduit de 32px à 16px */
+  }
+  
+  /* Réduction de l'espace entre le composer et le texte de footer */
   .web-question-footer {
     margin-top: 4px !important; /* Réduit de 8px à 4px */
-    padding-bottom: 8px !important; /* Réduit davantage l'espace entre le texte et le bas de la page */
+    padding-bottom: 8px !important; /* Réduit l'espace entre le texte et le bas de la page */
   }
 }
