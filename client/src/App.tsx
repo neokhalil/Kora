@@ -5,6 +5,7 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Header from "@/components/layout/Header";
+import DesktopHeader from "@/components/layout/DesktopHeader";
 import ChatAssistant from "@/pages/ChatAssistant";
 import Home from "@/pages/Home";
 import MathTest from "@/pages/MathTest";
@@ -19,12 +20,15 @@ const routes = [
   { path: "/math-code-test", Component: MathCodeTest }
 ];
 
-// App simplifié sans menu latéral
+// App avec Header Mobile et Desktop
 const AppContainer = () => {
   return (
     <div className="flex flex-col h-full">
-      {/* Header fixe en haut */}
+      {/* Header mobile en haut - masqué en version desktop */}
       <Header />
+      
+      {/* Header desktop - uniquement visible en version desktop */}
+      <DesktopHeader />
       
       <div className="flex h-full">
         {/* Contenu principal */}
