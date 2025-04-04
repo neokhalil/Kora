@@ -4,11 +4,11 @@
  * Ce fichier a été complètement réécrit avec une approche fondamentalement simplifiée:
  * 
  * PRINCIPES:
- * 1. Utiliser un padding-bottom (200px) pour garantir que les messages restent visibles
+ * 1. Utiliser un padding-bottom (250px) pour garantir que les messages restent visibles
  *    au-dessus de la zone de saisie.
  * 2. Traitement spécial pour les messages contenant des formules mathématiques afin d'éviter
  *    les problèmes de double défilement.
- * 3. Désactiver tous les boutons d'action sur mobile.
+ * 3. Maintenir actifs les boutons d'action sur mobile avec un style compact.
  * 4. Optimiser l'affichage des formules mathématiques et du code.
  * 5. Maximiser l'espace disponible en réduisant toutes les marges et espacements.
  */
@@ -23,9 +23,9 @@
 
 /* Tablettes et mobiles (768px et moins) */
 @media (max-width: 768px) {
-  /* SOLUTION PRINCIPALE: padding-bottom réduit pour améliorer l'expérience */
+  /* SOLUTION PRINCIPALE: padding-bottom ajusté pour améliorer l'expérience */
   .chat-messages-container {
-    padding-bottom: 200px !important; /* Valeur réduite de 400px à 200px */
+    padding-bottom: 250px !important; /* Valeur ajustée à 250px pour garantir que tout le contenu soit visible */
     padding-top: 8px !important;
     padding-left: 6px !important;
     padding-right: 6px !important;
@@ -40,8 +40,41 @@
     padding-bottom: 2px !important;
   }
   
-  /* Aucun style particulier pour les boutons d'action, ils sont simplement désactivés 
-     dans le composant React via allowActions: !isMobile */
+  /* Styles pour les boutons d'action sur mobile (Reformuler, Exercice, Indice) */
+  .action-buttons-container {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .kora-action-button {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+    border-radius: 16px !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: rgba(0, 0, 0, 0.7) !important;
+    font-weight: 500 !important;
+    border: none !important;
+    transition: background-color 0.2s !important;
+  }
+  
+  .dark .kora-action-button {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+  }
+  
+  .kora-action-button:active {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .dark .kora-action-button:active {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+  }
   
   /* Optimisations pour les formules mathématiques */
   .katex-display {

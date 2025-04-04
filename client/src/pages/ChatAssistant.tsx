@@ -349,12 +349,12 @@ const ChatAssistant: React.FC = () => {
       // Générer un ID unique pour ce message
       const messageId = Date.now().toString();
       
-      // Ajouter la réponse avec du contenu initial vide - actions désactivées sur mobile
+      // Ajouter la réponse avec du contenu initial vide - désormais activé sur mobile
       setMessages(prev => [...prev, {
         id: messageId,
         content: '',
         sender: 'kora',
-        allowActions: !isMobile, // Désactivé sur mobile uniquement
+        allowActions: true, // Désormais activé sur mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -461,13 +461,13 @@ const ChatAssistant: React.FC = () => {
       
       const data = await response.json();
       
-      // Ajouter la réponse de l'IA aux messages - actions désactivées sur mobile
+      // Ajouter la réponse de l'IA aux messages - désormais activé sur mobile
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
         content: data.content,
         sender: 'kora',
         isImageAnalysis: true,
-        allowActions: !isMobile, // Désactivé sur mobile uniquement
+        allowActions: true, // Désormais activé sur mobile
       }]);
     } catch (error) {
       console.error('Erreur lors de l\'analyse de l\'image:', error);
@@ -542,7 +542,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isReExplanation: true,
-        allowActions: !isMobile, // Désactivé sur mobile uniquement
+        allowActions: true, // Désormais activé sur mobile
       }]);
       
       // Afficher directement le contenu complet sans animation
@@ -618,7 +618,7 @@ const ChatAssistant: React.FC = () => {
         content: '',
         sender: 'kora',
         isChallenge: true,
-        allowActions: !isMobile, // Désactivé sur mobile uniquement
+        allowActions: true, // Désormais activé sur mobile
         challengeId: challengeId,
       }]);
       
