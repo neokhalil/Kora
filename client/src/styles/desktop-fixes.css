@@ -15,36 +15,4 @@
     margin-top: 4px !important; /* Réduit de 8px à 4px */
     padding-bottom: 8px !important; /* Réduit l'espace entre le texte et le bas de la page */
   }
-  
-  /* Correction des blocs de code pour desktop */
-  .code-block-wrapper {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 1rem 0 !important;
-    overflow: hidden !important;
-  }
-  
-  /* Assurer que les blocs de code ne débordent pas */
-  .web-message-content-wrapper .code-block-wrapper,
-  .prose .code-block-wrapper {
-    width: 100% !important;
-    overflow-x: auto !important;
-  }
-  
-  /* Supprimer le positionnement absolu du badge de langage sur desktop aussi */
-  .language-label {
-    position: static !important;
-    top: auto !important;
-    right: auto !important;
-    border-radius: 4px !important;
-    font-size: 0.7rem !important;
-  }
-  
-  /* Assurer que le header contenant le badge de langage s'affiche correctement */
-  .code-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    width: 100% !important;
-  }
 }

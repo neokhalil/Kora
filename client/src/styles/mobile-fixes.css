@@ -1,49 +1,33 @@
-/* Mobile-specific fixes */
-@media (max-width: 768px) {
-  /* Fix pour l'espacement entre messages et composer */
-  /* Ajoute de l'espace en bas de la page pour permettre le défilement et rendre visibles les boutons d'action */
-  main, #chat-container {
-    padding-bottom: 80px !important;
-    margin-bottom: 40px !important;
-  }
+/**
+ * Ajustements spécifiques pour l'affichage mobile (< 991px)
+ * ITCSS - Niveau "Trumps" (priorité la plus élevée)
+ */
 
-  /* Assure que les boutons d'action soient toujours visibles */
-  .action-buttons-container button,
-  .mt-4.flex.flex-row.gap-2.justify-start button,
-  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start button {
-    z-index: 35 !important;
-  }
-
-  /* Améliorer l'espacement entre les messages */
-  .chat-message-container {
-    margin-bottom: 8px !important;
-  }
-
-  /* S'assurer que le contenu est visible et ne défile pas sous le composer */
-  .messages-container, #chat-messages {
-    padding-bottom: 100px !important;
-    margin-bottom: 20px !important;
+/* Centrage complet du texte de bienvenue sur mobile */
+@media (max-width: 990px) {
+  /* Pour l'écran d'accueil dans ChatAssistant.tsx */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 {
+    justify-content: center !important; /* Centre verticalement */
+    align-items: center !important; /* Centre horizontalement */
+    padding-top: 0 !important; /* Supprime le padding-top pour centrer correctement */
+    margin-bottom: 0 !important; /* Élimine la marge en bas */
+    height: calc(100vh - 170px) !important; /* Ajuste la hauteur pour centrer verticalement entre header et composer */
   }
   
-  /* Sticker l'élément composer en bas avec un fond opaque pour une meilleure lisibilité */
-  .composer-container {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background-color: white !important;
-    padding: 8px !important;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
-    z-index: 20 !important;
+  /* Style du texte de bienvenue lui-même */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 .max-w-md {
+    padding-left: 0 !important; /* Supprime l'espacement à gauche */
+    margin: 0 auto !important; /* Centre le conteneur */
+    text-align: center !important; /* Centre le texte */
   }
   
-  /* Assurer que le z-index de tous les boutons d'action est supérieur au composer */
-  .kora-action-button {
-    z-index: 30 !important;
+  /* Centre spécifiquement les éléments de texte */
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 h2,
+  .messages-container .h-full.flex.flex-col.justify-start.pt-12 p {
+    text-align: center !important; 
+    width: 100% !important;
+    max-width: 280px !important; /* Limite la largeur pour un meilleur aspect sur mobile */
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
-}
-
-/* Améliorer le défilement sur mobile */
-html, body {
-  overscroll-behavior-y: contain;
 }
