@@ -132,3 +132,10 @@
   padding-bottom: 5px !important;
   margin-bottom: 2px !important;
 }
+
+/* Réduire l'espace entre le composer et le footer sur desktop uniquement */
+@media (min-width: 768px) {
+  .footer-message {
+    margin-top: 0 !important;
+  }
+}
