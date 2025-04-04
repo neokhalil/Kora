@@ -677,7 +677,7 @@ const ChatAssistant: React.FC = () => {
             
             {/* Actions supplémentaires (réexpliquer, défi, indice) */}
             {isKora && message.allowActions && (
-              <div className="mt-2 mb-2 flex flex-row gap-3 justify-start action-buttons-container">
+              <div className="mt-3 mb-2 flex flex-row gap-3 justify-start action-buttons-container">
                 {/* Bouton Explique différemment - caché pour les défis mais visible pour les indices */}
                 {(!message.isChallenge || message.isHint) && !message.isReExplanation && (
                   <button 

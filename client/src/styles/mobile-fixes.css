@@ -126,3 +126,9 @@
 .math-content-wrapper .katex-display {
   margin-bottom: 0.3em !important; /* Marge inférieure réduite */
 }
+
+/* Ajouter un peu d'espace entre le contenu des réponses et les boutons d'action */
+.web-message-content, .chat-content {
+  padding-bottom: 5px !important;
+  margin-bottom: 2px !important;
+}
