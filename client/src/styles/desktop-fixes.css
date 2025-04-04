@@ -4,16 +4,39 @@
  */
 
 /* Suppression de l'espace entre le composer et le footer sur desktop */
-@media (min-width: 769px) {
-  /* Suppression de l'espace entre le composer et le texte du footer */
-  .footer-message {
-    margin-top: -5px !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-  }
+/* Ces styles s'appliquent à tous les écrans, pas seulement desktop, pour assurer la cohérence */
 
-  /* Suppression de la marge inférieure du composeur */
-  .chat-assistant-composer {
-    margin-bottom: 0 !important;
+/* Suppression de l'espace entre le composer et le texte du footer */
+.footer-message {
+  margin-top: -5px !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  position: relative !important;
+  z-index: 40 !important; /* S'assurer que le footer est au-dessus du contenu défilant */
+}
+
+/* Suppression de la marge inférieure du composeur */
+.chat-assistant-composer {
+  margin-bottom: 0 !important;
+  position: relative !important;
+  z-index: 30 !important; /* S'assurer que le composer est correctement positionné */
+  background-color: white !important; /* S'assurer que le fond est opaque */
+}
+
+/* S'assurer que les messages ne défilent pas sous le composeur */
+.messages-container, .chat-messages-container {
+  overflow: hidden !important; /* Empêcher le défilement sous le composer */
+}
+
+/* Styles spécifiques pour les grands écrans (desktop) */
+@media (min-width: 769px) {
+  /* Ajouter un z-index plus élevé pour le footer et le composer sur desktop */
+  .messages-container, .web-messages-list {
+    padding-bottom: 120px !important; /* Espacement suffisant pour éviter le défilement sous le composer */
+  }
+  
+  /* Forcer la position du footer sous le composer sans espacement */
+  .footer-message {
+    margin-top: -8px !important; /* Plus grand sur desktop pour compenser les dimensions du composer */
   }
 }

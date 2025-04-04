@@ -138,4 +138,6 @@
   margin-top: -3px !important;
   margin-bottom: 0 !important;
   padding-bottom: 0 !important;
+  position: relative !important;
+  z-index: 50 !important; /* Valeur élevée pour être sûr que le footer reste visible */
 }
