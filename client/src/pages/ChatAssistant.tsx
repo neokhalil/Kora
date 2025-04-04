@@ -704,7 +704,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <RefreshCw size={12} />
+                    <RefreshCw size={16} />
                     <span>Reformuler</span>
                   </button>
                 )}
@@ -769,7 +769,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <HelpCircle size={12} />
+                    <HelpCircle size={16} />
                     <span>Indice</span>
                   </button>
                 )}
@@ -800,7 +800,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <Lightbulb size={12} />
+                    <Lightbulb size={16} />
                     <span>Exercice</span>
                   </button>
                 )}
