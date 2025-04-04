@@ -1,84 +1,49 @@
-/**
- * Ajustements spécifiques pour l'affichage mobile (< 991px)
- * ITCSS - Niveau "Trumps" (priorité la plus élevée)
- */
+/* Mobile-specific fixes */
+@media (max-width: 768px) {
+  /* Fix pour l'espacement entre messages et composer */
+  /* Ajoute de l'espace en bas de la page pour permettre le défilement et rendre visibles les boutons d'action */
+  main, #chat-container {
+    padding-bottom: 80px !important;
+    margin-bottom: 40px !important;
+  }
 
-/* Centrage complet du texte de bienvenue sur mobile */
-@media (max-width: 990px) {
-  /* Pour l'écran d'accueil dans ChatAssistant.tsx */
-  .messages-container .h-full.flex.flex-col.justify-start.pt-12 {
-    justify-content: center !important; /* Centre verticalement */
-    align-items: center !important; /* Centre horizontalement */
-    padding-top: 0 !important; /* Supprime le padding-top pour centrer correctement */
-    margin-bottom: 0 !important; /* Élimine la marge en bas */
-    height: calc(100vh - 170px) !important; /* Ajuste la hauteur pour centrer verticalement entre header et composer */
+  /* Assure que les boutons d'action soient toujours visibles */
+  .action-buttons-container button,
+  .mt-4.flex.flex-row.gap-2.justify-start button,
+  .mt-4.mb-6.pt-2.pb-3.flex.flex-row.gap-3.justify-start button {
+    z-index: 35 !important;
+  }
+
+  /* Améliorer l'espacement entre les messages */
+  .chat-message-container {
+    margin-bottom: 8px !important;
+  }
+
+  /* S'assurer que le contenu est visible et ne défile pas sous le composer */
+  .messages-container, #chat-messages {
+    padding-bottom: 100px !important;
+    margin-bottom: 20px !important;
   }
   
-  /* Style du texte de bienvenue lui-même */
-  .messages-container .h-full.flex.flex-col.justify-start.pt-12 .max-w-md {
-    padding-left: 0 !important; /* Supprime l'espacement à gauche */
-    margin: 0 auto !important; /* Centre le conteneur */
-    text-align: center !important; /* Centre le texte */
+  /* Sticker l'élément composer en bas avec un fond opaque pour une meilleure lisibilité */
+  .composer-container {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: white !important;
+    padding: 8px !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
+    z-index: 20 !important;
   }
   
-  /* Centre spécifiquement les éléments de texte */
-  .messages-container .h-full.flex.flex-col.justify-start.pt-12 h2,
-  .messages-container .h-full.flex.flex-col.justify-start.pt-12 p {
-    text-align: center !important; 
-    width: 100% !important;
-    max-width: 280px !important; /* Limite la largeur pour un meilleur aspect sur mobile */
-    margin-left: auto !important;
-    margin-right: auto !important;
+  /* Assurer que le z-index de tous les boutons d'action est supérieur au composer */
+  .kora-action-button {
+    z-index: 30 !important;
   }
-  
-  /* Correction des blocs de code sur mobile */
-  .code-block-wrapper {
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: auto !important;
-    margin: 0.75rem 0 !important;
-    box-sizing: border-box !important;
-  }
-  
-  /* Assurer que le conteneur de code est bien contenu */
-  .code-block-wrapper pre {
-    overflow-x: auto !important;
-    white-space: pre !important;
-    max-width: 100% !important;
-  }
-  
-  /* Supprime le positionnement absolu du badge de langage sur mobile */
-  .language-label {
-    position: static !important; /* Annule le position absolute */
-    top: auto !important;
-    right: auto !important;
-    border-radius: 4px !important;
-    font-size: 0.65rem !important;
-    padding: 0.15rem 0.4rem !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-  }
-  
-  /* Assurer que le header contenant le badge de langage s'affiche correctement */
-  .code-header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 0.4rem 0.75rem !important;
-    border-radius: 8px 8px 0 0 !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-  
-  /* Assurez-vous que les blocs de code dans les messages ne débordent pas */
-  .bg-white, .dark\\:bg-gray-800 {
-    overflow-x: hidden !important;
-    max-width: 100% !important;
-  }
-  
-  /* Assurer que les conteneurs de messages contiennent bien leur contenu */
-  .px-4.py-2.mb-4 {
-    max-width: 100% !important;
-    overflow-x: hidden !important;
-  }
+}
+
+/* Améliorer le défilement sur mobile */
+html, body {
+  overscroll-behavior-y: contain;
 }
