@@ -7,6 +7,6 @@
 @media (min-width: 991px) {
   .web-question-footer {
     margin-top: 4px !important; /* Réduit de 8px à 4px */
-    padding-bottom: 16px !important; /* Réduit l'espace entre le texte et le bas de la page */
+    padding-bottom: 8px !important; /* Réduit davantage l'espace entre le texte et le bas de la page */
   }
 }
