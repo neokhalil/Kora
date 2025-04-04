@@ -139,3 +139,10 @@
     margin-top: 0 !important;
   }
 }
+
+/* Ajustement pour WebHomeView (version desktop) */
+@media (min-width: 991px) {
+  .web-question-footer {
+    margin-top: 4px !important; /* Réduit de 8px à 4px */
+  }
+}
