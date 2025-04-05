@@ -30,4 +30,53 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
+  
+  /* Réduction de l'espace excessif causé par les boutons d'action sur mobile */
+  .web-message-actions {
+    padding-bottom: 10px !important; /* Réduit considérablement l'espace sous les boutons d'action */
+    margin-top: 6px !important; /* Réduit l'espace au-dessus des boutons */
+    gap: 6px !important; /* Réduit l'espace entre les boutons */
+  }
+  
+  /* Réduction de la taille des boutons d'action pour qu'ils prennent moins de place */
+  .web-action-button {
+    padding: 5px 8px !important; /* Padding plus compact */
+    font-size: 12px !important; /* Texte légèrement plus petit */
+    border-radius: 14px !important; /* Coins plus arrondis pour un look plus compact */
+  }
+  
+  /* Optimisation de l'espace entre les messages sur mobile */
+  .web-messages-list {
+    gap: 4px !important; /* Réduit davantage l'espace entre les messages */
+  }
+  
+  /* Réduction de l'espace vertical du contenu des messages */
+  .web-message {
+    margin-bottom: 0 !important; /* Supprime la marge du bas entre les messages */
+  }
+  
+  /* Réduction du padding dans le contenu des messages */
+  .web-kora-message .web-message-content {
+    padding: 6px 10px !important; /* Padding plus compact pour les messages de Kora */
+  }
+  
+  .web-user-message .web-message-content {
+    padding: 6px 10px !important; /* Padding plus compact pour les messages utilisateur */
+  }
+  
+  /* Optimisation des formules mathématiques sur mobile */
+  .katex-display {
+    margin: 0.5em 0 !important; /* Réduit les marges verticales des formules mathématiques */
+    overflow-x: auto !important; /* Permet le défilement horizontal pour les formules larges */
+    max-width: 100% !important; /* S'assure que les formules ne dépassent pas la largeur disponible */
+  }
+  
+  /* Réduit l'espace entre les éléments d'une réponse */
+  .web-message-content p {
+    margin-bottom: 0.5em !important; /* Espace réduit entre les paragraphes */
+  }
+  
+  .web-message-content > *:last-child {
+    margin-bottom: 0 !important; /* Supprime la marge après le dernier élément */
+  }
 }

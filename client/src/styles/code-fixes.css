@@ -35,24 +35,42 @@
 @media (max-width: 768px) {
   /* Réduire légèrement la taille du badge sur mobile */
   .language-label {
-    font-size: 0.7rem !important;
-    padding: 0.1rem 0.4rem !important;
+    font-size: 0.65rem !important;
+    padding: 0.1rem 0.3rem !important;
   }
   
   /* S'assurer que le bloc de code ne dépasse pas sur mobile */
   .code-block-wrapper {
     max-width: 100% !important;
     overflow-x: hidden !important; /* Contient le bloc dans la largeur disponible */
+    margin-top: 4px !important; /* Réduit l'espace avant le bloc de code */
+    margin-bottom: 4px !important; /* Réduit l'espace après le bloc de code */
   }
   
   /* Permettre le défilement horizontal à l'intérieur du bloc de code */
   .code-block-wrapper pre {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important; /* Pour le défilement fluide sur iOS */
+    max-height: 300px !important; /* Limite la hauteur pour éviter qu'un long bloc de code prenne trop d'espace */
+    margin: 0 !important; /* Supprime les marges par défaut */
   }
   
   /* S'assurer que l'en-tête n'est pas trop grand sur mobile */
   .code-header {
-    padding: 0.4rem 0.8rem !important;
+    padding: 0.3rem 0.6rem !important; /* En-tête encore plus compact sur mobile */
+    min-height: 30px !important; /* Hauteur minimale pour garantir l'alignement */
+  }
+  
+  /* Ajuste la taille du texte de code pour économiser de l'espace vertical */
+  .code-block-wrapper code {
+    font-size: 0.75rem !important; /* Police plus petite pour le code */
+    line-height: 1.3 !important; /* Interligne réduit */
+    padding: 0.3rem 0.6rem !important; /* Padding plus compact */
+  }
+  
+  /* Réduire la taille du bouton de copie */
+  .copy-button {
+    font-size: 0.65rem !important;
+    padding: 0.1rem 0.3rem !important;
   }
 }
