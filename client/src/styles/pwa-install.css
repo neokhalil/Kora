@@ -14,10 +14,11 @@
   font-size: 14px !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
   position: fixed !important; /* Position fixe pour rester visible */
-  top: 0 !important;
+  top: 56px !important; /* Positionnée juste en dessous du header (56px de hauteur) */
+  top: calc(56px + env(safe-area-inset-top, 0)) !important; /* Support pour le notch des iPhones */
   left: 0 !important;
   right: 0 !important;
-  z-index: 9000 !important; /* Valeur très élevée pour s'assurer de la visibilité */
+  z-index: 9000 !important; /* Inférieur au z-index du header (9999) */
   width: 100% !important;
   max-width: 100% !important;
   margin: 0 !important;
@@ -155,18 +156,23 @@
 }
 
 /* Position fixe avec priorité plus élevée pour s'assurer qu'elle reste visible pendant le défilement */
+/* 
+ * Ces sélecteurs ont été simplifiés car la position top est maintenant 
+ * définie directement dans le composant React via la prop fixedPositionTop
+ */
 div.pwa-install-banner, html body div.pwa-install-banner, #root div.pwa-install-banner, div.flex.flex-col.h-full > div.pwa-install-banner {
   position: fixed !important; 
-  top: 0 !important;
+  /* La position top est définie par la propriété style dans le composant React */
   left: 0 !important;
   right: 0 !important;
-  z-index: 9999 !important; /* z-index augmenté pour être sûr */
+  z-index: 9500 !important; /* z-index entre celui du contenu (9000) et du header (9999) */
 }
 
-/* Ajouter un padding en haut du contenu pour qu'il ne soit pas caché par la bannière fixe */
-.chat-messages-container, .messages-container {
-  padding-top: 60px !important;
-}
+/* 
+ * La règle de padding-top a été retirée car nous gérons maintenant la hauteur
+ * du header directement dans ChatAssistant.tsx via le composant InstallPWAPrompt
+ * qui utilise fixedPositionTop pour s'adapter à différentes situations
+ */
 
 /* Assurer que la bannière ne s'affiche que sur mobile */
 @media (min-width: 991px) {

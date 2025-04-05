@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Download, X, Share, Plus, ArrowRight } from 'lucide-react';
 import '@/styles/pwa-install.css';
 
+// Propriété pour accepter positionTop en option
+interface InstallPWAPromptProps {
+  fixedPositionTop?: number;
+}
+
 // Interface pour l'événement BeforeInstallPrompt
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-const InstallPWAPrompt: React.FC = () => {
+const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 56 }) => {
   // États du composant
   const [isVisible, setIsVisible] = useState(true); // Forcer l'affichage pour tester
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -163,8 +168,11 @@ const InstallPWAPrompt: React.FC = () => {
 
   return (
     <>
-      {/* Bannière d'installation principale */}
-      <div className="pwa-install-banner">
+      {/* Bannière d'installation principale avec position personnalisée */}
+      <div 
+        className="pwa-install-banner" 
+        style={{ top: `${fixedPositionTop}px` }}
+      >
         <div className="banner-content">
           <div className="banner-icon">
             <Download size={16} />

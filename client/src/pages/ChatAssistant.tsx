@@ -112,7 +112,7 @@ const ChatAssistant: React.FC = () => {
   useEffect(() => {
     setIsMobileDevice(isMobile);
     console.log('ChatAssistant - Détection mobile:', isMobile, isMobileDevice);
-  }, [isMobile, isMobileDevice]);
+  }, [isMobile]);
   
   /**
    * ARCHITECTURE UNIFIÉE POUR L'ESPACEMENT MOBILE
@@ -834,10 +834,9 @@ const ChatAssistant: React.FC = () => {
   };
   
   return (
-      <div className="flex flex-col h-full max-w-4xl mx-auto">
-        {/* Bannière d'installation PWA (force visible) */}
-        <InstallPWAPrompt />
-        {/* isMobileDevice && <InstallPWAPrompt /> */}
+      <div className={`flex flex-col h-full max-w-4xl mx-auto ${isMobileDevice ? 'with-pwa-banner' : ''}`}>
+        {/* Bannière d'installation PWA (uniquement sur mobile) */}
+        {isMobileDevice && <InstallPWAPrompt fixedPositionTop={56} />}
         
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
