@@ -50,7 +50,7 @@
     position: relative !important; /* Changé à relative car il est maintenant en dehors du composer */
     z-index: 10 !important;
     padding-top: 8px !important;
-    padding-bottom: 16px !important; /* Ajout d'un padding en bas pour l'espacement */
+    padding-bottom: 0px !important; /* Suppression du padding en bas */
     margin-top: 4px !important; /* Marge réduite car maintenant en dehors du composer */
     font-size: 11px !important; /* Texte légèrement plus petit pour un aspect plus élégant */
     opacity: 0.8 !important; /* Légère transparence pour un aspect plus subtil */
