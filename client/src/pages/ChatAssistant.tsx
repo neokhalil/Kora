@@ -144,60 +144,15 @@ const ChatAssistant: React.FC = () => {
     // car ça cause des problèmes sur mobile
   }, [messages, isThinking]);
   
-  // Fonction avancée de défilement automatique après l'envoi d'un message
-  // avec positionnement précis pour s'assurer que le message et l'indicateur de réflexion
-  // sont toujours visibles au-dessus de la zone de composition sur mobile
+  // Fonction de défilement automatique DÉSACTIVÉE
+  // Le padding-bottom de 300px sur le conteneur de messages suffit à maintenir la visibilité
+  // Cette fonction reste présente pour préserver les appels existants, mais ne fait rien
   const scrollToSentMessage = () => {
-    // Délai initial pour permettre au DOM de se mettre à jour avec le nouveau message
-    setTimeout(() => {
-      // Rechercher tous les éléments nécessaires
-      const messagesContainer = document.querySelector('.messages-container') as HTMLElement;
-      const composerElement = document.querySelector('.composer-container') as HTMLElement;
-      const lastMessage = document.querySelector('.messages-container > div:last-child') as HTMLElement;
-      
-      if (messagesContainer && lastMessage) {
-        // Calculer la hauteur du composer
-        const composerHeight = composerElement ? composerElement.offsetHeight : 150;
-        
-        // Trouver la hauteur de la fenêtre visible
-        const viewportHeight = window.innerHeight;
-        
-        // Trouver la hauteur totale à défiler pour s'assurer que le message est visible 
-        // avec un espace supplémentaire au-dessus du composer
-        const paddingAboveComposer = 120; // Espace généreux au-dessus du composer
-        
-        // Déterminer si nous devons défiler et de combien
-        // Note: Cette approche force le défilement à une position qui montre toujours
-        // le dernier message avec suffisamment d'espace au-dessus du composer
-        const targetScrollPosition = messagesContainer.scrollHeight - viewportHeight + paddingAboveComposer;
-        
-        console.log('Défilement auto vers:', targetScrollPosition);
-        
-        // Défiler à la position calculée avec un comportement fluide
-        messagesContainer.scrollTo({
-          top: targetScrollPosition,
-          behavior: 'smooth'
-        });
-        
-        // Appliquer un second défilement après un délai plus long
-        // pour s'assurer que l'animation est terminée et les indicateurs de réflexion sont visibles
-        setTimeout(() => {
-          // Recalculer la position optimale pour s'assurer que les
-          // points de chargement (thinking indicator) sont visibles
-          const thinkingIndicator = document.querySelector('.messages-container > div:last-child') as HTMLElement;
-          
-          if (thinkingIndicator && messagesContainer) {
-            // Position finale avec marge supplémentaire
-            const finalScrollPosition = messagesContainer.scrollHeight - viewportHeight + (composerHeight + 50);
-            
-            messagesContainer.scrollTo({
-              top: finalScrollPosition,
-              behavior: 'smooth'
-            });
-          }
-        }, 500); // Délai plus long pour le second défilement
-      }
-    }, 150); // Délai initial accru pour s'assurer que le DOM est complètement mis à jour
+    // Fonction désactivée - Le padding-bottom de 300px sur .messages-container 
+    // permet déjà un affichage correct des messages sans besoin d'auto-scroll
+    console.log('Auto-scroll désactivé - utilisation du padding-bottom uniquement');
+    
+    // Ne fait rien - le padding CSS gère l'affichage
   };
   
   // Mock sessionId pour le développement
