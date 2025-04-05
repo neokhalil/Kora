@@ -170,7 +170,7 @@ const InstallPWAPrompt: React.FC = () => {
             <Download size={16} />
           </div>
           <div className="banner-text">
-            {isIOS ? 'Installer Kora sur iPhone' : 'Ajouter Kora à l\'écran d\'accueil'}
+            Installer Kora sur votre téléphone
           </div>
         </div>
         

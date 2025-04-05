@@ -154,15 +154,18 @@
   }
 }
 
-/* Fix pour le positionnement dans le layout de ChatAssistant */
-.flex.flex-col.h-full > .pwa-install-banner {
-  position: relative !important;
-  order: -1 !important;
+/* Position fixe avec priorité plus élevée pour s'assurer qu'elle reste visible pendant le défilement */
+div.pwa-install-banner, html body div.pwa-install-banner, #root div.pwa-install-banner, div.flex.flex-col.h-full > div.pwa-install-banner {
+  position: fixed !important; 
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 9999 !important; /* z-index augmenté pour être sûr */
 }
 
 /* Ajouter un padding en haut du contenu pour qu'il ne soit pas caché par la bannière fixe */
-.chat-messages-container {
-  padding-top: 40px !important;
+.chat-messages-container, .messages-container {
+  padding-top: 60px !important;
 }
 
 /* Assurer que la bannière ne s'affiche que sur mobile */
