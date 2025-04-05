@@ -148,23 +148,34 @@ const ChatAssistant: React.FC = () => {
   // pour s'assurer que le message utilisateur et les indicateurs de réflexion sont visibles
   const scrollToSentMessage = () => {
     if (messagesEndRef.current) {
+      // Rechercher le conteneur de messages scrollable
+      const scrollContainer = document.querySelector('.messages-container') as HTMLElement;
+      
       // Utiliser un léger délai pour permettre au DOM de se mettre à jour
       setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'end'
-        });
-        
-        // Léger décalage supplémentaire pour s'assurer que le message est bien visible
-        // malgré la zone de composition
-        setTimeout(() => {
-          // Calculer une hauteur de défilement supplémentaire pour éviter que le message
-          // soit caché par la zone de composition
-          window.scrollBy({
-            top: -60, // Défilement léger vers le haut pour voir le message et les indicateurs
+        // Calculer la position à laquelle nous voulons défiler
+        // qui est juste avant la zone de composition pour que le dernier message soit visible
+        if (scrollContainer) {
+          // Trouver la hauteur du conteneur de messages
+          const containerHeight = scrollContainer.clientHeight;
+          // Trouver la position y du dernier élément
+          const lastMessagePosition = messagesEndRef.current.getBoundingClientRect().top;
+          // Calculer la position de défilement optimale
+          // qui laisse suffisamment d'espace pour voir le dernier message
+          const scrollPosition = scrollContainer.scrollTop + lastMessagePosition - containerHeight + 300;
+          
+          // Défiler jusqu'à la position calculée
+          scrollContainer.scrollTo({
+            top: scrollPosition,
             behavior: 'smooth'
           });
-        }, 300);
+        } else {
+          // Fallback si le sélecteur ne fonctionne pas
+          messagesEndRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'end'
+          });
+        }
       }, 100);
     }
   };
@@ -737,7 +748,7 @@ const ChatAssistant: React.FC = () => {
                       }
                     }}
                   >
-                    <RefreshCw size={16} />
+                    <RefreshCw size={14} />
                     <span>Reformuler</span>
                   </button>
                 )}
