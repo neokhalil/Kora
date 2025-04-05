@@ -30,7 +30,7 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
   const [isMobile, setIsMobile] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
-  const [debugVisible, setDebugVisible] = useState(isDev);
+  const [debugVisible, setDebugVisible] = useState(false); // Désactivé par défaut, même en développement
   
   // Fonction utilitaire - Détection des appareils mobiles
   const detectMobileDevice = () => {
