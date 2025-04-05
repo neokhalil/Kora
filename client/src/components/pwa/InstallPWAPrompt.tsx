@@ -15,138 +15,145 @@ interface BeforeInstallPromptEvent extends Event {
 
 const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 56 }) => {
   // États du composant
-  const [isVisible, setIsVisible] = useState(false); // Par défaut, la bannière est cachée
+  const [isVisible, setIsVisible] = useState(true); // Défaut : visible, sera ajusté dans useEffect
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   
-  // Log pour vérifier le chargement du composant
-  console.log('InstallPWAPrompt chargé, isVisible:', isVisible);
+  // Logs pour debug
+  console.log('InstallPWAPrompt rendu, état bannière:', isVisible);
   
-  // Vérifier si l'application est déjà en mode standalone (PWA installée)
-  const isInStandaloneMode = () => {
-    return (
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.matchMedia('(display-mode: minimal-ui)').matches ||
-      (window.navigator as any).standalone === true // iOS Safari
-    );
+  // Détection PWA/Standalone
+  const checkStandaloneMode = () => {
+    // Détection multi-méthodes pour couvrir tous les navigateurs
+    const standalone = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      window.matchMedia('(display-mode: fullscreen)').matches || 
+      window.matchMedia('(display-mode: minimal-ui)').matches || 
+      (window.navigator as any).standalone === true || // iOS Safari spécifique
+      // Vérifier l'URL pour les PWA (pas de barre d'adresse visible)
+      window.location.href.includes('homescreen') ||
+      document.referrer.includes('android-app://');
+    
+    console.log('Vérification mode standalone:', standalone);
+    setIsStandalone(standalone);
+    return standalone;
   };
   
-  // Détection des dispositifs
+  // Initialisation et détection
   useEffect(() => {
-    const checkDevice = () => {
-      // Vérifier si c'est iOS (sans utiliser MSStream qui n'est pas standard)
+    const detectDevice = () => {
+      // Détecter iOS
       const isAppleDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && 
         !(/Windows Phone/.test(navigator.userAgent));
       
-      // Vérifier si c'est Android
+      // Détecter Android
       const isAndroidDevice = /Android/.test(navigator.userAgent);
       
-      // Logs pour le debug
-      console.log('Détection dispositif:', {
-        userAgent: navigator.userAgent,
-        isAppleDevice,
-        isAndroidDevice,
-        isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent),
-        isStandalone: isInStandaloneMode()
-      });
+      // Détecter mobile en général
+      const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
       
-      // Détection correcte pour appareils mobiles
+      // Mettre à jour les états
       setIsIOS(isAppleDevice);
       setIsAndroid(isAndroidDevice);
+      setIsMobile(isMobileDevice);
       
-      // Si l'application est déjà installée en PWA, ne pas afficher la bannière
-      if (isInStandaloneMode()) {
-        console.log('Application détectée comme PWA installée, bannière cachée');
-        setIsVisible(false);
-        return;
-      }
+      // Logs détaillés pour debug
+      console.log('Détection appareil:', {
+        userAgent: navigator.userAgent,
+        isIOS: isAppleDevice,
+        isAndroid: isAndroidDevice,
+        isMobile: isMobileDevice
+      });
       
-      // Vérifier si l'utilisateur a déjà refusé la bannière
-      const hasUserDismissed = localStorage.getItem('pwa-dismissed');
-      if (hasUserDismissed) {
-        console.log('Bannière masquée car déjà refusée par utilisateur');
-        setIsVisible(false);
-        return;
-      }
-      
-      // Afficher uniquement sur mobile quand l'app n'est pas installée
-      const isMobileDevice = /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
-      if (isMobileDevice && !isInStandaloneMode()) {
-        console.log('Conditions réunies pour afficher la bannière');
-        setIsVisible(true);
-      } else {
-        console.log('Conditions non réunies pour la bannière');
+      return { isAppleDevice, isAndroidDevice, isMobileDevice };
+    };
+    
+    // Bannière uniquement pour mobiles
+    const { isMobileDevice } = detectDevice();
+    
+    if (!isMobileDevice) {
+      console.log('Appareil non mobile, bannière masquée');
+      setIsVisible(false);
+      return;
+    }
+    
+    // Vérifier si c'est une PWA déjà installée
+    const isPWA = checkStandaloneMode();
+    if (isPWA) {
+      console.log('C\'est une PWA installée, bannière masquée');
+      setIsVisible(false);
+      return;
+    }
+    
+    // Si l'utilisateur a rejeté la bannière précédemment
+    const hasRejected = localStorage.getItem('pwa-dismissed');
+    if (hasRejected) {
+      console.log('Bannière précédemment rejetée, non affichée');
+      setIsVisible(false);
+      return;
+    }
+    
+    // Si on arrive ici, on est sur mobile, pas en PWA, et pas rejeté → afficher
+    console.log('Conditions ok pour afficher la bannière');
+    setIsVisible(true);
+    
+    // Détecter les changements de mode d'affichage
+    const standaloneMediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        console.log('Passage en mode standalone détecté');
         setIsVisible(false);
       }
     };
     
-    checkDevice();
+    if (standaloneMediaQuery.addEventListener) {
+      standaloneMediaQuery.addEventListener('change', handleMediaChange);
+    }
+    
+    return () => {
+      if (standaloneMediaQuery.removeEventListener) {
+        standaloneMediaQuery.removeEventListener('change', handleMediaChange);
+      }
+    };
   }, []);
-
-  // Capturer l'événement beforeinstallprompt
+  
+  // Gestionnaire pour beforeinstallprompt (spécifique Android/Chrome)
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Empêcher Chrome 67+ de montrer automatiquement sa bannière
+      console.log('Événement beforeinstallprompt capturé');
       e.preventDefault();
       
-      // Stocker l'événement pour l'utiliser plus tard
+      // Stocker l'événement pour l'installer plus tard
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       
-      // Si l'app est déjà en mode standalone, ne pas afficher la bannière
-      if (isInStandaloneMode()) {
-        console.log('Application en mode standalone, pas de bannière');
+      // Si déjà en PWA ou rejeté avant, ne pas montrer
+      if (isStandalone || localStorage.getItem('pwa-dismissed')) {
         return;
       }
       
-      // Vérifier si on a déjà ignoré cette invite
-      const hasUserDismissed = localStorage.getItem('pwa-dismissed');
-      
-      // Logs pour debug
-      console.log('Événement beforeinstallprompt reçu:', {
-        deferredPrompt: !!e,
-        isIOS,
-        hasUserDismissed: !!hasUserDismissed,
-        isStandalone: isInStandaloneMode()
-      });
-      
-      // Afficher la bannière seulement si l'app n'est pas installée et pas refusée avant
-      if (!hasUserDismissed && !isInStandaloneMode()) {
+      // Si on est sur mobile et l'événement est capturé, on peut installer
+      if (isMobile) {
         setIsVisible(true);
       }
     };
     
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
-    // Media query pour détecter les changements de mode d'affichage
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleDisplayModeChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        // L'application est maintenant en mode standalone
-        console.log('Application maintenant en mode standalone, masquer bannière');
-        setIsVisible(false);
-      }
-    };
-    
-    // S'abonner aux changements de mode d'affichage
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleDisplayModeChange);
-    }
-    
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleDisplayModeChange);
-      }
     };
-  }, [isIOS]);
+  }, [isMobile, isStandalone]);
 
   // Gérer le clic sur le bouton d'installation
   const handleInstallClick = async () => {
     // Si l'application est déjà installée en PWA, cacher la bannière
-    if (isInStandaloneMode()) {
+    if (isStandalone) {
       console.log('Application déjà installée en PWA, bannière cachée');
       setIsVisible(false);
       return;
@@ -183,6 +190,10 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
       }
     } else {
       console.log('Aucun événement prompt disponible, impossible d\'installer');
+      // Pour iOS sans événement, afficher le guide d'installation
+      if (isIOS) {
+        setShowIOSGuide(true);
+      }
     }
   };
 
@@ -229,7 +240,7 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
       </div>
 
       {/* Guide d'installation pour iOS - vérifier si l'app n'est pas déjà installée */}
-      {isIOS && showIOSGuide && !isInStandaloneMode() && (
+      {isIOS && showIOSGuide && !isStandalone && (
         <div className="ios-install-guide">
           <div className="guide-header">
             <h3>Comment installer Kora</h3>

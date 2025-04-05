@@ -15,7 +15,9 @@
   display: flex !important;
   align-items: center !important;
   padding: 0 16px !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  /* Suppression de la barre de délimitation */
+  box-shadow: none !important;
+  border-bottom: none !important;
 }
 
 /* Style pour le header interne */
