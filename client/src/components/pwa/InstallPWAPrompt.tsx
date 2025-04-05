@@ -15,14 +15,29 @@ interface BeforeInstallPromptEvent extends Event {
 
 const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 56 }) => {
   // États du composant
-  const [isVisible, setIsVisible] = useState(true); // Forcer l'affichage pour tester
+  const [isVisible, setIsVisible] = useState(false); // Par défaut, la bannière est masquée
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
   
   // Log pour vérifier le chargement du composant
-  console.log('InstallPWAPrompt chargé, isVisible:', isVisible);
+  console.log('InstallPWAPrompt chargé');
+  
+  // Détecter si nous sommes en mode standalone (PWA installée)
+  const checkIfStandalone = () => {
+    // Vérifier si l'app est installée (mode standalone)
+    const isInStandaloneMode = 
+      (window.matchMedia('(display-mode: standalone)').matches) || // Chrome, Edge
+      (window.matchMedia('(display-mode: fullscreen)').matches) || // Samsung Internet
+      (window.matchMedia('(display-mode: minimal-ui)').matches) || // Chrome Mobile
+      (window.navigator as any).standalone === true; // iOS Safari
+    
+    console.log('Mode standalone détecté:', isInStandaloneMode);
+    setIsStandalone(isInStandaloneMode);
+    return isInStandaloneMode;
+  };
   
   // Détection des dispositifs
   useEffect(() => {
@@ -34,11 +49,15 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
       // Vérifier si c'est Android
       const isAndroidDevice = /Android/.test(navigator.userAgent);
       
+      // Vérifier si c'est en mode standalone (app installée)
+      const inStandaloneMode = checkIfStandalone();
+      
       // Logs pour le debug
       console.log('Détection dispositif:', {
         userAgent: navigator.userAgent,
         isAppleDevice,
         isAndroidDevice,
+        inStandaloneMode,
         isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent)
       });
       
@@ -48,6 +67,15 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
     };
     
     checkDevice();
+    
+    // Ajouter un écouteur pour détecter les changements de mode d'affichage
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleChange = () => checkIfStandalone();
+    mediaQuery.addEventListener('change', handleChange);
+    
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
   }, []);
 
   // Capturer l'événement beforeinstallprompt
@@ -62,62 +90,64 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
       // Vérifier si on a déjà ignoré cette invite
       const hasUserDismissed = localStorage.getItem('pwa-dismissed');
       
-      // Activer la bannière si l'événement beforeinstallprompt est déclenché
-      // (Android/Chrome) ou si c'est iOS
-      console.log('Activation de la bannière, conditions:', {
-        deferredPrompt: !!deferredPrompt,
-        isIOS,
-        hasUserDismissed: !!hasUserDismissed
-      });
+      console.log('Event beforeinstallprompt détecté');
       
-      // Rendre la bannière visible quelle que soit la condition
-      setIsVisible(true);
-      
-      // Le code original qui sera restauré plus tard
-      // if ((deferredPrompt || isIOS) && !hasUserDismissed) {
-      //   setIsVisible(true);
-      // }
+      // Ne pas montrer la bannière si:
+      // 1. L'app est déjà installée en mode standalone
+      // 2. L'utilisateur a déjà ignoré la bannière
+      if (!checkIfStandalone() && !hasUserDismissed) {
+        console.log('Affichage de la bannière sur Android');
+        setIsVisible(true);
+      } else {
+        console.log('Bannière masquée car app déjà installée ou invite refusée');
+      }
     };
-    
-    // Détecter iOS Stand-alone mode
-    const isInStandaloneMode = () => 
-      'standalone' in window.navigator && (window.navigator as any).standalone;
     
     // Sur iOS, afficher la bannière si:
     // 1. C'est iOS
     // 2. On n'est pas déjà en mode standalone
     // 3. L'utilisateur n'a pas ignoré l'invite
     const checkIOSInstall = () => {
-      if (isIOS && !isInStandaloneMode()) {
+      // Vérifier si on est en mode standalone sur iOS
+      const isIOSStandalone = (window.navigator as any).standalone === true;
+      
+      if (isIOS && !isIOSStandalone) {
         const hasUserDismissed = localStorage.getItem('pwa-dismissed');
         if (!hasUserDismissed) {
+          console.log('Affichage de la bannière sur iOS');
           setIsVisible(true);
+        } else {
+          console.log('Bannière iOS masquée car invite refusée');
         }
+      } else if (isIOS && isIOSStandalone) {
+        console.log('Bannière iOS masquée car déjà installée');
       }
     };
     
+    // Ajouter l'écouteur pour l'événement beforeinstallprompt (Android)
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
-    // Vérifier spécifiquement pour iOS et forcer l'affichage pour le test
-    console.log('Vérification iOS:', isIOS);
+    // Vérification initiale
+    const isAlreadyInstalledManually = localStorage.getItem('pwa-installed') === 'true';
+    const hasUserDismissed = localStorage.getItem('pwa-dismissed') === 'true';
     
-    // Vérifier si l'utilisateur a déjà refusé la bannière
-    const hasUserDismissed = localStorage.getItem('pwa-dismissed');
-    
-    // Afficher la bannière uniquement si l'utilisateur ne l'a pas refusée
-    if (!hasUserDismissed) {
-      setIsVisible(true);
-    } else {
-      console.log('Bannière masquée car déjà refusée par utilisateur');
+    // Si l'app est déjà installée (détecté par le mode standalone ou marqué comme installé)
+    if (checkIfStandalone() || isAlreadyInstalledManually) {
+      console.log('Bannière masquée car app déjà installée');
+      setIsVisible(false);
+    } 
+    // Si l'utilisateur a déjà refusé l'invitation
+    else if (hasUserDismissed) {
+      console.log('Bannière masquée car invite refusée par utilisateur');
+      setIsVisible(false);
     }
-    
-    // Détection réelle (sans simulation)
-    console.log('Appareil mobile détecté:', 
-      navigator.userAgent.toLowerCase().includes('mobile') ? 'Oui' : 'Non',
-      'Type:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Autre');
-    
-    if (isIOS) {
-      checkIOSInstall();
+    // Sinon, afficher la bannière selon la plateforme
+    else {
+      if (isIOS) {
+        checkIOSInstall();
+      }
+      // Pour Android, l'événement beforeinstallprompt gère l'affichage
+      // La bannière ne s'affiche que si l'événement est déclenché
     }
     
     return () => {
@@ -141,8 +171,18 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
         
         if (choiceResult.outcome === 'accepted') {
           console.log('Utilisateur a accepté l\'installation de l\'application');
+          // Marquer comme installé dans localStorage
+          localStorage.setItem('pwa-installed', 'true');
           // Cacher la bannière une fois installée
           setIsVisible(false);
+          // Mettre à jour le statut standalone
+          setIsStandalone(true);
+          
+          // Vérifier le mode standalone après un court délai
+          // (permet au navigateur de mettre à jour son état)
+          setTimeout(() => {
+            checkIfStandalone();
+          }, 1000);
         } else {
           console.log('Utilisateur a refusé l\'installation');
           // Stocker le choix de l'utilisateur
@@ -223,6 +263,8 @@ const InstallPWAPrompt: React.FC<InstallPWAPromptProps> = ({ fixedPositionTop = 
           <button 
             className="guide-close-btn"
             onClick={() => {
+              // Marquer comme installé dans localStorage pour iOS
+              localStorage.setItem('pwa-installed', 'true');
               setShowIOSGuide(false);
               setIsVisible(false);
             }}
