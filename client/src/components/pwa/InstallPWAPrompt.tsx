@@ -10,11 +10,14 @@ interface BeforeInstallPromptEvent extends Event {
 
 const InstallPWAPrompt: React.FC = () => {
   // États du composant
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Forcer l'affichage pour tester
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isAndroid, setIsAndroid] = useState(false);
   const [showIOSGuide, setShowIOSGuide] = useState(false);
+  
+  // Log pour vérifier le chargement du composant
+  console.log('InstallPWAPrompt chargé, isVisible:', isVisible);
   
   // Détection des dispositifs
   useEffect(() => {
@@ -26,8 +29,22 @@ const InstallPWAPrompt: React.FC = () => {
       // Vérifier si c'est Android
       const isAndroidDevice = /Android/.test(navigator.userAgent);
       
-      setIsIOS(isAppleDevice);
-      setIsAndroid(isAndroidDevice);
+      // Logs pour le debug
+      console.log('Détection dispositif:', {
+        userAgent: navigator.userAgent,
+        isAppleDevice,
+        isAndroidDevice,
+        isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent)
+      });
+      
+      // Pour le test, simuler iOS sur tous les appareils mobiles
+      if (/Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        setIsIOS(true);
+        setIsAndroid(false);
+      } else {
+        setIsIOS(isAppleDevice);
+        setIsAndroid(isAndroidDevice);
+      }
     };
     
     checkDevice();
@@ -45,11 +62,21 @@ const InstallPWAPrompt: React.FC = () => {
       // Vérifier si on a déjà ignoré cette invite
       const hasUserDismissed = localStorage.getItem('pwa-dismissed');
       
-      // iOS n'a pas d'événement beforeinstallprompt, donc on vérifie
-      // si c'est iOS et si l'utilisateur n'a pas ignoré l'invite
-      if ((deferredPrompt || isIOS) && !hasUserDismissed) {
-        setIsVisible(true);
-      }
+      // Activer la bannière si l'événement beforeinstallprompt est déclenché
+      // (Android/Chrome) ou si c'est iOS
+      console.log('Activation de la bannière, conditions:', {
+        deferredPrompt: !!deferredPrompt,
+        isIOS,
+        hasUserDismissed: !!hasUserDismissed
+      });
+      
+      // Rendre la bannière visible quelle que soit la condition
+      setIsVisible(true);
+      
+      // Le code original qui sera restauré plus tard
+      // if ((deferredPrompt || isIOS) && !hasUserDismissed) {
+      //   setIsVisible(true);
+      // }
     };
     
     // Détecter iOS Stand-alone mode
@@ -71,7 +98,19 @@ const InstallPWAPrompt: React.FC = () => {
     
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     
-    // Vérifier spécifiquement pour iOS
+    // Vérifier spécifiquement pour iOS et forcer l'affichage pour le test
+    console.log('Vérification iOS:', isIOS);
+    
+    // Forcer l'affichage pour le test, que ce soit iOS ou non
+    setIsVisible(true);
+    
+    // Simulation pour le test
+    if (navigator.userAgent.toLowerCase().includes('mobile')) {
+      console.log('Appareil mobile détecté:', navigator.userAgent);
+      // Simuler un appareil iOS pour le test
+      setIsIOS(true);
+    }
+    
     if (isIOS) {
       checkIOSInstall();
     }
