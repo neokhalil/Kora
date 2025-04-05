@@ -2,6 +2,56 @@
  * Ajustements spécifiques pour l'affichage mobile (< 991px)
  * ITCSS - Niveau "Trumps" (priorité la plus élevée)
  */
+ 
+/* Correction essentielle pour permettre le défilement sur mobile et rendre le contenu visible */
+@media (max-width: 990px) {
+  /* Ajout d'un espace en bas des messages pour permettre le défilement */
+  .messages-container {
+    padding-bottom: 170px !important; /* Espace très généreux en bas pour permettre de défiler et voir tout le contenu */
+  }
+  
+  /* Conteneurs principaux de messages dans ChatAssistant */
+  .h-screen .flex-grow.overflow-hidden,
+  .overflow-hidden.flex-grow,
+  .flex-grow.h-full,
+  .flex.flex-col.h-screen .flex-grow,
+  .flex.flex-col.h-screen .overflow-hidden {
+    overflow-y: auto !important; /* Force le défilement vertical */
+    -webkit-overflow-scrolling: touch !important; /* Améliore le défilement tactile sur iOS */
+    height: auto !important; /* S'assure que le conteneur peut grandir */
+    max-height: calc(100vh - 150px) !important; /* Limite la hauteur pour éviter qu'il ne prenne tout l'écran */
+  }
+  
+  /* Styles additionnels pour les messages de ChatAssistant */
+  .px-4.py-2.mb-4 {
+    margin-bottom: 8px !important; /* Réduit l'espace entre les messages */
+  }
+  
+  /* Pour assurer que les longs messages sont complètement visibles */
+  .messages-list {
+    padding-bottom: 120px !important; /* Padding supplémentaire pour permettre le défilement */
+  }
+  
+  /* Assurer que tous les conteneurs de messages défilent correctement */
+  .overflow-y-auto, .overflow-y-scroll, .messages-list, .messages-container {
+    -webkit-overflow-scrolling: touch !important; /* Améliore le défilement tactile sur iOS */
+  }
+  
+  /* Fix spécifique pour le conteneur principal dans ChatAssistant.tsx */
+  .flex.flex-col.overflow-hidden.h-full,
+  .flex.flex-col.h-screen > .flex-grow,
+  .flex.flex-col.h-screen > div:nth-child(2) {
+    overflow-y: auto !important; /* Force le défilement vertical */
+    -webkit-overflow-scrolling: touch !important; /* Améliore le défilement tactile sur iOS */
+  }
+  
+  /* Pour s'assurer que le footer reste en bas et ne monte pas */
+  .footer-message {
+    position: absolute !important;
+    bottom: 2px !important;
+    z-index: 10 !important;
+  }
+}
 
 /* Centrage complet du texte de bienvenue sur mobile */
 @media (max-width: 990px) {
