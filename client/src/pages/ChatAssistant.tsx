@@ -144,40 +144,60 @@ const ChatAssistant: React.FC = () => {
     // car ça cause des problèmes sur mobile
   }, [messages, isThinking]);
   
-  // Fonction optimisée de défilement automatique uniquement après l'envoi d'un message
-  // pour s'assurer que le message utilisateur et les indicateurs de réflexion sont visibles
+  // Fonction avancée de défilement automatique après l'envoi d'un message
+  // avec positionnement précis pour s'assurer que le message et l'indicateur de réflexion
+  // sont toujours visibles au-dessus de la zone de composition sur mobile
   const scrollToSentMessage = () => {
-    if (messagesEndRef.current) {
-      // Rechercher le conteneur de messages scrollable
-      const scrollContainer = document.querySelector('.messages-container') as HTMLElement;
+    // Délai initial pour permettre au DOM de se mettre à jour avec le nouveau message
+    setTimeout(() => {
+      // Rechercher tous les éléments nécessaires
+      const messagesContainer = document.querySelector('.messages-container') as HTMLElement;
+      const composerElement = document.querySelector('.composer-container') as HTMLElement;
+      const lastMessage = document.querySelector('.messages-container > div:last-child') as HTMLElement;
       
-      // Utiliser un léger délai pour permettre au DOM de se mettre à jour
-      setTimeout(() => {
-        // Calculer la position à laquelle nous voulons défiler
-        // qui est juste avant la zone de composition pour que le dernier message soit visible
-        if (scrollContainer) {
-          // Trouver la hauteur du conteneur de messages
-          const containerHeight = scrollContainer.clientHeight;
-          // Trouver la position y du dernier élément
-          const lastMessagePosition = messagesEndRef.current.getBoundingClientRect().top;
-          // Calculer la position de défilement optimale
-          // qui laisse suffisamment d'espace pour voir le dernier message
-          const scrollPosition = scrollContainer.scrollTop + lastMessagePosition - containerHeight + 300;
+      if (messagesContainer && lastMessage) {
+        // Calculer la hauteur du composer
+        const composerHeight = composerElement ? composerElement.offsetHeight : 150;
+        
+        // Trouver la hauteur de la fenêtre visible
+        const viewportHeight = window.innerHeight;
+        
+        // Trouver la hauteur totale à défiler pour s'assurer que le message est visible 
+        // avec un espace supplémentaire au-dessus du composer
+        const paddingAboveComposer = 120; // Espace généreux au-dessus du composer
+        
+        // Déterminer si nous devons défiler et de combien
+        // Note: Cette approche force le défilement à une position qui montre toujours
+        // le dernier message avec suffisamment d'espace au-dessus du composer
+        const targetScrollPosition = messagesContainer.scrollHeight - viewportHeight + paddingAboveComposer;
+        
+        console.log('Défilement auto vers:', targetScrollPosition);
+        
+        // Défiler à la position calculée avec un comportement fluide
+        messagesContainer.scrollTo({
+          top: targetScrollPosition,
+          behavior: 'smooth'
+        });
+        
+        // Appliquer un second défilement après un délai plus long
+        // pour s'assurer que l'animation est terminée et les indicateurs de réflexion sont visibles
+        setTimeout(() => {
+          // Recalculer la position optimale pour s'assurer que les
+          // points de chargement (thinking indicator) sont visibles
+          const thinkingIndicator = document.querySelector('.messages-container > div:last-child') as HTMLElement;
           
-          // Défiler jusqu'à la position calculée
-          scrollContainer.scrollTo({
-            top: scrollPosition,
-            behavior: 'smooth'
-          });
-        } else {
-          // Fallback si le sélecteur ne fonctionne pas
-          messagesEndRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'end'
-          });
-        }
-      }, 100);
-    }
+          if (thinkingIndicator && messagesContainer) {
+            // Position finale avec marge supplémentaire
+            const finalScrollPosition = messagesContainer.scrollHeight - viewportHeight + (composerHeight + 50);
+            
+            messagesContainer.scrollTo({
+              top: finalScrollPosition,
+              behavior: 'smooth'
+            });
+          }
+        }, 500); // Délai plus long pour le second défilement
+      }
+    }, 150); // Délai initial accru pour s'assurer que le DOM est complètement mis à jour
   };
   
   // Mock sessionId pour le développement

@@ -5,9 +5,9 @@
  
 /* Correction essentielle pour permettre le défilement sur mobile et rendre le contenu visible */
 @media (max-width: 990px) {
-  /* Ajout d'un espace en bas des messages pour permettre le défilement */
+  /* Ajout d'un espace en bas des messages pour permettre le défilement et éviter que les derniers messages soient cachés sous la zone de composition */
   .messages-container {
-    padding-bottom: 170px !important; /* Espace très généreux en bas pour permettre de défiler et voir tout le contenu */
+    padding-bottom: 250px !important; /* Espace extrêmement généreux en bas pour garantir la visibilité et éviter les problèmes de défilement */
   }
   
   /* Conteneurs principaux de messages dans ChatAssistant */
@@ -29,7 +29,7 @@
   
   /* Pour assurer que les longs messages sont complètement visibles */
   .messages-list {
-    padding-bottom: 120px !important; /* Padding supplémentaire pour permettre le défilement */
+    padding-bottom: 250px !important; /* Padding supplémentaire pour permettre le défilement - aligné avec messages-container */
   }
   
   /* Assurer que tous les conteneurs de messages défilent correctement */
