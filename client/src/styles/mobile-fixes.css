@@ -31,15 +31,23 @@
     margin-right: auto !important;
   }
   
-  /* Réduction de l'espace excessif causé par les boutons d'action sur mobile */
+  /* Éliminer complètement l'espace causé par les boutons d'action sur mobile */
   .web-message-actions {
-    padding-bottom: 10px !important; /* Réduit considérablement l'espace sous les boutons d'action */
-    margin-top: 6px !important; /* Réduit l'espace au-dessus des boutons */
+    padding-bottom: 0 !important; /* Supprime tout espace en bas */
+    margin-top: 4px !important; /* Réduit l'espace au-dessus des boutons */
+    margin-bottom: 4px !important; /* Ajoute une petite marge en bas pour séparer du message suivant */
     gap: 6px !important; /* Réduit l'espace entre les boutons */
   }
   
+  /* Classe spécifique pour mobile dans ChatAssistant.tsx */
+  .action-buttons-container {
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+    padding: 0 !important;
+  }
+  
   /* Réduction de la taille des boutons d'action pour qu'ils prennent moins de place */
-  .web-action-button {
+  .web-action-button, .kora-action-button {
     padding: 5px 8px !important; /* Padding plus compact */
     font-size: 12px !important; /* Texte légèrement plus petit */
     border-radius: 14px !important; /* Coins plus arrondis pour un look plus compact */
@@ -50,7 +58,7 @@
     gap: 4px !important; /* Réduit davantage l'espace entre les messages */
   }
   
-  /* Réduction de l'espace vertical du contenu des messages */
+  /* S'assurer que les messages sur mobile sont bien compacts */
   .web-message {
     margin-bottom: 0 !important; /* Supprime la marge du bas entre les messages */
   }
