@@ -11,6 +11,62 @@
   left: 0 !important;
   right: 0 !important;
   height: 56px !important;
+  background-color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 16px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Style pour le header interne */
+#kora-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Groupe gauche contenant le menu et le titre */
+.header-left-group {
+  display: flex !important;
+  align-items: center !important;
+  height: 100% !important;
+}
+
+/* Bouton de menu - amélioration de la zone de clic */
+#kora-menu-button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px !important;
+  margin: 0 !important;
+  background: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  height: 40px !important;
+  width: 40px !important;
+}
+
+/* Container de l'icône de menu - ajuster position */
+.menu-icon-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 24px !important;
+  width: 24px !important;
+  line-height: 0 !important; /* Éviter le décalage vertical */
+}
+
+/* Titre KORA - ajustement vertical et espacement */
+#kora-header-title.kora-name {
+  display: flex !important;
+  align-items: center !important;
+  margin-left: 12px !important; /* Augmenter l'espace entre l'icône et le texte */
+  height: 100% !important;
+  line-height: 1 !important; /* Assurer une hauteur de ligne cohérente */
+  padding-bottom: 2px !important; /* Petit ajustement pour équilibrer visuellement */
+  transform: translateY(-1px) !important; /* Décalage subtil vers le haut */
 }
 
 /* 
