@@ -7,7 +7,7 @@
 @media (max-width: 990px) {
   /* Ajout d'un espace en bas des messages pour permettre le défilement et éviter que les derniers messages soient cachés sous la zone de composition */
   .messages-container {
-    padding-bottom: 250px !important; /* Espace extrêmement généreux en bas pour garantir la visibilité et éviter les problèmes de défilement */
+    padding-bottom: 300px !important; /* Espace encore plus généreux en bas pour garantir la visibilité et éviter les problèmes de défilement */
   }
   
   /* Conteneurs principaux de messages dans ChatAssistant */
@@ -29,7 +29,7 @@
   
   /* Pour assurer que les longs messages sont complètement visibles */
   .messages-list {
-    padding-bottom: 250px !important; /* Padding supplémentaire pour permettre le défilement - aligné avec messages-container */
+    padding-bottom: 300px !important; /* Padding supplémentaire pour permettre le défilement - aligné avec messages-container */
   }
   
   /* Assurer que tous les conteneurs de messages défilent correctement */
@@ -45,11 +45,16 @@
     -webkit-overflow-scrolling: touch !important; /* Améliore le défilement tactile sur iOS */
   }
   
-  /* Pour s'assurer que le footer reste en bas et ne monte pas */
+  /* Pour s'assurer que le footer reste en bas et ne monte pas, avec plus d'espace sur mobile */
   .footer-message {
     position: absolute !important;
-    bottom: 2px !important;
+    bottom: 8px !important; /* Plus d'espace entre la fin du composer et le texte */
     z-index: 10 !important;
+    padding-top: 16px !important; /* Padding augmenté pour créer plus d'espace */
+    margin-top: 16px !important; /* Marge augmentée pour créer plus d'espace */
+    font-size: 11px !important; /* Texte légèrement plus petit pour un aspect plus élégant */
+    opacity: 0.8 !important; /* Légère transparence pour un aspect plus subtil */
+    color: #777777 !important; /* Couleur plus foncée pour un meilleur contraste */
   }
 }
 

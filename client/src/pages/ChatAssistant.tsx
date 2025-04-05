@@ -916,9 +916,9 @@ const ChatAssistant: React.FC = () => {
                 {/* 
                   Note: Le spacer dynamique a été complètement supprimé en faveur
                   d'une approche plus simple utilisant:
-                  - Un padding-bottom fixe de 250px
+                  - Un padding-bottom fixe de 300px
                   - Défini dans mobile-fixes.css sur .chat-messages-container
-                  - Aucun JavaScript n'est nécessaire pour cette solution
+                  - Fonction scrollToSentMessage intelligente pour défilement automatique
                   - Les boutons d'action sont désormais activés sur mobile
                 */}
                 
