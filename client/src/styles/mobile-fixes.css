@@ -30,19 +30,4 @@
     margin-left: auto !important;
     margin-right: auto !important;
   }
-  
-  /* Augmentation de l'espace entre les messages et le bas pour éviter que les messages soient cachés */
-  .web-question-container {
-    bottom: 50px !important; /* Augmenté de 32px à 50px pour garantir la visibilité complète des messages */
-  }
-  
-  /* Ajout d'espace sous le dernier message pour s'assurer qu'il est entièrement visible */
-  .messages-container {
-    padding-bottom: 1.5rem !important; /* Augmenté de 1rem à 1.5rem */
-  }
-  
-  /* S'assurer que la liste des messages a un meilleur espacement */
-  .messages-list {
-    padding-bottom: 1rem !important; /* Ajout d'un padding supplémentaire */
-  }
 }
