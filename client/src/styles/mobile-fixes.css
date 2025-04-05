@@ -45,16 +45,17 @@
     -webkit-overflow-scrolling: touch !important; /* Améliore le défilement tactile sur iOS */
   }
   
-  /* Pour s'assurer que le footer reste en bas et ne monte pas, avec plus d'espace sur mobile */
+  /* Styles pour le footer qui est maintenant en dehors du composer */
   .footer-message {
-    position: absolute !important;
-    bottom: 8px !important; /* Plus d'espace entre la fin du composer et le texte */
+    position: relative !important; /* Changé à relative car il est maintenant en dehors du composer */
     z-index: 10 !important;
-    padding-top: 16px !important; /* Padding augmenté pour créer plus d'espace */
-    margin-top: 16px !important; /* Marge augmentée pour créer plus d'espace */
+    padding-top: 8px !important;
+    padding-bottom: 16px !important; /* Ajout d'un padding en bas pour l'espacement */
+    margin-top: 4px !important; /* Marge réduite car maintenant en dehors du composer */
     font-size: 11px !important; /* Texte légèrement plus petit pour un aspect plus élégant */
     opacity: 0.8 !important; /* Légère transparence pour un aspect plus subtil */
     color: #777777 !important; /* Couleur plus foncée pour un meilleur contraste */
+    background-color: #ffffff !important; /* Assure que le fond est blanc pour la lisibilité */
   }
 }
 

@@ -1179,11 +1179,11 @@ const ChatAssistant: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
-{/* Message d'information visible sous la zone de saisie */}
-              <div className="text-xs text-gray-500 text-center mt-1 w-full footer-message">
-                KORA, ton assistant IA pour réviser et faire tes exercices.
-              </div>
+            </div>
+            
+            {/* Message d'information visible sous la zone de saisie - déplacé en dehors du composer */}
+            <div className="text-xs text-gray-500 text-center mt-1 w-full footer-message px-4 max-w-4xl mx-auto">
+              KORA, ton assistant IA pour réviser et faire tes exercices.
             </div>
           </div>
         </div>
