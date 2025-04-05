@@ -39,6 +39,7 @@ import "./styles/components/welcome-desktop-fix.css"; // Solution pour l'écran 
 import "./styles/components/custom-fixes.css"; // Corrections CSS de haute priorité (spécificité maximale)
 import "./styles/desktop-fixes.css"; // Ajustements spécifiques pour desktop (≥ 991px)
 import "./styles/code-fixes.css"; // Correction des badges de langage pour les blocs de code
+import "./styles/pwa-install.css"; // Styles pour la bannière d'installation PWA
 
 // Appliquer les corrections de viewport mobile
 if (typeof window !== 'undefined') {

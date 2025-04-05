@@ -28,6 +28,7 @@ import VoiceRecorder from '@/components/VoiceRecorder';
 import ContentRenderer from '@/components/ui/ContentRenderer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { setupMobileViewportFix } from '@/lib/mobileViewportFix';
+import InstallPWAPrompt from '@/components/pwa/InstallPWAPrompt';
 
 // Define the message types
 interface ChallengeData {
@@ -833,6 +834,9 @@ const ChatAssistant: React.FC = () => {
   
   return (
       <div className="flex flex-col h-full max-w-4xl mx-auto">
+        {/* Bannière d'installation PWA (mobile uniquement) */}
+        {isMobileDevice && <InstallPWAPrompt />}
+        
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Zone des messages */}
           <div 
