@@ -96,11 +96,19 @@
     padding: 0 !important;
   }
   
-  /* Réduction de la taille des boutons d'action pour qu'ils prennent moins de place */
+  /* Ajustement des boutons d'action pour qu'ils correspondent au texte des réponses */
   .web-action-button, .kora-action-button {
-    padding: 5px 8px !important; /* Padding plus compact */
-    font-size: 12px !important; /* Texte légèrement plus petit */
-    border-radius: 14px !important; /* Coins plus arrondis pour un look plus compact */
+    padding: 6px 10px !important; /* Padding légèrement plus grand */
+    font-size: 14px !important; /* Taille de texte correspondant aux réponses */
+    border-radius: 14px !important; /* Coins arrondis pour un look cohérent */
+    line-height: 1.4 !important; /* Alignement vertical du texte */
+  }
+  
+  /* Augmentation de la taille des icônes dans les boutons */
+  .web-action-button svg, .kora-action-button svg {
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 4px !important;
   }
   
   /* Optimisation de l'espace entre les messages sur mobile */

@@ -144,9 +144,30 @@ const ChatAssistant: React.FC = () => {
     // car ça cause des problèmes sur mobile
   }, [messages, isThinking]);
   
-  // Suppression complète de la fonction de défilement automatique
-  // pour permettre à l'utilisateur de contrôler le défilement manuellement
-  // car le défilement automatique pose problème sur mobile
+  // Fonction optimisée de défilement automatique uniquement après l'envoi d'un message
+  // pour s'assurer que le message utilisateur et les indicateurs de réflexion sont visibles
+  const scrollToSentMessage = () => {
+    if (messagesEndRef.current) {
+      // Utiliser un léger délai pour permettre au DOM de se mettre à jour
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'end'
+        });
+        
+        // Léger décalage supplémentaire pour s'assurer que le message est bien visible
+        // malgré la zone de composition
+        setTimeout(() => {
+          // Calculer une hauteur de défilement supplémentaire pour éviter que le message
+          // soit caché par la zone de composition
+          window.scrollBy({
+            top: -60, // Défilement léger vers le haut pour voir le message et les indicateurs
+            behavior: 'smooth'
+          });
+        }, 300);
+      }, 100);
+    }
+  };
   
   // Mock sessionId pour le développement
   const [sessionId] = useState("session_dev_123456789");
@@ -321,6 +342,9 @@ const ChatAssistant: React.FC = () => {
     // Marquer comme "en train de réfléchir"
     setIsThinking(true);
     
+    // Défiler automatiquement pour voir le message utilisateur et les indicateurs de réflexion
+    scrollToSentMessage();
+    
     try {
       // Préparer les messages précédents pour le contexte de la conversation
       const messageHistory = messages.map(msg => ({
@@ -437,6 +461,9 @@ const ChatAssistant: React.FC = () => {
       // Afficher l'indicateur de réflexion
       setIsThinking(true);
       
+      // Défiler automatiquement pour voir le message utilisateur et les indicateurs de réflexion
+      scrollToSentMessage();
+      
       // Créer un FormData pour envoyer l'image
       const formData = new FormData();
       formData.append('image', selectedImage);
@@ -518,6 +545,9 @@ const ChatAssistant: React.FC = () => {
         sender: 'user',
       }]);
       
+      // Défiler automatiquement pour voir le message utilisateur et les indicateurs de réflexion
+      scrollToSentMessage();
+      
       // Appel API pour la réexplication
       const response = await fetch('/api/tutoring/reexplain', {
         method: 'POST',
@@ -593,6 +623,9 @@ const ChatAssistant: React.FC = () => {
         content: "Peux-tu me donner un exercice pour pratiquer?",
         sender: 'user',
       }]);
+      
+      // Défiler automatiquement pour voir le message utilisateur et les indicateurs de réflexion
+      scrollToSentMessage();
       
       // Appel API pour le défi
       const response = await fetch('/api/tutoring/challenge', {
