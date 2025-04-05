@@ -32,6 +32,8 @@
   display: flex !important;
   align-items: center !important;
   height: 100% !important;
+  gap: 2px !important; /* Espace minimal entre les éléments */
+  padding-left: 0 !important; /* Éliminer tout padding indésirable */
 }
 
 /* Bouton de menu - amélioration de la zone de clic */
@@ -39,13 +41,13 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 8px !important;
+  padding: 0 !important;
   margin: 0 !important;
   background: none !important;
   border: none !important;
   cursor: pointer !important;
-  height: 40px !important;
-  width: 40px !important;
+  height: 32px !important;
+  width: 32px !important;
 }
 
 /* Container de l'icône de menu - ajuster position */
@@ -62,11 +64,10 @@
 #kora-header-title.kora-name {
   display: flex !important;
   align-items: center !important;
-  margin-left: 12px !important; /* Augmenter l'espace entre l'icône et le texte */
+  margin-left: 4px !important; /* Réduire l'espace entre l'icône et le texte */
   height: 100% !important;
   line-height: 1 !important; /* Assurer une hauteur de ligne cohérente */
-  padding-bottom: 2px !important; /* Petit ajustement pour équilibrer visuellement */
-  transform: translateY(-1px) !important; /* Décalage subtil vers le haut */
+  transform: translateY(0) !important; /* Aligner verticalement avec l'icône */
 }
 
 /* 
