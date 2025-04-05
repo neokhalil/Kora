@@ -49,9 +49,9 @@
   .footer-message {
     position: relative !important; /* Changé à relative car il est maintenant en dehors du composer */
     z-index: 10 !important;
-    padding-top: 8px !important;
-    padding-bottom: 0px !important; /* Suppression du padding en bas */
-    margin-top: 4px !important; /* Marge réduite car maintenant en dehors du composer */
+    padding-top: 2px !important; /* Espace réduit entre le composer et le footer */
+    padding-bottom: 0px !important; /* Pas de padding en bas */
+    margin-top: 0px !important; /* Marge supérieure supprimée pour rapprocher du composer */
     font-size: 11px !important; /* Texte légèrement plus petit pour un aspect plus élégant */
     opacity: 0.8 !important; /* Légère transparence pour un aspect plus subtil */
     color: #777777 !important; /* Couleur plus foncée pour un meilleur contraste */
