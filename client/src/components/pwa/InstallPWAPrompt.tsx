@@ -37,14 +37,9 @@ const InstallPWAPrompt: React.FC = () => {
         isMobile: /Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent)
       });
       
-      // Pour le test, simuler iOS sur tous les appareils mobiles
-      if (/Mobile|Android|iPhone|iPad|iPod/.test(navigator.userAgent)) {
-        setIsIOS(true);
-        setIsAndroid(false);
-      } else {
-        setIsIOS(isAppleDevice);
-        setIsAndroid(isAndroidDevice);
-      }
+      // Détection correcte pour appareils mobiles
+      setIsIOS(isAppleDevice);
+      setIsAndroid(isAndroidDevice);
     };
     
     checkDevice();
@@ -101,15 +96,20 @@ const InstallPWAPrompt: React.FC = () => {
     // Vérifier spécifiquement pour iOS et forcer l'affichage pour le test
     console.log('Vérification iOS:', isIOS);
     
-    // Forcer l'affichage pour le test, que ce soit iOS ou non
-    setIsVisible(true);
+    // Vérifier si l'utilisateur a déjà refusé la bannière
+    const hasUserDismissed = localStorage.getItem('pwa-dismissed');
     
-    // Simulation pour le test
-    if (navigator.userAgent.toLowerCase().includes('mobile')) {
-      console.log('Appareil mobile détecté:', navigator.userAgent);
-      // Simuler un appareil iOS pour le test
-      setIsIOS(true);
+    // Afficher la bannière uniquement si l'utilisateur ne l'a pas refusée
+    if (!hasUserDismissed) {
+      setIsVisible(true);
+    } else {
+      console.log('Bannière masquée car déjà refusée par utilisateur');
     }
+    
+    // Détection réelle (sans simulation)
+    console.log('Appareil mobile détecté:', 
+      navigator.userAgent.toLowerCase().includes('mobile') ? 'Oui' : 'Non',
+      'Type:', isIOS ? 'iOS' : isAndroid ? 'Android' : 'Autre');
     
     if (isIOS) {
       checkIOSInstall();
