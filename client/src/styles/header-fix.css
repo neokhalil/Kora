@@ -62,12 +62,11 @@
 #kora-header-title.kora-name {
   display: flex !important;
   align-items: center !important;
-  margin-left: 8px !important; /* Réduire l'espace entre l'icône et le texte */
+  margin-left: 12px !important; /* Augmenter l'espace entre l'icône et le texte */
   height: 100% !important;
   line-height: 1 !important; /* Assurer une hauteur de ligne cohérente */
   padding-bottom: 2px !important; /* Petit ajustement pour équilibrer visuellement */
   transform: translateY(-1px) !important; /* Décalage subtil vers le haut */
-  font-weight: 500 !important; /* Légèrement plus gras pour améliorer la visibilité */
 }
 
 /* 
